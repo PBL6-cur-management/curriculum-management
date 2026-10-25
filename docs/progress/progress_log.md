@@ -223,3 +223,19 @@ Format:
 - F15-TC_001: “Phê duyệt cuối” hiện nhãn tiếng Việt cho `MISSING_SYLLABUS`/`SYLLABUS_INCOMPLETE` kèm điều kiện thiếu, thay mã thô.
 - F11-TC_026: `onPressEnter` của ô trọng số gọi `preventDefault()`; trước đó Enter bấm luôn nút “Hủy” mà xác nhận vừa focus. Giả thuyết Enter + blur gọi `commit` hai lần đã bị loại bằng ghi sự kiện DOM.
 - Bỏ `test.fixme` ba ca; suite F-11 (49) và F15-TC_001 Passed; Vitest outcomes/change-requests/syllabi 156/156; `tsc -b` sạch. Tổng tự động: 381/381 Passed.
+
+## [DUT-LEGACY-SEED] Hoàn tất seed CTĐT DUT và đồng bộ tài liệu V-01
+**Date**: 2026-10-23
+**Files changed**: `docs/architecture/database_and_models.md`, `docs/technical/technical_reference.md`, `docs/progress/{handoff,todo,current_work,progress_log}.md`, `docs/implement-report/dut-legacy-seed-implement-report.md`, `docs/implementation/dut-legacy-seed-implementation-plan.md`
+- Ghi nhận extractor/loader đã dựng và caller kiểm chứng trên PostgreSQL 18 ICU `vi-VN` dùng một lần, không phải `ctdt-dev-pg`: migrate deploy, base seed, demo seed và DUT seed đều thành công; DUT seed lần hai created 0 ở mọi loại.
+- SQL cho `CNTT-%`: 24 programs, 46 versions (19 ACTIVE + 22 HISTORICAL + 5 DRAFT), 3.295 items, 3.135 requisites, 156 elective groups, 38 CohortVersion links; không program nào có hơn một ACTIVE. Giữ ngày hiện hữu `2025-2026-1 = 2025-09-08`, không ghi đè bằng legacy `2025-08-04`.
+- Caller xác nhận typecheck exit 0, `vitest run prisma` 52 passed, extractor deterministic và sensitive-pattern grep trên JSON sạch. Lượt đồng bộ này chỉ sửa tám tài liệu, không chạy lại database/Prisma commands và không sửa `error_log.md` vì không có bug được sửa.
+- Còn việc của người dùng: xác nhận năm defaults DUT và nạp database riêng; seed không thay `1024034`/`DEMO*`, `KnowledgeBlock` hoặc các semester/cohort giữ chỗ đã tồn tại. Giữ nguyên các việc MVP khác còn mở trong snapshot và TODO.
+
+## [DUT-REAL-ENV] Tách extractor/loader và thêm môi trường dữ liệu thật
+**Date**: 2026-10-23
+**Files changed**: `source/backend/prisma/seed-data/dut/{extract,load,data}/`, `source/backend/prisma/seed-data/dut/dut-data.ts`, `source/backend/prisma/seed-dut.ts`, `source/backend/scripts/with-env.ts`, `source/backend/{.env.real.example,.gitignore,package.json,README.md}`, `docs/architecture/database_and_models.md`, `docs/technical/technical_reference.md`, `docs/progress/{handoff,current_work,progress_log}.md`, `docs/implement-report/dut-legacy-seed-implement-report.md`
+- Di chuyển DUT thành `extract/`, `load/`, `data/`; giữ modules dùng chung ở root, chỉ sửa import/JSON paths, giữ nguyên logic và hashes ba JSON.
+- Thêm runner `with-env.ts`, template ba overrides và scripts `real:migrate`, `real:seed`, `real:seed:dut`, `real:dev`; thiếu override file thì dừng, không fallback database mặc định và không có script demo cho môi trường thật. Tách database/files/queue prefix; Redis và port 3000 vẫn dùng chung mặc định.
+- Typecheck, Prettier check và type-aware oxlint exit 0; không chạy tsx, Vitest hoặc database/Prisma commands. Kết quả runtime V-01 là kết quả trước refactor, chưa chạy lại trong lượt này.
+- Người dùng tự tạo `.env.real`, tạo database ICU `vi-VN`, chạy `pnpm real:migrate; pnpm real:seed; pnpm real:seed:dut`; vẫn cần xác nhận năm defaults DUT. Không sửa spent plan hoặc các phần report lịch sử.

@@ -78,6 +78,25 @@ Lý do chọn và bảng phiên bản: `docs/design/tech-stack.md` §2 và §6. 
 - Seed: `pnpm prisma:seed` chạy `tsx prisma/seed.ts` (khai ở `migrations.seed` trong `prisma.config.ts`); `tsx` là phụ thuộc phát triển.
 - Không có cơ sở dữ liệu chạy sẵn thì migration có thể sinh bằng `prisma migrate diff --from-empty` (cách làm của `20261018141101_auth_session`); một thư mục migration rỗng làm `migrate deploy` lỗi P3015.
 
+### Usage Pattern — DUT legacy seed
+
+Chạy trong `source/backend`:
+
+| Script | Input / output | Điều kiện |
+|---|---|---|
+| `pnpm dut:extract` | Chạy `prisma/seed-data/dut/extract/extract.ts`, đọc sáu bảng curriculum/danh mục allow-listed trong legacy dump; ghi `catalog.json`, `programs.json`, `report.json` tại `prisma/seed-data/dut/data/` | Chỉ máy có legacy dump mới cần chạy; không chạm database |
+| `pnpm prisma:seed:dut` | Chỉ đọc `catalog.json`, `programs.json` đã sinh, nạp catalog và CTĐT; không đọc dump | Áp migrations và chạy `pnpm prisma:seed` trước; cần university/faculty và publisher R1 SYSTEM của base seed |
+
+Ba JSON tại `source/backend/prisma/seed-data/dut/data/` là **artefact duy nhất từ legacy dump được mang ra ngoài**: chỉ dữ liệu CTĐT và danh mục hỗ trợ, không có dữ liệu cá nhân hoặc credentials. Không sao chép markdown dump hay các bảng hồ sơ sinh viên/giảng viên; `report.json` phục vụ rà soát counts/codes và các record bị bỏ. Máy chạy loader chỉ cần JSON, không cần giữ dump. Các module đọc/nạp JSON nằm tại `prisma/seed-data/dut/load/`; `dut-data.ts` và `legacy-mapping.ts` ở root `dut/` để dùng chung cho extract/load. `DEFAULT_LEGACY_ROOT` vẫn tương đối với working directory `source/backend`, không phải vị trí module.
+
+Giữ database Playwright `ctdt-dev-pg` tách khỏi lượt thử DUT seed vì dữ liệu thêm có thể đổi counts/pagination. Base/demo seed không bị thay thế; ngày semester hiện hữu và program đã có được giữ nguyên. Chi tiết quy tắc ghi tại `docs/architecture/database_and_models.md` §Seed CTĐT DUT legacy.
+
+### Usage Pattern — Runner cho môi trường dữ liệu thật
+
+`tsx scripts/with-env.ts <env-file> <command> [args...]` dùng `dotenv.parse` và merge `{ ...process.env, ...fileValues }` (file thắng), rồi spawn một command string với `shell: true`, `stdio: 'inherit'`; trả child exit code, signal → 1. Thiếu args → usage / exit 2; thiếu tệp → thông báo sao chép `<env-file>.example` / exit 1, không fallback database. `dotenv/config` của child không ghi đè biến có sẵn; `@nestjs/config` cũng ưu tiên environment nên chỉ cần override các khóa khác mặc định.
+
+Người dùng tự sao chép `.env.real.example` thành `.env.real`: `DATABASE_URL` trỏ `ctdt_real`, `FILES_ROOT=files-real`, `BULLMQ_PREFIX=ctdt-real`; các biến khác kế thừa cấu hình mặc định. `.env.real` và `/files-real/` bị gitignore; các example vẫn có thể tracked. Chạy `pnpm real:migrate` → `pnpm real:seed` → `pnpm real:seed:dut`, rồi `pnpm real:dev`; không chạy demo seed trên database thật và không có `real:seed:demo`. Database phải dùng ICU `vi-VN`; Redis dùng chung nhưng queue prefix/tệp đính kèm tách riêng, port 3000 dùng chung trừ khi override thêm `PORT` nên mặc định chỉ chạy một app tại một thời điểm. Lệnh chi tiết ở `source/backend/README.md`.
+
 ---
 
 ## 4. HTTP, kiểm dữ liệu vào, OpenAPI

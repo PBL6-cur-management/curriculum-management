@@ -31,6 +31,17 @@ Một dòng cho mỗi tính năng; việc chi tiết (CV-xxx) ở `docs/planning
 | Chuỗi `mvp-flow.spec.ts` | ❌ | Chưa viết/chạy: CTĐT → khung → nhất quán → đề xuất → duyệt ba cấp → ban hành → kích hoạt; dự kiến `source/e2e/specs/mvp-flow.spec.ts` |
 | 378 ca thủ công | ❌ | Chưa thực hiện — `docs/testing/test-cases/README.md`; không gộp với 381 Passed tự động |
 
+## DUT legacy seed
+
+| Hạng mục | Trạng thái | Ghi chú |
+|---|---|---|
+| Extractor + loader dữ liệu CTĐT DUT | ✅ | Hoàn tất 2026-10-23; caller kiểm chứng migrate + base/demo/DUT seed trên PostgreSQL dùng một lần: 24 programs, 46 versions, 3.295 items, 3.135 requisites; lần hai created 0; `vitest run prisma` 52 passed; JSON deterministic và sensitive-pattern grep sạch — `docs/implement-report/dut-legacy-seed-implement-report.md` §V-01 |
+| Xác nhận `LoaiDK` | ❌ | Default 0 → `PRIOR`, 1 → `PREREQUISITE`, 2 → `COREQUISITE`; chờ Phòng Đào tạo |
+| Xác nhận degree level K2026 | ❌ | Default `BACHELOR`, riêng frame `1024046` → `ENGINEER`; chờ Khoa |
+| Xác nhận course-type mapping | ❌ | Default: `LoaiHP = 1` → `CONDITIONAL`, `LoaiHP = 3` → `LAB`, `DATN = 1` → `CAPSTONE`; không có giờ lý thuyết thì `ThucTap > 0` → `INTERNSHIP`, tiếp đến `DoAn > 0` → `PROJECT`; còn lại `THEORY` |
+| Xác nhận synthetic program codes | ❌ | Default `CNTT-*` theo program map; chờ mã chính thức của Khoa |
+| Xác nhận chính sách ngày semester legacy | ❌ | Default không ghi đè ngày hiện hữu; conflict `2025-2026-1` đã giữ `2025-09-08` thay vì legacy `2025-08-04` |
+
 ## B1 — Nền tảng và danh mục học phần
 
 | # | Item | Status | Notes |

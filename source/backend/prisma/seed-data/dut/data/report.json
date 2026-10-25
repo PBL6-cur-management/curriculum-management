@@ -1,0 +1,498 @@
+{
+  "malformedLines": {
+    "DHBK_CDS/TmNganh": 0,
+    "Data_SV1/TmNganh": 0,
+    "DHBK_CDS/tmKhungCT": 0,
+    "Data_SV1/tmKhungCT": 0,
+    "DHBK_CDS/tmHocPhan": 0,
+    "Data_SV1/tmHocPhan": 0,
+    "DHBK_CDS/tmHocphanDK": 0,
+    "Data_SV1/tmHocphanDK": 0,
+    "DHBK_CDS/tmKehoach": 0,
+    "Data_SV1/tmKehoach": 0,
+    "DHBK_CDS/DonVi": 0,
+    "Data_SV1/DonVi": 0
+  },
+  "missingCourseCodes": [
+    "1025050",
+    "1025060",
+    "1025070",
+    "1025080",
+    "1025090",
+    "1025100",
+    "1025110",
+    "1025120"
+  ],
+  "snapshotConflicts": {
+    "TenHP": 19,
+    "TenHP1": 2,
+    "SoTC": 0,
+    "KhoaPC": 12,
+    "LoaiHP": 0
+  },
+  "conflictingRelationPairs": 2,
+  "excludedRelationPairs": 12,
+  "cycleSkippedRelations": [],
+  "frames": [
+    {
+      "frameCode": "1024001",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 18,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 19,
+      "groupsCountMismatch": 1,
+      "declaredCompulsory": "157",
+      "summedCompulsory": "187"
+    },
+    {
+      "frameCode": "1024002",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 1,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 0,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "159",
+      "summedCompulsory": "161"
+    },
+    {
+      "frameCode": "1024003",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 0,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "157",
+      "summedCompulsory": "157"
+    },
+    {
+      "frameCode": "1024004",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 18,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 19,
+      "groupsCountMismatch": 1,
+      "declaredCompulsory": "157",
+      "summedCompulsory": "187"
+    },
+    {
+      "frameCode": "1024005",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 1,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 0,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "159",
+      "summedCompulsory": "161"
+    },
+    {
+      "frameCode": "1024006",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 0,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "157",
+      "summedCompulsory": "157"
+    },
+    {
+      "frameCode": "1024007",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 1,
+      "electiveRowsWithoutGroup": 20,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "122",
+      "summedCompulsory": "160"
+    },
+    {
+      "frameCode": "1024008",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 0,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "124",
+      "summedCompulsory": "124"
+    },
+    {
+      "frameCode": "1024009",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 0,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "122",
+      "summedCompulsory": "122"
+    },
+    {
+      "frameCode": "1024010",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 0,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "122",
+      "summedCompulsory": "122"
+    },
+    {
+      "frameCode": "1024011",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 6,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "122",
+      "summedCompulsory": "122"
+    },
+    {
+      "frameCode": "1024012",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 3,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "122",
+      "summedCompulsory": "122"
+    },
+    {
+      "frameCode": "1024013",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 4,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "122",
+      "summedCompulsory": "122"
+    },
+    {
+      "frameCode": "1024014",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 3,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "122",
+      "summedCompulsory": "122"
+    },
+    {
+      "frameCode": "1024015",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 0,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "122",
+      "summedCompulsory": "122"
+    },
+    {
+      "frameCode": "1024016",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 0,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "122",
+      "summedCompulsory": "122"
+    },
+    {
+      "frameCode": "1024017",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 0,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "122",
+      "summedCompulsory": "122"
+    },
+    {
+      "frameCode": "1024018",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 20,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 4,
+      "groupsCountMismatch": 1,
+      "declaredCompulsory": "157",
+      "summedCompulsory": "157"
+    },
+    {
+      "frameCode": "1024019",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 6,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 7,
+      "groupsCountMismatch": 1,
+      "declaredCompulsory": "157",
+      "summedCompulsory": "157"
+    },
+    {
+      "frameCode": "1024020",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 18,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 19,
+      "groupsCountMismatch": 1,
+      "declaredCompulsory": "157",
+      "summedCompulsory": "187"
+    },
+    {
+      "frameCode": "1024021",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 1,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 0,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "159",
+      "summedCompulsory": "161"
+    },
+    {
+      "frameCode": "1024022",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 0,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "157",
+      "summedCompulsory": "157"
+    },
+    {
+      "frameCode": "1024023",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 6,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "122",
+      "summedCompulsory": "122"
+    },
+    {
+      "frameCode": "1024024",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 8,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "122",
+      "summedCompulsory": "122"
+    },
+    {
+      "frameCode": "1024025",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 6,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "122",
+      "summedCompulsory": "122"
+    },
+    {
+      "frameCode": "1024026",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 7,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "122",
+      "summedCompulsory": "122"
+    },
+    {
+      "frameCode": "1024027",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 20,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 4,
+      "groupsCountMismatch": 1,
+      "declaredCompulsory": "157",
+      "summedCompulsory": "157"
+    },
+    {
+      "frameCode": "1024028",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 20,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 6,
+      "groupsCountMismatch": 1,
+      "declaredCompulsory": "157",
+      "summedCompulsory": "157"
+    },
+    {
+      "frameCode": "1024029",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 20,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 3,
+      "groupsCountMismatch": 1,
+      "declaredCompulsory": "157",
+      "summedCompulsory": "157"
+    },
+    {
+      "frameCode": "1024030",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 20,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 5,
+      "groupsCountMismatch": 1,
+      "declaredCompulsory": "157",
+      "summedCompulsory": "157"
+    },
+    {
+      "frameCode": "1024031",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 18,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 19,
+      "groupsCountMismatch": 1,
+      "declaredCompulsory": "157",
+      "summedCompulsory": "187"
+    },
+    {
+      "frameCode": "1024032",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 0,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "159",
+      "summedCompulsory": "161"
+    },
+    {
+      "frameCode": "1024033",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 0,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "157",
+      "summedCompulsory": "157"
+    },
+    {
+      "frameCode": "1024034",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 6,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "122",
+      "summedCompulsory": "122"
+    },
+    {
+      "frameCode": "1024035",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 8,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "122",
+      "summedCompulsory": "122"
+    },
+    {
+      "frameCode": "1024036",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 6,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "122",
+      "summedCompulsory": "122"
+    },
+    {
+      "frameCode": "1024037",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 7,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "122",
+      "summedCompulsory": "122"
+    },
+    {
+      "frameCode": "1024038",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 18,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 4,
+      "groupsCountMismatch": 1,
+      "declaredCompulsory": "157",
+      "summedCompulsory": "157"
+    },
+    {
+      "frameCode": "1024039",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 18,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 6,
+      "groupsCountMismatch": 1,
+      "declaredCompulsory": "157",
+      "summedCompulsory": "157"
+    },
+    {
+      "frameCode": "1024040",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 18,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 3,
+      "groupsCountMismatch": 1,
+      "declaredCompulsory": "157",
+      "summedCompulsory": "157"
+    },
+    {
+      "frameCode": "1024041",
+      "rowsSkippedMissingCourse": 0,
+      "requisitesSkippedTargetOutside": 18,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 5,
+      "groupsCountMismatch": 1,
+      "declaredCompulsory": "157",
+      "summedCompulsory": "157"
+    },
+    {
+      "frameCode": "1024042",
+      "rowsSkippedMissingCourse": 4,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 0,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "150",
+      "summedCompulsory": "27"
+    },
+    {
+      "frameCode": "1024043",
+      "rowsSkippedMissingCourse": 5,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 0,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "150",
+      "summedCompulsory": "27"
+    },
+    {
+      "frameCode": "1024044",
+      "rowsSkippedMissingCourse": 4,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 0,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "150",
+      "summedCompulsory": "29"
+    },
+    {
+      "frameCode": "1024045",
+      "rowsSkippedMissingCourse": 4,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 0,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "150",
+      "summedCompulsory": "32"
+    },
+    {
+      "frameCode": "1024046",
+      "rowsSkippedMissingCourse": 4,
+      "requisitesSkippedTargetOutside": 0,
+      "requisitesSourceOutside": 0,
+      "electiveRowsWithoutGroup": 0,
+      "groupsCountMismatch": 0,
+      "declaredCompulsory": "150",
+      "summedCompulsory": "29"
+    }
+  ]
+}

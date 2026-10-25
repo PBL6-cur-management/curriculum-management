@@ -384,3 +384,12 @@ Quyền và vai trò (F-02, `prisma/seed-data/*`): đơn vị Trường → Khoa
 Chương trình mẫu (F-06, `prisma/seed-data/programs.ts`, gọi từ `seed.ts` sau `seedAccessControl`): chương trình `1024034` (Kỹ sư, Khoa CNTT) kèm một phiên bản Nháp; upsert theo `programCode`, chỉ tạo bản Nháp khi chương trình chưa có phiên bản nào nên chạy lại không đổi (kiểm bằng đầu-cuối và chạy `prisma db seed` hai lần: `Program` 1, `ProgramVersion` 1). **Tên, mã ngành và tổng tín chỉ là giá trị giữ chỗ** (Kỹ thuật máy tính, 7480106, 10 học kỳ, 150 = 140 + 10) cho đến khi đọc tệp Excel khung của Khoa (Q-11, F00-24).
 
 Học kỳ và khóa (F-15, gọi từ `seed.ts`): nạp học kỳ và khóa tuyển sinh **giữ chỗ** để ban hành chọn được; thay bằng lịch thật của Trường. Quyền: F-15 thêm hai mã, danh mục nay 43 quyền.
+
+### Seed CTĐT DUT legacy
+
+`pnpm prisma:seed:dut` chạy sau migration và `pnpm prisma:seed`, đọc JSON tại `prisma/seed-data/dut/data/` qua loader trong `prisma/seed-data/dut/load/`; extractor nằm ở `prisma/seed-data/dut/extract/`, hai module dùng chung ở root `dut/`. Môi trường dữ liệu thật dùng chuỗi `pnpm real:migrate` → `pnpm real:seed` → `pnpm real:seed:dut`; **không đổi schema hoặc thêm migration**. Seed ghi `OrgUnit`, `Course`, `CourseRelation`, `Semester`, `Cohort`, `Program`, `ProgramVersion`, `ElectiveGroup`, `CurriculumItem`, `CurriculumRequisite`, `CohortVersion`.
+
+- Unit/course/relation/semester/cohort đã có được giữ nguyên theo natural key; các upsert dùng `update: {}`. `Program` đã có `programCode` thì skip whole, không sửa versions hoặc khung; mỗi program mới được ghi trong một transaction.
+- Released versions sắp theo `Semester.startDate` thực tế trong database: bản cuối có ngày bắt đầu ≤ `todayDate()` là `ACTIVE`, bản cũ hơn `HISTORICAL`, bản tương lai `PENDING`; không có học kỳ bắt đầu thì `DRAFT`. Version number tăng `1.0`, `2.0`, …, nối `previousVersionId`. Legacy versions không ghim syllabus hoặc snapshots.
+- Ngày học kỳ legacy **không bao giờ ghi đè** ngày hiện hữu, kể cả null; summary báo khác biệt. Lượt kiểm chứng giữ `2025-2026-1` ở `2025-09-08`, không đổi thành `2025-08-04`.
+- Không thay `1024034`, `DEMO*`, `KnowledgeBlock` hoặc đề cương giữ chỗ. Kết quả caller kiểm chứng trên PostgreSQL 18 ICU `vi-VN` dùng một lần: 24 programs, 46 versions, 3.295 items, 3.135 requisites, 156 groups; chạy lần hai created 0. Không suy ra database của người dùng đã nạp; chi tiết tại `docs/implement-report/dut-legacy-seed-implement-report.md` §V-01.

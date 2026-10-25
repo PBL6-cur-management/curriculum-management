@@ -43,7 +43,19 @@ Biến sai kiểu hoặc thiếu giá trị bắt buộc thì ứng dụng dừn
 | `pnpm format` · `pnpm format:check`       | Prettier                                                                                                                                                                                                                                                                            |
 | `pnpm prisma:migrate`                     | Tạo và áp migration từ `prisma/schema.prisma`                                                                                                                                                                                                                                       |
 | `pnpm prisma:seed`                        | Nạp tài khoản R1, đơn vị, vai trò, quyền, chương trình mẫu, học kỳ và khóa (chạy lại an toàn)                                                                                                                                                                                       |
+| `pnpm real:migrate`                       | Áp migrations cho `ctdt_real` qua `.env.real`; thiếu tệp thì dừng |
+| `pnpm real:seed`                          | Chạy base seed trong môi trường dữ liệu thật |
+| `pnpm real:seed:dut`                      | Nạp JSON DUT vào database thật, không chạy demo seed |
+| `pnpm real:dev`                           | Chạy app với database, attachment folder và queue prefix riêng |
 | `pnpm services:up` · `pnpm services:down` | Bật · tắt PostgreSQL và Redis                                                                                                                                                                                                                                                       |
+
+## Dữ liệu thật (môi trường riêng)
+
+Trong `source/backend`, sao chép `.env.real.example` thành `.env.real` trên máy mình. Tệp này chỉ override `DATABASE_URL` sang database `ctdt_real`, `FILES_ROOT=files-real` và `BULLMQ_PREFIX=ctdt-real`; các biến khác vẫn lấy từ tệp môi trường mặc định. Không đưa `.env.real` hoặc tệp đính kèm vào git. Thiếu tệp override thì runner dừng, không tự dùng database mặc định.
+
+Database `ctdt_real` phải dùng ICU `vi-VN` như mục bên dưới. Tạo/migrate bằng `pnpm real:migrate`, rồi chạy lần lượt `pnpm real:seed` → `pnpm real:seed:dut`; khởi động bằng `pnpm real:dev`. Đây là chuỗi migrate → base seed → DUT seed, **không chạy `prisma:seed:demo` trên database thật**. JSON được đọc từ `prisma/seed-data/dut/data/`; không cần legacy dump trên máy chạy seed.
+
+Hai môi trường dùng chung Redis nhưng tách queue bằng prefix, tách tệp đính kèm bằng `files-real`. Cùng mặc định port 3000 nên chỉ chạy một app tại một thời điểm, trừ khi override thêm `PORT` trong `.env.real`. Không có script `real:seed:demo`.
 
 ## Cơ sở dữ liệu phải dùng quy tắc so sánh tiếng Việt
 

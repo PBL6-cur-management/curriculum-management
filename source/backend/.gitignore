@@ -3,5 +3,8 @@ dist/
 coverage/
 *.tsbuildinfo
 .env
+.env.*
+!.env.*example
 src/generated/
 /files/
+/files-real/
