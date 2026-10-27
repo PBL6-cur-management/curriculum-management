@@ -1,13 +1,30 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render } from '@testing-library/react';
-import { App } from 'antd';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { App, ConfigProvider } from 'antd';
 import type { ReactElement } from 'react';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { vi } from 'vitest';
-import type { VersionDetail, VersionRef } from './api/releases';
+import type {
+  CohortVersionList,
+  PinnedSyllabusComparison,
+  VersionComparison,
+  VersionDetail,
+  VersionRef,
+} from './api/releases';
 
 export const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status });
+
+export async function selectReleaseOption(label: string, option: string) {
+  const control = screen.getByLabelText(label);
+  fireEvent.mouseDown(control);
+  fireEvent.click(
+    await screen.findByText(option, {
+      selector: '.ant-select-item-option-content',
+    }),
+  );
+  fireEvent.keyDown(control, { key: 'Escape' });
+}
 
 export interface Write {
   method: string;
@@ -62,7 +79,11 @@ export function renderReleasePage(options: RenderOptions) {
       if (url === '/api/auth/me')
         return Promise.resolve(json(ME(options.permissions ?? [])));
       if (options.reads && url in options.reads)
-        return Promise.resolve(json(options.reads[url]));
+        return Promise.resolve(
+          options.reads[url] instanceof Response
+            ? options.reads[url].clone()
+            : json(options.reads[url]),
+        );
       return Promise.resolve(json({ message: 'Not found' }, 404));
     }),
   );
@@ -84,9 +105,11 @@ export function renderReleasePage(options: RenderOptions) {
         })
       }
     >
-      <App>
-        <RouterProvider router={router} />
-      </App>
+      <ConfigProvider theme={{ token: { motion: false } }}>
+        <App>
+          <RouterProvider router={router} />
+        </App>
+      </ConfigProvider>
     </QueryClientProvider>,
   );
   return { writes, reads, router };
@@ -99,6 +122,75 @@ export const SEMESTER = {
   termInYear: 2,
   startDate: '2027-01-18',
 };
+
+export const COHORT = { id: 'k1', cohortCode: 'K2026', intakeYear: 2026 };
+export function comparison(
+  patch: Partial<VersionComparison> = {},
+): VersionComparison {
+  const issued: VersionComparison['before'] = {
+    id: 'v1',
+    versionNumber: '1.0',
+    status: 'HISTORICAL',
+    decisionNumber: 'QD-1',
+    effectiveSemester: SEMESTER,
+  };
+  return {
+    programId: 'p1',
+    before: issued,
+    after: {
+      ...issued,
+      id: 'v2',
+      versionNumber: '2.0',
+      status: 'PENDING',
+      decisionNumber: 'QD-2',
+    },
+    sections: (
+      [
+        'INFO',
+        'CURRICULUM',
+        'ELECTIVE_GROUPS',
+        'PLOS',
+        'MATRICES',
+        'SYLLABI',
+      ] as const
+    ).map((key) => ({ key, title: key, rows: [] })),
+    ...patch,
+  };
+}
+export function syllabusComparison(): PinnedSyllabusComparison {
+  return {
+    programId: 'p1',
+    courseId: 'c1',
+    courseCode: 'IT001',
+    beforeVersionId: 'v1',
+    afterVersionId: 'v2',
+    before: { id: 'sy1', revisionNumber: 1, status: 'HISTORICAL' },
+    after: { id: 'sy2', revisionNumber: 2, status: 'PUBLISHED' },
+    sections: ['SYLLABUS', 'WEEKLY_CONTENT', 'CLO'].map((entityType) => ({
+      entityType,
+      title: entityType,
+      rows: [],
+    })),
+  };
+}
+export function cohortSchedule(
+  patch: Partial<CohortVersionList> = {},
+): CohortVersionList {
+  return {
+    programId: 'p1',
+    revision: 'a'.repeat(64),
+    assignments: [
+      {
+        id: 'a1',
+        cohort: COHORT,
+        version: comparison().before,
+        fromSemester: SEMESTER,
+        createdAt: '2026-01-01T00:00:00Z',
+      },
+    ],
+    ...patch,
+  };
+}
 
 export function versionRef(patch: Partial<VersionRef> = {}): VersionRef {
   return {

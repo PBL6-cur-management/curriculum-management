@@ -159,7 +159,7 @@ All endpoints are under `/api`; controller paths below omit `/api`. Scope in the
 | D11 | Initial release of a plain Draft is R1-only, checks once in its transaction and refuses second release; publish Draft syllabi, snapshot/pin, set decision and assignments. | US-071 AC5 and PB-03/04. | Treat a request copy as an initial version. |
 | D12 | R1-only correction creates an editable Draft with `correctionOfId`; issue with mandatory reason, minor number and same semester/status, move chosen cohorts; delete unissued Draft only. | PB-08/09 preserve both old and corrected history. | Update or delete the mistaken version in place. |
 | D13 | Extend F-06 history and add MH-47 read-only page with pinned curriculum/syllabus, decision and origin request link to approval history. | US-079 AC1–AC3; G-6 navigation. | Separate reimplementation of MH-22/25/31/32 displays. |
-| D14 | Keep REJECTED/WITHDRAWN working copies read-only. | The copy records precisely what was refused. | Invoke `WorkingCopyService.discard` at close. |
+| D14 | Xóa bản làm việc khi đề xuất chuyển sang REJECTED/WITHDRAWN bằng `WorkingCopyService.discard`, giữ hành vi hiện tại. | Người dùng quyết định 2026-10-25: diff từng thay đổi vẫn đọc được từ `ChangeItem`; giữ bản làm việc đã đóng chỉ thêm việc dọn dẹp mà không có nơi đọc. | Giữ bản làm việc REJECTED/WITHDRAWN ở chế độ chỉ đọc. |
 | D15 | Permit signed file additions to a PUBLISHED syllabus but never delete from non-Draft; request copies start with no attachments. | US-077 preserves signed revision identity. | Copy predecessor files to the new revision. |
 | D16 | Delete test-only `releaseVersionForTest` / `publishSyllabusForTest`; provide `releaseViaApi`. | E2E should exercise checks, locks, snapshots and state transitions. | Set ACTIVE/PUBLISHED directly in fixtures. |
 | D17 | Assert every existing non-Draft writer rejects PENDING, ACTIVE and HISTORICAL; correction exception applies only to its separate Draft. | BR-23, US-074 AC1. | Hide edit buttons while leaving writable API routes. |
@@ -1725,7 +1725,7 @@ Use fixtures to create a fully publishable syllabus and a semester BEFORE callin
 - Schema-only snapshot assertions are insufficient: mutate Course afterward and re-read the old program and syllabus.
 - Test a PENDING version before activation and again after, plus repeated processor invocation.
 - Count no duplicate approval/effective notification on retries and no partial fan-out on the third program's failure.
-- Reject and withdraw leave copy readable but not editable; no `WorkingCopyService.discard` call.
+- Từ chối/Thu hồi gọi `WorkingCopyService.discard` trong giao dịch đóng đề xuất để xóa bản làm việc; diff vẫn đọc được từ `ChangeItem`, không giữ bản làm việc chỉ đọc.
 
 **Verify**: run `pnpm test:e2e -- releases final-approval activation corrections curriculum consistency syllabi outcomes change-requests`; cover KB-037/038/039, KB-045, KB-055/056/057/058, NT-B4-01/05/06/10/12; `pnpm exec tsc --noEmit -p tsconfig.json`.
 
@@ -2139,6 +2139,8 @@ Build order: BE-01 → BE-02 → BE-03 → BE-04 → BE-05 → FE-01 → FE-02 �
 ---
 
 ## 8. Risks and open items
+
+Decided 2026-10-26 (user): confirm the built ChangeRequest.createdByAcademicOffice rule. Only requests created by the Academic Office may be released into an already-started semester; the flag is stored at creation. No code change.
 
 | Risk | Impact | Mitigation |
 |---|---|---|

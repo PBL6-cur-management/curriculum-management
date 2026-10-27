@@ -12,6 +12,7 @@ import { assertVersionWritePath } from '../../shared/releases/correction-access.
 import { AppException } from '../../shared/exception/app.exception.js';
 import type { PrismaService } from '../../shared/prisma/prisma.service.js';
 import { programEditState } from '../../shared/programs/program-target.js';
+import { isSemesterInRange } from '../../shared/curriculum/curriculum-row-rules.js';
 import {
   CURRICULUM_CONSTRAINT,
   CURRICULUM_ERRORS,
@@ -64,7 +65,7 @@ export function assertSemesterInRange(
   version: Pick<VersionRow, 'semesterCount'>,
   semester: number,
 ): void {
-  if (semester <= version.semesterCount) {
+  if (isSemesterInRange(version.semesterCount, semester)) {
     return;
   }
   const base = CURRICULUM_ERRORS.SEMESTER_OUT_OF_RANGE;

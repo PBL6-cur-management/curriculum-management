@@ -113,19 +113,49 @@ describe('CourseUsageReader.programsUsing', () => {
 
 describe('CourseUsageReader.inReleasedVersion', () => {
   it('looks only at versions that left Draft', async () => {
-    const { reader, findFirst } = curriculumReader([{ id: 'item' }]);
+    const { reader, findMany } = curriculumReader([{ courseId: 'course' }]);
     await expect(reader.inReleasedVersion('course')).resolves.toBe(true);
-    expect(findFirst).toHaveBeenCalledWith({
+    expect(findMany).toHaveBeenCalledWith({
       where: {
-        courseId: 'course',
+        courseId: { in: ['course'] },
         version: { status: { not: ProgramVersionStatus.DRAFT } },
       },
-      select: { id: true },
+      select: { courseId: true },
+      distinct: ['courseId'],
     });
   });
 
   it('is false with only Draft rows (no row matches)', async () => {
     const { reader } = curriculumReader([]);
     await expect(reader.inReleasedVersion('course')).resolves.toBe(false);
+  });
+
+  it('batches two courses into one query and returns only the released course', async () => {
+    const { reader, findMany } = curriculumReader([{ courseId: 'released' }]);
+    expect(await reader.releasedCourseIds(['released', 'draft'])).toEqual(
+      new Set(['released']),
+    );
+    expect(findMany).toHaveBeenCalledOnce();
+    expect(findMany.mock.calls[0][0].where.courseId).toEqual({
+      in: ['released', 'draft'],
+    });
+  });
+
+  it('does not query for an empty input', async () => {
+    const { reader, findMany } = curriculumReader([]);
+    expect(await reader.releasedCourseIds([])).toEqual(new Set());
+    expect(findMany).not.toHaveBeenCalled();
+  });
+
+  it('reads released ids through the supplied transaction', async () => {
+    const { reader, findMany } = curriculumReader([]);
+    const query = vi.fn().mockResolvedValue([{ courseId: 'active' }]);
+    expect(
+      await reader.releasedCourseIds(['active'], {
+        curriculumItem: { findMany: query },
+      } as never),
+    ).toEqual(new Set(['active']));
+    expect(findMany).not.toHaveBeenCalled();
+    expect(query).toHaveBeenCalledOnce();
   });
 });

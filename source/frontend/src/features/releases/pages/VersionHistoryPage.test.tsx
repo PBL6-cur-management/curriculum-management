@@ -1,21 +1,82 @@
-import { screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { renderReleasePage, versionRef } from '../testRender';
+import { comparison, renderReleasePage, versionRef } from '../testRender';
+import { VersionComparisonPage } from './VersionComparisonPage';
 import { VersionHistoryPage } from './VersionHistoryPage';
 
-function renderPage(versions: ReturnType<typeof versionRef>[]) {
+function renderPage(
+  versions: ReturnType<typeof versionRef>[],
+  permissions = ['program.view'],
+) {
   return renderReleasePage({
     path: '/programs/:programId/versions',
     entry: '/programs/p1/versions',
     element: <VersionHistoryPage />,
-    permissions: ['program.view'],
-    reads: { '/api/programs/p1/versions': { versions } },
+    permissions,
+    reads: {
+      '/api/programs/p1/versions': { versions },
+      '/api/programs/p1/version-comparison?beforeVersionId=v1&afterVersionId=v2':
+        comparison(),
+    },
+    extraRoutes: [
+      {
+        path: '/programs/:programId/version-comparison',
+        element: <VersionComparisonPage />,
+      },
+    ],
   });
 }
 
 afterEach(() => vi.unstubAllGlobals());
 
 describe('VersionHistoryPage (MH-46)', () => {
+  it('navigates a selected history pair to the comparison and back without writes', async () => {
+    const { router, writes } = renderPage(
+      [versionRef(), versionRef({ id: 'v2', versionNumber: '2.0' })],
+      ['program.view', 'version.compare'],
+    );
+    await screen.findByRole('button', { name: 'So sánh hai phiên bản' });
+    fireEvent.click(screen.getByLabelText('Chọn phiên bản 1.0'));
+    fireEvent.click(screen.getByLabelText('Chọn phiên bản 2.0'));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'So sánh hai phiên bản' }),
+    );
+    expect(await screen.findAllByText('Không thay đổi')).toHaveLength(6);
+    expect(router.state.location.search).toBe(
+      '?beforeVersionId=v1&afterVersionId=v2',
+    );
+    fireEvent.click(screen.getByRole('link', { name: '← Lịch sử phiên bản' }));
+    await screen.findByRole('heading', { name: 'Lịch sử phiên bản' });
+    expect(router.state.location.pathname).toBe('/programs/p1/versions');
+    expect(writes).toEqual([]);
+  });
+  it('requires exactly two issued selections and never displaces them with a third or Draft', async () => {
+    renderPage(
+      [
+        versionRef(),
+        versionRef({ id: 'v2', versionNumber: '2.0' }),
+        versionRef({ id: 'v3', versionNumber: '3.0' }),
+        versionRef({ id: 'd1', versionNumber: null, status: 'DRAFT' }),
+      ],
+      ['program.view', 'version.compare'],
+    );
+    const button = await screen.findByRole('button', {
+      name: 'So sánh hai phiên bản',
+    });
+    expect(button).toBeDisabled();
+    fireEvent.click(screen.getByLabelText('Chọn phiên bản 1.0'));
+    fireEvent.click(screen.getByLabelText('Chọn phiên bản 2.0'));
+    expect(button).toBeEnabled();
+    expect(screen.getByLabelText('Chọn phiên bản 3.0')).toBeDisabled();
+    expect(screen.getByLabelText('Chọn phiên bản Nháp')).toBeDisabled();
+  });
+  it('hides comparison selection without permission', async () => {
+    renderPage([versionRef()]);
+    await screen.findByRole('link', { name: '1.0' });
+    expect(
+      screen.queryByRole('button', { name: 'So sánh hai phiên bản' }),
+    ).not.toBeInTheDocument();
+  });
   it('lists each version with its decision, semester, cohorts and origin request, newest first as served', async () => {
     renderPage([
       versionRef({

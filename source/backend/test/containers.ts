@@ -9,6 +9,8 @@ const POSTGRES_IMAGE = 'postgres:18';
 const REDIS_IMAGE = 'redis:8';
 const VIETNAMESE_ICU_INIT_ARGS =
   '--locale-provider=icu --icu-locale=vi-VN --locale=C.UTF-8';
+// Every spec file runs its own app pool against this one server; the default 100 runs out.
+const TEST_MAX_CONNECTIONS = '300';
 
 // Created and migrated once per run by global-setup.ts; per-file databases are copies of it.
 export const ICU_TEMPLATE_DATABASE = 'ctdt_template';
@@ -30,7 +32,11 @@ export function startPostgresContainer({
 }: {
   vietnameseCollation: boolean;
 }) {
-  const container = new PostgreSqlContainer(POSTGRES_IMAGE);
+  const container = new PostgreSqlContainer(POSTGRES_IMAGE).withCommand([
+    'postgres',
+    '-c',
+    `max_connections=${TEST_MAX_CONNECTIONS}`,
+  ]);
   if (vietnameseCollation) {
     container.withEnvironment({
       POSTGRES_INITDB_ARGS: VIETNAMESE_ICU_INIT_ARGS,

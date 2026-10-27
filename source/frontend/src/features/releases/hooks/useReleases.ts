@@ -6,6 +6,16 @@ import { OUTCOME_QUERY_ROOT } from '../../../shared/outcomes/outcomeQueryRoot';
 import { RELEASE_OPTIONS_QUERY_ROOT } from '../../../shared/releases/semesters';
 import {
   createCohort,
+  fetchAssignmentPrograms,
+  fetchVersionComparison,
+  fetchPinnedSyllabusComparison,
+  fetchCohortVersions,
+  fetchAppliedCohortVersion,
+  assignCohortVersions,
+  updateCohortVersion,
+  type AssignmentProgramQuery,
+  type AssignCohortVersionsInput,
+  type UpdateCohortVersionInput,
   createSemester,
   discardCorrection,
   fetchReleaseCheck,
@@ -26,6 +36,34 @@ import {
 
 export const RELEASE_QUERY_ROOT = ['releases'] as const;
 export const RELEASE_QUERY_KEYS = {
+  assignmentPrograms: (query: AssignmentProgramQuery) =>
+    [...RELEASE_QUERY_ROOT, 'assignment-programs', query] as const,
+  comparison: (programId: string, before: string, after: string) =>
+    [...RELEASE_QUERY_ROOT, 'comparison', programId, before, after] as const,
+  syllabusComparison: (
+    programId: string,
+    courseId: string,
+    before: string,
+    after: string,
+  ) =>
+    [
+      ...RELEASE_QUERY_ROOT,
+      'syllabus-comparison',
+      programId,
+      courseId,
+      before,
+      after,
+    ] as const,
+  cohortVersions: (programId: string) =>
+    [...RELEASE_QUERY_ROOT, 'cohort-versions', programId] as const,
+  applied: (programId: string, cohortId: string, semesterId: string) =>
+    [
+      ...RELEASE_QUERY_ROOT,
+      'applied',
+      programId,
+      cohortId,
+      semesterId,
+    ] as const,
   check: (programId: string, versionId: string) =>
     [...RELEASE_QUERY_ROOT, 'check', programId, versionId] as const,
   history: (programId: string) =>
@@ -40,6 +78,84 @@ export const RELEASE_QUERY_KEYS = {
 const PROGRAM_ROOT = ['programs'] as const;
 const SYLLABUS_ROOT = ['syllabi'] as const;
 const CONSISTENCY_ROOT = ['consistency'] as const;
+
+export const COHORT_ASSIGNMENT_STALE_TIME_MS = 0;
+export function useAssignmentPrograms(query: AssignmentProgramQuery) {
+  return useQuery({
+    queryKey: RELEASE_QUERY_KEYS.assignmentPrograms(query),
+    queryFn: () => fetchAssignmentPrograms(query),
+  });
+}
+export function useVersionComparison(
+  programId: string,
+  before: string,
+  after: string,
+) {
+  return useQuery({
+    queryKey: RELEASE_QUERY_KEYS.comparison(programId, before, after),
+    queryFn: () => fetchVersionComparison(programId, before, after),
+    enabled: Boolean(programId && before && after),
+  });
+}
+export function usePinnedSyllabusComparison(
+  programId: string,
+  courseId: string,
+  before: string,
+  after: string,
+) {
+  return useQuery({
+    queryKey: RELEASE_QUERY_KEYS.syllabusComparison(
+      programId,
+      courseId,
+      before,
+      after,
+    ),
+    queryFn: () =>
+      fetchPinnedSyllabusComparison(programId, courseId, before, after),
+    enabled: Boolean(programId && courseId && before && after),
+  });
+}
+export function useCohortVersions(programId: string) {
+  return useQuery({
+    queryKey: RELEASE_QUERY_KEYS.cohortVersions(programId),
+    queryFn: () => fetchCohortVersions(programId),
+    enabled: Boolean(programId),
+    staleTime: COHORT_ASSIGNMENT_STALE_TIME_MS,
+  });
+}
+export function useAppliedCohortVersion(
+  programId: string,
+  cohortId: string,
+  semesterId: string,
+) {
+  return useQuery({
+    queryKey: RELEASE_QUERY_KEYS.applied(programId, cohortId, semesterId),
+    queryFn: () => fetchAppliedCohortVersion(programId, cohortId, semesterId),
+    enabled: Boolean(programId && cohortId && semesterId),
+    staleTime: COHORT_ASSIGNMENT_STALE_TIME_MS,
+  });
+}
+export function useAssignCohortVersions(programId: string) {
+  const invalidate = useInvalidateReleased();
+  return useMutation({
+    mutationFn: (body: AssignCohortVersionsInput) =>
+      assignCohortVersions(programId, body),
+    onSuccess: invalidate,
+    retry: false,
+  });
+}
+export function useUpdateCohortVersion(
+  programId: string,
+  assignmentId: string,
+) {
+  const invalidate = useInvalidateReleased();
+  return useMutation({
+    mutationFn: (body: UpdateCohortVersionInput) =>
+      updateCohortVersion(programId, assignmentId, body),
+    onSuccess: invalidate,
+    retry: false,
+  });
+}
 
 export function useReleaseCheck(programId: string, versionId: string) {
   return useQuery({

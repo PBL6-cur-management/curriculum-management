@@ -97,6 +97,24 @@ describe('withQuery', () => {
 });
 
 describe('file helpers', () => {
+  it('propagates an expired upload session instead of returning a batch', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            code: 'UNAUTHORIZED',
+            message: 'Phiên đăng nhập đã hết hạn.',
+          }),
+          { status: 401 },
+        ),
+      ),
+    );
+    await expect(sendForm('/imports', new FormData())).rejects.toMatchObject({
+      status: 401,
+      code: 'UNAUTHORIZED',
+    });
+  });
   it('sends a form without a Content-Type of its own', async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response('{"id":"a"}'));
     vi.stubGlobal('fetch', fetchMock);

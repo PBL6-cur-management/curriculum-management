@@ -481,7 +481,7 @@ Số liệu trong mục này được tính từ các bảng ở mục 3..8.
 | CV-257 | Màn hình đối sánh và xuất Excel | Giao diện | CV-256 | M | US-105 |
 | CV-258 | Phân bổ tín chỉ theo khối, học kỳ, loại học phần; đánh dấu khối lệch `requiredCredits` | Nghiệp vụ | CV-079 | S | US-106 |
 | CV-259 | Màn hình báo cáo phân bổ tín chỉ và xuất Excel | Giao diện | CV-258 | M | US-106 |
-| CV-260 | Xuất ma trận CLO–PLO và ma trận học phần–PLO ra Excel, có chú thích ô ghi đè | Tích hợp | CV-119 | M | US-107 |
+| CV-260 | Xuất ma trận CLO–PLO và ma trận học phần–PLO ra Excel, giữ trọng số số thực trực tiếp theo FR-41/BR-21, không I–R–M hay chú thích ghi đè (chốt 2026-10-26) | Tích hợp | CV-119 | M | US-107 |
 | CV-261 | Bộ xuất kiểm định của một phiên bản: khung, PLO, hai ma trận, phân bổ tín chỉ, đề cương kèm công thức điểm, trang lỗ hổng | Tích hợp | CV-096, CV-121, CV-258, CV-260 | L | US-108 |
 | CV-262 | Thống kê đề xuất theo trạng thái, loại, nguồn và thời gian xử lý trung bình từng cấp; giới hạn theo phạm vi | Nghiệp vụ | CV-147 | S | US-109 |
 | CV-263 | Màn hình thống kê đề xuất | Giao diện | CV-262 | M | US-109 |

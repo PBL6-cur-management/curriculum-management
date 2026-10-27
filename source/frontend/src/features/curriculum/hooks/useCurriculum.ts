@@ -10,6 +10,7 @@ import {
   deleteGroup,
   deleteItem,
   fetchCurriculum,
+  exportCurriculum,
   reorderSemester,
   replaceRequisites,
   updateGroup,
@@ -34,6 +35,10 @@ export function useCurriculum(versionId: string) {
     queryFn: () => fetchCurriculum(versionId),
     enabled: Boolean(versionId),
   });
+}
+
+export function useExportCurriculum(versionId: string) {
+  return useMutation({ mutationFn: () => exportCurriculum(versionId) });
 }
 
 // A row write changes totals, warnings and group credits; one refetch of the version is simpler than patching the cache.

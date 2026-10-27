@@ -117,7 +117,7 @@
 | MH-41 | Chi tiết đề xuất | R1 T, R2 P, R3 P, R4 P, R5 P | Xem một đề xuất: khác biệt trước và sau, tiến độ từng người duyệt, lịch sử, bình luận, hồ sơ | `ChangeRequest`, `ChangeItem`, `ApprovalStep`, `Comment`, `ChangeRequestDocument` | Mọi vai trò có quyền xem: đọc bảng so sánh, lịch sử phê duyệt theo từng lần gửi, bình luận. Người tạo: thu hồi (có hộp xác nhận). Người duyệt của cấp hiện tại: Đồng ý, Trả lại, Từ chối; hai thao tác sau đòi lý do từ 20 ký tự. R1: can thiệp ở cấp 1 và 2 kèm lý do; mở form chấp thuận cuối. R2: chỉ xem và bình luận | UC-39, UC-40, UC-41, UC-43, UC-44, UC-45 · FR-57, FR-58, FR-59, FR-60, FR-61, FR-62, FR-67 | B4 |
 | MH-42 | Hàng đợi chờ duyệt | R1 T, R3 P, R4 P | Danh sách đề xuất đang chờ chính người này xử lý | `ApprovalStep`, `ChangeRequest` | Sắp theo số ngày đã chờ; lọc theo loại; mở chi tiết. Từ B6: hiện cả đề xuất được ủy quyền và dấu quá hạn | UC-42 · FR-65, FR-66 | B4 |
 | MH-43 | Form chấp thuận cuối | R1 T | Phòng Đào tạo chấp thuận lần cuối và cung cấp thông tin ban hành | `ChangeRequest`, `ProgramVersion`, `Semester`, `Cohort`, `CohortVersion` | Nhập số quyết định, ngày ký, học kỳ hiệu lực, khóa áp dụng; xem danh sách chương trình sẽ sinh phiên bản mới; xác nhận (không hoàn tác) | UC-46, UC-49 · FR-69, FR-70 | B4 |
-| MH-44 | Thống kê đề xuất | R1 X, R2 X, R3 X, R4 X | Số đề xuất theo trạng thái, loại, nguồn và thời gian xử lý trung bình từng cấp | `ChangeRequest`, `ApprovalStep` | Chọn khoảng thời gian; lọc theo chương trình, nhóm chuyên môn; xem bảng số liệu | UC-83 · FR-107 | B6 |
+| MH-44 | Thống kê đề xuất | R1 X, R2 X, R3 P, R4 P | Số đề xuất theo trạng thái, loại, nguồn và thời gian xử lý trung bình từng cấp | `ChangeRequest`, `ApprovalStep` | Chọn khoảng thời gian; lọc theo chương trình, nhóm chuyên môn; xem bảng số liệu | UC-83 · FR-107 | B6 |
 
 ### 2.7. Nhóm G — Phiên bản
 
@@ -155,7 +155,7 @@
 |---|---|---|---|---|---|---|---|
 | MH-60 | Đối sánh hai chương trình | R1 X, R2 X, R3 X, R4 X | So hai chương trình: phần chung, phần riêng, cặp học phần tương đương | `CurriculumItem`, `ProgramVersion`, `EquivalentCourseGroup` | Chọn hai chương trình và phiên bản; xem ba danh sách; xuất Excel | UC-79 · FR-102 | B6 |
 | MH-61 | Phân bổ tín chỉ | R1 X, R2 X, R3 X, R4 X | Tín chỉ của một phiên bản chia theo khối kiến thức, học kỳ, loại học phần | `CurriculumItem`, `KnowledgeBlock`, `ProgramVersion` | Chọn chương trình và phiên bản; xem bảng; khối lệch yêu cầu được đánh dấu; xuất Excel | UC-80 · FR-103 | B6 |
-| MH-62 | Xuất hồ sơ kiểm định | R1 T, R2 P, R3 P | Xuất ma trận chuẩn đầu ra và bộ tài liệu kiểm định của một phiên bản | `ProgramVersion`, `PLO`, `CLOPLOMapping`, `CoursePLOMapping`, `Syllabus` | Chọn chương trình và phiên bản; chọn thành phần cần xuất; xuất ma trận ra Excel; xuất cả bộ | UC-81 · FR-43, FR-104 | B6 |
+| MH-62 | Xuất hồ sơ kiểm định | R1 T, R2 X, R3 P | Xuất ma trận chuẩn đầu ra và bộ tài liệu kiểm định của một phiên bản | `ProgramVersion`, `PLO`, `CLOPLOMapping`, `CoursePLOMapping`, `Syllabus` | Chọn chương trình và phiên bản; chọn thành phần cần xuất; xuất ma trận ra Excel; xuất cả bộ | UC-81 · FR-43, FR-104 | B6 |
 
 ---
 
@@ -208,7 +208,7 @@ Sinh từ cột Vai trò của mục 2. Dấu — nghĩa là vai trò không và
 | MH-41 | Chi tiết đề xuất | T | P | P | P | P | — |
 | MH-42 | Hàng đợi chờ duyệt | T | — | P | P | — | — |
 | MH-43 | Form chấp thuận cuối | T | — | — | — | — | — |
-| MH-44 | Thống kê đề xuất | X | X | X | X | — | — |
+| MH-44 | Thống kê đề xuất | X | X | P | P | — | — |
 | MH-45 | Ban hành phiên bản đầu tiên | T | — | — | — | — | — |
 | MH-46 | Lịch sử phiên bản | X | X | X | X | X | — |
 | MH-47 | Phiên bản chỉ đọc | X | X | X | X | X | — |
@@ -226,7 +226,7 @@ Sinh từ cột Vai trò của mục 2. Dấu — nghĩa là vai trò không và
 | MH-59 | Kết quả xét tốt nghiệp của tôi | — | — | — | — | — | X |
 | MH-60 | Đối sánh hai chương trình | X | X | X | X | — | — |
 | MH-61 | Phân bổ tín chỉ | X | X | X | X | — | — |
-| MH-62 | Xuất hồ sơ kiểm định | T | P | P | — | — | — |
+| MH-62 | Xuất hồ sơ kiểm định | T | X | P | — | — | — |
 |  | **Số màn hình vào được** | **56** | **31** | **41** | **34** | **25** | **12** |
 
 ---
@@ -316,7 +316,7 @@ Màn hình không có mục menu riêng, vào từ màn hình khác:
 | Báo cáo › Thống kê đề xuất | MH-44 Thống kê đề xuất | X | B6 | — |
 | Báo cáo › Đối sánh chương trình | MH-60 Đối sánh hai chương trình | X | B6 | — |
 | Báo cáo › Phân bổ tín chỉ | MH-61 Phân bổ tín chỉ | X | B6 | — |
-| Báo cáo › Xuất kiểm định | MH-62 Xuất hồ sơ kiểm định | P | B6 | — |
+| Báo cáo › Xuất kiểm định | MH-62 Xuất hồ sơ kiểm định | X | B6 | — |
 
 Màn hình không có mục menu riêng, vào từ màn hình khác:
 
@@ -355,7 +355,7 @@ Màn hình không có mục menu riêng, vào từ màn hình khác:
 | Nhập liệu › Lịch sử phiên nhập | MH-30 Lịch sử phiên nhập | X | B2 | — |
 | Đề xuất | MH-38 Danh sách đề xuất | P | B4 | MH-39, MH-41 |
 | Phê duyệt › Chờ tôi duyệt | MH-42 Hàng đợi chờ duyệt | P | B4 | MH-41 |
-| Báo cáo › Thống kê đề xuất | MH-44 Thống kê đề xuất | X | B6 | — |
+| Báo cáo › Thống kê đề xuất | MH-44 Thống kê đề xuất | P | B6 | — |
 | Sinh viên | MH-51 Danh sách sinh viên | X | B5 | MH-52 |
 | Sinh viên › Xét tốt nghiệp theo lô | MH-54 Xét tốt nghiệp theo lô | P | B5 | — |
 | Báo cáo › Đối sánh chương trình | MH-60 Đối sánh hai chương trình | X | B6 | — |
@@ -404,7 +404,7 @@ Màn hình không có mục menu riêng, vào từ màn hình khác:
 | Chương trình đào tạo | MH-21 Danh sách chương trình đào tạo | X | B2 | MH-22 |
 | Đề xuất | MH-38 Danh sách đề xuất | P | B4 | MH-39, MH-40, MH-41 |
 | Phê duyệt › Chờ tôi duyệt | MH-42 Hàng đợi chờ duyệt | P | B4 | MH-41 |
-| Báo cáo › Thống kê đề xuất | MH-44 Thống kê đề xuất | X | B6 | — |
+| Báo cáo › Thống kê đề xuất | MH-44 Thống kê đề xuất | P | B6 | — |
 | Báo cáo › Đối sánh chương trình | MH-60 Đối sánh hai chương trình | X | B6 | — |
 | Báo cáo › Phân bổ tín chỉ | MH-61 Phân bổ tín chỉ | X | B6 | — |
 

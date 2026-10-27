@@ -197,3 +197,18 @@ Trình duyệt ──/api/...──► (Vite proxy | Caddy) ──► NestJS
                                                    ├─ PrismaService ──► PostgreSQL 18 (ICU vi-VN)
                                                    └─ Queue ──► Redis 8 ──► Worker BullMQ
 ```
+
+## Nhập, xuất Excel (F-09)
+
+### Module và hàng đợi
+
+- `source/backend/src/features/imports/imports.module.ts` được AppModule nạp, đăng ký queue `imports`, hai controller nhập/xuất và ImportsProcessor. Đây là processor tiếp nối release-activation của F-15, không phải worker đầu tiên.
+- `source/backend/src/shared/queue/queue.module.ts` cấp cấu hình Redis và `BULLMQ_PREFIX` dùng chung. Job validate/commit có id `<name>-<batchId>`, 3 lần thử với exponential backoff 5 giây; kiểm trạng thái và đọc lại batch dưới khóa làm retry không ghi trùng.
+- `source/backend/src/features/imports/imports.processor.ts` đọc Excel, chạy thử không ghi nghiệp vụ, rồi kiểm lại và ghi toàn bộ trong một transaction khi chủ phiên xác nhận. Scheduler `imports-sweep` dùng upsertJobScheduler lúc 02:00 Asia/Ho_Chi_Minh: xóa tệp hết hạn 30 ngày và chuyển phiên đang xử lý quá 1 giờ sang ABORTED, không xóa lịch sử.
+- Khi shutdown, chờ tác vụ hiện tại tối đa 10 giây, đóng worker bằng close(true), rồi queue.getBackend().close(true). Đóng backend cưỡng bức trước hook queue tự động của Nest tránh chờ Redis QUIT vô hạn khi Redis mất; không bỏ grace hoặc thay đổi retry.
+
+### Quy tắc dùng chung và giao diện
+
+- `source/backend/src/shared/courses/course-owners.ts` tập trung kiểm đơn vị/nhóm sở hữu; `source/backend/src/shared/curriculum/curriculum-row-rules.ts` tập trung kiểm học kỳ và dữ liệu dòng. Luồng nhập tái sử dụng quy tắc với CRUD thay vì phụ thuộc service feature khác.
+- `source/frontend/src/shared/api/client.ts` cung cấp sendForm (multipart, cookie/CSRF, không tự đặt Content-Type) và downloadFile (tệp tải về, tên từ response). `source/frontend/src/features/imports/hooks/useImports.ts` chỉ polling VALIDATING/COMMITTING và làm mới cache liên quan khi quan sát COMMITTED.
+- Quyền đặt trên route; service kiểm loại nhập, phạm vi, trạng thái và chủ phiên. Chỉ nhập khung vào Nháp thông thường của chương trình chưa từng ban hành; không mở đường nhập vào Nháp của đề xuất/đính chính. Lịch sử vẫn đọc được khi tệp gốc hết hạn.

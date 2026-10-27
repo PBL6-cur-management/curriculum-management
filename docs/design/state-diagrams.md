@@ -31,7 +31,7 @@
 | 5 | `Syllabus` | `status` | 3 |
 | 6 | `Course` | `status` | 3 |
 | 7 | `ApprovalDelegation` | `status` | 3 |
-| 8 | `ImportBatch` | `status` | 3 |
+| 8 | `ImportBatch` | `status` | 5 |
 | 9 | `SyncLog` | `status` | 3 |
 | 10 | `ProgramEnrollment` | `status` | 3 |
 | 11 | `Student` | `status` | 4 |

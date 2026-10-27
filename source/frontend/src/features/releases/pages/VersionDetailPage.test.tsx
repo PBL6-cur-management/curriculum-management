@@ -34,6 +34,18 @@ function renderPage(
 afterEach(() => vi.unstubAllGlobals());
 
 describe('VersionDetailPage (MH-47)', () => {
+  it('opens elective groups in the same historical version context without inline editing', async () => {
+    renderPage(versionDetail({ status: 'HISTORICAL' }));
+    expect(
+      await screen.findByRole('link', { name: 'Nhóm tự chọn' }),
+    ).toHaveAttribute('href', '/programs/p1/versions/v1/elective-groups');
+    expect(
+      screen.queryByRole('button', { name: 'Lưu' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Sửa thông tin' }),
+    ).not.toBeInTheDocument();
+  });
   it('shows the name and credits the version was released with and links each syllabus to the revision it pins (US-079 AC3)', async () => {
     renderPage(versionDetail());
 

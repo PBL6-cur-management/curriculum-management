@@ -299,7 +299,7 @@
 - **Tiêu chí chấp nhận**
   1. **Cho** R3 được phân công chương trình A — **Khi** mở A và B — **Thì** sửa được A, chỉ xem được B.
   2. **Cho** phân công vừa hết hạn — **Khi** R3 lưu một thay đổi trên A — **Thì** máy chủ từ chối.
-  3. **Cho** một người vừa là R3 của A vừa là R5 của một nhóm — **Khi** làm việc — **Thì** quyền theo chương trình và quyền theo nhóm áp dụng độc lập.
+  3. **Cho** một người vừa là R3 của A vừa là R5 của một nhóm — **Khi** làm việc — **Thì** quyền theo chương trình và quyền theo nhóm áp dụng độc lập; sửa học phần theo `course.edit` toàn trường của R3 (F-04), còn sửa chương trình vẫn giới hạn theo phân công.
 - **Bao phủ:** FR-07 (đợt 2) · UC-06 · BR — · EC — · khác: NFR-09, M-7
 
 ### US-022 — Nhân bản chương trình cho khóa mới (đợt 1)
@@ -1306,7 +1306,7 @@
 - **Là** người chuẩn bị hồ sơ, **tôi muốn** xuất ma trận CLO–PLO và ma trận học phần–PLO ra Excel, **để** đưa vào hồ sơ mà không chép tay.
 - **Tiêu chí chấp nhận**
   1. **Cho** một phiên bản có ma trận — **Khi** xuất — **Thì** tệp có một trang ma trận học phần–PLO và một trang ma trận CLO–PLO, giá trị trùng với màn hình.
-  2. **Cho** ô ghi đè — **Khi** xuất — **Thì** ô mang giá trị ghi đè và có chú thích.
+  2. **Cho** ma trận dùng trọng số số thực trực tiếp — **Khi** xuất — **Thì** giữ đúng giá trị số như trên màn hình theo FR-41/BR-21, không đổi sang I–R–M và không tạo chú thích ghi đè (người dùng chốt 2026-10-26).
   3. **Cho** R3 — **Khi** xuất cho chương trình không được phân công — **Thì** máy chủ từ chối.
 - **Bao phủ:** FR-43 · UC-81 · BR-21 · EC — · khác: —
 
@@ -1316,7 +1316,7 @@
 - **Là** người chuẩn bị kiểm định, **tôi muốn** xuất một bộ tài liệu của một phiên bản chương trình trong một lần, **để** nộp cho đoàn kiểm định.
 - **Tiêu chí chấp nhận**
   1. **Cho** một phiên bản đã ban hành — **Khi** xuất bộ kiểm định — **Thì** nhận khung chương trình, danh sách PLO, hai ma trận, bảng phân bổ tín chỉ và danh sách đề cương kèm công thức điểm.
-  2. **Cho** phiên bản Lịch sử — **Khi** xuất — **Thì** nội dung là dữ liệu tại thời điểm ban hành của phiên bản đó.
+  2. **Cho** phiên bản Lịch sử — **Khi** xuất — **Thì** chỉ lõi đã đóng băng khi ban hành (tên học phần, tín chỉ, liên kết bản đề cương) là dữ liệu lịch sử; hồ sơ ghi rõ phần bổ sung nào dùng giá trị hiện tại, không cam kết phân loại/ngưỡng chưa được chụp là dữ liệu lúc ban hành (người dùng chốt 2026-10-26).
   3. **Cho** phiên bản còn lỗ hổng chuẩn đầu ra — **Khi** xuất — **Thì** vẫn xuất được, bộ tài liệu có trang liệt kê lỗ hổng.
   4. **Cho** mỗi lần xuất — **Khi** hoàn tất — **Thì** có một dòng nhật ký.
 - **Bao phủ:** FR-104 · UC-81 · BR-20 · EC-41 · khác: —

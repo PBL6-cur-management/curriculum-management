@@ -92,6 +92,7 @@ Device-side states (airplane mode, low storage) need no backend action.
 - [F-13 Đề xuất thay đổi — Test Cases](./test-cases/f-13-change-requests-test-cases.md)
 - [F-14 Duyệt ba cấp, bình luận, thông báo — Test Cases](./test-cases/f-14-three-level-approval-notifications-test-cases.md)
 - [F-15 Ban hành phiên bản — Test Cases](./test-cases/f-15-release-version-snapshots-test-cases.md)
+- [MVP Luồng xuyên tính năng — Test Cases](./test-cases/mvp-flow-test-cases.md)
 - [Playwright — hướng dẫn chạy và mở rộng pilot](./playwright-guide.md)
 - …
 

@@ -1,5 +1,13 @@
-import { Flex, Result, Skeleton, Table, Typography } from 'antd';
-import { generatePath, Link, useParams } from 'react-router';
+import { Button, Flex, Result, Skeleton, Table, Typography } from 'antd';
+import { useState } from 'react';
+import { generatePath, Link, useNavigate, useParams } from 'react-router';
+import { PERMISSIONS } from '../../../shared/auth/permissions';
+import { useCan } from '../../../shared/auth/useCan';
+import {
+  comparisonPath,
+  isIssuedVersion,
+  VERSION_COMPARISON_SELECTION_SIZE,
+} from '../utils/versionComparison';
 import { ROUTES } from '../../../routes';
 import { ApiError } from '../../../shared/api/client';
 import { versionLabel } from '../../../shared/constants/versionLabels';
@@ -12,6 +20,9 @@ import { formatDay } from '../utils/format';
 // MH-46: every version of a program, newest first, scoped like the program itself.
 export function VersionHistoryPage() {
   const { programId = '' } = useParams();
+  const canCompare = useCan(PERMISSIONS.versionCompare);
+  const navigate = useNavigate();
+  const [selected, setSelected] = useState<string[]>([]);
   const { data, isPending, error } = useVersionHistory(programId);
   if (isPending) return <Skeleton active />;
   if (!data) {
@@ -32,11 +43,45 @@ export function VersionHistoryPage() {
       <Typography.Title level={2} style={{ margin: 0 }}>
         Lịch sử phiên bản
       </Typography.Title>
+      {canCompare && (
+        <Button
+          type="primary"
+          disabled={selected.length !== VERSION_COMPARISON_SELECTION_SIZE}
+          onClick={() =>
+            void navigate(comparisonPath(programId, selected[0]!, selected[1]!))
+          }
+        >
+          So sánh hai phiên bản
+        </Button>
+      )}
+      <Typography.Text type="secondary">
+        Các khóa có dòng gán cho phiên bản này; xem màn hình gán khóa để xác
+        định theo học kỳ.
+      </Typography.Text>
       <Table<VersionRef>
         rowKey="id"
         size="small"
         pagination={false}
         dataSource={data.versions}
+        rowSelection={
+          canCompare
+            ? {
+                hideSelectAll: true,
+                selectedRowKeys: selected,
+                onChange: (keys) => {
+                  if (keys.length <= VERSION_COMPARISON_SELECTION_SIZE)
+                    setSelected(keys.map(String));
+                },
+                getCheckboxProps: (version) => ({
+                  disabled:
+                    !isIssuedVersion(version) ||
+                    (selected.length === VERSION_COMPARISON_SELECTION_SIZE &&
+                      !selected.includes(version.id)),
+                  'aria-label': `Chọn phiên bản ${versionLabel(version)}`,
+                }),
+              }
+            : undefined
+        }
         locale={{ emptyText: NO_VERSIONS }}
         columns={[
           {

@@ -25,6 +25,25 @@ function renderPage(
 afterEach(() => vi.unstubAllGlobals());
 
 describe('SemestersPage (MH-10)', () => {
+  it('links assignment management only with the assignment permission', async () => {
+    renderReleasePage({
+      path: '/semesters',
+      entry: '/semesters',
+      element: <SemestersPage />,
+      permissions: ['semester.manage', 'version.assignCohort'],
+      reads: { '/api/semesters': [], '/api/cohorts': [] },
+    });
+    expect(
+      await screen.findByRole('link', { name: 'Gán phiên bản cho khóa' }),
+    ).toHaveAttribute('href', '/cohort-versions');
+  });
+  it('does not expose assignment navigation to a semester manager without assignment permission', async () => {
+    renderPage();
+    await screen.findByText('K2026');
+    expect(
+      screen.queryByRole('link', { name: 'Gán phiên bản cho khóa' }),
+    ).not.toBeInTheDocument();
+  });
   it('lists semesters with their start dates (or none yet) and the cohorts', async () => {
     renderPage();
 

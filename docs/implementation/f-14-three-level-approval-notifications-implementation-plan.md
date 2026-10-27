@@ -79,13 +79,13 @@ Everything below in one table. Read this; the rest is detail for whoever builds 
 | Queue MH-42 | US-061 |
 | F-13's submit sets `levelEnteredAt` and notifies level-1 (or first pending) approvers | US-068 AC1; FR-63 |
 | `returnForTest` replaced by the real Return | F-13 §8 constraint |
+| Xóa bản làm việc khi Từ chối/Thu hồi | Đã quyết định bởi người dùng 2026-10-25: giữ `WorkingCopyService.discard` khi đóng đề xuất; diff vẫn lưu trong `ChangeItem` |
 
 | Out of scope | Deferred until |
 |---|---|
 | Final approval and release of data requests | F-15 |
 | E-mail, reminders | B6 |
 | Delegation | B6 |
-| Discarding the working copy of a rejected request | F-15 (§8 constraint) |
 
 | AC | Covered by |
 |---|---|

@@ -114,25 +114,27 @@ Câu hỏi còn mở của từng tính năng: `docs/planning/feature-questions.
 | B2 | F-06 Thông tin chương trình, Giám đốc CTĐT | EP-06 | US-018..022 | 21 | [f-06](f-06-programs-directors-implementation-plan.md) |
 | B2 | F-07 Khung chương trình, nhóm tự chọn | EP-07 | US-023..028 | 25 | [f-07](f-07-curriculum-elective-groups-implementation-plan.md) |
 | B2 | F-08 Kiểm tra nhất quán | EP-08 | US-029..031 | 11 | [f-08](f-08-consistency-check-implementation-plan.md) |
-| B2 | F-09 Nhập, xuất Excel | EP-09 | US-032..037 | 28 | [f-09](f-09-excel-import-export-implementation-plan.md) |
+| B2 | F-09 Nhập, xuất Excel | EP-09 | US-032..037 | 28 | [f-09](f-09-excel-import-export-implementation-plan.md) — Done BE + FE + browser walk 2026-10-26; còn 3 ca Manual và flake chooseOption |
 | B3 | F-10 Đề cương | EP-10 | US-038..041 | 17 | [f-10](f-10-syllabus-implementation-plan.md) |
 | B3 | F-11 PLO, CLO, ma trận | EP-11 | US-042..048 | 30 | [f-11](f-11-plo-clo-matrices-implementation-plan.md) |
-| B3 | F-12 Công thức điểm, đánh giá–CLO | EP-12 | US-049..052 | 17 | — |
+| B3 | F-12 Công thức điểm, đánh giá–CLO | EP-12 | US-049..052 | 17 | [f-12](f-12-grade-formula-assessment-clo-implementation-plan.md) |
 | B4 | F-13 Đề xuất thay đổi | EP-13 | US-053..060 | 42 | [f-13](f-13-change-requests-implementation-plan.md) |
 | B4 | F-14 Duyệt ba cấp, thông báo | EP-14 | US-061..070 | 37 | [f-14](f-14-three-level-approval-notifications-implementation-plan.md) |
 | B4 | F-15 Ban hành, ảnh chụp phiên bản | EP-15 | US-071..077 | 36 | [f-15](f-15-release-version-snapshots-implementation-plan.md) |
-| B4 | F-16 So sánh phiên bản, gán khóa | EP-16 | US-078..080 | 17 | — |
-| B4 | F-26 Sao lưu, diễn tập phục hồi | CV-187 | — | 2 | — |
-| B5 | F-17 Hồ sơ sinh viên, kết quả học tập | EP-17 | US-081..084 | 19 | — |
-| B5 | F-18 Điều kiện đăng ký học phần | EP-18 | US-085..086 | 10 | — |
-| B5 | F-19 Xét tốt nghiệp | EP-19 | US-087..091 | 23 | — |
-| B5 | F-20 Cổng sinh viên | EP-20 | US-092..097 | 22 | — |
-| B5 | F-21 API cho dDUT | EP-21 | US-098..101 | 17 | — |
-| B6 | F-22 Đồng bộ cơ sở dữ liệu Trường | EP-22 | US-102..104 | 22 | — |
-| B6 | F-23 Báo cáo kiểm định | EP-23 | US-105..109 | 16 | — |
-| B6 | F-24 Đồ thị, PDF, dòng thời gian, bảng sức khỏe | EP-24 | US-110..113 | 14 | — |
-| B6 | F-25 Ủy quyền, email, nhắc hạn | EP-25 | US-114..116 | 16 | — |
-| B6 | F-27 Triển khai, thử tải, theo dõi hoạt động | CV-249, CV-250 | — | 6 | — |
+| B4 | F-16 So sánh phiên bản, gán khóa | EP-16 | US-078..080 | 17 | [f-16](f-16-version-compare-cohort-assignment-implementation-plan.md) |
+| B4 | F-26 Sao lưu, diễn tập phục hồi | CV-187 | — | 2 | [f-26](f-26-backup-restore-drill-implementation-plan.md) — **hoãn, 2026-10-26** (người dùng); không xếp lịch |
+| B5 | F-17 Hồ sơ sinh viên, kết quả học tập | EP-17 | US-081..084 | 19 | [f-17](f-17-student-records-results-import-implementation-plan.md) |
+| B5 | F-18 Điều kiện đăng ký học phần | EP-18 | US-085..086 | 10 | [f-18](f-18-course-registration-eligibility-implementation-plan.md) |
+| B5 | F-19 Xét tốt nghiệp | EP-19 | US-087..091 | 23 | [f-19](f-19-graduation-review-implementation-plan.md) |
+| B5 | F-20 Cổng sinh viên | EP-20 | US-092..097 | 22 | [f-20](f-20-student-portal-implementation-plan.md) |
+| B5 | F-21 API cho dDUT | EP-21 | US-098..101 | 17 | [f-21](f-21-ddut-api-implementation-plan.md) |
+| B6 | F-22 Đồng bộ cơ sở dữ liệu Trường | EP-22 | US-102..104 | 22 | [f-22](f-22-school-db-sync-implementation-plan.md) |
+| B6 | F-23 Báo cáo kiểm định | EP-23 | US-105..109 | 16 | [f-23](f-23-accreditation-reports-implementation-plan.md) |
+| B6 | F-24 Đồ thị, PDF, dòng thời gian, bảng sức khỏe | EP-24 | US-110..113 | 14 | [f-24](f-24-graphs-pdf-timeline-health-implementation-plan.md) |
+| B6 | F-25 Ủy quyền, email, nhắc hạn | EP-25 | US-114..116 | 16 | [f-25](f-25-delegation-email-reminders-implementation-plan.md) |
+| B6 | F-27 Triển khai, thử tải, theo dõi hoạt động | CV-249, CV-250 | — | 6 | [f-27](f-27-deployment-load-test-monitoring-implementation-plan.md) — **hoãn, 2026-10-26** (người dùng); không xếp lịch |
+
+Các kế hoạch được người dùng chấp nhận với mặc định ngày 2026-10-26. F-09 đã xong BE + FE + browser walk (3 ca Manual còn nợ); F-16 FE đang triển khai, tiếp theo F-12 → F-17. F-26/F-27 hoãn, không xếp lịch.
 
 **MVP (chốt 2026-10-18, `docs/planning/epics.md` §0):** F-01..F-08, F-10, F-11, F-13, F-14, F-15 — 13 tính năng, 298 điểm. Làm trước; F-09, F-12, F-16, F-26 và B5, B6 làm sau MVP.
 
@@ -152,10 +154,11 @@ Thứ tự phụ thuộc đáng chú ý: F-02 cần `OrgUnit` của F-03 (CV-011
 - [F-13 Đề xuất thay đổi](f-13-change-requests-implementation-plan.md) — mã xong 2026-10-19; còn nợ đi thử bằng trình duyệt
 - [F-14 Duyệt ba cấp, thông báo](f-14-three-level-approval-notifications-implementation-plan.md) — mã xong 2026-10-19; còn nợ đi thử bằng trình duyệt
 - [F-15 Ban hành, ảnh chụp phiên bản](f-15-release-version-snapshots-implementation-plan.md) — mã xong 2026-10-19; còn nợ đi thử bằng trình duyệt
-- Mã MVP đã đủ (13 tính năng). Sau MVP: F-09 (đã có kế hoạch), F-12, F-16, F-26, rồi B5, B6.
+- [F-16 So sánh phiên bản, gán khóa](f-16-version-compare-cohort-assignment-implementation-plan.md) — FE đang triển khai; chưa hoàn tất.
+- Đã đủ 13 tính năng MVP và F-09 (14 tính năng có mã hoàn tất). Tiếp theo F-16 FE → F-12 → F-17; sau đó F-23 (cần F-12), F-25, F-24 → F-18 → F-19 → F-22 → F-20 → F-21. F-26/F-27 hoãn theo người dùng 2026-10-26, không xếp lịch.
 
 ### Completed
-- …
+- [F-09 Nhập, xuất Excel](f-09-excel-import-export-implementation-plan.md) — Done BE + FE + browser walk ngày 2026-10-26; 27 ca tự động Passed, 3 ca Manual F09-TC_015/016/025 chưa chạy; flake chooseOption vẫn theo dõi.
 
 ---
 

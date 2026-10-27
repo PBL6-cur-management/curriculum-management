@@ -169,6 +169,21 @@ const SemestersPage = lazy(() =>
     default: module.SemestersPage,
   })),
 );
+const VersionComparisonPage = lazy(() =>
+  import('./features/releases/pages/VersionComparisonPage').then((module) => ({
+    default: module.VersionComparisonPage,
+  })),
+);
+const PinnedSyllabusComparisonPage = lazy(() =>
+  import('./features/releases/pages/PinnedSyllabusComparisonPage').then(
+    (module) => ({ default: module.PinnedSyllabusComparisonPage }),
+  ),
+);
+const CohortVersionAssignmentsPage = lazy(() =>
+  import('./features/releases/pages/CohortVersionAssignmentsPage').then(
+    (module) => ({ default: module.CohortVersionAssignmentsPage }),
+  ),
+);
 const InitialReleasePage = lazy(() =>
   import('./features/releases/pages/InitialReleasePage').then((module) => ({
     default: module.InitialReleasePage,
@@ -211,6 +226,22 @@ const HealthPage = lazy(() =>
   })),
 );
 
+const ImportPage = lazy(() =>
+  import('./features/imports/pages/ImportPage').then((module) => ({
+    default: module.ImportPage,
+  })),
+);
+const ImportHistoryPage = lazy(() =>
+  import('./features/imports/pages/ImportHistoryPage').then((module) => ({
+    default: module.ImportHistoryPage,
+  })),
+);
+const ImportDetailPage = lazy(() =>
+  import('./features/imports/pages/ImportDetailPage').then((module) => ({
+    default: module.ImportDetailPage,
+  })),
+);
+
 export const router = createBrowserRouter([
   { path: ROUTES.login, element: <LoginPage /> },
   {
@@ -221,6 +252,30 @@ export const router = createBrowserRouter([
         element: <AppLayout />,
         children: [
           { index: true, element: <HomePage /> },
+          {
+            path: ROUTES.imports,
+            element: (
+              <RequirePermission code={PERMISSIONS.curriculumImportExportExcel}>
+                <ImportPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: ROUTES.importHistory,
+            element: (
+              <RequirePermission code={PERMISSIONS.curriculumImportExportExcel}>
+                <ImportHistoryPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: ROUTES.importDetail,
+            element: (
+              <RequirePermission code={PERMISSIONS.curriculumImportExportExcel}>
+                <ImportDetailPage />
+              </RequirePermission>
+            ),
+          },
           { path: ROUTES.account, element: <AccountPage /> },
           { path: ROUTES.health, element: <HealthPage /> },
           {
@@ -324,6 +379,38 @@ export const router = createBrowserRouter([
             element: (
               <RequirePermission code={PERMISSIONS.semesterManage}>
                 <SemestersPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: ROUTES.versionCompare,
+            element: (
+              <RequirePermission code={PERMISSIONS.versionCompare}>
+                <VersionComparisonPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: ROUTES.pinnedSyllabusCompare,
+            element: (
+              <RequirePermission code={PERMISSIONS.versionCompare}>
+                <PinnedSyllabusComparisonPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: ROUTES.cohortVersionAssignmentStart,
+            element: (
+              <RequirePermission code={PERMISSIONS.versionAssignCohort}>
+                <CohortVersionAssignmentsPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: ROUTES.cohortVersionAssignments,
+            element: (
+              <RequirePermission code={PERMISSIONS.versionAssignCohort}>
+                <CohortVersionAssignmentsPage />
               </RequirePermission>
             ),
           },

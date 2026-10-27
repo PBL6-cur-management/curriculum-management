@@ -264,7 +264,7 @@
 | KB-090 | Bảng sức khỏe gom mọi cảnh báo của một chương trình | HT | Chương trình có: lệch tổng tín chỉ, học kỳ trống, tiên quyết ngoài khung, PLO chưa có học phần đóng góp, học phần chưa có đề cương, học phần Ngừng mở lớp chưa có học phần thay thế | Mở bảng sức khỏe; bấm một dòng cảnh báo | Bảng hiện đủ sáu loại kèm số lượng; bấm một dòng thì tới đúng màn hình xử lý | BR-05, BR-20, EC-07, EC-12, EC-13, EC-41, EC-44 | US-113 | CV-277 |
 | KB-091 | Đối sánh ghép cặp học phần tương đương | HT | Hai chương trình có hai học phần khác mã nhưng cùng nhóm tương đương | Đối sánh hai chương trình | Hai học phần được ghép thành một cặp tương đương, không nằm ở mục "chỉ có ở một chương trình" | BR-09, EC-18 | US-105 | CV-277 |
 | KB-092 | Phân bổ tín chỉ cộng lại bằng tổng | HT | Một phiên bản có khung đầy đủ | Mở báo cáo phân bổ theo khối kiến thức, theo học kỳ, theo bắt buộc và tự chọn | Tổng các dòng của mỗi cách phân bổ bằng tổng tín chỉ tính được của khung | BR-03 | US-106 | CV-277 |
-| KB-093 | Xuất ma trận giữ nguyên thang mức đóng góp | HT | Phiên bản có ma trận theo thang I–R–M và một ô ghi đè | Xuất ma trận ra Excel | Giá trị trong tệp trùng với màn hình, đúng thang; ô ghi đè mang giá trị ghi đè và có chú thích | BR-21 | US-107 | CV-277 |
+| KB-093 | Xuất ma trận giữ nguyên trọng số số thực trực tiếp | HT | Phiên bản có ma trận dùng trọng số số thực trực tiếp theo FR-41/BR-21 | Xuất ma trận ra Excel | Giá trị số trong tệp trùng với màn hình; không đổi sang I–R–M hoặc tạo chú thích ghi đè (chốt 2026-10-26) | BR-21 | US-107 | CV-277 |
 | KB-094 | Bộ kiểm định nêu lỗ hổng chuẩn đầu ra | HT | Phiên bản đã ban hành còn một PLO chưa có học phần đóng góp | Xuất bộ báo cáo kiểm định | Vẫn xuất được; bộ tài liệu có trang liệt kê PLO đó | BR-20, EC-41 | US-108 | CV-277 |
 
 ---
@@ -435,7 +435,7 @@ Số yêu cầu theo loại phương pháp: Kiểm thử 9 · Rà soát 8 · Đo
 | BR-18 | Mỗi CLO thuộc về đúng một đề cương chi tiết học phần | KB-032, KB-035 | 2 |
 | BR-19 | Ma trận CLO–PLO được khai báo theo cặp (Chương trình đào tạo, Học phần), vì một học phần thuộc nhiều chương trình sẽ có bộ PLO khác nhau | KB-033 | 1 |
 | BR-20 | Mọi PLO phải được ít nhất một học phần trong khung chương trình đóng góp; nếu không, sinh cảnh báo | KB-034, KB-090, KB-094 | 3 |
-| BR-21 | Mức độ đóng góp dùng thang I–R–M (Introduce – Reinforce – Master) hoặc thang số 1–2–3 | KB-033, KB-093 | 2 |
+| BR-21 | Mức độ đóng góp dùng trọng số số thực trực tiếp theo FR-41/BR-21 (đối soát 2026-10-26) | KB-033, KB-093 | 2 |
 | BR-22 | Mỗi Chương trình đào tạo có tối đa một phiên bản Đang hiệu lực tại mỗi thời điểm | KB-038, KB-057 | 2 |
 | BR-23 | Phiên bản đã ban hành là bất biến | KB-039, KB-056 | 2 |
 | BR-24 | Số phiên bản theo định dạng `<Chính>.<Phụ>` — thay đổi khung chương trình hoặc PLO tăng số Chính; thay đổi đề cương hoặc công thức điểm tăng số Phụ | KB-055, KB-058 | 2 |

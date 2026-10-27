@@ -305,6 +305,10 @@ describe('semesters, cohorts and the first release (F-15)', () => {
 
     it('is Active at once when the semester has already begun, and replaces nothing before it (PB-04, KB-038)', async () => {
       const { programId, versionId } = await draft(1);
+      await createCohort(app, `K-UNSELECTED-${counter}`);
+      const mappingsBefore = await prisma.cohortVersion.findMany({
+        orderBy: { id: 'asc' },
+      });
 
       const released = await releaseViaApi(app, admin, {
         programId,
@@ -313,6 +317,9 @@ describe('semesters, cohorts and the first release (F-15)', () => {
       });
 
       expect(released.status).toBe('ACTIVE');
+      expect(
+        await prisma.cohortVersion.findMany({ orderBy: { id: 'asc' } }),
+      ).toEqual(mappingsBefore);
       const program = await admin.get(`/api/programs/${programId}`).expect(200);
       expect(program.body.currentVersion).toMatchObject({
         versionNumber: '1.0',

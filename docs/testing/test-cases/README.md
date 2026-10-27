@@ -10,11 +10,19 @@
 - [F-06 Thông tin chương trình, Giám đốc CTĐT](./f-06-programs-directors-test-cases.md)
 - [F-07 Khung chương trình, nhóm tự chọn](./f-07-curriculum-elective-groups-test-cases.md)
 - [F-08 Kiểm tra nhất quán](./f-08-consistency-check-test-cases.md)
+- [F-09 Nhập, xuất Excel](./f-09-excel-import-export-test-cases.md) — 30 ca: 27 tự động Passed ngày 10/26/26 (5 Playwright, 17 Backend e2e, 1 Backend unit, 4 Frontend unit); 3 Manual chưa chạy. TC_001 Passed nhưng Failed 1/2 lượt do flake chooseOption chưa sửa.
 - [F-10 Đề cương](./f-10-syllabus-test-cases.md)
 - [F-11 PLO, CLO, ma trận](./f-11-plo-clo-matrices-test-cases.md)
 - [F-13 Đề xuất thay đổi](./f-13-change-requests-test-cases.md)
 - [F-14 Duyệt ba cấp, bình luận, thông báo](./f-14-three-level-approval-notifications-test-cases.md)
 - [F-15 Ban hành phiên bản](./f-15-release-version-snapshots-test-cases.md)
+- [MVP Luồng xuyên tính năng](./mvp-flow-test-cases.md)
+
+- [F-16 So sánh phiên bản, gán khóa](./f-16-version-compare-cohort-assignment-test-cases.md) — 27 ca: 22 Automated (backend e2e/frontend unit; 5 ca Playwright), 5 Manual; chưa chạy, orchestrator điền kết quả browser walk.
+
+## Tổng kết thực thi theo chỉ mục
+
+Đếm trực tiếp các dòng TC trong 14 tài liệu tính năng ngày 2026-10-26: **789 ca = 408 tự động Passed + 381 thủ công chưa chạy**. F-09 bổ sung 30 ca (27 tự động Passed + 3 Manual); 13 tính năng MVP giữ 759 ca (381 Passed + 378 thủ công). Không cộng 9 auth setup, không đếm trùng các tầng automation của cùng TC. Năm ca MVP xuyên tính năng trong mvp-flow-test-cases.md đã Passed, được theo dõi riêng, không cộng vào tổng theo tính năng này.
 
 ## Mục đích và phạm vi
 

@@ -223,7 +223,7 @@ describe('corrections and signed attachments (US-076, US-077, MH-49)', () => {
   it('issues the correction as the next minor number: the corrected version becomes Historical and the cohorts follow (PB-09, KB-056)', async () => {
     const { programId, versionId } = await released();
     const cohort = await createCohort(app, `K-COR-${counter}`);
-    await prisma.cohortVersion.create({
+    const originalAssignment = await prisma.cohortVersion.create({
       data: {
         cohortId: cohort.id,
         programVersionId: versionId,
@@ -272,6 +272,16 @@ describe('corrections and signed attachments (US-076, US-077, MH-49)', () => {
       ).effectiveSemesterId,
     );
     const original = await read(programId, versionId);
+    expect(
+      await prisma.cohortVersion.findUniqueOrThrow({
+        where: { id: originalAssignment.id },
+      }),
+    ).toEqual({ ...originalAssignment, programVersionId: issued.id });
+    const retroactive = await admin
+      .get(`/api/programs/${programId}/cohorts/${cohort.id}/applied-version`)
+      .query({ semesterId: originalAssignment.fromSemesterId })
+      .expect(200);
+    expect(retroactive.body.assignment.version.id).toBe(issued.id);
     expect(original).toMatchObject({
       status: 'HISTORICAL',
       correctedBy: { id: draft.id, versionNumber: '1.1' },
@@ -325,7 +335,7 @@ describe('corrections and signed attachments (US-076, US-077, MH-49)', () => {
   it('leaves the cohorts on the corrected version when R1 asks it to', async () => {
     const { programId, versionId } = await released();
     const cohort = await createCohort(app, `K-KEEP-${counter}`);
-    await prisma.cohortVersion.create({
+    const originalAssignment = await prisma.cohortVersion.create({
       data: {
         cohortId: cohort.id,
         programVersionId: versionId,
@@ -347,6 +357,16 @@ describe('corrections and signed attachments (US-076, US-077, MH-49)', () => {
 
     expect(issued.cohorts).toEqual([]);
     expect((await read(programId, versionId)).cohorts).toHaveLength(1);
+    expect(
+      await prisma.cohortVersion.findUniqueOrThrow({
+        where: { id: originalAssignment.id },
+      }),
+    ).toEqual(originalAssignment);
+    const unchanged = await admin
+      .get(`/api/programs/${programId}/cohorts/${cohort.id}/applied-version`)
+      .query({ semesterId: originalAssignment.fromSemesterId })
+      .expect(200);
+    expect(unchanged.body.assignment.version.id).toBe(versionId);
   });
 
   it('keeps a Pending version Pending and leaves its request provenance on the correction', async () => {

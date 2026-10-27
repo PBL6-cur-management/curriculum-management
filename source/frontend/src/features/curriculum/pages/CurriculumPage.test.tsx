@@ -10,13 +10,17 @@ import { CurriculumPage } from './CurriculumPage';
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status });
 
-function renderPage(data: Curriculum = fixture(), status = 200, search = '') {
+function renderPage(
+  data: Curriculum = fixture(),
+  status = 200,
+  search = '',
+  permissions = ['changeRequest.create'],
+) {
   vi.stubGlobal(
     'fetch',
     vi.fn((input: RequestInfo | URL) => {
       const url = String(input);
-      if (url === '/api/auth/me')
-        return Promise.resolve(json({ permissions: ['changeRequest.create'] }));
+      if (url === '/api/auth/me') return Promise.resolve(json({ permissions }));
       if (url === '/api/program-versions/v1/curriculum')
         return Promise.resolve(json(status === 200 ? data : {}, status));
       return Promise.resolve(
@@ -63,6 +67,70 @@ Element.prototype.scrollIntoView = vi.fn();
 afterEach(() => vi.unstubAllGlobals());
 
 describe('CurriculumPage', () => {
+  it('requests the version export URL and displays a scoped refusal', async () => {
+    renderPage(fixture(), 200, '', ['curriculum.importExportExcel']);
+    const exportButton = await screen.findByRole('button', {
+      name: 'Xuất Excel',
+    });
+    const fetchMock = vi.mocked(fetch);
+    const original = fetchMock.getMockImplementation()!;
+    fetchMock.mockImplementation((input, init) =>
+      String(input).endsWith('/curriculum/export')
+        ? Promise.resolve(
+            json(
+              {
+                message: 'Chương trình ngoài phạm vi của bạn.',
+                code: 'OUT_OF_SCOPE',
+              },
+              403,
+            ),
+          )
+        : original(input, init),
+    );
+    fireEvent.click(exportButton);
+    expect(
+      await screen.findByText('Chương trình ngoài phạm vi của bạn.'),
+    ).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/program-versions/v1/curriculum/export',
+      expect.objectContaining({
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      }),
+    );
+  });
+  it('offers export and preselects the ordinary draft import when permitted', async () => {
+    renderPage(fixture(), 200, '', ['curriculum.importExportExcel']);
+    expect(
+      await screen.findByRole('button', { name: 'Xuất Excel' }),
+    ).toBeEnabled();
+    expect(screen.getByRole('link', { name: 'Nhập từ Excel' })).toHaveAttribute(
+      'href',
+      '/imports?type=CURRICULUM&versionId=v1',
+    );
+  });
+
+  it('keeps export on a released version and hides import', async () => {
+    const data = fixture();
+    data.version.status = 'ACTIVE';
+    renderPage(data, 200, '', ['curriculum.importExportExcel']);
+    expect(
+      await screen.findByRole('button', { name: 'Xuất Excel' }),
+    ).toBeEnabled();
+    expect(
+      screen.queryByRole('link', { name: 'Nhập từ Excel' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('hides Excel actions without the import export permission', async () => {
+    renderPage();
+    await screen.findByText('MAT101');
+    expect(
+      screen.queryByRole('button', { name: 'Xuất Excel' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: 'Nhập từ Excel' }),
+    ).not.toBeInTheDocument();
+  });
   it('lists the rows in TT order with every Excel column and the exact totals', async () => {
     renderPage();
     expect(

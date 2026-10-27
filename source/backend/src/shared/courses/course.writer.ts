@@ -1,10 +1,7 @@
 import {
   CourseStatus,
   CourseType,
-  OrgUnitStatus,
-  OrgUnitType,
   Prisma,
-  SubjectGroupStatus,
 } from '../../generated/prisma/client.js';
 import type { CourseRequestField } from '../change-requests/authored-item.types.js';
 import { CREDITS_PATTERN } from '../decimal/decimal.js';
@@ -15,6 +12,8 @@ import {
   COURSE_WRITE_ERRORS,
   OWNER_CONSTRAINT,
 } from './course-write.errors.js';
+
+import { ownerProblem, OWNER_PROBLEM } from './course-owners.js';
 
 type Db = PrismaService | Prisma.TransactionClient;
 
@@ -33,11 +32,7 @@ export async function assertCourseOwners(
   const faculty = await db.orgUnit.findUnique({
     where: { id: ownerFacultyId },
   });
-  if (
-    !faculty ||
-    faculty.unitType !== OrgUnitType.FACULTY ||
-    faculty.status !== OrgUnitStatus.ACTIVE
-  ) {
+  if (ownerProblem(faculty, null, false) === OWNER_PROBLEM.FACULTY_INVALID) {
     throw new AppException(COURSE_WRITE_ERRORS.OWNER_FACULTY_INVALID, [
       {
         field: 'ownerFacultyId',
@@ -49,11 +44,7 @@ export async function assertCourseOwners(
     const group = await db.subjectGroup.findUnique({
       where: { id: ownerGroupId },
     });
-    if (
-      !group ||
-      group.status !== SubjectGroupStatus.ACTIVE ||
-      group.facultyId !== ownerFacultyId
-    ) {
+    if (ownerProblem(faculty, group, true) === OWNER_PROBLEM.GROUP_INVALID) {
       throw new AppException(COURSE_WRITE_ERRORS.OWNER_GROUP_INVALID, [
         {
           field: 'ownerGroupId',
@@ -65,7 +56,7 @@ export async function assertCourseOwners(
   return {
     ownerFacultyId,
     ownerGroupId,
-    isForeign: faculty.unitCode !== HOME_FACULTY_CODE,
+    isForeign: faculty!.unitCode !== HOME_FACULTY_CODE,
   };
 }
 

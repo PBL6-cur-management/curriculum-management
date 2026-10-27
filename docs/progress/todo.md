@@ -1,6 +1,6 @@
 # Project TODO
 
-Legend: ✅ Done | 🔄 In Progress | ⚠️ Stub/Partial | ❌ Not Started
+Legend: ✅ Done | 🔄 In Progress | ⚠️ Stub/Partial | ❌ Not Started | ⏸️ Deferred (hoãn)
 
 ENTRY FORMAT: `| XX | Item description | ❌ | Short approach note — what the implementation should do |`
 
@@ -17,19 +17,21 @@ Một dòng cho mỗi tính năng; việc chi tiết (CV-xxx) ở `docs/planning
 | F-00 | Khung backend + frontend, trạng thái hệ thống | ✅ | `GET /api/health`, `HealthPage`; kiểm thử đơn vị và đầu-cuối |
 | C-01 | Thiết lập Claude Code + tài liệu dự án | ✅ | `.claude/`, `CLAUDE.md`, `docs/architecture`, `docs/progress` |
 | C-02 | Câu hỏi theo tính năng | ✅ | Trả lời 2026-10-18; câu trống nhận A; bốn trả lời khác A đã sửa vào tài liệu nguồn |
-| C-04 | Kế hoạch triển khai tính năng | ✅ | F-01..F-11, F-13, F-14, F-15 — đủ 13 kế hoạch MVP; tính năng sau MVP viết kế hoạch khi tới lượt |
+| C-04 | Kế hoạch triển khai tính năng | ✅ | Đủ 13 kế hoạch MVP; F-09 hoàn tất BE + FE + browser walk ngày 2026-10-26; F-16 FE đang triển khai → F-12 → F-17; F-26/F-27 hoãn |
 | C-03 | Sửa lỗi mẫu `claude-code-templates` | ❌ | Bốn lỗi; sửa ở mẫu và bản đang dùng cùng lúc; cần đồng ý |
 
-## Kiểm tra chức năng MVP
+## Kiểm tra chức năng MVP và F-09
 
 | Hạng mục | Trạng thái | Ghi chú |
 |---|---|---|
-| Tài liệu ca kiểm thử và kiểm tra chức năng tự động theo tính năng | ✅ | Đủ 13 tính năng, bảng 14 cột; đã chạy 2026-10-21/22: 759 ca = 381 tự động (381 Passed) + 378 thủ công chưa chạy; không đồng nghĩa toàn MVP đạt — `docs/testing/README.md`, `docs/testing/test-cases/README.md` |
+| Tài liệu ca kiểm thử và kiểm tra chức năng tự động theo tính năng | ✅ | 14 tính năng có mã hoàn tất; đếm từ chỉ mục: 789 ca = 408 tự động Passed + 381 thủ công chưa chạy (MVP 759/381/378 + F-09 30/27/3). Không đồng nghĩa toàn bộ nghiệm thu đã xong — `docs/testing/test-cases/README.md` |
 | Ba lỗi ứng dụng từ suite (F11-TC_063, F11-TC_026, F15-TC_001) | ✅ | Đã sửa 2026-10-22, ghi `docs/troubleshooting/error_log.md`; ba test bỏ `test.fixme`, Passed |
-| F-06 — quyết định US-021 AC3 | ❌ | Người dùng chọn sửa ma trận quyền hay tiêu chí “học phần ngoài nhóm → 403” — `docs/progress/handoff.md` §3.2 |
-| F-14 — quyết định bản làm việc | ❌ | Người dùng chọn xóa hay giữ khi Từ chối/Thu hồi; mã hiện xóa — `docs/implement-report/f-14-three-level-approval-notifications-implement-report.md:28`, `docs/implement-report/f-14-three-level-approval-notifications-implement-report.md:53` |
-| Chuỗi `mvp-flow.spec.ts` | ❌ | Chưa viết/chạy: CTĐT → khung → nhất quán → đề xuất → duyệt ba cấp → ban hành → kích hoạt; dự kiến `source/e2e/specs/mvp-flow.spec.ts` |
-| 378 ca thủ công | ❌ | Chưa thực hiện — `docs/testing/test-cases/README.md`; không gộp với 381 Passed tự động |
+| F-06 — quyết định US-021 AC3 | ✅ | Người dùng chốt 2026-10-25: sửa tiêu chí, giữ ma trận; sửa học phần trong G được, PATCH chương trình B không phân công trả 403 — `docs/progress/handoff.md` §3.2 |
+| F-14 — quyết định bản làm việc | ✅ | Người dùng chốt 2026-10-25: xóa khi Từ chối/Thu hồi bằng `WorkingCopyService.discard`; diff vẫn đọc từ `ChangeItem` — báo cáo F-14, phần quyết định bổ sung |
+| Chuỗi `mvp-flow.spec.ts` | ✅ | Caller chạy ngày 2026-10-25: lần 3 và 4 đều 14 Passed (9 setup + 5 ca MVP), 1.7 phút/lần; ghi Passed cho MVP-TC_001..005. Đã kiểm đường ban hành đầu tiên thành `ACTIVE` và bản từ duyệt ba cấp là `PENDING`; không bao gồm kích hoạt bản tương lai |
+| Kích hoạt bản 1.1 vào học kỳ tương lai | ❌ | Chưa bao phủ `PENDING → ACTIVE` qua `release-activation.processor.ts`; cần đúng ngày bắt đầu học kỳ với worker thật đang chạy, rồi kiểm đổi bản đang áp dụng |
+| Flake `chooseOption` trong MVP và F-09 | ⚠️ | `fixtures/select.ts:22`: trước qua curriculum.ts:27; ngày 10/26/26 cũng gặp F09-TC_001 qua spec F-09:22 (Loại dữ liệu vẫn aria-expanded=true, value rỗng sau 10 giây). Failed 1/2 lượt F-09, chưa sửa; Passed không chứng minh hết flake |
+| 381 ca thủ công | ❌ | MVP 378 + F-09 3 (F09-TC_015 sự cố DB thật, 016 NFR-05 đầy đủ, 025 tệp Khoa); kết quả tự động và 5 ca xuyên tính năng không thay thế — `docs/testing/test-cases/README.md` |
 
 ## DUT legacy seed
 
@@ -59,7 +61,7 @@ Một dòng cho mỗi tính năng; việc chi tiết (CV-xxx) ở `docs/planning
 | F-06 | Thông tin chương trình, Giám đốc CTĐT | 🔄 | Mã xong; Playwright 21/21 Passed. Còn migration `programs` + seed, thay dữ liệu 1024034, quyết định US-021 AC3 và ca thủ công. — `docs/implement-report/f-06-programs-directors-implement-report.md` |
 | F-07 | Khung chương trình, nhóm tự chọn | 🔄 | Mã xong; Playwright 26/26 Passed. Còn migration `curriculum` + seed, dữ liệu Excel/DEMO* và ca thủ công. — `docs/implement-report/f-07-curriculum-elective-groups-implement-report.md` |
 | F-08 | Kiểm tra nhất quán | 🔄 | Mã xong; Playwright 13/13 Passed. Còn migration `credit_mismatch_acceptance` trên máy người dùng và ca thủ công. — `docs/implement-report/f-08-consistency-check-implement-report.md` |
-| F-09 | Nhập, xuất Excel | ❌ | Sau MVP. ExcelJS trong worker; chạy thử → xác nhận |
+| F-09 | Nhập, xuất Excel | ✅ | Xong BE + FE + browser walk 2026-10-26; 27 ca tự động Passed, 3 Manual chưa chạy; TC_001 Failed 1/2 lượt do flake chooseOption chưa sửa. Mẫu mặc định nhãn SRS 4.3; còn nợ file Excel thật của Khoa — `docs/implement-report/f-09-excel-import-export-implement-report.md` |
 
 ## B3 — Đề cương và chuẩn đầu ra
 
@@ -67,7 +69,7 @@ Một dòng cho mỗi tính năng; việc chi tiết (CV-xxx) ở `docs/planning
 |---|---|---|---|
 | F-10 | Đề cương | 🔄 | Mã xong; Playwright 37/37 Passed. Còn migration `syllabi`, `FILES_ROOT` bền vững và ca thủ công. — `docs/implement-report/f-10-syllabus-implement-report.md` |
 | F-11 | PLO, CLO, ma trận | 🔄 | Mã xong; Playwright 49/49 Passed (F11-TC_063/F11-TC_026 sửa 2026-10-22); còn migration `outcomes` và ca thủ công. — `docs/implement-report/f-11-plo-clo-matrices-implement-report.md` |
-| F-12 | Công thức điểm, đánh giá–CLO | ❌ | Sau MVP |
+| F-12 | Công thức điểm, đánh giá–CLO | ❌ | Sau MVP — [Kế hoạch](../implementation/f-12-grade-formula-assessment-clo-implementation-plan.md); được người dùng chấp nhận với mặc định 2026-10-26; chưa triển khai |
 
 ## B4 — Đề xuất thay đổi và phiên bản
 
@@ -76,25 +78,25 @@ Một dòng cho mỗi tính năng; việc chi tiết (CV-xxx) ở `docs/planning
 | F-13 | Đề xuất thay đổi | 🔄 | Mã xong; Playwright 28/28 Passed. Còn migration `change_requests` + seed trên máy người dùng và ca thủ công. — `docs/implement-report/f-13-change-requests-implement-report.md` |
 | F-14 | Duyệt ba cấp, thông báo | 🔄 | Mã xong; Playwright 31/31 Passed. Migration đã áp trên `ctdt-dev-pg`; còn quyết định xóa/giữ bản làm việc và ca thủ công. — `docs/implement-report/f-14-three-level-approval-notifications-implement-report.md` |
 | F-15 | Ban hành, ảnh chụp phiên bản | 🔄 | Mã xong; Playwright 33/33 Passed (F15-TC_001 sửa 2026-10-22); migration đã áp trên `ctdt-dev-pg`; còn seed học kỳ/khóa và ca thủ công. — `docs/implement-report/f-15-release-version-snapshots-implement-report.md` |
-| F-16 | So sánh phiên bản, gán khóa | ❌ | Sau MVP |
-| F-26 | Sao lưu, diễn tập phục hồi | ❌ | Sau MVP. `pg_dump` hằng ngày + thư mục tệp |
+| F-16 | So sánh phiên bản, gán khóa | 🔄 | FE đang triển khai; chưa hoàn tất — [Kế hoạch](../implementation/f-16-version-compare-cohort-assignment-implementation-plan.md); tiếp theo F-12 → F-17 |
+| F-26 | Sao lưu, diễn tập phục hồi | ⏸️ | Sau MVP. `pg_dump` hằng ngày + thư mục tệp — [Kế hoạch](../implementation/f-26-backup-restore-drill-implementation-plan.md); hoãn theo người dùng 2026-10-26, không xếp lịch; kế hoạch giữ nguyên |
 
 ## B5 — Sinh viên, điều kiện đăng ký, xét tốt nghiệp
 
 | # | Item | Status | Notes |
 |---|---|---|---|
-| F-17 | Hồ sơ sinh viên, kết quả học tập | ❌ | |
-| F-18 | Điều kiện đăng ký học phần | ❌ | |
-| F-19 | Xét tốt nghiệp | ❌ | Xét hàng loạt trong worker |
-| F-20 | Cổng sinh viên | ❌ | |
-| F-21 | API cho dDUT | ❌ | Khóa API, nhật ký từng lời gọi |
+| F-17 | Hồ sơ sinh viên, kết quả học tập | ❌ | [Kế hoạch](../implementation/f-17-student-records-results-import-implementation-plan.md); được người dùng chấp nhận với mặc định 2026-10-26; chưa triển khai |
+| F-18 | Điều kiện đăng ký học phần | ❌ | [Kế hoạch](../implementation/f-18-course-registration-eligibility-implementation-plan.md); được người dùng chấp nhận với mặc định 2026-10-26; chưa triển khai |
+| F-19 | Xét tốt nghiệp | ❌ | Xét hàng loạt trong worker — [Kế hoạch](../implementation/f-19-graduation-review-implementation-plan.md); được người dùng chấp nhận với mặc định 2026-10-26; chưa triển khai |
+| F-20 | Cổng sinh viên | ❌ | [Kế hoạch](../implementation/f-20-student-portal-implementation-plan.md); được người dùng chấp nhận với mặc định 2026-10-26; chưa triển khai |
+| F-21 | API cho dDUT | ❌ | Khóa API, nhật ký từng lời gọi — [Kế hoạch](../implementation/f-21-ddut-api-implementation-plan.md); được người dùng chấp nhận với mặc định 2026-10-26; chưa triển khai |
 
 ## B6 — Tích hợp, báo cáo, hoàn thiện
 
 | # | Item | Status | Notes |
 |---|---|---|---|
-| F-22 | Đồng bộ cơ sở dữ liệu Trường | ❌ | `mssql`, chỉ đọc, theo lịch |
-| F-23 | Báo cáo kiểm định | ❌ | |
-| F-24 | Đồ thị, PDF, dòng thời gian, bảng sức khỏe | ❌ | Puppeteer |
-| F-25 | Ủy quyền, email, nhắc hạn | ❌ | Nodemailer |
-| F-27 | Triển khai, thử tải, theo dõi hoạt động | ❌ | Docker Compose + Caddy |
+| F-22 | Đồng bộ cơ sở dữ liệu Trường | ❌ | `mssql`, chỉ đọc, theo lịch — [Kế hoạch](../implementation/f-22-school-db-sync-implementation-plan.md); được người dùng chấp nhận với mặc định 2026-10-26; chưa triển khai |
+| F-23 | Báo cáo kiểm định | ❌ | [Kế hoạch](../implementation/f-23-accreditation-reports-implementation-plan.md); được người dùng chấp nhận với mặc định 2026-10-26; chưa triển khai |
+| F-24 | Đồ thị, PDF, dòng thời gian, bảng sức khỏe | ❌ | Puppeteer — [Kế hoạch](../implementation/f-24-graphs-pdf-timeline-health-implementation-plan.md); được người dùng chấp nhận với mặc định 2026-10-26; chưa triển khai |
+| F-25 | Ủy quyền, email, nhắc hạn | ❌ | Nodemailer — [Kế hoạch](../implementation/f-25-delegation-email-reminders-implementation-plan.md); được người dùng chấp nhận với mặc định 2026-10-26; chưa triển khai |
+| F-27 | Triển khai, thử tải, theo dõi hoạt động | ⏸️ | Docker Compose + Caddy — [Kế hoạch](../implementation/f-27-deployment-load-test-monitoring-implementation-plan.md); hoãn theo người dùng 2026-10-26, không xếp lịch; kế hoạch giữ nguyên |

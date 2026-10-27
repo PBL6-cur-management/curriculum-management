@@ -393,3 +393,20 @@ Học kỳ và khóa (F-15, gọi từ `seed.ts`): nạp học kỳ và khóa tu
 - Released versions sắp theo `Semester.startDate` thực tế trong database: bản cuối có ngày bắt đầu ≤ `todayDate()` là `ACTIVE`, bản cũ hơn `HISTORICAL`, bản tương lai `PENDING`; không có học kỳ bắt đầu thì `DRAFT`. Version number tăng `1.0`, `2.0`, …, nối `previousVersionId`. Legacy versions không ghim syllabus hoặc snapshots.
 - Ngày học kỳ legacy **không bao giờ ghi đè** ngày hiện hữu, kể cả null; summary báo khác biệt. Lượt kiểm chứng giữ `2025-2026-1` ở `2025-09-08`, không đổi thành `2025-08-04`.
 - Không thay `1024034`, `DEMO*`, `KnowledgeBlock` hoặc đề cương giữ chỗ. Kết quả caller kiểm chứng trên PostgreSQL 18 ICU `vi-VN` dùng một lần: 24 programs, 46 versions, 3.295 items, 3.135 requisites, 156 groups; chạy lần hai created 0. Không suy ra database của người dùng đã nạp; chi tiết tại `docs/implement-report/dut-legacy-seed-implement-report.md` §V-01.
+
+## Nhập Excel (F-09) — lược đồ đã áp dụng
+
+Nguồn: `source/backend/prisma/schema.prisma`; migration `source/backend/prisma/migrations/20261026091026_import_batches/migration.sql`. Orchestrator xác nhận đã áp migration trên dev database và Testcontainers; prisma format/generate đã hoàn tất ngày 2026-10-26. Không suy ra mọi máy người dùng đã migrate.
+
+| Thành phần | Dữ liệu / ràng buộc |
+|---|---|
+| ImportType | COURSE_CATALOG, CURRICULUM, STUDENT_LIST, ACADEMIC_RESULT; F-09 chỉ mở API cho hai loại đầu |
+| ImportBatchStatus | VALIDATING, DRY_RUN, COMMITTING, COMMITTED, ABORTED |
+| ImportBatch | id cuid2; importType, fileName, performedById, programId?, versionId?, status; totalRows/successRows/errorRows mặc định 0; errorReport JSON; recordedAt, finishedAt? |
+| ImportBatchFile | batchId vừa PK vừa FK; content Bytes, sizeBytes, expiresAt. Tách nội dung khỏi truy vấn lịch sử; giữ 30 ngày |
+| Khóa ngoại | performedById → User và programId → Program: Restrict; versionId → ProgramVersion: SetNull; xóa batch cascade tệp |
+| Chỉ mục | batch: (performedById, recordedAt), (programId, recordedAt), (status, recordedAt); file: expiresAt |
+| ImportBatch_program_for_curriculum | (importType = CURRICULUM) tương đương (programId IS NOT NULL) |
+| ImportBatch_row_counts | Ba bộ đếm không âm; successRows + errorRows = totalRows |
+
+Hai CHECK được nối tay trong migration, không được bỏ khi sinh lại SQL. Dọn tệp không xóa batch/report; việc xóa phiên bản không làm mất lịch sử nhập. Ma trận liên quan dòng khung đã cascade từ CurriculumItem theo F-11; F-09 không thêm thay đổi lược đồ ngoài hai bảng và hai enum này.

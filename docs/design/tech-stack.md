@@ -43,6 +43,7 @@
 | Tác vụ nền | `@nestjs/bullmq`. Một cơ chế chung cho bốn việc chạy theo lịch (K-7) dùng job scheduler của BullMQ, xét tốt nghiệp hàng loạt, nhập Excel, gửi thư | NFR-03, NFR-05, B6 |
 | Excel | ExcelJS | NFR-05, xuất khung và báo cáo |
 | PDF | Puppeteer: dựng HTML rồi in ra PDF, nhúng phông chữ tiếng Việt | Xuất đề cương, khung chương trình |
+| Đồ thị tiên quyết | `@antv/g6` (cùng hệ Ant Design), được người dùng duyệt 2026-10-26; ghim phiên bản khi build F-24 | FR-38, US-110 |
 | Thư điện tử | Nodemailer qua SMTP của Trường | Thông báo (B6) |
 | Tệp đính kèm | Thư mục trên đĩa máy chủ, gắn vào container của máy chủ ứng dụng, nằm trong phạm vi sao lưu | K-6 |
 | Giao diện — dữ liệu và điều hướng | TanStack Query, React Router; `ConfigProvider` của Ant Design đặt ngôn ngữ `vi_VN` | NFR-16, NFR-17, NFR-18, NFR-20 |

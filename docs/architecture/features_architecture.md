@@ -317,3 +317,29 @@ Kế hoạch: `docs/implementation/f-15-release-version-snapshots-implementation
 
 ### Frontend — `src/features/releases/`, `FinalApprovalPage` ở `change-requests`
 - `SemestersPage` MH-10, `FinalApprovalPage` MH-43, `InitialReleasePage` MH-45, `VersionHistoryPage` MH-46, `VersionDetailPage` MH-47 (liên kết tới màn hình chỉ đọc sẵn có), `CorrectionPage` MH-49; `ReleaseCard`, `ProgramVersionsSection` ở tổng quan chương trình; `SemesterSelect`, `CohortSelect` ở `shared/releases/`.
+
+## Nhập, xuất Excel (F-09) — MH-29, MH-30 và MH-25
+
+### Backend
+
+Mã tại `source/backend/src/features/imports/`. ImportsController dùng PermissionGuard; quyền data.import_excel cho danh mục, curriculum.import_export_excel cho khung. Các route chung chấp nhận một trong hai quyền rồi service kiểm đúng loại/phạm vi; không phải authenticated-only. GET /api/imports/types quyết định loại UI được cung cấp; hiện chỉ COURSE_CATALOG và CURRICULUM. R3 giới hạn chương trình được phân công, kiểm ngay khi upload (ngoài phạm vi trả 403 OUT_OF_SCOPE).
+
+| Method | Route | Hành vi |
+|---|---|---|
+| GET | /api/imports/types | Loại nhập khả dụng theo quyền |
+| GET | /api/imports/curriculum-targets | Nháp hợp lệ trong phạm vi |
+| GET | /api/imports/templates/:importType | Tải mẫu XLSX |
+| POST | /api/imports | Multipart file/importType/versionId; tạo batch HTTP 201; sai header vẫn tạo ABORTED với formatErrors |
+| GET | /api/imports | Lịch sử có lọc, phân trang và phạm vi |
+| GET | /api/imports/:batchId | Chi tiết và báo cáo theo dòng |
+| POST | /api/imports/:batchId/commit | Chỉ chủ phiên DRY_RUN, tệp còn hạn và đích còn hợp lệ; kiểm lại trước transaction |
+| GET | /api/imports/:batchId/file | Tải tệp gốc trong hạn 30 ngày |
+| GET | /api/program-versions/:versionId/curriculum/export | Xuất khung cùng định dạng nhập; không giới hạn trạng thái Nháp |
+
+Báo cáo giữ số dòng worksheet và tên cột. Severity trên wire là ERROR/HIGH/INFO tương ứng LỖI/CẢNH BÁO/LƯU Ý; chỉ ERROR chặn ghi. Trạng thái VALIDATING → DRY_RUN → COMMITTING → COMMITTED; lỗi định dạng, kiểm dữ liệu, tái kiểm hoặc job thất bại kết thúc ABORTED. Xác nhận lại không ghi trùng; nhập lại khung giữ id dòng còn tồn tại. Xuất/nhập vào bản sao cần metadata chương trình đích khớp, không áp metadata tệp vào phiên bản.
+
+### Frontend và kiểm chứng
+
+- `source/frontend/src/features/imports/`: /imports (MH-29), /imports/history và /imports/:batchId (MH-30); chọn loại từ API, tải mẫu, kiểm .xlsx/5 MB, upload, báo cáo severity, xác nhận minh thị, polling, lỗi/rỗng riêng. Lịch sử giữ bộ lọc và phân trang trên URL; hết hạn chỉ khóa tệp/ghi, không mất báo cáo.
+- `source/frontend/src/features/curriculum/pages/CurriculumPage.tsx`: nút xuất theo quyền; shortcut nhập cho Nháp thông thường, backend vẫn là nguồn quyết định đích được phép.
+- `source/backend/test/imports.e2e-spec.ts`: PostgreSQL + BullMQ/Redis thật trên Testcontainers, round trip sang bản sao, giữ id, phân quyền, hết hạn và NFR dry-run khung. `source/e2e/specs/f-09-excel-import-export.spec.ts`: tải mẫu, round trip cùng Nháp, lịch sử, lỗi header, giới hạn tệp và sinh viên bị chặn. Ba ca thủ công còn nợ: sự cố DB thật, NFR-05 đủ hai bước/hai loại và tệp Khoa thật.

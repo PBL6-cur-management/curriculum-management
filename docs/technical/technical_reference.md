@@ -190,3 +190,12 @@ Playwright chạy trên app dev đang hoạt động, có demo seed: backend `ht
 ## 9. Kiểm tra mã
 
 oxlint (`pnpm lint`; máy chủ bật `--type-aware`, lời hứa bị bỏ quên là lỗi), Prettier (`pnpm format`). Kiểm kiểu: `pnpm exec tsc --noEmit -p tsconfig.json` (backend), `pnpm exec tsc -b` (frontend).
+
+## 10. Excel XLSX và truyền tệp (F-09)
+
+- Backend dùng dependency trực tiếp exceljs 4.4.0 (CommonJS), nạp bằng `import ExcelJS from 'exceljs'` trong `source/backend/src/features/imports/sheets/sheet-reader.ts` và `source/backend/src/features/imports/sheets/sheet-writer.ts`. Khi đọc, tạo ArrayBuffer sở hữu từ bytes bằng new Uint8Array(content).buffer; không ép kiểu để vượt khác biệt Buffer của types.
+- `source/backend/src/features/imports/import.constants.ts` quy định FILE_MAX_BYTES = 5 * 1024 * 1024, tối đa 2000 dòng; phía frontend `source/frontend/src/features/imports/constants/importLabels.ts` giữ IMPORT_FILE_MAX_BYTES cùng giá trị và chỉ nhận .xlsx. Kiểm phía client để tránh upload vô ích; giới hạn backend và HTTP 413 mới có tính quyết định.
+- FileInterceptor của @nestjs/platform-express dùng lưu trữ bộ nhớ mặc định, một file mỗi request. @types/multer chỉ cung cấp kiểu Express.Multer.File; multer không là dependency trực tiếp, không import memoryStorage từ gói bắc cầu (pnpm strict layout).
+- Mẫu mặc định dùng nhãn SRS 4.3, chưa xác nhận tệp Excel thật của Khoa. Giữ tên cột ở SheetSpec; header sai tạo batch ABORTED/report và trả HTTP 201, không đổi thành HTTP 400. Content-Disposition giữ tên UTF-8 để tải lại không hỏng tiếng Việt.
+- Client dùng sendForm/downloadFile hiện có; không tự đặt multipart Content-Type để browser gắn boundary. Playwright tải mẫu/bản xuất từ app, không thêm thư viện sửa XLSX; round trip sang bản sao được backend e2e chuẩn bị metadata khớp đích.
+- Queue imports dùng chung BULLMQ_PREFIX; shutdown phải force-close cả worker và backend queue sau grace tối đa 10 giây, trước hook close của Nest, để Redis QUIT không treo khi Redis đã dừng.

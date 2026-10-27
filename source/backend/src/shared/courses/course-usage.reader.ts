@@ -26,14 +26,23 @@ export class CourseUsageReader {
 
   // The course sits in a version that has left Draft (Pending, Active or Historical).
   async inReleasedVersion(courseId: string): Promise<boolean> {
-    const row = await this.prisma.curriculumItem.findFirst({
+    return (await this.releasedCourseIds([courseId])).has(courseId);
+  }
+
+  async releasedCourseIds(
+    courseIds: readonly string[],
+    client: Pick<Prisma.TransactionClient, 'curriculumItem'> = this.prisma,
+  ): Promise<Set<string>> {
+    if (courseIds.length === 0) return new Set();
+    const rows = await client.curriculumItem.findMany({
       where: {
-        courseId,
+        courseId: { in: [...courseIds] },
         version: { status: { not: ProgramVersionStatus.DRAFT } },
       },
-      select: { id: true },
+      select: { courseId: true },
+      distinct: ['courseId'],
     });
-    return row !== null;
+    return new Set(rows.map((row) => row.courseId));
   }
 
   async hasStudyResults(_courseId: string): Promise<boolean> {

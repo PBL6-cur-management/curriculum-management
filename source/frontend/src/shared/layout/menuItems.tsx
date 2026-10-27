@@ -16,6 +16,16 @@ export interface AppMenuItem {
 export const STUDENT_ROLE_CODE = 'R6';
 
 export const APP_MENU: readonly AppMenuItem[] = [
+  {
+    path: ROUTES.imports,
+    label: 'Nhập liệu',
+    permission: PERMISSIONS.curriculumImportExportExcel,
+  },
+  {
+    path: ROUTES.importHistory,
+    label: 'Lịch sử nhập liệu',
+    permission: PERMISSIONS.curriculumImportExportExcel,
+  },
   { path: ROUTES.home, label: 'Trang chính' },
   {
     path: ROUTES.users,

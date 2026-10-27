@@ -20,15 +20,8 @@ import {
 } from '../../shared/decimal/decimal.js';
 import { emptyToNull } from '../../shared/dtos/transforms.js';
 
-export const CURRICULUM_LIMITS = {
-  BLOCK_SYMBOL_MAX: 20,
-  NOTE_MAX: 500,
-  ITEMS_MAX: 200,
-  REQUISITES_MAX: 20,
-  GROUP_CODE_MAX: 20,
-  GROUP_NAME_MAX: 200,
-  SEMESTER_MIN: 1,
-} as const;
+import { CURRICULUM_LIMITS } from '../../shared/curriculum/curriculum-limits.js';
+export { CURRICULUM_LIMITS } from '../../shared/curriculum/curriculum-limits.js';
 
 export class CreateCurriculumItemDto {
   @ApiProperty() @IsString() courseId!: string;

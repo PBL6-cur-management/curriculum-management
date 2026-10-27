@@ -4,6 +4,8 @@ import type { Me } from './me';
 export type PermissionCode = components['schemas']['PermissionCode'];
 
 export const PERMISSIONS = {
+  versionCompare: 'version.compare',
+  versionAssignCohort: 'version.assignCohort',
   userManage: 'user.manage',
   permissionView: 'permission.view',
   permissionManage: 'permission.manage',
@@ -31,6 +33,8 @@ export const PERMISSIONS = {
   versionCorrect: 'version.correct',
   versionViewHistory: 'version.viewHistory',
   semesterManage: 'semester.manage',
+  dataImportExcel: 'data.importExcel',
+  curriculumImportExportExcel: 'curriculum.importExportExcel',
 } as const satisfies Record<string, PermissionCode>;
 
 export function hasPermission(

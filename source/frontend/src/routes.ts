@@ -30,6 +30,11 @@ export const ROUTES = {
   outcomeCoverage: '/programs/:programId/versions/:versionId/outcome-coverage',
   programVersionInfo: '/programs/:programId/versions/:versionId/info',
   versionHistory: '/programs/:programId/versions',
+  versionCompare: '/programs/:programId/version-comparison',
+  pinnedSyllabusCompare:
+    '/programs/:programId/version-comparison/syllabi/:courseId',
+  cohortVersionAssignmentStart: '/cohort-versions',
+  cohortVersionAssignments: '/programs/:programId/cohort-versions',
   versionDetail: '/programs/:programId/versions/:versionId',
   versionRelease: '/programs/:programId/versions/:versionId/release',
   versionCorrection:
@@ -43,7 +48,12 @@ export const ROUTES = {
   changeRequestEdit: '/change-requests/:requestId/edit',
   approvalQueue: '/approval-queue',
   notifications: '/notifications',
+  imports: '/imports',
+  importHistory: '/imports/history',
+  importDetail: '/imports/history/:batchId',
 } as const;
 
 // Row or group to scroll to and highlight on arrival; set by the consistency result list.
 export const FOCUS_PARAM = 'focus';
+export const IMPORT_TYPE_PARAM = 'type';
+export const IMPORT_VERSION_PARAM = 'versionId';

@@ -1,6 +1,6 @@
 # F-09 Excel Import and Export — Backend + Frontend Implementation Plan
 
-This plan builds Excel import for the course catalog and for the curriculum of a Draft version, and Excel export of a curriculum in the same template (FR-33..36, FR-96..101, EP-09). An import is a stored batch: the file is uploaded, checked row by row in a BullMQ worker without writing anything (dry-run), shown as a report with LỖI / CẢNH BÁO / LƯU Ý per row, and written only when the user who ran it confirms and the whole file passes again — all rows or none. It delivers the import screen (MH-29), the import history with its detail report (MH-30), template downloads, the export button on the curriculum screen, and the first BullMQ processor of the project.
+This plan builds Excel import for the course catalog and for the curriculum of a Draft version, and Excel export of a curriculum in the same template (FR-33..36, FR-96..101, EP-09). An import is a stored batch: the file is uploaded, checked row by row in a BullMQ worker without writing anything (dry-run), shown as a report with LỖI / CẢNH BÁO / LƯU Ý per row, and written only when the user who ran it confirms and the whole file passes again — all rows or none. It delivers the import screen (MH-29), the import history with its detail report (MH-30), template downloads, the export button on the curriculum screen, and an imports worker following F-15's existing BullMQ lifecycle pattern.
 
 It deliberately excludes the student-list and academic-result imports (wave 2, F09-03: their tables arrive with F-17 and F-19 in B5), importing into a version that has left Draft (F09-01: that is a change request, F-13), reading the program header values into the version (they are compared, not applied — D9), and the exact column layout of the Khoa's own sheet until the file is supplied (F09-04 🏫 — D6 keeps it to one constant per type).
 
@@ -12,7 +12,9 @@ It deliberately excludes the student-list and academic-result imports (wave 2, F
 > - Builds on: F-01 (`AppException`, `COMMON_ERRORS`, `QueueModule` in `src/shared/queue/`, `createTestApp`, Redis container, `client.ts`), F-02 (`AccessContext`, `PERMISSIONS.DATA_IMPORT_EXCEL`, `CURRICULUM_IMPORT_EXPORT_EXCEL`, `PERMISSION_TABLE`, `APP_MENU`), F-03 (`OrgUnit`, `SubjectGroup`), F-04 (`Course`, `CoursesService.assertOwners`, `CourseUsageReader`, `edit-path.ts`, `decimal.ts`, `HOME_FACULTY_CODE`), F-05 (`requisite-graph.ts`, `CourseRelation`, `GRADE_POINT_PATTERN`), F-06 (`programTarget`, `programEditState`), F-07 (`CurriculumItem`, `CurriculumRequisite`, `ElectiveGroup`, `assertSemesterInRange`, `CURRICULUM_LIMITS`, `curriculum-access.ts`, `CurriculumPage`), F-08 (`curriculumWarnings`, `programCredits`, `curriculumCycles`, `WARNING_SEVERITY`)
 > - Tests: `docs/planning/test-plan.md:84-86` (DL-2, DL-4), `:176-179` (KB-022..KB-025), `:294-302` (NT-B2-01, -02, -03, -09), `:384` (NFR-05), `:399` (NFR-20)
 
-**Status**: Not started
+**Status**: Done — BE + FE + browser walk (2026-10-26); còn 3 ca Manual F09-TC_015/016/025 và flake chooseOption đã biết
+
+Build history (2026-10-26): BE-01..BE-07 implemented; current continuation fixes backend e2e fixtures and adds regressions only. P1 remains waived: retain SRS 4.3 labels (D6); the Khoa's real sheet remains owed. The orchestrator has migrated/generated Prisma and owns Docker/e2e execution. No dependency installation, schema edits or frontend work in this continuation.
 
 ---
 
@@ -111,34 +113,36 @@ Everything below in one table. Read this; the rest is detail for whoever builds 
 
 ## 2. Contract verification
 
-F-09 builds on F-01..F-08 code that is **specified, not built**. Every "existing" claim cites the plan that defines it; Rule 13 re-reads the built file before the step that uses it.
+F-01..F-15 are built. The source checks below supersede the old plan references for BE-01..BE-07 (2026-10-26). Backend is implemented; real-worker e2e execution belongs to the orchestrator because Docker is prohibited in this sandbox. No §3 decision changes.
 
 | Existing piece used | Defined at | Used by |
 |---|---|---|
-| `PERMISSIONS.DATA_IMPORT_EXCEL = 'data.importExcel'` (R1 X, R3 P), `PERMISSIONS.CURRICULUM_IMPORT_EXPORT_EXCEL = 'curriculum.importExportExcel'` (R1 X, R3 P); seed rows | F-02 BE-03 (`f-02-…:570`, `:587`, `:1212`, `:1229`) | BE-05, BE-06 |
-| `AccessContext.has`, `assertCan(code, target)`, `scopeFor(code)`, `userId`; an empty target is covered only by an ALL scope | F-02 BE-04 (`f-02-…:640-760`) | BE-05, BE-06 |
+| `PERMISSIONS.DATA_IMPORT_EXCEL = 'data.importExcel'` (R1 X, R3 P), `PERMISSIONS.CURRICULUM_IMPORT_EXPORT_EXCEL = 'curriculum.importExportExcel'` (R1 X, R3 P); R3 holds both but catalog requires ALL, so its catalog denial is OUT_OF_SCOPE | `source/backend/prisma/seed-data/permission-catalog.ts:159`, `:292`; `src/shared/authz/access-context.ts` | BE-05, BE-06, BE-07 |
+| `AccessContext.has`, `assertCan(code, target)`, `scopeFor(code)`, `userId`; an empty target is covered only by an ALL scope | `source/backend/src/shared/authz/access-context.ts`; `permission.guard.ts` keeps any-of route gating before batch visibility | BE-05, BE-06 |
 | `@RequirePermission`, `@CurrentAccess()`, `AppException(definition, details?)`, `COMMON_ERRORS` | F-01 BE-03 (`f-01-…:342`), F-02 | BE-05 |
-| `QueueModule` (`BullModule.forRootAsync` over `REDIS_HOST`, `REDIS_PORT`) at `src/shared/queue/queue.module.ts`; no queue or processor registered yet | Built at `source/backend/src/queue/queue.module.ts:1-19`; moved by F-01 (`f-01-…:236`) | BE-05 |
-| `@nestjs/bullmq ^12.0.0`, `bullmq ^6.3.15`, `@nestjs/platform-express ^12.1.3` installed; `exceljs`, `@types/multer` absent | `source/backend/package.json:26-34` | BE-03, BE-05 |
+| `QueueModule` configures `REDIS_HOST`, `REDIS_PORT`, `BULLMQ_PREFIX`; F-15 already has queue registration, state-idempotent worker, nonblocking scheduling and bounded shutdown | `source/backend/src/shared/queue/queue.module.ts:9`; `src/features/releases/releases.module.ts`; `release-activation.processor.ts:15`, `:72`; `release-activation.scheduler.ts` | BE-05 |
+| ExcelJS and `@types/multer` are already installed by the orchestrator; no dependency edits in this run | `source/backend/package.json`; ExcelJS `index.d.ts:1`, `:1490` declares its load buffer as `ArrayBuffer`; pass an owned `Uint8Array(...).buffer` without casts | BE-03, BE-05 |
 | ExcelJS is the chosen library; heavy Excel work runs in a BullMQ worker | `docs/design/tech-stack.md:44`, `:65` | D1, D2 |
 | `Course {courseCode @unique, courseName, englishName?, credits Decimal(5,2), courseType, status, ownerFacultyId, ownerGroupId?}`; `CourseType` 7 values; `CourseStatus` ACTIVE / DISCONTINUED / CANCELLED | F-04 BE-01 (`f-04-…:261-295`) | BE-04 |
-| `CoursesService.assertOwners(facultyId, groupId)` (private; faculty ACTIVE `FACULTY`, group ACTIVE of that faculty), `OWNER_FACULTY_INVALID`, `OWNER_GROUP_INVALID`, `HOME_FACULTY_CODE` | F-04 BE-03 (`f-04-…:522`, `:700`, `:729`, `:826-838`) | BE-02 |
+| `CoursesService.assertOwners` already delegates to shared `assertCourseOwners`; extract the pure check there, preserving signatures, errors and faculty-first query order | `source/backend/src/features/courses/courses.service.ts:360`; `src/shared/courses/course.writer.ts:27` | BE-02 |
 | `COURSE_FIELD_LIMITS {CODE_MAX: 20, NAME_MAX: 200}`; `CreateCourseDto` trims and upper-cases the code | F-04 BE-03 | BE-04 |
-| `CourseUsageReader.inReleasedVersion(courseId)` = a `CurriculumItem` of the course in a non-Draft version | F-04 BE-02 (`f-04-…:401`), filled by F-07 BE-02 (`f-07-…:537-542`) | BE-02 (batched form) |
+| `CourseUsageReader.inReleasedVersion(courseId)` means a curriculum item in any status other than DRAFT (PENDING / ACTIVE / HISTORICAL); `releasedCourseIds` must use the same predicate | `source/backend/src/shared/courses/course-usage.reader.ts:28` | BE-02 (batched form) |
 | `CREDITS_PATTERN`, `toWireDecimal`, `GRADE_POINT_PATTERN` in `src/shared/decimal/decimal.ts` | F-04 BE-02, F-05 BE-01 (`f-05-…:360-364`) | BE-04 |
 | `RequisiteEdge`, `CYCLE_CHECKED_TYPES`, `findRequisiteCycle`, `lockRequisiteGraph(tx)` | F-05 BE-02 (`f-05-…:316-345`, `:639`) | BE-04, BE-05 |
-| `CourseRelation {sourceCourseId, targetCourseId, type, minScore}` | F-05 BE-01 | BE-04 |
-| `programTarget({id, facultyId})`, `programEditState(prisma \| tx, programId)` (`released` = some version not Draft) | F-06 BE-02 (`f-06-…:372-411`) | BE-05, BE-06 |
-| `ProgramVersion {programId, status, semesterCount, totalCredits, compulsoryCredits, electiveCredits, versionNumber}`; `Program {programCode, programName, majorCode, facultyId}` | F-06 BE-01 (`f-06-…:245-279`) | BE-01, BE-04 |
+| `CourseRelation {sourceCourseId, targetCourseId, relationType, minScore}`; source is the earlier course, target is the course requiring it | `source/backend/prisma/schema.prisma:294`; `src/shared/courses/requisite-graph.ts:25` | BE-04 |
+| `programTarget({id, facultyId})`, `programEditState(prisma \| tx, programId)` (`released` = some version not DRAFT); correction/request write paths exist, but imports do not gain those paths | `source/backend/src/shared/programs/program-target.ts:10`, `:19`; `src/shared/authz/edit-path.ts:64`; `src/features/curriculum/curriculum-access.ts:48` | BE-05, BE-06 |
+| `ProgramVersion` owns `programName`, `majorCode`, semester/credit declarations and correction metadata; `Program` owns `programCode`, `facultyId`. The loader composes the existing context from those actual owners | `source/backend/prisma/schema.prisma:340`, `:363` | BE-01, BE-04 |
 | `CurriculumItem` (unique version + course; `plannedSemester`, `sortOrder`, `blockSymbol`, `isElective`, `electiveGroupId`, `htDa`, `tqDa`, `minStudiedScore`, `minTransferScore`, `note`), `CurriculumRequisite {itemId, sourceCourseId, relationType, minScore}`; versions cascade to items | F-07 BE-01 (`f-07-…:275-377`) | BE-04, BE-05, BE-06 |
 | `CURRICULUM_ERRORS` (`COURSE_NOT_ACTIVE`, `SEMESTER_OUT_OF_RANGE`, …), `CURRICULUM_LIMITS {BLOCK_SYMBOL_MAX: 20, NOTE_MAX: 500, …}` | F-07 BE-03 (`f-07-…:656-690`) | BE-02, BE-04 |
-| `assertSemesterInRange(version, semester)` exported from `curriculum.service.ts`; active-course check inline in `createItem` | F-07 BE-03 (`f-07-…:890-891`, `:960-967`) | BE-02 |
-| `VERSION_ACCESS_SELECT`, `assertDraft`, `assertCurriculumWrite` in `src/features/curriculum/curriculum-access.ts` | F-07 BE-03 (`f-07-…:727-751`) | BE-05 (shape mirrored, not imported) |
-| `curriculumWarnings({semesterCount, items, groups})`, `WarningItem`, `WarningGroup`, `CURRICULUM_WARNING` (incl. `DUPLICATE_COURSE` ERROR), `WARNING_SEVERITY {ERROR, HIGH, INFO}`; `programCredits(items, groups)`; `curriculumCycles(catalogEdges, curriculumEdges)` | F-08 BE-02, BE-03 (`f-08-…:300-430`, `:517-529`) | BE-04 |
-| `createTestApp`, `startPostgres`, `startRedis`, `setAppEnv`; `PERMISSION_TABLE`; `loginAgent`, `createProgram`, `createCourse`, `addCurriculumItem`, `releaseVersionForTest` | F-01 BE-10 (`f-01-…:797-805`, `:1500-1544`), F-02 (`f-02-…:2059`), F-06 BE-06, F-07 BE-06 (`f-07-…:1489-1498`) | BE-07 |
-| Frontend: `getJson`, `sendJson`, `ApiError`, `CSRF_HEADER` in `src/shared/api/client.ts` (JSON only; no upload or file download helper) | F-01 FE-03 (`f-01-…:1656`, `:1674-1730`) | FE-02 |
-| `APP_MENU`, `toMenuItems`, `ROUTES`, `router.tsx` lazy pages, `RequirePermission`, `useCan`, `PageContainer`, `ApiErrorAlert` | F-02 FE-02, FE-04 (`f-02-…:2334-2358`) | FE-01, FE-03..FE-05 |
-| `CurriculumPage` (toolbar), `COURSE_TYPE_LABELS` (client) | F-07 FE-03 (`f-07-…:1716`), F-04 FE (`f-04-…:1223`) | FE-05 |
+| `assertSemesterInRange` is exported from `curriculum-access.ts`, not the service; keep that export and its error mapping. `createItem` uses the shared addable check | `source/backend/src/features/curriculum/curriculum-access.ts:64`; `src/features/curriculum/curriculum.service.ts:39`, `:61`, `:121` | BE-02 |
+| `VERSION_SELECT`, `assertDraft`, `assertCurriculumWrite` in `src/features/curriculum/curriculum-access.ts`, including correction/request metadata | `source/backend/src/features/curriculum/curriculum-access.ts:21`, `:39`, `:48` | BE-05 (shape mirrored, not imported) |
+| `curriculumWarnings`, `WarningItem`, `WarningGroup`, severity/codes, `programCredits`, `curriculumCycles` are built shared APIs; reuse directly. New import rows use live catalog credits, never release snapshots | `source/backend/src/shared/curriculum/curriculum-warnings.ts:35`, `:264`; `program-credits.ts:40`; `curriculum-cycles.ts:8` | BE-04 |
+| Built test fixtures include `releaseViaApi` and `publishSyllabusViaRelease`; `releaseVersionForTest` was deleted by F-15. Existing containers and app harness already support real Redis workers and PostgreSQL | `source/backend/test/fixtures/releases.ts:124`; `test/fixtures/{accounts,programs,courses,curriculum,outcomes,syllabi}.ts`; `test/test-app.ts`; `test/containers.ts:86`; `test/test-env.ts:16` | BE-07 |
+| Shared file helpers already handle RFC 5987, UTF-8 multipart names and sanitizing; 413 mapping already exists; ref and page DTOs have actual paths below | `source/backend/src/shared/files/{send-file,uploaded-file-name}.ts`; `src/shared/exception/error-codes.ts`; `src/shared/dtos/ref.dto.ts`; `src/shared/pagination/{page-query.dto,page}.ts` | BE-05 |
+| F-15 frozen row facts must be used when exporting any version; actual requisites are `CurriculumRequisite` with `relationType` | `source/backend/src/shared/curriculum/row-course.ts:11`; `prisma/schema.prisma`; `src/features/curriculum/dto/curriculum-response.dto.ts` | BE-06 |
+| Frontend: built `getJson`, `sendJson`, `sendForm`, `downloadFile`, `fileNameFromHeader`, `withQuery`, `ApiError`; CSRF_HEADER is private; reuse helpers unchanged | `source/frontend/src/shared/api/client.ts:9`, `:94`, `:98`, `:115`; generated `schema.d.ts:3737` | FE-02 |
+| Built `APP_MENU`, `ROUTES`, lazy router, `RequirePermission`, `useCan`; actual design-system PageHeader, ListPageLayout, DataTable, StatusTag, EmptyState, DetailPageLayout; no PageContainer/ApiErrorAlert | `source/frontend/src/shared/layout/menuItems.tsx:21`; `src/shared/auth/RequirePermission.tsx:11`; `src/shared/design-system/index.ts`; `src/shared/forms/applyFieldErrors.ts:65` | FE-01, FE-03..FE-05 |
+| Built CurriculumPage custom toolbar, sourceRequest-aware version and canEdit flags; course labels already use the generated 7-value CourseType; courses list query is local state, not URL state | `source/frontend/src/features/curriculum/pages/CurriculumPage.tsx:42`; `src/features/courses/constants/courseLabels.ts:4`; `src/features/courses/pages/CourseListPage.tsx:63` | FE-04, FE-05 |
 
 ### 2a. Endpoints
 
@@ -150,7 +154,7 @@ All under `/api`. "Scoped" means `assertCan` in the service on top of the guard.
 | `GET /imports/curriculum-targets` | `curriculum.importExportExcel` | — | `ImportTargetDto[]` | Draft versions of never-released programs in the caller's scope, ordered by program code. Exists because `GET /programs` needs `program.view` with ALL scope (F-06), which R3 does not have |
 | `GET /imports/templates/:importType` | `data.importExcel` or `curriculum.importExportExcel` (by type, in the service) | path `COURSE_CATALOG \| CURRICULUM` | `.xlsx` stream, `Content-Disposition: attachment` | Wave-2 types → 404 `IMPORT_TYPE_UNAVAILABLE` |
 | `POST /imports` | either of the two (service picks by type) | `multipart/form-data`: `file`, `importType`, `versionId?` (required for `CURRICULUM`) | `ImportBatchDetailDto` (201) | Size, type and header checked in the request; a header error returns the batch "Không ghi do lỗi" (201, not an error status — the batch exists); otherwise status `VALIDATING` and a `validate` job queued |
-| `GET /imports` | either of the two | `ImportListQueryDto` (`importType?`, `status?`, `mine?`, `page`, `pageSize`) | `Page<ImportBatchSummaryDto>` | Catalog batches only with `data.importExcel` ALL; curriculum batches filtered to the caller's program scope |
+| `GET /imports` | either of the two | `ImportListQueryDto` (`importType?`, `status?`, `mine?`, `page`, `pageSize`) | `Page<ImportBatchSummaryDto>` | Own batches plus catalog batches with data.importExcel ALL and curriculum batches in program scope; route guard still applies |
 | `GET /imports/:batchId` | either of the two | — | `ImportBatchDetailDto` | Same visibility as the list; the client polls it while `VALIDATING` / `COMMITTING` |
 | `POST /imports/:batchId/commit` | either of the two | — | `ImportBatchDetailDto` (202) | Only `performedBy`; only from `DRY_RUN`; file still kept; status → `COMMITTING`, `commit` job queued |
 | `GET /imports/:batchId/file` | either of the two | — | original bytes, original file name | 410 `IMPORT_FILE_EXPIRED` after 30 days |
@@ -208,12 +212,38 @@ A row with no issue is OK and is not listed (D5); the totals carry the counts.
 
 | Deliverable | What the design says | What this plan does | Found at |
 |---|---|---|---|
+| DOC-01 | Mô tả imports là BullMQ worker đầu tiên; bảng tổng trạng thái ImportBatch vẫn ghi 3 | Theo processor F-15 đã dựng và shutdown fix của orchestrator: grace 10 giây, worker.close(true), queue.getBackend().close(true); §8 đã đủ 5 trạng thái và stale sweep nên chỉ sửa số đếm 3 → 5. Data dictionary đã có đủ hai bảng/trạng thái, không sửa lại | `source/backend/src/features/imports/imports.processor.ts:367`; `docs/design/state-diagrams.md:34`; `docs/design/data-dictionary.md:750` |
+| FE-01..FE-02 | Generate types and add upload/download helpers; some execution context calls severities WARNING/NOTE | Types already generated; do not regenerate/edit schema.d.ts. Reuse existing helpers; wire severity is ERROR/HIGH/INFO with Vietnamese labels unchanged | `source/frontend/src/shared/api/schema.d.ts:2745`, `:3737`; `src/shared/api/client.ts:94`, `:115` |
+| FE-02 | toSearchParams and shared/api/queryRoots.ts | Use built withQuery; import existing shared course/curriculum/outcome roots and PROGRAM_QUERY_KEYS. Invalidate domain caches in useImportBatch only when COMMITTED is observed, including detail route | `src/shared/api/client.ts:9`; `src/shared/{courses,curriculum,outcomes}/`; `src/features/programs/hooks/usePrograms.ts:28` |
+| FE-03..FE-04 | PageContainer/ApiErrorAlert and MSW; emulate course list URL state | Use actual design-system layouts and AntD Alert/errorMessage. Built tests use fetch stubs/fireEvent; MSW is not a direct dependency. Imports history deliberately owns URL filters/pagination; CourseListPage uses local state | `src/shared/design-system/index.ts`; `src/features/curriculum/pages/CurriculumPage.test.tsx:12`; `src/features/courses/pages/CourseListPage.tsx:63`; `package.json` |
+| FE-05 | Draft means a direct-import target | Show import shortcut only ordinary Draft (no sourceRequest); target endpoint still refuses ever-released programs/corrections. Export stays available for any status when permission is held | `src/features/curriculum/pages/CurriculumPage.tsx`; `source/backend/src/features/imports/import-access.ts`; `imports.service.ts:76` |
+| Playwright | Browser round trip into another program requires edited XLSX metadata | Browser reuses unchanged app export in the same Draft; backend e2e covers a copy with matching target metadata. No xlsx editing dependency in e2e; real Khoa data, DB-failure injection and complete two-type NFR timing remain Manual in the TC document | `source/e2e/package.json`; `source/backend/test/imports.e2e-spec.ts:382`; `docs/testing/test-cases/f-09-excel-import-export-test-cases.md` |
 | BE-01 | `ImportBatch.status`: `DRY_RUN`, `COMMITTED`, `ABORTED` | Adds `VALIDATING` and `COMMITTING` before `DRY_RUN` and `COMMITTED`; the worker runs between (D2). DD and state diagram updated with this plan | `data-dictionary.md:762`; `state-diagrams.md:273-298`; `tech-stack.md:65` |
 | BE-01 | `ImportBatch` has no link to a program or version | `programId` (required for curriculum) and `versionId` (nullable) so R3's history can be filtered and confirm knows its target (US-036 AC3). DD updated | `data-dictionary.md:751-764` |
 | BE-01 | The uploaded file is not in the dictionary; F09-05 keeps it 30 days | `ImportBatchFile` table, one row per batch, deleted after `IMPORT_LIMITS.FILE_RETENTION_DAYS` (D4). DD updated | `feature-questions.md:167` |
 | BE-02 | F-07's §8 asks for the curriculum row rules "through a shared helper"; `assertSemesterInRange` is exported from the feature's service, the active-course check is inline | Both move to `src/shared/curriculum/curriculum-row-rules.ts` as pure checks; F-07's call sites migrate (BE-02 table) | `f-07-…:890-891`, `:960`, `:2095` |
 | BE-02 | `assertOwners` is a private method that queries per call | A pure `ownerProblem(owners, facultyId, groupId)` in `src/shared/courses/course-owners.ts`; `assertOwners` keeps its signature and calls it | `f-04-…:826-838` |
 | BE-02 | `CourseUsageReader.inReleasedVersion` answers one course per query | Adds `releasedCourseIds(courseIds)` — one query for a 1000-row file (NFR-05) | `f-07-…:537-542` |
+| BE-01 | Migration creation was part of this step | User restricts this run to `schema.prisma`. Orchestrator creates migration, appends the two CHECK constraints and generates Prisma client | Approved execution brief, 2026-10-26 |
+| BE-02 | Owner and semester assertions lived inside services | F-15 already extracted owners into `shared/courses/course.writer.ts`; semester assertion lives in `curriculum-access.ts`. Change those bodies, not their exports; keep `CoursesService.assertOwners` delegating unchanged | `courses.service.ts:360`; `course.writer.ts:27`; `curriculum-access.ts:64` |
+| BE-02 / BE-04 | Field limits are feature DTO exports | Move values unchanged to shared `course-field-limits.ts` / `curriculum-limits.ts`, re-export from DTOs so old callers do not change. Import validators never depend on another feature's DTO | `features/courses/create-course.dto.ts:23`; `features/curriculum/create-curriculum-item.dto.ts:23` |
+| BE-02 | Service specs would need no changes | `Record<keyof CourseUsageReader, Mock>` needs `releasedCourseIds` in courses and course-relations mocks; no assertion or production contract changes | `courses.service.spec.ts:165`; `course-relations.service.spec.ts:186` |
+| BE-03 | P1 waited for the Khoa sheet; ExcelJS accepted a Node Buffer in its types | P1 waived, D6 SRS labels retained. Installed ExcelJS types accept `ArrayBuffer`; own the bytes with `new Uint8Array(content).buffer`, no casts | Execution brief; `node_modules/exceljs/index.d.ts:1`, `:1490` |
+| BE-04 | Catalog loader comment says three reads | Three base table reads plus one batched released-course read (zero when no courses match), all through the supplied client; no per-row query | `src/features/imports/validation/catalog-context.ts` |
+| BE-04 | Program name and major code were attributed to `Program` | Read them from the target `ProgramVersion`; cycle graph course codes also load in one course query, including intermediate graph vertices | `prisma/schema.prisma:363`; `curriculum-context.ts` |
+| BE-04 | Validator signatures did not carry unknown columns | Catalog accepts optional third `unknownColumns` array; curriculum parsed input accepts optional `unknownColumns`. Both emit file INFO `UNKNOWN_COLUMN`; existing two-argument calls remain valid | `catalog-validator.ts`; `curriculum-validator.ts` |
+| BE-04 | Example expects B → A → B for catalog A → B and file B → A | Shared graph code returns a path starting at the closing edge's target: A → B → A. Keep source orientation and map that first course to its spreadsheet row | `src/shared/courses/requisite-graph.ts:25`; `curriculum-cycles.ts:23` |
+| BE-05 | F-09 was the first processor | Follow built F-15: queue registration inherits BULLMQ_PREFIX; nonblocking bootstrap logs scheduler failure; state-idempotent jobs; wait at most 10 seconds then close(true). Also close the injected queue | `src/shared/queue/queue.module.ts:15`; `src/features/releases/release-activation.processor.ts:72`; `release-activation.scheduler.ts` |
+| BE-05 | A new 413 mapping and local file-header implementation were planned | Existing mapping and shared sendFile/uploadedFileName are reused unchanged; UserRefDto lives in shared/dtos and page helpers in shared/pagination | `src/shared/exception/error-codes.ts`; `src/shared/files/`; `src/shared/dtos/ref.dto.ts` |
+| BE-05 | Single service and import-time age for stale batches | Split private reading and validation orchestration into imports.reader.ts and import-validation.ts; unit-test them. COMMITTING claim resets finishedAt as processing clock, so an old clean dry-run is not swept immediately; no schema change | `src/features/imports/imports.service.ts`; `imports.processor.ts` |
+| BE-05 | Ordinary Draft gate described before F-13/F-15 paths existed | Refuse ever-released programs using status not DRAFT; additionally reject sourceRequestId/correctionOfId. No import into change-request Drafts or correction Drafts | `src/shared/programs/program-target.ts`; `src/features/imports/import-access.ts` |
+| BE-05 | JSON history list could load detail data | Explicit summary select omits report and file bytes; detail selects expiry only; file query separately enforces expiry. Claim and commit re-read a locked batch to prevent duplicate writes | `src/features/imports/import-mapping.ts`; `imports.reader.ts`; `imports.processor.ts` |
+| BE-06 | Export uses live course facts and old Released/Superseded names | Use rowCourse snapshots for released rows; support DRAFT/PENDING/ACTIVE/HISTORICAL, order requisites deterministically and keep registrable blank | `src/shared/curriculum/row-course.ts:11`; `src/features/imports/curriculum-export.service.ts` |
+| BE-07 | Harness paths test/support/create-test-app.ts and test/permissions.e2e-spec.ts; R3 catalog denial as missing permission | Real paths are test/test-app.ts, test/permission-table.ts and test/permission-table.e2e-spec.ts; no harness change needed. R4 is the table's denied catalog role; dedicated multipart tests prove R3 OUT_OF_SCOPE and own-program success | `test/permission-table.e2e-spec.ts`; `prisma/seed-data/permission-catalog.ts:159`, `:292` |
+| BE-05 | Upload example imported memoryStorage directly from multer | pnpm does not expose this transitive runtime dependency; orchestrator removed the import/storage option. Keep FileInterceptor's default memory storage, no dependency addition | `src/features/imports/imports.controller.ts`; orchestrator boot error ERR_MODULE_NOT_FOUND |
+| BE-07 | Export denial used R7 and the director fixture explicitly assigned R3 | Only R1..R6 are seeded; export denial uses R6. createAccount with an unscoped role creates a manual SYSTEM grant, not director-only access. Create the director account without a manual role; assignDirector supplies the derived R3 scope | `prisma/seed-data/roles.ts:3`; `test/fixtures/accounts.ts:45`; `src/shared/authz/scope.service.ts:77`; `scope-source.reader.ts:21` |
+| BE-07 | Round-trip fixture inserted minTransferScore 5 directly through Prisma | Shared DEC-11 validator accepts 0..4. Fixture now uses 2.5; exporter/reader/validator are unchanged. Unit regression reproduces VALUE_INVALID for 5 and no ERROR for valid workbook cells; e2e failures include the batch report | `src/shared/decimal/decimal.ts:14`; `src/features/imports/validation/curriculum-validator.ts:201`; `test/imports.e2e-spec.ts` |
+| F-11 constraint | Matrix rows must cascade from curriculum items in a future build | Cascade already exists: item → `CoursePLOMapping` → `CLOPLOMapping` via `coursePlo`. Kept item ids remain stable and removed rows are reported, without schema changes to matrices | `prisma/schema.prisma:797`, `:814` |
 
 ---
 
@@ -348,11 +378,14 @@ What/Why: F-07 §8 constraint ("the same row rules through a shared helper"); D8
 | NEW | `src/shared/courses/course-owners.ts` |
 | NEW | `src/shared/courses/course-owners.spec.ts` |
 | MODIFY | `src/features/courses/courses.service.ts` (`assertOwners` body) |
+| MODIFY instead | `src/shared/courses/course.writer.ts` (`assertCourseOwners` already owns the body); courses service delegation stays unchanged |
+| NEW / MODIFY | `src/shared/courses/course-field-limits.ts`, `src/shared/curriculum/curriculum-limits.ts`; original DTO exports retained as re-exports |
 | MODIFY | `src/shared/courses/course-usage.reader.ts` (`releasedCourseIds`; `inReleasedVersion` delegates) |
 | MODIFY | `src/shared/courses/course-usage.reader.spec.ts` |
 | NEW | `src/shared/curriculum/curriculum-row-rules.ts` |
 | NEW | `src/shared/curriculum/curriculum-row-rules.spec.ts` |
 | MODIFY | `src/features/curriculum/curriculum.service.ts` (`assertSemesterInRange` body, `createItem` status check) |
+| MODIFY also | `src/features/curriculum/curriculum-access.ts` (actual location of `assertSemesterInRange`; signature/errors retained) |
 
 **Shape**
 
@@ -833,7 +866,7 @@ export interface CatalogContext {
   homeFacultyCode: string;
 }
 
-// Three reads whatever the file size; `client` is the transaction during commit.
+// Three base-table reads and one batched usage read; `client` is the transaction during commit.
 export async function loadCatalogContext(
   client: PrismaClientLike, usage: CourseUsageReader, codes: readonly string[],
 ): Promise<CatalogContext>;
@@ -944,7 +977,12 @@ What/Why: US-032..US-036; FR-96..FR-99; D2, D3, D4, D15, D16. The HTTP surface a
 | NEW | `src/features/imports/writers/curriculum-writer.ts` |
 | NEW | `src/features/imports/import-mapping.ts` |
 | MODIFY | `src/app.module.ts` (import `ImportsModule`) |
-| MODIFY | `src/shared/exception/error-codes.ts` (413 in `ERRORS_BY_STATUS`) |
+| READ | `src/shared/exception/error-codes.ts` (413 already exists; no edit) |
+| NEW | `src/features/imports/imports.reader.ts`, `imports.reader.spec.ts` |
+| NEW | `src/features/imports/import-validation.ts`, `import-validation.spec.ts` |
+| NEW | `src/features/imports/import-access.spec.ts`, `import-mapping.spec.ts`, `dto/import.dto.spec.ts` |
+| NEW | `src/features/imports/writers/catalog-writer.spec.ts`, `writers/curriculum-writer.spec.ts` |
+| MODIFY | `src/features/imports/import.constants.ts` (typed payload, shutdown grace and advisory lock key) |
 
 **Shape**
 
@@ -973,7 +1011,7 @@ export const IMPORT_ABORT_MESSAGE = {
 } as const;
 ```
 
-`410 GONE` is not in `ERRORS_BY_STATUS`, which is fine — `FILE_EXPIRED` is thrown as an `AppException` with its own code; 413 is added because multer's `PayloadTooLargeException` is a Nest exception with no code of ours (`[HttpStatus.PAYLOAD_TOO_LARGE]: { code: 'PAYLOAD_TOO_LARGE', message: 'Tệp vượt quá dung lượng cho phép.' }`).
+`FILE_EXPIRED` is an AppException with its own 410 code. Built ERRORS_BY_STATUS already maps multer's PayloadTooLargeException to PAYLOAD_TOO_LARGE; reuse it unchanged.
 
 ```ts
 // src/features/imports/import-access.ts
@@ -1032,7 +1070,7 @@ export class CreateImportFormDto extends CreateImportDto {
 }
 ```
 
-Response DTOs are the §2b classes (`ImportTypeOptionDto`, `ImportBatchSummaryDto`, `ImportBatchDetailDto`, `ImportReportDto`, `ImportIssueDto`, `ImportFormatErrorDto`) with `@ApiProperty` on every field, mirroring `src/features/curriculum/dto/curriculum-response.dto.ts` (F-07 BE-02). `performedBy` uses `UserRefDto` (`src/shared/dto/ref.dto.ts`, F-02 BE-07); `program` is `{ id, programCode, programName }` with the name taken from the batch's version, else the program's current version.
+Response DTOs are the §2b classes with ApiProperty on every field, mirroring `src/features/curriculum/dto/curriculum-response.dto.ts`. performedBy uses UserRefDto (`src/shared/dtos/ref.dto.ts`); program is `{ id, programCode, programName }`, with the batch version name first, else the latest ordinary version. Pagination uses `src/shared/pagination/`. Invalid mine query values are rejected, not silently coerced to false.
 
 ```ts
 // src/features/imports/imports.controller.ts
@@ -1062,7 +1100,7 @@ export class ImportsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @RequirePermission(PERMISSIONS.DATA_IMPORT_EXCEL, PERMISSIONS.CURRICULUM_IMPORT_EXPORT_EXCEL)
-  @UseInterceptors(FileInterceptor('file', { storage: memoryStorage(), limits: { fileSize: IMPORT_LIMITS.FILE_MAX_BYTES, files: 1 } }))
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: IMPORT_LIMITS.FILE_MAX_BYTES, files: 1 } }))
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateImportFormDto })
   @ApiCreatedResponse({ type: ImportBatchDetailDto })
@@ -1100,11 +1138,7 @@ export class ImportsController {
 // src/features/imports/import-mapping.ts (excerpt)
 // RFC 5987 so Vietnamese file names survive the header; the ASCII fallback is for old clients.
 export function sendXlsx(res: Response, content: Uint8Array, fileName: string): StreamableFile {
-  res.set({
-    'Content-Type': XLSX_MIME,
-    'Content-Disposition': `attachment; filename="${asciiFileName(fileName)}"; filename*=UTF-8''${encodeURIComponent(fileName)}`,
-  });
-  return new StreamableFile(content);
+  return sendFile(res, content, fileName, XLSX_MIME);
 }
 
 export function toReportJson(report: ImportReport): Prisma.InputJsonValue {
@@ -1116,7 +1150,7 @@ export function fromReportJson(value: Prisma.JsonValue | null): ImportReport | n
 }
 ```
 
-`asciiFileName` replaces non-ASCII characters with `_` for the `filename` fallback. F-10 BE-02 moves this header logic to the shared `sendFile` (`src/shared/files/send-file.ts`); `sendXlsx` then keeps its signature and wraps it.
+F-10 already built shared sendFile (`src/shared/files/send-file.ts`); sendXlsx wraps it. Multipart names reuse uploadedFileName, not feature-local decoding. DTO references live in `src/shared/dtos/ref.dto.ts` and pagination helpers in `src/shared/pagination/`.
 
 ```ts
 // src/features/imports/imports.service.ts
@@ -1186,7 +1220,7 @@ Visibility in `list` and `detail` (D16), as a `Prisma.ImportBatchWhereInput` bui
 ```ts
 // src/features/imports/imports.processor.ts
 @Processor(IMPORT_QUEUE)
-export class ImportsProcessor extends WorkerHost implements OnModuleInit {
+export class ImportsProcessor extends WorkerHost implements OnApplicationBootstrap, OnModuleDestroy {
   private readonly logger = new Logger(ImportsProcessor.name);
 
   constructor(
@@ -1195,7 +1229,11 @@ export class ImportsProcessor extends WorkerHost implements OnModuleInit {
     @InjectQueue(IMPORT_QUEUE) private readonly queue: Queue<ImportJobData, void, ImportJobName>,
   ) { super(); }
 
-  async onModuleInit(): Promise<void> {
+  onApplicationBootstrap(): void {
+    void this.schedule().catch((error: unknown) => this.logger.error(String(error)));
+  }
+
+  async schedule(): Promise<void> {
     await this.queue.upsertJobScheduler(
       IMPORT_SWEEP.SCHEDULER_ID,
       { pattern: IMPORT_SWEEP.CRON, tz: IMPORT_SWEEP.TIME_ZONE },
@@ -1271,7 +1309,7 @@ export async function writeCurriculum(tx: Prisma.TransactionClient, versionId: s
 
 `writeCurriculum` writes the same columns F-07's `CurriculumService.createItem` / `updateItem` / `RequisitesService.replace` write (`f-07-…:885-930`, `:1146`), with `sortOrder` from the plan instead of `nextSortOrder` — the import owns the whole order of every semester it touches.
 
-**Rationale**: The controller and service mirror `src/features/curriculum/` (F-07 BE-03): permissions on the route, scope and state in the service. The processor mirrors nothing in the repo yet — it is the first BullMQ worker — so it follows `@nestjs/bullmq`'s `WorkerHost` pattern exactly and keeps all its idempotency in "read the status first" (D3, `nestjs-rules.md` §7). Re-running the validator inside the commit transaction is what makes a dry-run that is an hour old still safe (D15). The imports feature does not import from `curriculum` or `courses`: it uses the shared rules (BE-02), `programTarget` / `programEditState` (`src/shared/programs/`, F-06), and `assertDirectEdit` (`src/shared/authz/edit-path.ts`, F-04).
+**Rationale**: Permissions stay on routes, scope and state in services. Follow built F-15 queue registration, shared BULLMQ_PREFIX, nonblocking scheduling and bounded close. Status checks plus a locked batch re-read make retries idempotent; validation and writes use one transaction client (D15). No feature-to-feature imports: shared rules, programTarget/programEditState and assertDirectEdit remain the boundary. The excerpt omits lifecycle/locking details; §2c and the built processor are authoritative.
 
 **Gotchas**
 - `@nestjs/platform-express`'s `FileInterceptor` throws `PayloadTooLargeException` before the controller runs; the global filter maps it via the new 413 entry. The FE pre-checks the size too (FE-03) so this is the fallback.
@@ -1338,7 +1376,7 @@ export class CurriculumExportService {
 }
 ```
 
-**Rationale**: Export reads any version state (Draft, Pending, Released, Superseded) because US-037 is a read; the permission is the one cell R1/R3 hold for both directions. The requisite cell format "code – name" is what the parser's `REQUISITE_CODE_TOKEN` reads back, so the round trip is exact (D13). Living in the imports feature keeps every sheet format in one folder (D6); it reads curriculum tables directly with Prisma, like F-08's checker does (`f-08-…` BE-03), rather than importing `CurriculumService`.
+**Rationale**: Export reads DRAFT/PENDING/ACTIVE/HISTORICAL because US-037 is a read; shared rowCourse preserves F-15 frozen names/credits. R1/R3 hold the permission for both directions. Requisite cells use "code – name", read back by REQUISITE_CODE_TOKEN (D13). Read through Prisma, not CurriculumService; actual requisites use relationType.
 
 **Gotchas**
 - Decimal credits through `toWireDecimal` (`src/shared/decimal/decimal.ts`), never `Number(...)`: `2.5` must not become `2.5000000001` and `3` must not become `3.00` on a round trip that the validator then compares as text.
@@ -1361,8 +1399,8 @@ What/Why: KB-022..KB-025, DL-2, DL-4, NFR-05, US-033..US-037; the F-02 `PERMISSI
 |---|---|
 | NEW | `test/imports.e2e-spec.ts` |
 | NEW | `test/support/xlsx-builder.ts` |
-| MODIFY | `test/support/create-test-app.ts` (start Redis for suites that ask for it; already wired by F-01 `startRedis`) |
-| MODIFY | `test/permissions.e2e-spec.ts` (rows for `POST /imports`, `GET …/curriculum/export`) |
+| READ | `test/test-app.ts`, `test/containers.ts`, `test/test-env.ts` (existing PostgreSQL/Redis harness; no edits) |
+| MODIFY | `test/permission-table.ts`, `test/permission-table.e2e-spec.ts` (import/export rows; denied writes count ImportBatch) |
 
 **Shape**
 
@@ -1400,16 +1438,16 @@ Cases:
 | File after expiry (set `expiresAt` in the past, run the sweep job directly) | `GET /imports/:id/file` → 410; batch still listed |
 | Catalog `WILL_UPDATE` then commit | course name changed; `COURSE_RELEASED` refused for a course in a released version |
 
-`permissions.e2e-spec.ts`: add `POST /imports` (catalog) — R1 201, R3 403; `POST /imports` (curriculum, own program) — R1 201, R3 201, R4 403; `GET …/curriculum/export` — R1, R3 200, R7 403 — following the table F-02 BE-08 drives from `PERMISSION_TABLE` (`f-02-…:2059`).
+`permission-table.ts`: catalog/curriculum POST rows allow R1 and deny R4; export GET allows R1 and denies seeded R6. The table tests guards with placeholder bodies. Dedicated multipart tests prove R1 201, derived R3 catalog 403 OUT_OF_SCOPE, R3 own curriculum 201, own export 200 and out-of-scope refusal. The director account has no manual SYSTEM grant: assignDirector supplies scope. Current seed grants R3 scoped P for both permissions: catalog must not assert PERMISSION_DENIED for R3. Round-trip fixtures use valid 0..4 scores, and assertions include the batch report.
 
 **Rationale**: The suite runs the real worker against Testcontainers Redis, as F-01's harness already supports (`f-01-…:797-805`); polling the batch is exactly what the client does, so the test proves the contract the screen relies on. Building fixtures through `sheet-writer` keeps the test files and the template in lockstep.
 
 **Gotchas**
 - Close the worker in `afterAll` (`app.close()` does it through `WorkerHost`) or Vitest hangs on the open Redis connection.
-- The sweep scheduler registers in `onModuleInit`; in tests, call the processor's `process({ name: IMPORT_JOB.SWEEP })` directly instead of waiting for the cron.
+- The sweep scheduler registers nonblockingly in onApplicationBootstrap; tests call `process({ name: IMPORT_JOB.SWEEP, data: { batchId: '' } })` directly instead of waiting for cron.
 - supertest: `.attach('file', buffer, 'khung.xlsx').field('importType', 'CURRICULUM').field('versionId', id)`; send the CSRF header as every other e2e call does.
 
-**Verify**: `pnpm test:e2e -- imports permissions` green.
+**Verify**: Orchestrator runs `pnpm test:e2e -- imports permission-table`. Docker/e2e must not run in this sandbox; written cases are not a runtime pass.
 
 **Depends on**: BE-05, BE-06
 ---
@@ -1420,7 +1458,7 @@ Cases:
 
 | Action | Path |
 |---|---|
-| MODIFY | `src/shared/api/schema.d.ts` (generated) |
+| REUSE | `src/shared/api/schema.d.ts` (already generated by orchestrator; do not edit/regenerate) |
 | MODIFY | `src/shared/auth/permissions.ts` (`dataImportExcel`, `curriculumImportExportExcel`) |
 | MODIFY | `src/routes.ts` |
 | MODIFY | `src/router.tsx` |
@@ -1485,13 +1523,13 @@ export const IMPORT_ACCEPT = '.xlsx';
 export const FILE_LEVEL_ROW_LABEL = 'Toàn tệp';
 ```
 
-**Rationale**: As F-07 FE-01 (`f-07-…:1557-1590`) and F-02's `APP_MENU` (`f-02-…:2334-2358`). The menu and route guard use `curriculumImportExportExcel` because every holder of `data.importExcel` (R1) also holds it (`PERMISSION_TABLE`), so one code covers both without widening `AppMenuItem` to "any of" — the screen then offers only the types `GET /imports/types` returns.
+**Rationale**: Built permission-catalog.ts:159/292 grants both cells to R1 (school-wide) and R3 (program-scoped). Every holder of data.importExcel also holds curriculum.importExportExcel, so keep the single-code menu/route guard without widening AppMenuItem. GET /imports/types determines actual usable types: the R3 scoped data cell is not permission to import a school-wide catalog.
 
 **Gotchas**
 - `IMPORT_FILE_MAX_BYTES` duplicates the backend's `IMPORT_LIMITS.FILE_MAX_BYTES`; the backend's 413 is authoritative, the client check only saves an upload. Note both in `technical_reference.md` (DOC-01).
 - If a later role holds `data.importExcel` without the curriculum cell, the guard must become any-of — `PERMISSION_TABLE` change review catches it (§8).
 
-**Verify**: `pnpm api:types`; `pnpm exec tsc -b`.
+**Verify**: `pnpm exec tsc -b`; generated types are already supplied, do not run `pnpm api:types` in this build.
 
 **Depends on**: BE-05, BE-06
 
@@ -1503,7 +1541,7 @@ export const FILE_LEVEL_ROW_LABEL = 'Toàn tệp';
 
 | Action | Path |
 |---|---|
-| MODIFY | `src/shared/api/client.ts` (`sendForm`, `downloadFile`) |
+| REUSE | `src/shared/api/client.ts` (built `sendForm`, `downloadFile`, `withQuery`; runtime unchanged) |
 | MODIFY | `src/shared/api/client.test.ts` |
 | NEW | `src/features/imports/api/imports.ts` |
 | NEW | `src/features/imports/hooks/useImports.ts` |
@@ -1570,7 +1608,7 @@ const batchPath = (batchId: string) => `/imports/${encodeURIComponent(batchId)}`
 
 export const fetchImportTypes = () => getJson<ImportTypeOption[]>('/imports/types');
 export const fetchImportTargets = () => getJson<ImportTarget[]>('/imports/curriculum-targets');
-export const fetchImports = (query: ImportListQuery) => getJson<ImportBatchPage>(`/imports?${toSearchParams(query)}`);
+export const fetchImports = (query: ImportListQuery) => getJson<ImportBatchPage>(withQuery('/imports', query));
 export const fetchImport = (batchId: string) => getJson<ImportBatchDetail>(batchPath(batchId));
 
 export function createImport(input: CreateImportInput) {
@@ -1586,7 +1624,7 @@ export const downloadTemplate = (importType: ImportType) => downloadFile(`/impor
 export const downloadImportFile = (batch: ImportBatchSummary) => downloadFile(`${batchPath(batch.id)}/file`, batch.fileName);
 ```
 
-`toSearchParams` is the helper F-04's course list uses for its query (`f-04-…:1195`); reuse it from `src/shared/api/`.
+`withQuery` is the built client helper; `toSearchParams` does not exist. The generated operation supplies the list query type.
 
 ```ts
 // src/features/imports/hooks/useImports.ts
@@ -1670,7 +1708,7 @@ export function useExportCurriculum(versionId: string) {
 **Rationale**: `client.ts` stays the one place that talks `fetch` (`react-vite-rules.md` §6); the two helpers reuse its private `request`, `readErrorBody` and `CSRF_HEADER` so an upload fails with the same `ApiError` as any JSON call. Downloads are mutations because they are user-triggered actions with a pending state for the button, not cached data. The export lives in the curriculum feature's own API file, so `features/curriculum` does not import `features/imports`.
 
 **Gotchas**
-- A committed batch must refresh the curriculum and catalog screens: when `useImportBatch` sees the status turn `COMMITTED`, invalidate the curriculum query of `batch.versionId` and the course list — do it in `ImportPage` through `queryClient.invalidateQueries` with the curriculum and course key roots imported from `src/shared/api/queryRoots.ts` (add `CURRICULUM_QUERY_ROOT`, `COURSE_QUERY_ROOT` there if F-04/F-07 kept them feature-local; record the move in the implement report).
+- When useImportBatch observes COMMITTED, invalidate the existing shared curriculum, course, outcome roots, program keys, target list and import lists. Keep the effect in the hook so reopening a detail also refreshes data; do not invalidate domain caches merely on POST commit returning COMMITTING. No shared root is moved.
 - Polling a protected endpoint keeps the server session alive (60-minute idle, NFR-08). The intervals stop as soon as the batch leaves a transient state, so an idle screen does not poll forever; F-14's constraint about polls not renewing the session applies to its notification poll, not to this bounded one (§8).
 - `URL.revokeObjectURL` right after `click()` is safe in current browsers; Safari needs the anchor in the document — append then remove it if the manual walk on Safari fails.
 
@@ -1681,6 +1719,8 @@ export function useExportCurriculum(versionId: string) {
 ---
 
 ### FE-03 — Import page (MH-29)
+
+**Built-source adaptation**: below are pre-build shape sketches, not exported contracts. Actual page uses DetailPageLayout/PageHeader and Alert/errorMessage instead of nonexistent PageContainer/ApiErrorAlert. ImportPage owns the upload mutation and passes pending/onUpload to its Form; initial type is validated against server types. Tests use built fetch-stub/fireEvent style, not MSW. Report is a severity-filtered table paginated at 50, format errors share one file-level alert; confirmation is labeled Xác nhận nhập / Ghi dữ liệu. See §2c.
 
 **Files**
 
@@ -1821,10 +1861,10 @@ export function ImportDetailPage() {
 }
 ```
 
-**Rationale**: List page mirrors F-04's `CourseListPage` (`f-04-…:1271`) — filters in the URL, `Page<T>` pagination. The detail page reuses FE-03's components unchanged.
+**Rationale**: Use F-04's pagination constants, but implement URL filters locally with useSearchParams: built CourseListPage uses local useState, not URL state. Use ListPageLayout/DataTable for history and DetailPageLayout/PageHeader for detail. The detail page reuses FE-03's report/confirmation unchanged.
 
 **Gotchas**
-- `useParams()` gives `string | undefined`; `useImportBatch` takes `undefined` and stays disabled, which only happens on a malformed URL.
+- `useParams()` gives `string | undefined`; built pages normalize to an empty id, and useImportBatch stays disabled for empty ids.
 - A batch outside the user's scope returns 404 `IMPORT_BATCH_NOT_FOUND`; `ApiErrorAlert` shows it — do not special-case 403.
 
 **Verify**: `ImportHistoryPage.test.tsx`: three batches render with labels; filter by status sets `?status=COMMITTED`; a VALIDATING row makes the list poll, which stops after it turns DRY_RUN.
@@ -1849,23 +1889,23 @@ export function ImportDetailPage() {
 const canExport = useCan(PERMISSIONS.curriculumImportExportExcel);
 const exportCurriculum = useExportCurriculum(versionId);
 {canExport && (
-  <Button icon={<DownloadOutlined />} loading={exportCurriculum.isPending} onClick={() => exportCurriculum.mutate(`${programCode}.xlsx`)}>
+  <Button icon={<DownloadOutlined />} loading={exportCurriculum.isPending} onClick={() => exportCurriculum.mutate()}>
     Xuất Excel
   </Button>
 )}
-{canExport && isDraft && (
+{canExport && isDraft && !version.sourceRequest && (
   <Link to={`${ROUTES.imports}?${new URLSearchParams({ [IMPORT_TYPE_PARAM]: 'CURRICULUM', [IMPORT_VERSION_PARAM]: versionId })}`}>
     <Button icon={<UploadOutlined />}>Nhập từ Excel</Button>
   </Link>
 )}
-{exportCurriculum.isError && <ApiErrorAlert error={exportCurriculum.error} />}
+{exportCurriculum.isError && <Alert type="error" title={errorMessage(exportCurriculum.error, 'Không xuất được khung chương trình. Hãy thử lại.')} />}
 ```
 
 **Rationale**: Beside F-08's "Kiểm tra nhất quán" button in the same toolbar (`f-08-…:1071-1077`). `useCan` answers "holds the permission somewhere"; a scoped R3 viewing another program gets the server's 403 in the alert — the button is not hidden per program because `MeDto.permissions` carries no scopes (F-02).
 
 `IMPORT_TYPE_PARAM` / `IMPORT_VERSION_PARAM` live in `src/routes.ts` beside `FOCUS_PARAM` (F-08), so the curriculum feature links to the import page without importing the imports feature.
 
-**Gotchas**: The page is also used for Released and Superseded versions; export works on every state (BE-06), so "Xuất Excel" shows regardless of status, while "Nhập từ Excel" shows on a Draft only (a released program's Draft is still refused by the server with `CHANGE_REQUEST_REQUIRED`).
+**Gotchas**: The page serves DRAFT/PENDING/ACTIVE/HISTORICAL; export works on every state (BE-06). Import shortcut is only for an ordinary Draft (no sourceRequest). The target list/server still refuse any ever-released program or correction Draft with CHANGE_REQUEST_REQUIRED; no change-request Draft import path is added.
 
 **Verify**: `CurriculumPage.test.tsx`: with the permission the button shows and calls the export URL of the version; without it the button is absent.
 
@@ -1880,7 +1920,7 @@ const exportCurriculum = useExportCurriculum(versionId);
 | MODIFY | `docs/design/data-dictionary.md` | Applied with this plan: `ImportBatch` — status values gain VALIDATING / COMMITTING, `programId` and `versionId` (⊕), `fileName` kept, the file moved to `ImportBatchFile` (⊕ new entity, 30-day retention); "Không ghi do lỗi" also covers a batch the sweep or a failed job ended |
 | MODIFY | `docs/design/state-diagrams.md` | Applied with this plan: §8 `ImportBatch` gains the two transient states and the stale-sweep exit |
 | MODIFY | `docs/architecture/database_and_models.md` | Two tables, two enums, the two checks |
-| MODIFY | `docs/architecture/general_architecture.md` | First BullMQ worker: queue `imports`, job ids, idempotency by state, daily sweep via `upsertJobScheduler`; `src/shared/courses/course-owners.ts`, `src/shared/curriculum/curriculum-row-rules.ts`; `client.ts` upload/download helpers |
+| MODIFY | `docs/architecture/general_architecture.md` | Worker tiếp nối release-activation của F-15: queue `imports`, BULLMQ_PREFIX dùng chung, job ids, idempotency by state, daily sweep via `upsertJobScheduler`; shutdown chờ tối đa 10 giây rồi force-close worker và queue backend trước hook Nest; `src/shared/courses/course-owners.ts`, `src/shared/curriculum/curriculum-row-rules.ts`; `client.ts` upload/download helpers |
 | MODIFY | `docs/architecture/features_architecture.md` | `imports` feature, MH-29, MH-30, export on MH-25 |
 | MODIFY | `docs/technical/technical_reference.md` | `exceljs` (CJS default import), `@types/multer`; 5 MB limit held on both sides |
 | MODIFY | `docs/implementation/README.md`, `docs/progress/*` | Status |
@@ -1939,8 +1979,8 @@ Build order: BE-01 → BE-02 → BE-03 → BE-04 → **pause P1** → BE-05 → 
 | Risk | Impact | Mitigation |
 |---|---|---|
 | 🏫 The Khoa's real curriculum file differs from the SRS 4.3 column list (labels, a program block laid out differently, merged header cells) | DL-2 cannot be imported as is; CV-097 round trip fails | Column labels and the program block are data in `curriculum.sheet.ts` (D6); pause P1 compares against the real file; header matching ignores case and spacing; unknown columns are LƯU Ý, not LỖI |
-| F-01..F-08 unbuilt; shapes come from their plans | Call-site drift | Rule 13 re-read before BE-02 of `courses.service.ts` (`assertOwners`), `curriculum.service.ts` (`assertSemesterInRange`, `createItem`), `course-usage.reader.ts`, `curriculum-warnings.ts`, `curriculum-cycles.ts`, `program-credits.ts`, `edit-path.ts`, `program-target.ts`, `queue.module.ts` |
-| First BullMQ worker in the project | Worker lifecycle issues (hung tests, duplicated jobs) surface here first | Idempotency by state (D3), custom job ids, `app.close()` in e2e, stale sweep; `general_architecture.md` records the pattern for F-17, F-19, F-22 |
+| F-01..F-15 built; old plan shapes differ from source | Call-site drift | BE-01..BE-04 checked actual owners, semester assertions, usage reader, warnings/cycles/credits, edit path, program target and queue config; see §2 and §2c. Later steps must repeat Rule 13 |
+| F-15 already has a BullMQ worker | Replacing its lifecycle pattern risks hung tests or unbounded shutdown | Follow `release-activation.processor.ts` (bounded close) and `QueueModule` (`BULLMQ_PREFIX`); retain import idempotency by state (D3), custom job ids and stale sweep in the later run |
 | Large files and the 2-minute commit transaction | Locks on the Draft version (curriculum) or the advisory lock (catalog) held while writing | `ROWS_MAX` 2000 bounds the work; NFR-05 measured in BE-07; raise `TX_TIMEOUT_MS` only with a measurement |
 | Files kept in PostgreSQL | Table grows by up to 5 MB per upload | 30-day retention, daily sweep, `ImportBatchFile` separate from list queries (D4) |
 | Menu and route guard use one permission code | A future role with `data.importExcel` only would not see the menu | FE-01 gotcha; the `PERMISSION_TABLE` review for that role changes the guard to any-of |

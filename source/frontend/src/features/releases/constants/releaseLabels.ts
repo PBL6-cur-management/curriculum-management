@@ -42,3 +42,14 @@ export const PIN_STATUS_LABELS = {
 } as const;
 export const CORRECTION_REASON_REQUIRED = 'Nhập lý do đính chính.';
 export const NO_VERSIONS = 'Chương trình chưa có phiên bản nào.';
+export const COMPARISON_OPERATIONS = [
+  { change: 'ADDED', label: 'Thêm', color: 'success' },
+  { change: 'REMOVED', label: 'Bớt', color: 'error' },
+  { change: 'CHANGED', label: 'Sửa', color: 'warning' },
+] as const;
+export const ASSIGNMENT_NOTE =
+  'Phiên bản mới không tự áp dụng cho mọi khóa. Chỉ các khóa được chọn mới thay đổi từ học kỳ đã chỉ định.';
+export const STUDENT_ASSIGNMENT_NOTE =
+  'Gán theo khóa; ghi danh và ngoại lệ từng sinh viên được xử lý ở tính năng hồ sơ sinh viên.';
+export const ASSIGNMENT_REVISION_CHANGED =
+  'Lịch gán hoặc lịch học kỳ đã thay đổi. Nạp lại dữ liệu, kiểm tra lựa chọn và xác nhận lại.';

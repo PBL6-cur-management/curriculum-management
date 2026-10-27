@@ -196,9 +196,9 @@ Trả lời một lần, áp cho mọi tính năng. Phần lớn là chỗ khung
 
 | # | Câu hỏi | Nguồn | A (đề xuất) | B | C | Trả lời |
 |---|---|---|---|---|---|---|
-| F12-01 | Thành phần dưới ngưỡng | T-1, EC-42 | Khai báo và hiển thị quy tắc; khi tính dùng Đạt/Không đạt từ nguồn, không suy lại từ điểm | Lưu điểm thành phần và tự kết luận | | |
-| F12-02 | Áp dụng công thức mới | BR-16 | Từ học kỳ kế tiếp sau duyệt, qua phiên bản chương trình | | | |
-| F12-03 | Tổng trọng số | — | Bắt buộc đúng 100% mới lưu được | Cảnh báo, vẫn lưu | | |
+| F12-01 | Thành phần dưới ngưỡng | T-1, EC-42 | Khai báo và hiển thị quy tắc; khi tính dùng Đạt/Không đạt từ nguồn, không suy lại từ điểm | Lưu điểm thành phần và tự kết luận | | A — người dùng chốt 2026-10-26 |
+| F12-02 | Áp dụng công thức mới | BR-16 | Từ học kỳ kế tiếp sau duyệt, qua phiên bản chương trình | | | Chốt 2026-10-26: phiên bản Phụ cho học kỳ tương lai do người dùng chọn; sửa công thức không được ngoại lệ học kỳ đã bắt đầu |
+| F12-03 | Tổng trọng số | — | Bắt buộc đúng 100% mới lưu được | Cảnh báo, vẫn lưu | | A — người dùng chốt 2026-10-26 |
 
 ---
 
@@ -238,21 +238,21 @@ Trả lời một lần, áp cho mọi tính năng. Phần lớn là chỗ khung
 | # | Câu hỏi | Nguồn | A (đề xuất) | B | C | Trả lời |
 |---|---|---|---|---|---|---|
 | F15-01 🏫 | Thời điểm ảnh chụp | C01, E-3, T-5 | Tạo khi duyệt cuối ở Chờ hiệu lực; kích hoạt ở ngày bắt đầu học kỳ | Tạo khi tới học kỳ | | A |
-| F15-02 | Phiên bản đầu tiên | H-1, L-3 | Thao tác "ban hành khởi tạo", số mặc định 1.0 sửa được | | | |
-| F15-03 | Nạp các phiên bản cũ | S-7 | Ban hành khởi tạo cho bản cũ nhất; bản sau qua đề xuất của R1, được bỏ điều kiện học kỳ chưa tới có ghi nhật ký | | | |
-| F15-04 | Hai đề xuất cùng học kỳ | L-7, E-3 | Mỗi đề xuất một phiên bản; bản sau chép từ bản mới nhất đã rời Nháp | Gộp một phiên bản | | |
-| F15-05 | Học kỳ hiệu lực | S-5 | Phải có `startDate` chưa tới (trừ ban hành khởi tạo) | | | |
-| F15-06 🏫 | Đính chính | S-8, U-9 | R1 ban hành trực tiếp, bắt buộc lý do, tăng số Phụ | Qua ba cấp | | |
-| F15-07 | Hình thức ảnh chụp | M-1 | Bảng con sao chép (phiên bản sở hữu dòng khung, liên kết đề cương theo bản) | Một cột JSON chứa toàn bộ | | |
-| F15-08 | Đề cương thiếu khi ban hành | EC-44 | Chặn ban hành khi còn học phần chưa có đề cương | Cảnh báo | | |
+| F15-02 | Phiên bản đầu tiên | H-1, L-3 | Thao tác "ban hành khởi tạo", số mặc định 1.0 sửa được | | | A — người dùng chốt 2026-10-26 |
+| F15-03 | Nạp các phiên bản cũ | S-7 | Ban hành khởi tạo cho bản cũ nhất; bản sau qua đề xuất của R1, được bỏ điều kiện học kỳ chưa tới có ghi nhật ký | | | Chốt 2026-10-26: chỉ đề xuất do Phòng Đào tạo tạo, lưu createdByAcademicOffice khi tạo; sửa công thức vẫn phải chọn học kỳ tương lai |
+| F15-04 | Hai đề xuất cùng học kỳ | L-7, E-3 | Mỗi đề xuất một phiên bản; bản sau chép từ bản mới nhất đã rời Nháp | Gộp một phiên bản | | A — người dùng chốt 2026-10-26 |
+| F15-05 | Học kỳ hiệu lực | S-5 | Phải có `startDate` chưa tới (trừ ban hành khởi tạo) | | | Chốt 2026-10-26: giữ quy tắc F-15; riêng sửa công thức không có ngoại lệ học kỳ đã bắt đầu |
+| F15-06 🏫 | Đính chính | S-8, U-9 | R1 ban hành trực tiếp, bắt buộc lý do, tăng số Phụ | Qua ba cấp | | Mặc định A có hiệu lực 2026-10-26; đầu vào Khoa còn nợ, không phải trả lời của Khoa |
+| F15-07 | Hình thức ảnh chụp | M-1 | Bảng con sao chép (phiên bản sở hữu dòng khung, liên kết đề cương theo bản) | Một cột JSON chứa toàn bộ | | A — người dùng chốt 2026-10-26 |
+| F15-08 | Đề cương thiếu khi ban hành | EC-44 | Chặn ban hành khi còn học phần chưa có đề cương | Cảnh báo | | A — người dùng chốt 2026-10-26 |
 
 ### F-16 — So sánh phiên bản, gán khóa
 
 | # | Câu hỏi | Nguồn | A (đề xuất) | B | C | Trả lời |
 |---|---|---|---|---|---|---|
-| F16-01 🏫 | Khóa cũ nhận phiên bản mới | C07, E-9, L-8 | R1 chọn khóa áp dụng khi ban hành; khóa cũ chỉ đổi khi R1 chọn | Khóa cũ luôn giữ phiên bản lúc nhập học | | A |
-| F16-02 | Gán theo khóa vs từng sinh viên | U-5 | Theo khóa ở B4; từng sinh viên và ngoại lệ ở B5 | | | |
-| F16-03 | Cách hiện so sánh | FR-74 | Bảng ba nhóm Thêm / Bớt / Sửa theo dòng khung, kèm giá trị cũ → mới | Hai cột song song | | |
+| F16-01 🏫 | Khóa cũ nhận phiên bản mới | C07, E-9, L-8 | R1 chọn khóa áp dụng khi ban hành; khóa cũ chỉ đổi khi R1 chọn | Khóa cũ luôn giữ phiên bản lúc nhập học | | Chốt 2026-10-26: quyết định ban hành đích + R1 chọn khóa là đủ căn cứ, không có kho bằng chứng riêng |
+| F16-02 | Gán theo khóa vs từng sinh viên | U-5 | Theo khóa ở B4; từng sinh viên và ngoại lệ ở B5 | | | A — người dùng chốt 2026-10-26 |
+| F16-03 | Cách hiện so sánh | FR-74 | Bảng ba nhóm Thêm / Bớt / Sửa theo dòng khung, kèm giá trị cũ → mới | Hai cột song song | | A — người dùng chốt 2026-10-26 |
 
 ### F-26 — Sao lưu, diễn tập phục hồi
 
@@ -270,46 +270,46 @@ Trả lời một lần, áp cho mọi tính năng. Phần lớn là chỗ khung
 
 | # | Câu hỏi | Nguồn | A (đề xuất) | B | C | Trả lời |
 |---|---|---|---|---|---|---|
-| F17-01 🏫 | Tài khoản sinh viên | H-2, E-8 | Tạo tự động khi nhập danh sách, tên đăng nhập là mã sinh viên; tài khoản không bắt buộc | Tạo tay | | |
-| F17-02 🏫 | Phát mật khẩu ban đầu | H-2, G-1 | Hệ thống sinh mật khẩu ngẫu nhiên, R1 tải tệp danh sách để phát; bắt đổi ở lần đầu | Mật khẩu ban đầu = ngày sinh | Gửi email (cần F-25) | |
-| F17-03 | Danh mục trạng thái | E-10 | Đang học · Bảo lưu · Thôi học · Đã tốt nghiệp | | | |
-| F17-04 | Ai đặt "Đã tốt nghiệp" | S-14 | Chỉ theo nguồn dữ liệu; kết quả xét không tự đổi | Xét Đủ điều kiện thì tự đổi | | |
-| F17-05 | Hai ghi danh | L-9 | Cổng và API dùng ghi danh Chính; cổng cho chọn ghi danh còn lại | | | |
+| F17-01 🏫 | Tài khoản sinh viên | H-2, E-8 | Tạo tự động khi nhập danh sách, tên đăng nhập là mã sinh viên; tài khoản không bắt buộc | Tạo tay | | Mặc định A có hiệu lực 2026-10-26; đầu vào Khoa còn nợ, không phải trả lời của Khoa |
+| F17-02 🏫 | Phát mật khẩu ban đầu | H-2, G-1 | Hệ thống sinh mật khẩu ngẫu nhiên, R1 tải tệp danh sách để phát; bắt đổi ở lần đầu | Mật khẩu ban đầu = ngày sinh | Gửi email (cần F-25) | Mặc định A có hiệu lực 2026-10-26; đầu vào Khoa còn nợ, không phải trả lời của Khoa |
+| F17-03 | Danh mục trạng thái | E-10 | Đang học · Bảo lưu · Thôi học · Đã tốt nghiệp | | | A — người dùng chốt 2026-10-26 |
+| F17-04 | Ai đặt "Đã tốt nghiệp" | S-14 | Chỉ theo nguồn dữ liệu; kết quả xét không tự đổi | Xét Đủ điều kiện thì tự đổi | | A — người dùng chốt 2026-10-26 |
+| F17-05 | Hai ghi danh | L-9 | Cổng và API dùng ghi danh Chính; cổng cho chọn ghi danh còn lại | | | A — người dùng chốt 2026-10-26 |
 
 ### F-18 — Điều kiện đăng ký học phần
 
 | # | Câu hỏi | Nguồn | A (đề xuất) | B | C | Trả lời |
 |---|---|---|---|---|---|---|
-| F18-01 | Ba hay bốn kết quả | C05 | Ba kết quả đủ điều kiện + trạng thái Đã hoàn thành riêng | Bốn kết quả | | |
-| F18-02 | Ngưỡng và thang | E-1, Q-03 | Như F05-02, F05-03 | | | |
-| F18-03 | Tính khi nào | NFR-02 | Tính khi xem, không lưu | Lưu sẵn, tính lại khi dữ liệu đổi | | |
+| F18-01 | Ba hay bốn kết quả | C05 | Ba kết quả đủ điều kiện + trạng thái Đã hoàn thành riêng | Bốn kết quả | | A — người dùng chốt 2026-10-26 |
+| F18-02 | Ngưỡng và thang | E-1, Q-03 | Như F05-02, F05-03 | | | A — người dùng chốt 2026-10-26 |
+| F18-03 | Tính khi nào | NFR-02 | Tính khi xem, không lưu | Lưu sẵn, tính lại khi dữ liệu đổi | | A — người dùng chốt 2026-10-26 |
 
 ### F-19 — Xét tốt nghiệp
 
 | # | Câu hỏi | Nguồn | A (đề xuất) | B | C | Trả lời |
 |---|---|---|---|---|---|---|
-| F19-01 🏫 | Điều kiện ngoài tín chỉ | Q-10 | Mô hình là học phần điều kiện | Thêm thực thể chứng chỉ | | |
-| F19-02 | Nhóm tương đương khi xét lại | C11, E-11 | Dùng nhóm hiện tại; mỗi lần xét một dòng `GraduationAudit` | Chụp nhóm theo phiên bản | | |
-| F19-03 | Tín chỉ tự chọn | C09 | Như F07-03, không đếm trùng | | | |
-| F19-04 | Xét hàng loạt | NFR-03 | Job BullMQ, tiến độ hiện trên màn hình, xuất Excel kết quả | Chạy đồng bộ | | |
+| F19-01 🏫 | Điều kiện ngoài tín chỉ | Q-10 | Mô hình là học phần điều kiện | Thêm thực thể chứng chỉ | | Mặc định A có hiệu lực 2026-10-26; đầu vào Khoa còn nợ, không phải trả lời của Khoa |
+| F19-02 | Nhóm tương đương khi xét lại | C11, E-11 | Dùng nhóm hiện tại; mỗi lần xét một dòng `GraduationAudit` | Chụp nhóm theo phiên bản | | A — chốt 2026-10-26: dữ liệu hành chính hiện tại; mỗi GraduationAudit chụp đúng đầu vào, không hứa lịch sử bất biến trước đính chính |
+| F19-03 | Tín chỉ tự chọn | C09 | Như F07-03, không đếm trùng | | | A — người dùng chốt 2026-10-26 |
+| F19-04 | Xét hàng loạt | NFR-03 | Job BullMQ, tiến độ hiện trên màn hình, xuất Excel kết quả | Chạy đồng bộ | | A — người dùng chốt 2026-10-26 |
 
 ### F-20 — Cổng sinh viên
 
 | # | Câu hỏi | Nguồn | A (đề xuất) | B | C | Trả lời |
 |---|---|---|---|---|---|---|
-| F20-01 | Sinh viên xem danh mục, đề cương | G-8 | Mọi học phần, chỉ bản đề cương đã ban hành; khung và PLO chỉ của phiên bản mình | | | |
-| F20-02 | Tên bốn trạng thái tiến độ | T-4 | Theo US-093: Đã đạt, Chưa đạt, Đang học, Chưa học | | | |
-| F20-03 | Giao diện | — | Cùng ứng dụng React, bố cục riêng cho vai trò sinh viên, ưu tiên màn hình điện thoại | Ứng dụng riêng | | |
+| F20-01 | Sinh viên xem danh mục, đề cương | G-8 | Mọi học phần, chỉ bản đề cương đã ban hành; khung và PLO chỉ của phiên bản mình | | | A — người dùng chốt 2026-10-26 |
+| F20-02 | Tên bốn trạng thái tiến độ | T-4 | Theo US-093: Đã đạt, Chưa đạt, Đang học, Chưa học | | | A — người dùng chốt 2026-10-26 |
+| F20-03 | Giao diện | — | Cùng ứng dụng React, bố cục riêng cho vai trò sinh viên, ưu tiên màn hình điện thoại | Ứng dụng riêng | | A — người dùng chốt 2026-10-26 |
 
 ### F-21 — API cho dDUT
 
 | # | Câu hỏi | Nguồn | A (đề xuất) | B | C | Trả lời |
 |---|---|---|---|---|---|---|
-| F21-01 | Xác thực | FR-94 | Khóa API trong header `X-Api-Key`, lưu băm, R1 tạo/thu hồi | OAuth2 client credentials | | |
-| F21-02 | Ai xem dữ liệu sinh viên | L-10, U-8, G-4 | R1 mọi sinh viên, R3 sinh viên chương trình mình, R6 của mình; bên tích hợp được tin, ghi nhật ký từng lời gọi | | | |
-| F21-03 | Phiên bản đề cương qua API | C10 | Tham số `programVersion` hoặc `semester`; mặc định bản áp dụng cho sinh viên | Luôn bản mới nhất | | |
-| F21-04 | Hai ghi danh qua API | L-9 | Chỉ ghi danh Chính | Trả cả hai | | |
-| F21-05 | Giới hạn tốc độ | — | 60 lời gọi/phút mỗi khóa | Không giới hạn | | |
+| F21-01 | Xác thực | FR-94 | Khóa API trong header `X-Api-Key`, lưu băm, R1 tạo/thu hồi | OAuth2 client credentials | | A — người dùng chốt 2026-10-26 |
+| F21-02 | Ai xem dữ liệu sinh viên | L-10, U-8, G-4 | R1 mọi sinh viên, R3 sinh viên chương trình mình, R6 của mình; bên tích hợp được tin, ghi nhật ký từng lời gọi | | | A — người dùng chốt 2026-10-26 |
+| F21-03 | Phiên bản đề cương qua API | C10 | Tham số `programVersion` hoặc `semester`; mặc định bản áp dụng cho sinh viên | Luôn bản mới nhất | | A — người dùng chốt 2026-10-26 |
+| F21-04 | Hai ghi danh qua API | L-9 | Chỉ ghi danh Chính | Trả cả hai | | A — người dùng chốt 2026-10-26 |
+| F21-05 | Giới hạn tốc độ | — | 60 lời gọi/phút mỗi khóa | Không giới hạn | | A — người dùng chốt 2026-10-26 |
 
 ---
 
@@ -319,34 +319,34 @@ Trả lời một lần, áp cho mọi tính năng. Phần lớn là chỗ khung
 
 | # | Câu hỏi | Nguồn | A (đề xuất) | B | C | Trả lời |
 |---|---|---|---|---|---|---|
-| F22-01 ⛔🏫 | Cơ sở dữ liệu có sẵn là gì | Q-09, T-11 | Hỗ trợ cả hai; giả lập DB Trường (SQL Server) cho tới khi có quyền | Chỉ nạp từ Excel | | |
-| F22-02 | Lần đồng bộ bị treo | S-13 | Quá thời hạn cấu hình thì đánh Thất bại ở lần kế | | | |
-| F22-03 | Xung đột dữ liệu | FR-98 | Nguồn Trường thắng cho sinh viên và kết quả; dữ liệu đào tạo không đồng bộ ngược | Hỏi người dùng từng dòng | | |
+| F22-01 ⛔🏫 | Cơ sở dữ liệu có sẵn là gì | Q-09, T-11 | Hỗ trợ cả hai; giả lập DB Trường (SQL Server) cho tới khi có quyền | Chỉ nạp từ Excel | | Mặc định A có hiệu lực 2026-10-26; đầu vào Khoa còn nợ, không phải trả lời của Khoa |
+| F22-02 | Lần đồng bộ bị treo | S-13 | Quá thời hạn cấu hình thì đánh Thất bại ở lần kế | | | A — người dùng chốt 2026-10-26 |
+| F22-03 | Xung đột dữ liệu | FR-98 | Nguồn Trường thắng cho sinh viên và kết quả; dữ liệu đào tạo không đồng bộ ngược | Hỏi người dùng từng dòng | | A — người dùng chốt 2026-10-26 |
 
 ### F-23 — Báo cáo kiểm định
 
 | # | Câu hỏi | Nguồn | A (đề xuất) | B | C | Trả lời |
 |---|---|---|---|---|---|---|
-| F23-01 | Yêu cầu từ quy định mới | R-1, R-2, R-4 | Chưa làm (bạn đã chốt "chưa có lúc này") | | | |
-| F23-02 🏫 | Mẫu báo cáo | FR-105..107 | Mẫu tổng quát xuất Excel; đổi theo mẫu AUN/MOET khi có | | | |
+| F23-01 | Yêu cầu từ quy định mới | R-1, R-2, R-4 | Chưa làm (bạn đã chốt "chưa có lúc này") | | | A — người dùng chốt 2026-10-26 |
+| F23-02 🏫 | Mẫu báo cáo | FR-105..107 | Mẫu tổng quát xuất Excel; đổi theo mẫu AUN/MOET khi có | | | Mặc định A có hiệu lực 2026-10-26; đầu vào Khoa còn nợ, không phải trả lời của Khoa |
 
 ### F-24 — Đồ thị, PDF, dòng thời gian, bảng sức khỏe
 
 | # | Câu hỏi | Nguồn | A (đề xuất) | B | C | Trả lời |
 |---|---|---|---|---|---|---|
-| F24-01 🏫 | PDF theo mẫu quyết định | Q-14 | Mẫu tổng quát, đổi khi có mẫu chính thức | | | |
-| F24-02 | Xem lại phiên bản đã ban hành | G-6 | Màn hình riêng MH-47, dùng lại phần hiển thị | | | |
-| F24-03 | Công cụ PDF | CN-3 | Puppeteer (ảnh máy chủ nặng thêm ~300 MB) | pdfmake (nhẹ, phải dựng bố cục bằng mã) | | |
-| F24-04 | Thư viện đồ thị tiên quyết | FR-38 | `@antv/g6` (cùng hệ AntD) | React Flow | | |
+| F24-01 🏫 | PDF theo mẫu quyết định | Q-14 | Mẫu tổng quát, đổi khi có mẫu chính thức | | | Mặc định A có hiệu lực 2026-10-26; đầu vào Khoa còn nợ, không phải trả lời của Khoa |
+| F24-02 | Xem lại phiên bản đã ban hành | G-6 | Màn hình riêng MH-47, dùng lại phần hiển thị | | | A — người dùng chốt 2026-10-26 |
+| F24-03 | Công cụ PDF | CN-3 | Puppeteer (ảnh máy chủ nặng thêm ~300 MB) | pdfmake (nhẹ, phải dựng bố cục bằng mã) | | A — người dùng chốt 2026-10-26 |
+| F24-04 | Thư viện đồ thị tiên quyết | FR-38 | `@antv/g6` (cùng hệ AntD) | React Flow | | A — @antv/g6 được duyệt 2026-10-26, đã ghi tech-stack; ghim phiên bản khi build F-24 |
 
 ### F-25 — Ủy quyền, email, nhắc hạn
 
 | # | Câu hỏi | Nguồn | A (đề xuất) | B | C | Trả lời |
 |---|---|---|---|---|---|---|
-| F25-01 | Nhắc hạn | Q-17 | Làm (mức tùy chọn), số ngày là tham số cấu hình | Bỏ | | |
-| F25-02 | Email hỏng | L-6 | Trong ứng dụng là kênh chính; email hỏng ghi lỗi, không gửi lại | Thử lại 3 lần qua BullMQ | | |
-| F25-03 | Ủy quyền ngày tương lai | S-11 | Hiệu lực khi tạo, chỉ dùng trong `validFrom..validTo` | | | |
-| F25-04 🏫 | Máy chủ email | — | SMTP của Trường; giả lập bằng Mailpit khi phát triển | Gmail SMTP | | |
+| F25-01 | Nhắc hạn | Q-17 | Làm (mức tùy chọn), số ngày là tham số cấu hình | Bỏ | | A — người dùng chốt 2026-10-26 |
+| F25-02 | Email hỏng | L-6 | Trong ứng dụng là kênh chính; email hỏng ghi lỗi, không gửi lại | Thử lại 3 lần qua BullMQ | | A — người dùng chốt 2026-10-26 |
+| F25-03 | Ủy quyền ngày tương lai | S-11 | Hiệu lực khi tạo, chỉ dùng trong `validFrom..validTo` | | | A — người dùng chốt 2026-10-26 |
+| F25-04 🏫 | Máy chủ email | — | SMTP của Trường; giả lập bằng Mailpit khi phát triển | Gmail SMTP | | Mặc định A có hiệu lực 2026-10-26; đầu vào Khoa còn nợ, không phải trả lời của Khoa |
 
 ### F-27 — Triển khai, thử tải, theo dõi hoạt động
 

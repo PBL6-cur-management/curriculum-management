@@ -20,11 +20,8 @@ import {
   trimUpperCase,
 } from '../../shared/dtos/transforms.js';
 
-export const COURSE_FIELD_LIMITS = {
-  CODE_MAX: 20,
-  NAME_MAX: 200,
-  QUERY_MAX: 100,
-} as const;
+import { COURSE_FIELD_LIMITS } from '../../shared/courses/course-field-limits.js';
+export { COURSE_FIELD_LIMITS } from '../../shared/courses/course-field-limits.js';
 
 export class CreateCourseDto {
   @ApiProperty({ maxLength: COURSE_FIELD_LIMITS.CODE_MAX })

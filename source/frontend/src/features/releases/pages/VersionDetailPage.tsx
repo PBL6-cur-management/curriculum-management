@@ -92,6 +92,9 @@ export function VersionDetailPage() {
         <Link to={generatePath(ROUTES.consistency, params)}>
           Kiểm tra nhất quán
         </Link>
+        <Link to={generatePath(ROUTES.electiveGroups, params)}>
+          Nhóm tự chọn
+        </Link>
         {canViewOutcomes && (
           <>
             <Link to={generatePath(ROUTES.plos, params)}>PLO</Link>

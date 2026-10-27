@@ -1,15 +1,16 @@
-import {
-  Button,
-  Flex,
-  Result,
-  Segmented,
-  Skeleton,
-  Space,
-  Typography,
-} from 'antd';
+import { Button, Alert, Flex, Result, Segmented, Skeleton, Space } from 'antd';
 import { useEffect, useState } from 'react';
 import { generatePath, Link, useParams, useSearchParams } from 'react-router';
-import { FOCUS_PARAM, ROUTES } from '../../../routes';
+import {
+  FOCUS_PARAM,
+  IMPORT_TYPE_PARAM,
+  IMPORT_VERSION_PARAM,
+  ROUTES,
+} from '../../../routes';
+import { PERMISSIONS } from '../../../shared/auth/permissions';
+import { useCan } from '../../../shared/auth/useCan';
+import { PageHeader } from '../../../shared/design-system';
+import { errorMessage } from '../../../shared/forms/applyFieldErrors';
 import { ApiError } from '../../../shared/api/client';
 import { RequestDraftBanner } from '../../../shared/change-requests/RequestDraftBanner';
 import { versionLabel } from '../../../shared/constants/versionLabels';
@@ -27,7 +28,7 @@ import {
   CURRICULUM_VIEW_LABELS,
   type CurriculumView,
 } from '../constants/curriculumLabels';
-import { useCurriculum } from '../hooks/useCurriculum';
+import { useCurriculum, useExportCurriculum } from '../hooks/useCurriculum';
 import {
   EMPTY_CURRICULUM_FILTERS,
   useCurriculumFilters,
@@ -41,6 +42,8 @@ const VIEW_OPTIONS = (
 export function CurriculumPage() {
   const { programId = '', versionId = '' } = useParams();
   const { data: curriculum, isPending, error } = useCurriculum(versionId);
+  const canImportExport = useCan(PERMISSIONS.curriculumImportExportExcel);
+  const exportExcel = useExportCurriculum(versionId);
   const [view, setView] = useState<CurriculumView>(CURRICULUM_VIEW.rows);
   const { filters, setFilters, visible, filtered } = useCurriculumFilters(
     curriculum?.items ?? [],
@@ -82,33 +85,62 @@ export function CurriculumPage() {
         ← Chương trình {version.programCode}
       </Link>
       <RequestDraftBanner request={version.sourceRequest} />
-      <Flex justify="space-between" align="center" wrap gap="small">
-        <Typography.Title level={2} style={{ margin: 0 }}>
-          Khung chương trình — {version.programCode} ({versionLabel(version)})
-        </Typography.Title>
-        <Space wrap>
-          <Segmented<CurriculumView>
-            options={VIEW_OPTIONS}
-            value={view}
-            onChange={setView}
-          />
-          <Link
-            to={generatePath(ROUTES.electiveGroups, {
-              programId,
-              versionId,
-            })}
-          >
-            Nhóm tự chọn
-          </Link>
-          <Link to={generatePath(ROUTES.consistency, { programId, versionId })}>
-            <Button>Kiểm tra nhất quán</Button>
-          </Link>
-          <CurriculumAddButton
-            curriculum={curriculum}
-            onAdd={() => setEditing('new')}
-          />
-        </Space>
-      </Flex>
+      <PageHeader
+        title={`Khung chương trình — ${version.programCode} (${versionLabel(version)})`}
+        actions={
+          <Space wrap>
+            {canImportExport && (
+              <>
+                <Button
+                  loading={exportExcel.isPending}
+                  onClick={() => exportExcel.mutate()}
+                >
+                  Xuất Excel
+                </Button>
+                {version.status === 'DRAFT' && !version.sourceRequest && (
+                  <Link
+                    to={`${ROUTES.imports}?${new URLSearchParams({ [IMPORT_TYPE_PARAM]: 'CURRICULUM', [IMPORT_VERSION_PARAM]: versionId })}`}
+                  >
+                    <Button>Nhập từ Excel</Button>
+                  </Link>
+                )}
+              </>
+            )}
+            <Segmented<CurriculumView>
+              options={VIEW_OPTIONS}
+              value={view}
+              onChange={setView}
+            />
+            <Link
+              to={generatePath(ROUTES.electiveGroups, {
+                programId,
+                versionId,
+              })}
+            >
+              Nhóm tự chọn
+            </Link>
+            <Link
+              to={generatePath(ROUTES.consistency, { programId, versionId })}
+            >
+              <Button>Kiểm tra nhất quán</Button>
+            </Link>
+            <CurriculumAddButton
+              curriculum={curriculum}
+              onAdd={() => setEditing('new')}
+            />
+          </Space>
+        }
+      />
+      {exportExcel.error && (
+        <Alert
+          type="error"
+          showIcon
+          title={errorMessage(
+            exportExcel.error,
+            'Không xuất được khung chương trình. Hãy thử lại.',
+          )}
+        />
+      )}
       <CurriculumWarningsPanel warnings={curriculum.warnings} />
       <CurriculumFiltersBar
         curriculum={curriculum}

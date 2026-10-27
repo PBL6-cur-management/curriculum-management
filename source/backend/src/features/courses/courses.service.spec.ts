@@ -163,6 +163,7 @@ describe('CoursesService', () => {
       findUnique: vi.fn().mockResolvedValue({ ...G1, facultyId: HOME.id }),
     };
     usage = {
+      releasedCourseIds: vi.fn().mockResolvedValue(new Set()),
       inReleasedVersion: vi.fn().mockResolvedValue(false),
       hasStudyResults: vi.fn().mockResolvedValue(false),
       programsUsing: vi.fn().mockResolvedValue([]),

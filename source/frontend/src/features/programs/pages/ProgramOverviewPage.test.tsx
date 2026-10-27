@@ -117,6 +117,26 @@ function renderPage(
 afterEach(() => vi.unstubAllGlobals());
 
 describe('ProgramOverviewPage', () => {
+  it('offers the program-specific cohort assignment route only with its permission', async () => {
+    renderPage(PROGRAM, [], {
+      ...ME,
+      permissions: [...ME.permissions, 'version.assignCohort'],
+    });
+    expect(
+      await screen.findByRole(
+        'link',
+        { name: 'Gán phiên bản cho khóa' },
+        { timeout: 3000 },
+      ),
+    ).toHaveAttribute('href', '/programs/p1/cohort-versions');
+  });
+  it('hides cohort assignment without permission', async () => {
+    renderPage(PROGRAM, [], ME);
+    await screen.findByRole('heading', { name: /1024034 — Kỹ thuật máy tính/ });
+    expect(
+      screen.queryByRole('link', { name: 'Gán phiên bản cho khóa' }),
+    ).not.toBeInTheDocument();
+  });
   it('shows the Draft info, the status and the way to the later sections', async () => {
     renderPage();
     expect(

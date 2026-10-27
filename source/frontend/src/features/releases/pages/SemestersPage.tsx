@@ -1,6 +1,10 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { Button, Card, Flex, Result, Table, Typography } from 'antd';
 import { useState } from 'react';
+import { Link } from 'react-router';
+import { ROUTES } from '../../../routes';
+import { PERMISSIONS } from '../../../shared/auth/permissions';
+import { useCan } from '../../../shared/auth/useCan';
 import { ApiError } from '../../../shared/api/client';
 import type { Cohort, Semester } from '../../../shared/releases/semesters';
 import {
@@ -17,6 +21,7 @@ type CohortDialog = { cohort?: Cohort } | null;
 // MH-10 (US-071): terms and intakes a release names. There is no delete: a semester or cohort a version stands on
 // must stay, and one nobody uses costs nothing. Reassigning cohorts is F-16.
 export function SemestersPage() {
+  const canAssign = useCan(PERMISSIONS.versionAssignCohort);
   const semesters = useSemesters();
   const cohorts = useCohorts();
   const [semesterDialog, setSemesterDialog] = useState<SemesterDialog>(null);
@@ -28,6 +33,11 @@ export function SemestersPage() {
       <Typography.Title level={2} style={{ margin: 0 }}>
         Học kỳ và khóa tuyển sinh
       </Typography.Title>
+      {canAssign && (
+        <Link to={ROUTES.cohortVersionAssignmentStart}>
+          Gán phiên bản cho khóa
+        </Link>
+      )}
       <Card
         title="Học kỳ"
         extra={

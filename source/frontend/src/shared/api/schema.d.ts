@@ -4,7109 +4,7691 @@
  */
 
 export interface paths {
-  '/api/health': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['HealthController_check'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/auth/login': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['AuthController_login'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/auth/logout': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['AuthController_logout'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/auth/me': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['AuthController_me'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/auth/change-password': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['AuthController_changePassword'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/users': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['UsersController_list'];
-    put?: never;
-    post: operations['UsersController_create'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/users/{userId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['UsersController_get'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch: operations['UsersController_update'];
-    trace?: never;
-  };
-  '/api/users/{userId}/disable': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['UsersController_disable'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/users/{userId}/enable': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['UsersController_enable'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/users/{userId}/reset-password': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['UsersController_resetPassword'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/users/{userId}/role-assignments': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['UsersController_history'];
-    put?: never;
-    post: operations['UsersController_assign'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/users/{userId}/role-assignments/{assignmentId}/revoke': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['UsersController_revoke'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/roles': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['PermissionsController_roles'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/permissions/matrix': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['PermissionsController_matrix'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/roles/{roleCode}/permissions/{permissionCode}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put: operations['PermissionsController_setCell'];
-    post?: never;
-    delete: operations['PermissionsController_clearCell'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/org-units': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['OrgUnitsController_list'];
-    put?: never;
-    post: operations['OrgUnitsController_create'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/org-units/{unitId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch: operations['OrgUnitsController_update'];
-    trace?: never;
-  };
-  '/api/org-units/{unitId}/deactivate': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['OrgUnitsController_deactivate'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/org-units/{unitId}/activate': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['OrgUnitsController_activate'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/subject-groups': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['SubjectGroupsController_list'];
-    put?: never;
-    post: operations['SubjectGroupsController_create'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/subject-groups/{groupId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['SubjectGroupsController_detail'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch: operations['SubjectGroupsController_update'];
-    trace?: never;
-  };
-  '/api/subject-groups/{groupId}/deactivation-impact': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['SubjectGroupsController_impact'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/subject-groups/{groupId}/deactivate': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['SubjectGroupsController_deactivate'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/subject-groups/{groupId}/activate': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['SubjectGroupsController_activate'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/subject-groups/{groupId}/members': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['SubjectGroupsController_addMember'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/subject-groups/{groupId}/members/{memberId}/end': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['SubjectGroupsController_endMember'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/subject-groups/{groupId}/members/{memberId}/revoke': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['SubjectGroupsController_revokeMember'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/subject-group-memberships': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['SubjectGroupMembershipsController_list'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/courses': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['CoursesController_list'];
-    put?: never;
-    post: operations['CoursesController_create'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/courses/{courseId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['CoursesController_detail'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch: operations['CoursesController_update'];
-    trace?: never;
-  };
-  '/api/courses/{courseId}/discontinue': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['CoursesController_discontinue'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/courses/{courseId}/reopen': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['CoursesController_reopen'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/courses/{courseId}/cancel': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['CoursesController_cancel'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/courses/{courseId}/relations': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['CourseRelationsController_list'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/course-relations': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['CourseRelationsController_create'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/course-relations/{relationId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete: operations['CourseRelationsController_remove'];
-    options?: never;
-    head?: never;
-    patch: operations['CourseRelationsController_update'];
-    trace?: never;
-  };
-  '/api/equivalence-groups': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['EquivalenceGroupsController_list'];
-    put?: never;
-    post: operations['EquivalenceGroupsController_create'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/equivalence-groups/{groupId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['EquivalenceGroupsController_detail'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch: operations['EquivalenceGroupsController_update'];
-    trace?: never;
-  };
-  '/api/equivalence-groups/{groupId}/members': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['EquivalenceGroupsController_addMember'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/equivalence-groups/{groupId}/members/{courseId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete: operations['EquivalenceGroupsController_removeMember'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/equivalence-groups/{groupId}/merge': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['EquivalenceGroupsController_merge'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/equivalence-groups/{groupId}/dissolve': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['EquivalenceGroupsController_dissolve'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/programs': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['ProgramsController_list'];
-    put?: never;
-    post: operations['ProgramsController_create'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/programs/{programId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['ProgramsController_detail'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch: operations['ProgramsController_update'];
-    trace?: never;
-  };
-  '/api/programs/{programId}/deactivate': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['ProgramsController_deactivate'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/programs/{programId}/reactivate': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['ProgramsController_reactivate'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/programs/{programId}/clone': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['ProgramsController_clone'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/programs/{programId}/directors': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['ProgramsController_listDirectors'];
-    put?: never;
-    post: operations['ProgramsController_assign'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/programs/{programId}/directors/{assignmentId}/end': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['ProgramsController_end'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/programs/{programId}/directors/{assignmentId}/revoke': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['ProgramsController_revoke'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/program-versions/{versionId}/info': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['ProgramVersionInfoController_read'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch: operations['ProgramVersionInfoController_update'];
-    trace?: never;
-  };
-  '/api/program-versions/{versionId}/curriculum': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['ProgramVersionsCurriculumController_read'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/program-versions/{versionId}/curriculum-items': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['ProgramVersionsCurriculumController_createItem'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/program-versions/{versionId}/curriculum-order': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put: operations['ProgramVersionsCurriculumController_reorder'];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/program-versions/{versionId}/elective-groups': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['ProgramVersionsCurriculumController_createGroup'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/curriculum-items/{itemId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete: operations['CurriculumItemsController_remove'];
-    options?: never;
-    head?: never;
-    patch: operations['CurriculumItemsController_update'];
-    trace?: never;
-  };
-  '/api/curriculum-items/{itemId}/requisites': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put: operations['CurriculumItemsController_replaceRequisites'];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/elective-groups/{groupId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete: operations['ElectiveGroupsController_remove'];
-    options?: never;
-    head?: never;
-    patch: operations['ElectiveGroupsController_update'];
-    trace?: never;
-  };
-  '/api/elective-groups/{groupId}/items': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put: operations['ElectiveGroupsController_assignItems'];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/program-versions/{versionId}/consistency': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['ConsistencyController_report'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/program-versions/{versionId}/credit-mismatch-acceptance': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put: operations['ConsistencyController_accept'];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/program-versions/{versionId}/plos': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['OutcomesController_listPlos'];
-    put?: never;
-    post: operations['OutcomesController_createPlo'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/program-versions/{versionId}/plos/order': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put: operations['OutcomesController_reorderPlos'];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/plos/{ploId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete: operations['OutcomesController_removePlo'];
-    options?: never;
-    head?: never;
-    patch: operations['OutcomesController_updatePlo'];
-    trace?: never;
-  };
-  '/api/program-versions/{versionId}/course-plo-matrix': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['OutcomesController_coursePloMatrix'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/curriculum-items/{itemId}/plo-weights/{ploId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put: operations['OutcomesController_setWeight'];
-    post?: never;
-    delete: operations['OutcomesController_removeWeight'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/program-versions/{versionId}/clo-plo-matrix': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['OutcomesController_programCloPloMatrix'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/curriculum-items/{itemId}/clo-plo-matrix': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['OutcomesController_itemCloPloMatrix'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/curriculum-items/{itemId}/clo-plo-links': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put: operations['OutcomesController_replaceLinks'];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/program-versions/{versionId}/outcome-coverage': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['OutcomesController_outcomeCoverage'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/courses/{courseId}/syllabus': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['SyllabiController_forCourse'];
-    put?: never;
-    post: operations['SyllabiController_create'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/syllabi/{syllabusId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch: operations['SyllabiController_update'];
-    trace?: never;
-  };
-  '/api/syllabi/{syllabusId}/weekly-contents': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['SyllabiController_createWeek'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/syllabi/{syllabusId}/weekly-contents/order': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put: operations['SyllabiController_reorderWeeks'];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/weekly-contents/{weeklyContentId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete: operations['SyllabiController_removeWeek'];
-    options?: never;
-    head?: never;
-    patch: operations['SyllabiController_updateWeek'];
-    trace?: never;
-  };
-  '/api/syllabi/{syllabusId}/clos': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['SyllabiController_createClo'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/syllabi/{syllabusId}/clos/order': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put: operations['SyllabiController_reorderClos'];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/clos/{cloId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete: operations['SyllabiController_removeClo'];
-    options?: never;
-    head?: never;
-    patch: operations['SyllabiController_updateClo'];
-    trace?: never;
-  };
-  '/api/syllabi/{syllabusId}/attachments': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['SyllabiController_upload'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/syllabus-attachments/{attachmentId}/file': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['SyllabiController_download'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/syllabus-attachments/{attachmentId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete: operations['SyllabiController_removeAttachment'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/change-requests': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['ChangeRequestsController_list'];
-    put?: never;
-    post: operations['ChangeRequestsController_create'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/change-requests/conflicts': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['ChangeRequestsController_conflicts'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/change-requests/user-options': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['ChangeRequestsController_userOptions'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/change-requests/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['ChangeRequestsController_read'];
-    put?: never;
-    post?: never;
-    delete: operations['ChangeRequestsController_remove'];
-    options?: never;
-    head?: never;
-    patch: operations['ChangeRequestsController_update'];
-    trace?: never;
-  };
-  '/api/change-requests/{id}/rebase': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['ChangeRequestsController_rebase'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/change-requests/{id}/items': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put: operations['ChangeRequestsController_replaceItems'];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/change-requests/{id}/diff': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['ChangeRequestsController_diff'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/change-requests/{id}/submit-preview': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['ChangeRequestsController_preview'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/change-requests/{id}/submit': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['ChangeRequestsController_submit'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/change-requests/{id}/withdraw': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['ChangeRequestsController_withdraw'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/change-requests/{id}/documents': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['ChangeRequestsController_upload'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/change-request-documents/{documentId}/file': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['ChangeRequestDocumentsController_download'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/change-request-documents/{documentId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete: operations['ChangeRequestDocumentsController_remove'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/change-requests/{id}/approve': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['ApprovalController_approve'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/change-requests/{id}/final-approval': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['ApprovalController_finalApproval'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/change-requests/{id}/final-approve': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['ApprovalController_finalApprove'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/change-requests/{id}/return': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['ApprovalController_returnToDraft'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/change-requests/{id}/reject': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['ApprovalController_reject'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/change-requests/{id}/override': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['ApprovalController_override'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/change-requests/{id}/history': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['ApprovalController_readHistory'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/change-requests/{id}/comments': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['ApprovalController_listComments'];
-    put?: never;
-    post: operations['ApprovalController_createComment'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/approval-queue': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['ApprovalQueueController_read'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/notifications': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['NotificationsController_list'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/notifications/unread-count': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['NotificationsController_unreadCount'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/notifications/read-all': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['NotificationsController_markAllRead'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/notifications/{id}/read': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['NotificationsController_markRead'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/semesters': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['SemestersController_listSemesters'];
-    put?: never;
-    post: operations['SemestersController_createSemester'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/semesters/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch: operations['SemestersController_updateSemester'];
-    trace?: never;
-  };
-  '/api/cohorts': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['SemestersController_listCohorts'];
-    put?: never;
-    post: operations['SemestersController_createCohort'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/cohorts/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch: operations['SemestersController_updateCohort'];
-    trace?: never;
-  };
-  '/api/programs/{programId}/versions/{versionId}/release-check': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['ReleasesController_check'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/programs/{programId}/versions/{versionId}/release': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['ReleasesController_release'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/programs/{programId}/versions': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['VersionHistoryController_list'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/programs/{programId}/versions/{versionId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['VersionHistoryController_detail'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/programs/{programId}/versions/{versionId}/corrections': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['CorrectionsController_create'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/programs/{programId}/versions/{versionId}/corrections/{correctionId}/issue': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['CorrectionsController_issue'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/programs/{programId}/versions/{versionId}/corrections/{correctionId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete: operations['CorrectionsController_discard'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
+    "/api/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["HealthController_check"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AuthController_login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AuthController_logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AuthController_me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/change-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AuthController_changePassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["UsersController_list"];
+        put?: never;
+        post: operations["UsersController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/users/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["UsersController_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["UsersController_update"];
+        trace?: never;
+    };
+    "/api/users/{userId}/disable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["UsersController_disable"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/users/{userId}/enable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["UsersController_enable"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/users/{userId}/reset-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["UsersController_resetPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/users/{userId}/role-assignments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["UsersController_history"];
+        put?: never;
+        post: operations["UsersController_assign"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/users/{userId}/role-assignments/{assignmentId}/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["UsersController_revoke"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["PermissionsController_roles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/permissions/matrix": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["PermissionsController_matrix"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/roles/{roleCode}/permissions/{permissionCode}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["PermissionsController_setCell"];
+        post?: never;
+        delete: operations["PermissionsController_clearCell"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org-units": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["OrgUnitsController_list"];
+        put?: never;
+        post: operations["OrgUnitsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org-units/{unitId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["OrgUnitsController_update"];
+        trace?: never;
+    };
+    "/api/org-units/{unitId}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["OrgUnitsController_deactivate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org-units/{unitId}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["OrgUnitsController_activate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/subject-groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["SubjectGroupsController_list"];
+        put?: never;
+        post: operations["SubjectGroupsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/subject-groups/{groupId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["SubjectGroupsController_detail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["SubjectGroupsController_update"];
+        trace?: never;
+    };
+    "/api/subject-groups/{groupId}/deactivation-impact": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["SubjectGroupsController_impact"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/subject-groups/{groupId}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["SubjectGroupsController_deactivate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/subject-groups/{groupId}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["SubjectGroupsController_activate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/subject-groups/{groupId}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["SubjectGroupsController_addMember"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/subject-groups/{groupId}/members/{memberId}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["SubjectGroupsController_endMember"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/subject-groups/{groupId}/members/{memberId}/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["SubjectGroupsController_revokeMember"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/subject-group-memberships": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["SubjectGroupMembershipsController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/courses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["CoursesController_list"];
+        put?: never;
+        post: operations["CoursesController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/courses/{courseId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["CoursesController_detail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["CoursesController_update"];
+        trace?: never;
+    };
+    "/api/courses/{courseId}/discontinue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["CoursesController_discontinue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/courses/{courseId}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["CoursesController_reopen"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/courses/{courseId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["CoursesController_cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/courses/{courseId}/relations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["CourseRelationsController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/course-relations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["CourseRelationsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/course-relations/{relationId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["CourseRelationsController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["CourseRelationsController_update"];
+        trace?: never;
+    };
+    "/api/equivalence-groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["EquivalenceGroupsController_list"];
+        put?: never;
+        post: operations["EquivalenceGroupsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/equivalence-groups/{groupId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["EquivalenceGroupsController_detail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["EquivalenceGroupsController_update"];
+        trace?: never;
+    };
+    "/api/equivalence-groups/{groupId}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["EquivalenceGroupsController_addMember"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/equivalence-groups/{groupId}/members/{courseId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["EquivalenceGroupsController_removeMember"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/equivalence-groups/{groupId}/merge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["EquivalenceGroupsController_merge"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/equivalence-groups/{groupId}/dissolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["EquivalenceGroupsController_dissolve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/programs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ProgramsController_list"];
+        put?: never;
+        post: operations["ProgramsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/programs/{programId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ProgramsController_detail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["ProgramsController_update"];
+        trace?: never;
+    };
+    "/api/programs/{programId}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ProgramsController_deactivate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/programs/{programId}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ProgramsController_reactivate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/programs/{programId}/clone": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ProgramsController_clone"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/programs/{programId}/directors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ProgramsController_listDirectors"];
+        put?: never;
+        post: operations["ProgramsController_assign"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/programs/{programId}/directors/{assignmentId}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ProgramsController_end"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/programs/{programId}/directors/{assignmentId}/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ProgramsController_revoke"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/program-versions/{versionId}/info": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ProgramVersionInfoController_read"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["ProgramVersionInfoController_update"];
+        trace?: never;
+    };
+    "/api/program-versions/{versionId}/curriculum": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ProgramVersionsCurriculumController_read"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/program-versions/{versionId}/curriculum-items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ProgramVersionsCurriculumController_createItem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/program-versions/{versionId}/curriculum-order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["ProgramVersionsCurriculumController_reorder"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/program-versions/{versionId}/elective-groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ProgramVersionsCurriculumController_createGroup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/curriculum-items/{itemId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["CurriculumItemsController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["CurriculumItemsController_update"];
+        trace?: never;
+    };
+    "/api/curriculum-items/{itemId}/requisites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["CurriculumItemsController_replaceRequisites"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/elective-groups/{groupId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["ElectiveGroupsController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["ElectiveGroupsController_update"];
+        trace?: never;
+    };
+    "/api/elective-groups/{groupId}/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["ElectiveGroupsController_assignItems"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/program-versions/{versionId}/consistency": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ConsistencyController_report"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/program-versions/{versionId}/credit-mismatch-acceptance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["ConsistencyController_accept"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/program-versions/{versionId}/plos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["OutcomesController_listPlos"];
+        put?: never;
+        post: operations["OutcomesController_createPlo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/program-versions/{versionId}/plos/order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["OutcomesController_reorderPlos"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/plos/{ploId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["OutcomesController_removePlo"];
+        options?: never;
+        head?: never;
+        patch: operations["OutcomesController_updatePlo"];
+        trace?: never;
+    };
+    "/api/program-versions/{versionId}/course-plo-matrix": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["OutcomesController_coursePloMatrix"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/curriculum-items/{itemId}/plo-weights/{ploId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["OutcomesController_setWeight"];
+        post?: never;
+        delete: operations["OutcomesController_removeWeight"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/program-versions/{versionId}/clo-plo-matrix": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["OutcomesController_programCloPloMatrix"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/curriculum-items/{itemId}/clo-plo-matrix": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["OutcomesController_itemCloPloMatrix"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/curriculum-items/{itemId}/clo-plo-links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["OutcomesController_replaceLinks"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/program-versions/{versionId}/outcome-coverage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["OutcomesController_outcomeCoverage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/courses/{courseId}/syllabus": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["SyllabiController_forCourse"];
+        put?: never;
+        post: operations["SyllabiController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/syllabi/{syllabusId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["SyllabiController_update"];
+        trace?: never;
+    };
+    "/api/syllabi/{syllabusId}/weekly-contents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["SyllabiController_createWeek"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/syllabi/{syllabusId}/weekly-contents/order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["SyllabiController_reorderWeeks"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/weekly-contents/{weeklyContentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["SyllabiController_removeWeek"];
+        options?: never;
+        head?: never;
+        patch: operations["SyllabiController_updateWeek"];
+        trace?: never;
+    };
+    "/api/syllabi/{syllabusId}/clos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["SyllabiController_createClo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/syllabi/{syllabusId}/clos/order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["SyllabiController_reorderClos"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clos/{cloId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["SyllabiController_removeClo"];
+        options?: never;
+        head?: never;
+        patch: operations["SyllabiController_updateClo"];
+        trace?: never;
+    };
+    "/api/syllabi/{syllabusId}/attachments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["SyllabiController_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/syllabus-attachments/{attachmentId}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["SyllabiController_download"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/syllabus-attachments/{attachmentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["SyllabiController_removeAttachment"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/change-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ChangeRequestsController_list"];
+        put?: never;
+        post: operations["ChangeRequestsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/change-requests/conflicts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ChangeRequestsController_conflicts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/change-requests/user-options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ChangeRequestsController_userOptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/change-requests/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ChangeRequestsController_read"];
+        put?: never;
+        post?: never;
+        delete: operations["ChangeRequestsController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["ChangeRequestsController_update"];
+        trace?: never;
+    };
+    "/api/change-requests/{id}/rebase": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ChangeRequestsController_rebase"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/change-requests/{id}/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["ChangeRequestsController_replaceItems"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/change-requests/{id}/diff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ChangeRequestsController_diff"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/change-requests/{id}/submit-preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ChangeRequestsController_preview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/change-requests/{id}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ChangeRequestsController_submit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/change-requests/{id}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ChangeRequestsController_withdraw"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/change-requests/{id}/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ChangeRequestsController_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/change-request-documents/{documentId}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ChangeRequestDocumentsController_download"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/change-request-documents/{documentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["ChangeRequestDocumentsController_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/change-requests/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ApprovalController_approve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/change-requests/{id}/final-approval": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ApprovalController_finalApproval"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/change-requests/{id}/final-approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ApprovalController_finalApprove"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/change-requests/{id}/return": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ApprovalController_returnToDraft"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/change-requests/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ApprovalController_reject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/change-requests/{id}/override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ApprovalController_override"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/change-requests/{id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ApprovalController_readHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/change-requests/{id}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ApprovalController_listComments"];
+        put?: never;
+        post: operations["ApprovalController_createComment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/approval-queue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ApprovalQueueController_read"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["NotificationsController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["NotificationsController_unreadCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/read-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["NotificationsController_markAllRead"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/{id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["NotificationsController_markRead"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/semesters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["SemestersController_listSemesters"];
+        put?: never;
+        post: operations["SemestersController_createSemester"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/semesters/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["SemestersController_updateSemester"];
+        trace?: never;
+    };
+    "/api/cohorts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["SemestersController_listCohorts"];
+        put?: never;
+        post: operations["SemestersController_createCohort"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/cohorts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["SemestersController_updateCohort"];
+        trace?: never;
+    };
+    "/api/programs/{programId}/versions/{versionId}/release-check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ReleasesController_check"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/programs/{programId}/versions/{versionId}/release": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ReleasesController_release"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/programs/{programId}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["VersionHistoryController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/programs/{programId}/versions/{versionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["VersionHistoryController_detail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/programs/{programId}/versions/{versionId}/corrections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["CorrectionsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/programs/{programId}/versions/{versionId}/corrections/{correctionId}/issue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["CorrectionsController_issue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/programs/{programId}/versions/{versionId}/corrections/{correctionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["CorrectionsController_discard"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/programs/{programId}/version-comparison": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["VersionComparisonController_compare"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/programs/{programId}/version-comparison/syllabi/{courseId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["VersionComparisonController_syllabi"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/programs/{programId}/cohort-versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["CohortVersionsController_list"];
+        put?: never;
+        post: operations["CohortVersionsController_assign"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/programs/{programId}/cohort-versions/{assignmentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["CohortVersionsController_update"];
+        trace?: never;
+    };
+    "/api/programs/{programId}/cohorts/{cohortId}/applied-version": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["CohortVersionsController_applied"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/imports/types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ImportsController_types"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/imports/curriculum-targets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ImportsController_targets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/imports/templates/{importType}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ImportsController_template"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/imports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ImportsController_list"];
+        put?: never;
+        post: operations["ImportsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/imports/{batchId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ImportsController_detail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/imports/{batchId}/commit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ImportsController_commit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/imports/{batchId}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ImportsController_file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/program-versions/{versionId}/curriculum/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["CurriculumExportController_export"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    HealthDto: {
-      /** @enum {string} */
-      status: 'ok' | 'error';
-      /** @enum {string} */
-      database: 'up' | 'down';
-      /** @enum {string} */
-      redis: 'up' | 'down';
-    };
-    LoginDto: {
-      username: string;
-      password: string;
-    };
-    OrgUnitRefDto: {
-      id: string;
-      unitCode: string;
-      unitName: string;
-    };
-    MeRoleDto: {
-      roleCode: string;
-      roleName: string;
-      /** @enum {string} */
-      scopeType: 'SYSTEM' | 'UNIT' | 'ASSIGNMENT';
-      scopeUnit: components['schemas']['OrgUnitRefDto'] | null;
-      derived: boolean;
-    };
-    /** @enum {string} */
-    PermissionCode:
-      | 'orgUnit.manage'
-      | 'subjectGroup.view'
-      | 'user.manage'
-      | 'permission.view'
-      | 'permission.manage'
-      | 'director.assign'
-      | 'delegation.manage'
-      | 'integrationClient.manage'
-      | 'sync.configure'
-      | 'auditLog.view'
-      | 'course.view'
-      | 'course.edit'
-      | 'courseRelation.edit'
-      | 'program.view'
-      | 'program.editInfo'
-      | 'program.clone'
-      | 'curriculum.edit'
-      | 'curriculum.importExportExcel'
-      | 'version.assignCohort'
-      | 'outcome.view'
-      | 'plo.edit'
-      | 'clo.edit'
-      | 'syllabus.view'
-      | 'syllabus.edit'
-      | 'gradingFormula.edit'
-      | 'changeRequest.view'
-      | 'changeRequest.create'
-      | 'changeRequest.createOrganizational'
-      | 'changeRequest.override'
-      | 'changeRequest.comment'
-      | 'changeRequest.statistics'
-      | 'version.publish'
-      | 'version.correct'
-      | 'version.viewHistory'
-      | 'version.compare'
-      | 'semester.manage'
-      | 'data.importExcel'
-      | 'report.exportAccreditation'
-      | 'report.benchmark'
-      | 'student.viewProgress'
-      | 'student.viewRegistrationEligibility'
-      | 'graduation.view'
-      | 'graduation.audit';
-    MeDto: {
-      id: string;
-      username: string;
-      userCode: string;
-      fullName: string;
-      email: string | null;
-      mustChangePassword: boolean;
-      orgUnit: components['schemas']['OrgUnitRefDto'] | null;
-      roles: components['schemas']['MeRoleDto'][];
-      permissions: components['schemas']['PermissionCode'][];
-    };
-    FieldErrorDto: {
-      field: string;
-      constraints: string[];
-    };
-    ErrorResponseDto: {
-      statusCode: number;
-      code: string;
-      message: string;
-      details?: components['schemas']['FieldErrorDto'][];
-      path: string;
-      timestamp: string;
-    };
-    ChangePasswordDto: {
-      currentPassword: string;
-      newPassword: string;
-    };
-    UserSummaryDto: {
-      id: string;
-      username: string;
-      userCode: string;
-      fullName: string;
-      email: string | null;
-      orgUnit: components['schemas']['OrgUnitRefDto'] | null;
-      /** @enum {string} */
-      status: 'ACTIVE' | 'DISABLED';
-      activeRoleCodes: string[];
-    };
-    UserPageDto: {
-      items: components['schemas']['UserSummaryDto'][];
-      total: number;
-      page: number;
-      pageSize: number;
-    };
-    CreateUserDto: {
-      username: string;
-      userCode: string;
-      fullName: string;
-      email?: string;
-      orgUnitId?: string;
-    };
-    UserDetailDto: {
-      id: string;
-      username: string;
-      userCode: string;
-      fullName: string;
-      email: string | null;
-      orgUnit: components['schemas']['OrgUnitRefDto'] | null;
-      /** @enum {string} */
-      status: 'ACTIVE' | 'DISABLED';
-      activeRoleCodes: string[];
-      mustChangePassword: boolean;
-      /** Format: date-time */
-      createdAt: string;
-      /** Format: date-time */
-      updatedAt: string;
-    };
-    CreatedUserDto: {
-      user: components['schemas']['UserDetailDto'];
-      temporaryPassword: string;
-    };
-    UpdateUserDto: {
-      userCode?: string;
-      fullName?: string;
-      email?: string | null;
-      orgUnitId?: string | null;
-    };
-    TemporaryPasswordDto: {
-      temporaryPassword: string;
-    };
-    RoleRefDto: {
-      id: string;
-      roleCode: string;
-      roleName: string;
-    };
-    UserRefDto: {
-      id: string;
-      fullName: string;
-    };
-    /** @enum {string} */
-    ValidityState: 'ACTIVE' | 'SCHEDULED' | 'EXPIRED' | 'REVOKED';
-    RoleAssignmentDto: {
-      id: string | null;
-      role: components['schemas']['RoleRefDto'];
-      /** @enum {string} */
-      scopeType: 'SYSTEM' | 'UNIT' | 'ASSIGNMENT';
-      scopeUnit: components['schemas']['OrgUnitRefDto'] | null;
-      /** Format: date */
-      validFrom: string | null;
-      /** Format: date */
-      validTo: string | null;
-      assignedBy: components['schemas']['UserRefDto'] | null;
-      /** Format: date-time */
-      createdAt: string | null;
-      /** Format: date-time */
-      revokedAt: string | null;
-      revokedBy: components['schemas']['UserRefDto'] | null;
-      state: components['schemas']['ValidityState'];
-      derived: boolean;
-    };
-    CreateRoleAssignmentDto: {
-      roleId: string;
-      /** @enum {string} */
-      scopeType: 'SYSTEM' | 'UNIT';
-      scopeUnitId?: string;
-      /** Format: date */
-      validFrom: string;
-      /** Format: date */
-      validTo?: string;
-    };
-    RoleDto: {
-      id: string;
-      roleCode: string;
-      roleName: string;
-      description: string | null;
-      isSystemRole: boolean;
-      /** @enum {string} */
-      scopeSource:
-        | 'NONE'
-        | 'PROGRAM_DIRECTOR'
-        | 'SUBJECT_GROUP_COORDINATOR'
-        | 'SUBJECT_GROUP_MEMBER'
-        | 'OWN_ENROLLMENT';
-      assignable: boolean;
-    };
-    PermissionDto: {
-      id: string;
-      permissionCode: components['schemas']['PermissionCode'];
-      permissionName: string;
-      /** @enum {string} */
-      functionGroup:
-        | 'SYSTEM_ADMIN'
-        | 'COURSE_CATALOG'
-        | 'PROGRAM'
-        | 'LEARNING_OUTCOME'
-        | 'SYLLABUS'
-        | 'APPROVAL'
-        | 'VERSION'
-        | 'DATA_REPORT'
-        | 'STUDENT_LOOKUP';
-      description: string | null;
-      source: string | null;
-    };
-    MatrixCellDto: {
-      roleCode: string;
-      permissionCode: components['schemas']['PermissionCode'];
-      /** @enum {string} */
-      mode: 'DIRECT' | 'VIA_REQUEST';
-      /** @enum {string} */
-      scope: 'ALL' | 'SCOPED';
-      /** Format: date-time */
-      updatedAt: string;
-      updatedBy: components['schemas']['UserRefDto'] | null;
-    };
-    MatrixCellKeyDto: {
-      roleCode: string;
-      permissionCode: components['schemas']['PermissionCode'];
-    };
-    PermissionMatrixDto: {
-      roles: components['schemas']['RoleDto'][];
-      permissions: components['schemas']['PermissionDto'][];
-      cells: components['schemas']['MatrixCellDto'][];
-      lockedCells: components['schemas']['MatrixCellKeyDto'][];
-    };
-    SetRolePermissionDto: {
-      /** @enum {string} */
-      mode: 'DIRECT' | 'VIA_REQUEST';
-      /** @enum {string} */
-      scope: 'ALL' | 'SCOPED';
-    };
-    OrgUnitDto: {
-      id: string;
-      unitCode: string;
-      unitName: string;
-      /** @enum {string} */
-      unitType: 'UNIVERSITY' | 'FACULTY' | 'OFFICE';
-      parentUnitId: string | null;
-      /** @enum {string} */
-      status: 'ACTIVE' | 'INACTIVE';
-    };
-    CreateOrgUnitDto: {
-      unitCode: string;
-      unitName: string;
-      /** @enum {string} */
-      unitType: 'FACULTY' | 'OFFICE';
-      parentUnitId: string;
-    };
-    UpdateOrgUnitDto: {
-      unitName?: string;
-      parentUnitId?: string;
-    };
-    /** @enum {string} */
-    SubjectGroupStatus: 'ACTIVE' | 'INACTIVE';
-    SubjectGroupSummaryDto: {
-      id: string;
-      groupCode: string;
-      groupName: string;
-      status: components['schemas']['SubjectGroupStatus'];
-      faculty: components['schemas']['OrgUnitRefDto'];
-      activeMemberCount: number;
-      activeCoordinators: components['schemas']['UserRefDto'][];
-      hasActiveCoordinator: boolean;
-    };
-    CreateSubjectGroupDto: {
-      groupCode: string;
-      groupName: string;
-      facultyId: string;
-    };
-    /** @enum {string} */
-    UserStatus: 'ACTIVE' | 'DISABLED';
-    MemberUserDto: {
-      id: string;
-      userCode: string;
-      fullName: string;
-      status: components['schemas']['UserStatus'];
-    };
-    /** @enum {string} */
-    SubjectGroupMemberRole: 'MEMBER' | 'COORDINATOR';
-    SubjectGroupMemberDto: {
-      id: string;
-      lecturer: components['schemas']['MemberUserDto'];
-      memberRole: components['schemas']['SubjectGroupMemberRole'];
-      /** Format: date */
-      validFrom: string;
-      /** Format: date */
-      validTo: string | null;
-      state: components['schemas']['ValidityState'];
-      assignedBy: components['schemas']['UserRefDto'] | null;
-      createdAt: string;
-      revokedAt: string | null;
-      revokedBy: components['schemas']['UserRefDto'] | null;
-    };
-    SubjectGroupDetailDto: {
-      id: string;
-      groupCode: string;
-      groupName: string;
-      status: components['schemas']['SubjectGroupStatus'];
-      faculty: components['schemas']['OrgUnitRefDto'];
-      activeMemberCount: number;
-      activeCoordinators: components['schemas']['UserRefDto'][];
-      hasActiveCoordinator: boolean;
-      members: components['schemas']['SubjectGroupMemberDto'][];
-      createdAt: string;
-      updatedAt: string;
-    };
-    UpdateSubjectGroupDto: {
-      groupName?: string;
-      facultyId?: string;
-    };
-    CourseRefDto: {
-      id: string;
-      courseCode: string;
-      courseName: string;
-    };
-    SubjectGroupDeactivationImpactDto: {
-      activeMemberCount: number;
-      activeCoordinators: components['schemas']['UserRefDto'][];
-      courses: components['schemas']['CourseRefDto'][];
-    };
-    AddSubjectGroupMemberDto: {
-      lecturerId: string;
-      memberRole: components['schemas']['SubjectGroupMemberRole'];
-      /** Format: date */
-      validFrom: string;
-      /** Format: date */
-      validTo?: string;
-    };
-    EndSubjectGroupMemberDto: {
-      /** Format: date */
-      validTo: string;
-    };
-    SubjectGroupRefDto: {
-      id: string;
-      groupCode: string;
-      groupName: string;
-      status: components['schemas']['SubjectGroupStatus'];
-    };
-    UserSubjectGroupMembershipDto: {
-      id: string;
-      lecturer: components['schemas']['MemberUserDto'];
-      memberRole: components['schemas']['SubjectGroupMemberRole'];
-      /** Format: date */
-      validFrom: string;
-      /** Format: date */
-      validTo: string | null;
-      state: components['schemas']['ValidityState'];
-      assignedBy: components['schemas']['UserRefDto'] | null;
-      createdAt: string;
-      revokedAt: string | null;
-      revokedBy: components['schemas']['UserRefDto'] | null;
-      subjectGroup: components['schemas']['SubjectGroupRefDto'];
-    };
-    /** @enum {string} */
-    CourseType:
-      | 'THEORY'
-      | 'PRACTICE'
-      | 'LAB'
-      | 'PROJECT'
-      | 'CAPSTONE'
-      | 'INTERNSHIP'
-      | 'CONDITIONAL';
-    /** @enum {string} */
-    CourseStatus: 'ACTIVE' | 'DISCONTINUED' | 'CANCELLED';
-    CourseSummaryDto: {
-      id: string;
-      courseCode: string;
-      courseName: string;
-      englishName: string | null;
-      /** @example 2.5 */
-      credits: string;
-      courseType: components['schemas']['CourseType'];
-      status: components['schemas']['CourseStatus'];
-      ownerFaculty: components['schemas']['OrgUnitRefDto'];
-      ownerGroup: components['schemas']['SubjectGroupRefDto'] | null;
-      isForeign: boolean;
-    };
-    CoursePageDto: {
-      items: components['schemas']['CourseSummaryDto'][];
-      total: number;
-      page: number;
-      pageSize: number;
-    };
-    CreateCourseDto: {
-      courseCode: string;
-      courseName: string;
-      englishName?: string | null;
-      /** @example 2.5 */
-      credits: string;
-      courseType: components['schemas']['CourseType'];
-      ownerFacultyId: string;
-      ownerGroupId?: string | null;
-    };
-    CourseUsageDto: {
-      programId: string;
-      programCode: string;
-      programName: string;
-      versionLabel: string | null;
-      plannedSemester: number;
-    };
-    /** @enum {string} */
-    EditPath: 'DIRECT' | 'VIA_REQUEST';
-    RelatedCourseDto: {
-      id: string;
-      courseCode: string;
-      courseName: string;
-      /** @example 3 */
-      credits: string;
-      status: components['schemas']['CourseStatus'];
-    };
-    CourseEquivalenceDto: {
-      id: string;
-      groupCode: string;
-      members: components['schemas']['RelatedCourseDto'][];
-    };
-    CourseDetailDto: {
-      id: string;
-      courseCode: string;
-      courseName: string;
-      englishName: string | null;
-      /** @example 2.5 */
-      credits: string;
-      courseType: components['schemas']['CourseType'];
-      status: components['schemas']['CourseStatus'];
-      ownerFaculty: components['schemas']['OrgUnitRefDto'];
-      ownerGroup: components['schemas']['SubjectGroupRefDto'] | null;
-      isForeign: boolean;
-      programsUsing: components['schemas']['CourseUsageDto'][];
-      editPath: components['schemas']['EditPath'] | null;
-      canChangeStatus: boolean;
-      equivalenceGroup: components['schemas']['CourseEquivalenceDto'] | null;
-      createdAt: string;
-      updatedAt: string;
-    };
-    UpdateCourseDto: {
-      courseName?: string;
-      englishName?: string | null;
-      /** @example 2.5 */
-      credits?: string;
-      courseType?: components['schemas']['CourseType'];
-      ownerFacultyId?: string;
-      ownerGroupId?: string | null;
-    };
-    DiscontinueCourseDto: {
-      /** @description Học phần thay thế; quan hệ Thay thế được tạo cùng lúc với việc ngừng mở lớp. */
-      replacementCourseId?: string;
-    };
-    /** @enum {string} */
-    CourseRelationType:
-      'PRIOR' | 'PREREQUISITE' | 'COREQUISITE' | 'REPLACEMENT';
-    CourseRelationDto: {
-      id: string;
-      relationType: components['schemas']['CourseRelationType'];
-      sourceCourse: components['schemas']['RelatedCourseDto'];
-      targetCourse: components['schemas']['RelatedCourseDto'];
-      minScore: string | null;
-      editPath: components['schemas']['EditPath'] | null;
-    };
-    CreateCourseRelationDto: {
-      sourceCourseId: string;
-      targetCourseId: string;
-      relationType: components['schemas']['CourseRelationType'];
-      /** @example 2 */
-      minScore?: string | null;
-    };
-    UpdateCourseRelationDto: {
-      /** @example 2 */
-      minScore: string | null;
-    };
-    EquivalenceGroupDto: {
-      id: string;
-      groupCode: string;
-      note: string | null;
-      members: components['schemas']['RelatedCourseDto'][];
-      updatedAt: string;
-    };
-    EquivalenceGroupPageDto: {
-      items: components['schemas']['EquivalenceGroupDto'][];
-      total: number;
-      page: number;
-      pageSize: number;
-    };
-    CreateEquivalenceGroupDto: {
-      groupCode: string;
-      note?: string | null;
-      courseIds: string[];
-    };
-    UpdateEquivalenceGroupDto: {
-      groupCode?: string;
-      note?: string | null;
-    };
-    AddEquivalenceMemberDto: {
-      courseId: string;
-    };
-    MergeEquivalenceGroupsDto: {
-      /** @description Nhóm sẽ bị xóa; học phần của nó chuyển sang nhóm được giữ. */
-      otherGroupId: string;
-    };
-    /** @enum {string} */
-    DegreeLevel: 'ENGINEER' | 'BACHELOR';
-    /** @enum {string} */
-    ProgramStatus: 'ACTIVE' | 'INACTIVE';
-    /** @enum {string} */
-    ProgramVersionStatus: 'DRAFT' | 'PENDING' | 'ACTIVE' | 'HISTORICAL';
-    ProgramVersionRefDto: {
-      id: string;
-      versionNumber: string | null;
-      status: components['schemas']['ProgramVersionStatus'];
-    };
-    ProgramSummaryDto: {
-      id: string;
-      programCode: string;
-      degreeLevel: components['schemas']['DegreeLevel'];
-      status: components['schemas']['ProgramStatus'];
-      faculty: components['schemas']['OrgUnitRefDto'];
-      programName: string;
-      currentVersion: components['schemas']['ProgramVersionRefDto'];
-      directors: components['schemas']['UserRefDto'][];
-    };
-    ProgramPageDto: {
-      items: components['schemas']['ProgramSummaryDto'][];
-      total: number;
-      page: number;
-      pageSize: number;
-    };
-    CreateProgramDto: {
-      programCode: string;
-      /** @description Khoa quản lý; mặc định là Khoa CNTT. */
-      facultyId?: string;
-      degreeLevel: components['schemas']['DegreeLevel'];
-      programName: string;
-      majorCode: string;
-      majorName: string;
-      semesterCount: number;
-      /** @example 130 */
-      totalCredits: string;
-      /** @example 122 */
-      compulsoryCredits: string;
-      /** @example 8 */
-      electiveCredits: string;
-    };
-    ProgramVersionInfoDto: {
-      id: string;
-      versionNumber: string | null;
-      status: components['schemas']['ProgramVersionStatus'];
-      programName: string;
-      majorCode: string;
-      majorName: string;
-      semesterCount: number;
-      /** @example 150 */
-      totalCredits: string;
-      /** @example 140 */
-      compulsoryCredits: string;
-      /** @example 10 */
-      electiveCredits: string;
-      updatedAt: string;
-    };
-    ProgramClonedFromDto: {
-      programId: string;
-      programCode: string;
-      version: components['schemas']['ProgramVersionRefDto'];
-    };
-    ProgramDetailDto: {
-      id: string;
-      programCode: string;
-      degreeLevel: components['schemas']['DegreeLevel'];
-      status: components['schemas']['ProgramStatus'];
-      faculty: components['schemas']['OrgUnitRefDto'];
-      programName: string;
-      currentVersion: components['schemas']['ProgramVersionRefDto'];
-      directors: components['schemas']['UserRefDto'][];
-      currentVersionInfo: components['schemas']['ProgramVersionInfoDto'];
-      draftVersion: components['schemas']['ProgramVersionInfoDto'] | null;
-      versions: components['schemas']['ProgramVersionRefDto'][];
-      clonedFrom: components['schemas']['ProgramClonedFromDto'] | null;
-      editPath: components['schemas']['EditPath'] | null;
-      canManage: boolean;
-      canClone: boolean;
-      createdAt: string;
-      updatedAt: string;
-    };
-    UpdateProgramDto: {
-      degreeLevel?: components['schemas']['DegreeLevel'];
-      programName?: string;
-      majorCode?: string;
-      majorName?: string;
-      semesterCount?: number;
-      /** @example 130 */
-      totalCredits?: string;
-      /** @example 122 */
-      compulsoryCredits?: string;
-      /** @example 8 */
-      electiveCredits?: string;
-    };
-    CloneProgramDto: {
-      programCode: string;
-      programName: string;
-      /** @description Phiên bản nguồn; mặc định là phiên bản hiện hành. */
-      sourceVersionId?: string;
-    };
-    ProgramDirectorDto: {
-      id: string;
-      director: components['schemas']['UserRefDto'];
-      /** Format: date */
-      validFrom: string;
-      /** Format: date */
-      validTo: string | null;
-      state: components['schemas']['ValidityState'];
-      assignedBy: components['schemas']['UserRefDto'] | null;
-      revokedAt: string | null;
-      revokedBy: components['schemas']['UserRefDto'] | null;
-    };
-    AssignDirectorDto: {
-      directorId: string;
-      /** Format: date */
-      validFrom: string;
-      /** Format: date */
-      validTo?: string;
-    };
-    EndDirectorDto: {
-      /** Format: date */
-      validTo: string;
-    };
-    VersionInfoProgramDto: {
-      id: string;
-      programCode: string;
-      degreeLevel: components['schemas']['DegreeLevel'];
-    };
-    /** @enum {string} */
-    ChangeRequestStatus:
-      | 'DRAFT'
-      | 'PENDING_COORDINATOR'
-      | 'PENDING_DIRECTOR'
-      | 'PENDING_ACADEMIC_OFFICE'
-      | 'APPROVED'
-      | 'EFFECTIVE'
-      | 'REJECTED'
-      | 'WITHDRAWN';
-    RequestRefDto: {
-      id: string;
-      requestCode: string;
-      status: components['schemas']['ChangeRequestStatus'];
-    };
-    VersionInfoEditDto: {
-      id: string;
-      versionNumber: string | null;
-      status: components['schemas']['ProgramVersionStatus'];
-      programName: string;
-      majorCode: string;
-      majorName: string;
-      semesterCount: number;
-      /** @example 150 */
-      totalCredits: string;
-      /** @example 140 */
-      compulsoryCredits: string;
-      /** @example 10 */
-      electiveCredits: string;
-      updatedAt: string;
-      program: components['schemas']['VersionInfoProgramDto'];
-      sourceRequest: components['schemas']['RequestRefDto'] | null;
-      canEdit: boolean;
-    };
-    UpdateVersionInfoDto: {
-      programName?: string;
-      majorCode?: string;
-      majorName?: string;
-      semesterCount?: number;
-      /** @example 130 */
-      totalCredits?: string;
-      /** @example 122 */
-      compulsoryCredits?: string;
-      /** @example 8 */
-      electiveCredits?: string;
-    };
-    CurriculumVersionDto: {
-      id: string;
-      programId: string;
-      programCode: string;
-      programName: string;
-      versionNumber: string | null;
-      status: components['schemas']['ProgramVersionStatus'];
-      semesterCount: number;
-      sourceRequest: components['schemas']['RequestRefDto'] | null;
-    };
-    CurriculumElectiveGroupRefDto: {
-      id: string;
-      groupCode: string;
-    };
-    /** @enum {string} */
-    CurriculumRequisiteType: 'PRIOR' | 'PREREQUISITE' | 'COREQUISITE';
-    CurriculumRequisiteDto: {
-      id: string;
-      sourceCourse: components['schemas']['RelatedCourseDto'];
-      relationType: components['schemas']['CurriculumRequisiteType'];
-      /** @example 2 */
-      minScore: string | null;
-      /** @description Học kỳ mà học phần điều kiện đang xếp trong khung này; null khi nó không có trong khung. */
-      sourceSemester: number | null;
-    };
-    CurriculumItemDto: {
-      id: string;
-      /** @description TT: vị trí 1-based theo (học kỳ, thứ tự). */
-      displayOrder: number;
-      plannedSemester: number;
-      sortOrder: number;
-      course: components['schemas']['RelatedCourseDto'];
-      /** @description The course has a syllabus revision (EC-44). */
-      hasSyllabus: boolean;
-      blockSymbol: string | null;
-      blockName: string | null;
-      isElective: boolean;
-      electiveGroup:
-        components['schemas']['CurriculumElectiveGroupRefDto'] | null;
-      htDa: boolean;
-      tqDa: boolean;
-      /** @example 2 */
-      minStudiedScore: string | null;
-      /** @example 2 */
-      minTransferScore: string | null;
-      note: string | null;
-      requisites: components['schemas']['CurriculumRequisiteDto'][];
-      canEdit: boolean;
-    };
-    SemesterTotalDto: {
-      semester: number;
-      /** @example 17 */
-      totalCredits: string;
-      /** @example 15 */
-      compulsoryCredits: string;
-      /** @example 2 */
-      electiveCredits: string;
-      itemCount: number;
-    };
-    BlockTotalDto: {
-      symbol: string | null;
-      blockName: string | null;
-      /** @example 30 */
-      totalCredits: string;
-      itemCount: number;
-    };
-    KnowledgeBlockDto: {
-      blockCode: string;
-      blockName: string;
-      /** @example 40 */
-      requiredCredits: string | null;
-    };
-    ElectiveGroupDto: {
-      id: string;
-      groupCode: string;
-      groupName: string;
-      minCredits: string | null;
-      minCourses: number | null;
-      itemIds: string[];
-      /** @example 15 */
-      listedCredits: string;
-      itemCount: number;
-    };
-    CreditBreakdownDto: {
-      /** @example 98 */
-      compulsory: string;
-      /** @example 50 */
-      elective: string;
-      /** @example 148 */
-      total: string;
-    };
-    ProgramCreditsDto: {
-      computed: components['schemas']['CreditBreakdownDto'];
-      declared: components['schemas']['CreditBreakdownDto'];
-      mismatch: boolean;
-    };
-    /** @enum {string} */
-    CurriculumWarningCode:
-      | 'EMPTY_SEMESTER'
-      | 'REQUISITE_NOT_EARLIER'
-      | 'REQUISITE_OUTSIDE'
-      | 'ELECTIVE_WITHOUT_GROUP'
-      | 'DUPLICATE_COURSE'
-      | 'GROUP_MINIMUM_UNREACHABLE'
-      | 'REQUISITE_CYCLE'
-      | 'CREDIT_MISMATCH'
-      | 'CREDIT_MISMATCH_ACCEPTED'
-      | 'MISSING_SYLLABUS';
-    /** @enum {string} */
-    WarningSeverity: 'ERROR' | 'HIGH' | 'INFO';
-    CurriculumWarningDto: {
-      code: components['schemas']['CurriculumWarningCode'];
-      severity: components['schemas']['WarningSeverity'];
-      message: string;
-      semester: number | null;
-      itemId: string | null;
-      groupId: string | null;
-    };
-    CurriculumDto: {
-      version: components['schemas']['CurriculumVersionDto'];
-      editPath: components['schemas']['EditPath'] | null;
-      canEditStructure: boolean;
-      canAddItems: boolean;
-      items: components['schemas']['CurriculumItemDto'][];
-      semesters: components['schemas']['SemesterTotalDto'][];
-      blocks: components['schemas']['BlockTotalDto'][];
-      knowledgeBlocks: components['schemas']['KnowledgeBlockDto'][];
-      electiveGroups: components['schemas']['ElectiveGroupDto'][];
-      programCredits: components['schemas']['ProgramCreditsDto'];
-      warnings: components['schemas']['CurriculumWarningDto'][];
-    };
-    CreateCurriculumItemDto: {
-      courseId: string;
-      plannedSemester: number;
-      blockSymbol?: string | null;
-      isElective: boolean;
-      htDa?: boolean;
-      tqDa?: boolean;
-      /** @example 4 */
-      minStudiedScore?: string | null;
-      /** @example 4 */
-      minTransferScore?: string | null;
-      note?: string | null;
-    };
-    ReorderCurriculumDto: {
-      plannedSemester: number;
-      /** @description Mọi dòng của học kỳ, theo thứ tự mới. */
-      itemIds: string[];
-    };
-    CreateElectiveGroupDto: {
-      groupCode: string;
-      groupName: string;
-      /** @example 6 */
-      minCredits?: string | null;
-      minCourses?: number | null;
-    };
-    UpdateCurriculumItemDto: {
-      plannedSemester?: number;
-      blockSymbol?: string | null;
-      isElective?: boolean;
-      htDa?: boolean;
-      tqDa?: boolean;
-      /** @example 4 */
-      minStudiedScore?: string | null;
-      /** @example 4 */
-      minTransferScore?: string | null;
-      note?: string | null;
-    };
-    RequisiteInputDto: {
-      sourceCourseId: string;
-      relationType: components['schemas']['CurriculumRequisiteType'];
-      /** @example 4 */
-      minScore?: string | null;
-    };
-    ReplaceRequisitesDto: {
-      requisites: components['schemas']['RequisiteInputDto'][];
-    };
-    UpdateElectiveGroupDto: {
-      groupCode?: string;
-      groupName?: string;
-      /** @example 6 */
-      minCredits?: string | null;
-      minCourses?: number | null;
-    };
-    AssignGroupItemsDto: {
-      itemIds: string[];
-    };
-    ConsistencyVersionDto: {
-      id: string;
-      programId: string;
-      programCode: string;
-      programName: string;
-      versionNumber: string | null;
-      status: components['schemas']['ProgramVersionStatus'];
-    };
-    CreditAcceptedByDto: {
-      id: string;
-      fullName: string;
-    };
-    CreditAcceptanceDto: {
-      reason: string;
-      /** @example -2 */
-      compulsoryGap: string;
-      /** @example 0 */
-      electiveGap: string;
-      acceptedBy: components['schemas']['CreditAcceptedByDto'];
-      acceptedAt: string;
-    };
-    CreditCheckDto: {
-      declared: components['schemas']['CreditBreakdownDto'];
-      computed: components['schemas']['CreditBreakdownDto'];
-      /** @description Tính từ khung trừ khai báo; có thể âm. */
-      gap: components['schemas']['CreditBreakdownDto'];
-      mismatch: boolean;
-      acceptance: components['schemas']['CreditAcceptanceDto'] | null;
-      acceptanceCurrent: boolean;
-    };
-    GroupRequirementDto: {
-      id: string;
-      groupCode: string;
-      groupName: string;
-      minCredits: string | null;
-      minCourses: number | null;
-      /**
-       * @description Phần nhóm cộng vào tổng.
-       * @example 6
-       */
-      requiredCredits: string;
-      /** @example 15 */
-      listedCredits: string;
-      itemCount: number;
-    };
-    ConsistencyIssueDto: {
-      code: components['schemas']['CurriculumWarningCode'];
-      severity: components['schemas']['WarningSeverity'];
-      message: string;
-      semester: number | null;
-      itemId: string | null;
-      groupId: string | null;
-    };
-    ConsistencyReportDto: {
-      version: components['schemas']['ConsistencyVersionDto'];
-      checkedAt: string;
-      credits: components['schemas']['CreditCheckDto'];
-      groups: components['schemas']['GroupRequirementDto'][];
-      issues: components['schemas']['ConsistencyIssueDto'][];
-      errorCount: number;
-      warningCount: number;
-      /** @description errorCount === 0: what assertPasses decides. */
-      passes: boolean;
-      canAcceptMismatch: boolean;
-    };
-    AcceptCreditMismatchDto: {
-      reason: string;
-      /** @example -2 */
-      compulsoryGap: string;
-      /** @example 0 */
-      electiveGap: string;
-    };
-    OutcomeVersionDto: {
-      id: string;
-      programId: string;
-      programCode: string;
-      programName: string;
-      versionNumber: string | null;
-      status: components['schemas']['ProgramVersionStatus'];
-      sourceRequest: components['schemas']['RequestRefDto'] | null;
-    };
-    PloDto: {
-      id: string;
-      ploCode: string;
-      description: string;
-      englishDescription: string | null;
-      competencyGroup: string | null;
-      /** @description 1-based, contiguous */
-      sortOrder: number;
-      /** @description Course cells that carry this PLO */
-      courseCount: number;
-      /** @description CLO links that go with the PLO if deleted */
-      cloLinkCount: number;
-    };
-    PloListDto: {
-      editPath: components['schemas']['EditPath'] | null;
-      /** @description Draft version and a direct edit path */
-      canEdit: boolean;
-      version: components['schemas']['OutcomeVersionDto'];
-      plos: components['schemas']['PloDto'][];
-    };
-    CreatePloDto: {
-      /**
-       * @description Trimmed and upper-cased
-       * @example PLO1
-       */
-      ploCode: string;
-      description: string;
-      englishDescription?: string | null;
-      competencyGroup?: string | null;
-    };
-    ReorderOutcomeRowsDto: {
-      ids: string[];
-    };
-    UpdatePloDto: {
-      /**
-       * @description Trimmed and upper-cased
-       * @example PLO1
-       */
-      ploCode?: string;
-      description?: string;
-      englishDescription?: string | null;
-      competencyGroup?: string | null;
-    };
-    PloHeaderDto: {
-      id: string;
-      ploCode: string;
-      description: string;
-    };
-    CoursePloCourseDto: {
-      id: string;
-      courseCode: string;
-      courseName: string;
-      /** @example 3 */
-      credits: string;
-    };
-    CoursePloCellDto: {
-      ploId: string;
-      /** @example 0.5 */
-      weight: string;
-      /** @description CLO links that go with the cell if cleared */
-      cloLinkCount: number;
-    };
-    CoursePloRowDto: {
-      itemId: string;
-      plannedSemester: number;
-      course: components['schemas']['CoursePloCourseDto'];
-      /** @description Mapped PLOs only */
-      cells: components['schemas']['CoursePloCellDto'][];
-    };
-    CoursePloMatrixDto: {
-      editPath: components['schemas']['EditPath'] | null;
-      /** @description Draft version and a direct edit path */
-      canEdit: boolean;
-      version: components['schemas']['OutcomeVersionDto'];
-      plos: components['schemas']['PloHeaderDto'][];
-      rows: components['schemas']['CoursePloRowDto'][];
-    };
-    SetPloWeightDto: {
-      /** @example 0.5 */
-      weight: string;
-    };
-    MatrixCourseRefDto: {
-      id: string;
-      courseCode: string;
-      courseName: string;
-    };
-    CloRefDto: {
-      id: string;
-      cloCode: string;
-      description: string;
-      englishDescription: string | null;
-    };
-    CloPloLinkDto: {
-      cloId: string;
-      ploId: string;
-    };
-    ProgramCloPloRowDto: {
-      itemId: string;
-      plannedSemester: number;
-      course: components['schemas']['MatrixCourseRefDto'];
-      revisionNumber: number | null;
-      clos: components['schemas']['CloRefDto'][];
-      mappedPloIds: string[];
-      links: components['schemas']['CloPloLinkDto'][];
-    };
-    ProgramCloPloMatrixDto: {
-      version: components['schemas']['OutcomeVersionDto'];
-      plos: components['schemas']['PloHeaderDto'][];
-      rows: components['schemas']['ProgramCloPloRowDto'][];
-    };
-    ItemRefDto: {
-      id: string;
-      plannedSemester: number;
-      course: components['schemas']['MatrixCourseRefDto'];
-    };
-    /** @enum {string} */
-    SyllabusStatus: 'DRAFT' | 'PUBLISHED' | 'HISTORICAL';
-    ItemCloPloRevisionDto: {
-      id: string;
-      revisionNumber: number;
-      status: components['schemas']['SyllabusStatus'];
-    };
-    ItemPloColumnDto: {
-      id: string;
-      ploCode: string;
-      description: string;
-      /** @description null = the course does not map this PLO; the column is off */
-      weight: string | null;
-    };
-    ItemCloPloMatrixDto: {
-      editPath: components['schemas']['EditPath'] | null;
-      /** @description Draft version and a direct edit path */
-      canEdit: boolean;
-      version: components['schemas']['OutcomeVersionDto'];
-      item: components['schemas']['ItemRefDto'];
-      /** @description null = the course has no syllabus */
-      revision: components['schemas']['ItemCloPloRevisionDto'] | null;
-      clos: components['schemas']['CloRefDto'][];
-      plos: components['schemas']['ItemPloColumnDto'][];
-      links: components['schemas']['CloPloLinkDto'][];
-    };
-    ReplaceCloPloLinksDto: {
-      links: components['schemas']['CloPloLinkDto'][];
-    };
-    CloGapDto: {
-      itemId: string;
-      courseCode: string;
-      courseName: string;
-      cloId: string;
-      cloCode: string;
-      cloDescription: string;
-    };
-    CourseGapDto: {
-      itemId: string;
-      courseCode: string;
-      courseName: string;
-      plannedSemester: number;
-    };
-    OutcomeCoverageDto: {
-      version: components['schemas']['OutcomeVersionDto'];
-      plosWithoutCourse: components['schemas']['PloHeaderDto'][];
-      closWithoutPlo: components['schemas']['CloGapDto'][];
-      coursesWithoutPlo: components['schemas']['CourseGapDto'][];
-      /** @description Courses skipped from the CLO list for lack of a syllabus */
-      coursesWithoutSyllabus: number;
-      /** @description Course lists hold only the caller’s groups */
-      filteredToGroups: boolean;
-    };
-    SyllabusCourseDto: {
-      id: string;
-      courseCode: string;
-      courseName: string;
-      englishName: string | null;
-      /** @example 3 */
-      credits: string;
-      status: components['schemas']['CourseStatus'];
-    };
-    WeeklyContentDto: {
-      id: string;
-      weekLabel: string;
-      /** @description 1-based, contiguous */
-      sortOrder: number;
-      /** @description Sanitized HTML */
-      content: string;
-      teachingActivities: string | null;
-      /** @description In CLO order */
-      cloIds: string[];
-    };
-    /** @enum {string} */
-    AttachmentFileType: 'PDF' | 'DOCX' | 'XLSX' | 'IMAGE';
-    SyllabusAttachmentDto: {
-      id: string;
-      /** @description Original name, UTF-8 decoded */
-      fileName: string;
-      fileType: components['schemas']['AttachmentFileType'];
-      sizeBytes: number;
-      uploadedBy: components['schemas']['UserRefDto'];
-      recordedAt: string;
-      canDelete: boolean;
-    };
-    CloDto: {
-      id: string;
-      cloCode: string;
-      description: string;
-      englishDescription: string | null;
-      cognitiveLevel: string | null;
-      /** @description 1-based, contiguous */
-      sortOrder: number;
-      /** @description Codes of the programs that link this CLO to a PLO, sorted */
-      linkedPrograms: string[];
-    };
-    SyllabusDto: {
-      id: string;
-      /** @description Null on the working copy of a change request */
-      revisionNumber: number | null;
-      status: components['schemas']['SyllabusStatus'];
-      sourceRequest: components['schemas']['RequestRefDto'] | null;
-      /** @description Sanitized HTML; null = empty section */
-      courseDescription: string | null;
-      /** @description Sanitized HTML; null = empty section */
-      englishDescription: string | null;
-      /** @description Sanitized HTML; null = empty section */
-      objectives: string | null;
-      /** @description Sanitized HTML; null = empty section */
-      teachingMethods: string | null;
-      /** @description Sanitized HTML; null = empty section */
-      assessmentMethods: string | null;
-      /** @description Sanitized HTML; null = empty section */
-      references: string | null;
-      publishedAt: string | null;
-      updatedAt: string;
-      weeklyContents: components['schemas']['WeeklyContentDto'][];
-      attachments: components['schemas']['SyllabusAttachmentDto'][];
-      clos: components['schemas']['CloDto'][];
-    };
-    AttachmentRulesDto: {
-      maxBytes: number;
-      fileTypes: components['schemas']['AttachmentFileType'][];
-    };
-    SyllabusVersionRefDto: {
-      id: string;
-      programId: string;
-      programCode: string;
-      versionNumber: string | null;
-    };
-    CourseSyllabusDto: {
-      course: components['schemas']['SyllabusCourseDto'];
-      programsUsing: components['schemas']['CourseUsageDto'][];
-      published: components['schemas']['SyllabusDto'] | null;
-      draft: components['schemas']['SyllabusDto'] | null;
-      canCreate: boolean;
-      /** @description A Draft exists and its CLOs are directly editable */
-      canEditClos: boolean;
-      editPath: components['schemas']['EditPath'] | null;
-      attachmentRules: components['schemas']['AttachmentRulesDto'];
-      /** @description The caller may add a signed file to the published revision (files are only ever added once a revision is published) */
-      canAttachToPublished: boolean;
-      /** @description Set when the answer is the revision pinned by this version */
-      version: components['schemas']['SyllabusVersionRefDto'] | null;
-    };
-    UpdateSyllabusDto: {
-      courseDescription?: string | null;
-      englishDescription?: string | null;
-      objectives?: string | null;
-      teachingMethods?: string | null;
-      assessmentMethods?: string | null;
-      references?: string | null;
-    };
-    CreateWeeklyContentDto: {
-      /** @example Tuần 1 */
-      weekLabel: string;
-      /** @description HTML; sanitized on save */
-      content: string;
-      teachingActivities?: string | null;
-      /** @description CLOs of the same syllabus this week covers; omitted = keep */
-      cloIds?: string[];
-    };
-    ReorderWeeklyContentsDto: {
-      ids: string[];
-    };
-    UpdateWeeklyContentDto: {
-      /** @example Tuần 1 */
-      weekLabel?: string;
-      /** @description HTML; sanitized on save */
-      content?: string;
-      teachingActivities?: string | null;
-      /** @description CLOs of the same syllabus this week covers; omitted = keep */
-      cloIds?: string[];
-    };
-    CreateCloDto: {
-      /**
-       * @description Trimmed and upper-cased
-       * @example CLO1
-       */
-      cloCode: string;
-      description: string;
-      englishDescription?: string | null;
-      cognitiveLevel?: string | null;
-    };
-    ReorderClosDto: {
-      ids: string[];
-    };
-    UpdateCloDto: {
-      /**
-       * @description Trimmed and upper-cased
-       * @example CLO1
-       */
-      cloCode?: string;
-      description?: string;
-      englishDescription?: string | null;
-      cognitiveLevel?: string | null;
-    };
-    UploadAttachmentFormDto: {
-      /** Format: binary */
-      file: string;
-    };
-    /** @enum {string} */
-    ChangeRequestType:
-      | 'GRADING_FORMULA'
-      | 'OUTCOME'
-      | 'SYLLABUS_CONTENT'
-      | 'CURRICULUM'
-      | 'COURSE_RELATION'
-      | 'PROGRAM_INFO'
-      | 'ORGANIZATION';
-    /** @enum {string} */
-    RequestOrigin: 'UNIVERSITY' | 'FACULTY';
-    /** @enum {string} */
-    ChangeTargetType: 'COURSE' | 'PROGRAM' | 'SUBJECT_GROUP';
-    RequestTargetDto: {
-      targetType: components['schemas']['ChangeTargetType'];
-      id: string;
-      code: string;
-      name: string;
-    };
-    ChangeRequestSummaryDto: {
-      id: string;
-      requestCode: string;
-      requestType: components['schemas']['ChangeRequestType'];
-      target: components['schemas']['RequestTargetDto'];
-      title: string;
-      status: components['schemas']['ChangeRequestStatus'];
-      origin: components['schemas']['RequestOrigin'];
-      /** @description 0 = never submitted */
-      submissionRound: number;
-      /** @description When the request entered its current level; null outside PENDING_* */
-      levelEnteredAt: string | null;
-      daysWaiting: number | null;
-      createdBy: components['schemas']['UserRefDto'];
-      createdAt: string;
-      updatedAt: string;
-    };
-    ChangeRequestPageDto: {
-      items: components['schemas']['ChangeRequestSummaryDto'][];
-      total: number;
-      page: number;
-      pageSize: number;
-    };
-    ConflictDto: {
-      id: string;
-      requestCode: string;
-      title: string;
-      status: components['schemas']['ChangeRequestStatus'];
-      createdBy: components['schemas']['UserRefDto'];
-    };
-    UserOptionDto: {
-      id: string;
-      userCode: string;
-      fullName: string;
-    };
-    CreateChangeRequestDto: {
-      /** @description GRADING_FORMULA is refused until F-12 */
-      requestType: components['schemas']['ChangeRequestType'];
-      targetType: components['schemas']['ChangeTargetType'];
-      targetId: string;
-      title: string;
-      reason: string;
-      origin: components['schemas']['RequestOrigin'];
-      /** @description Required when origin is UNIVERSITY */
-      basisDocumentNumber?: string | null;
-    };
-    /** @enum {string} */
-    WorkspaceKind: 'PROGRAM_VERSION' | 'SYLLABUS';
-    RequestWorkspaceDto: {
-      kind: components['schemas']['WorkspaceKind'];
-      /** @description Version id or syllabus id of the copy */
-      copyId: string;
-      programId: string | null;
-      courseId: string | null;
-      /** @example Phiên bản 2.1 */
-      baseLabel: string;
-      isStale: boolean;
-    };
-    /** @enum {string} */
-    AuthoredEntityType:
-      'COURSE_FIELD' | 'COURSE_RELATION' | 'ORG_MEMBERSHIP' | 'ORG_DIRECTOR';
-    AuthoredItemDto: {
-      id: string;
-      entityType: components['schemas']['AuthoredEntityType'];
-      itemKey: string;
-      label: string;
-      oldValue: Record<string, never> | null;
-      newValue: Record<string, never> | null;
-    };
-    /** @enum {string} */
-    ChangeDocumentType:
-      | 'SUBMISSION'
-      | 'MINUTES'
-      | 'COUNCIL_MINUTES'
-      | 'REVIEW_MINUTES'
-      | 'OFFICIAL_LETTER';
-    ChangeRequestDocumentDto: {
-      id: string;
-      documentType: components['schemas']['ChangeDocumentType'];
-      fileName: string;
-      fileType: components['schemas']['AttachmentFileType'];
-      sizeBytes: number;
-      uploadedBy: components['schemas']['UserRefDto'];
-      createdAt: string;
-      /** @description Null = no approver has seen it yet */
-      seenInRound: number | null;
-      canRemove: boolean;
-    };
-    StepGroupRefDto: {
-      id: string;
-      groupCode: string;
-      groupName: string;
-    };
-    StepProgramRefDto: {
-      id: string;
-      programCode: string;
-    };
-    /** @enum {string} */
-    ApprovalAction: 'PENDING' | 'APPROVE' | 'RETURN' | 'REJECT';
-    /** @enum {string} */
-    ApprovalStepKind: 'NORMAL' | 'SKIPPED' | 'OVERRIDE';
-    ApprovalStepDto: {
-      id: string;
-      /** @enum {number} */
-      approvalLevel: 1 | 2 | 3;
-      levelName: string;
-      approver: components['schemas']['UserRefDto'] | null;
-      forSubjectGroup: components['schemas']['StepGroupRefDto'] | null;
-      forProgram: components['schemas']['StepProgramRefDto'] | null;
-      action: components['schemas']['ApprovalAction'];
-      isSkipped: boolean;
-      skipReason: string | null;
-      remark: string | null;
-      recordedAt: string | null;
-      /** @description Who acted; differs from approver on an override */
-      performedBy: components['schemas']['UserRefDto'] | null;
-      isOverride: boolean;
-      kind: components['schemas']['ApprovalStepKind'];
-    };
-    RequestActionsDto: {
-      canEdit: boolean;
-      canDelete: boolean;
-      canSubmit: boolean;
-      canWithdraw: boolean;
-      canUpload: boolean;
-      canApprove: boolean;
-      /** @description Đề xuất dữ liệu đang chờ Phòng Đào tạo và người xem được phép phê duyệt cuối (MH-43). */
-      canFinalApprove: boolean;
-      canReturn: boolean;
-      canReject: boolean;
-      canOverride: boolean;
-      canComment: boolean;
-    };
-    SemesterDto: {
-      id: string;
-      semesterCode: string;
-      academicYear: string;
-      termInYear: number;
-      /** Format: date */
-      startDate: string | null;
-    };
-    ReleasedVersionDto: {
-      id: string;
-      programId: string;
-      programCode: string;
-      versionNumber: string | null;
-      status: components['schemas']['ProgramVersionStatus'];
-    };
-    RequestReleaseDto: {
-      decisionNumber: string;
-      /** Format: date */
-      signedDate: string;
-      effectiveSemester: components['schemas']['SemesterDto'] | null;
-      pastSemesterAllowed: boolean;
-      versions: components['schemas']['ReleasedVersionDto'][];
-    };
-    ChangeRequestDetailDto: {
-      id: string;
-      requestCode: string;
-      requestType: components['schemas']['ChangeRequestType'];
-      target: components['schemas']['RequestTargetDto'];
-      title: string;
-      status: components['schemas']['ChangeRequestStatus'];
-      origin: components['schemas']['RequestOrigin'];
-      /** @description 0 = never submitted */
-      submissionRound: number;
-      /** @description When the request entered its current level; null outside PENDING_* */
-      levelEnteredAt: string | null;
-      daysWaiting: number | null;
-      createdBy: components['schemas']['UserRefDto'];
-      createdAt: string;
-      updatedAt: string;
-      reason: string;
-      basisDocumentNumber: string | null;
-      workspace: components['schemas']['RequestWorkspaceDto'] | null;
-      authoredItems: components['schemas']['AuthoredItemDto'][];
-      documents: components['schemas']['ChangeRequestDocumentDto'][];
-      /** @description Current round only; empty before the first submit */
-      steps: components['schemas']['ApprovalStepDto'][];
-      conflicts: components['schemas']['ConflictDto'][];
-      permissions: components['schemas']['RequestActionsDto'];
-      release: components['schemas']['RequestReleaseDto'] | null;
-    };
-    UpdateChangeRequestDto: {
-      title?: string;
-      reason?: string;
-      origin?: components['schemas']['RequestOrigin'];
-      /** @description Required when origin is UNIVERSITY */
-      basisDocumentNumber?: string | null;
-    };
-    AuthoredItemInputBase: {
-      /** @enum {string} */
-      operation:
-        | 'SET_COURSE_FIELD'
-        | 'ADD_RELATION'
-        | 'UPDATE_RELATION'
-        | 'REMOVE_RELATION'
-        | 'ADD_MEMBER'
-        | 'END_MEMBERSHIP'
-        | 'ASSIGN_DIRECTOR'
-        | 'END_DIRECTOR';
-    };
-    ReplaceAuthoredItemsDto: {
-      /** @description The whole list: items not sent are removed */
-      items: components['schemas']['AuthoredItemInputBase'][];
-    };
-    /** @enum {string} */
-    DiffChange: 'ADDED' | 'REMOVED' | 'CHANGED';
-    DiffFieldDto: {
-      name: string;
-      label: string;
-      before: string | null;
-      after: string | null;
-    };
-    DiffRowDto: {
-      itemKey: string;
-      label: string;
-      change: components['schemas']['DiffChange'];
-      fields: components['schemas']['DiffFieldDto'][];
-    };
-    DiffSectionDto: {
-      entityType: string;
-      title: string;
-      rows: components['schemas']['DiffRowDto'][];
-    };
-    ChangeDiffDto: {
-      /** @description True while a Draft: computed from the working copy at read time */
-      live: boolean;
-      sections: components['schemas']['DiffSectionDto'][];
-    };
-    AffectedProgramDto: {
-      id: string;
-      programCode: string;
-      programName: string;
-    };
-    PreviewApproverDto: {
-      name: string;
-      scope: string | null;
-      skipReason: string | null;
-    };
-    PreviewLevelDto: {
-      /** @enum {number} */
-      approvalLevel: 1 | 2 | 3;
-      levelName: string;
-      approvers: components['schemas']['PreviewApproverDto'][];
-    };
-    BlockingIssueDto: {
-      /** @example STALE_BASE */
-      code: string;
-      message: string;
-    };
-    SubmitPreviewDto: {
-      itemCount: number;
-      affectedPrograms: components['schemas']['AffectedProgramDto'][];
-      levels: components['schemas']['PreviewLevelDto'][];
-      blockingIssues: components['schemas']['BlockingIssueDto'][];
-    };
-    UploadDocumentFormDto: {
-      documentType: components['schemas']['ChangeDocumentType'];
-      /** Format: binary */
-      file: string;
-    };
-    ApproveDecisionDto: {
-      remark?: Record<string, never>;
-    };
-    /** @enum {string} */
-    FinalApprovalKind: 'PROGRAM_VERSION' | 'SYLLABUS' | 'AUTHORED';
-    /** @enum {string} */
-    SyllabusIssueCode: 'MISSING_SYLLABUS' | 'SYLLABUS_INCOMPLETE';
-    SyllabusReleaseIssueDto: {
-      courseId: string;
-      courseCode: string;
-      code: components['schemas']['SyllabusIssueCode'];
-      /** @description Điều kiện chưa đạt, theo mã (rỗng khi chưa có đề cương). */
-      details: string[];
-    };
-    FinalApprovalProgramDto: {
-      programId: string;
-      programCode: string;
-      baseVersionId: string;
-      baseVersionNumber: string | null;
-      nextVersionNumber: string;
-      consistencyIssues: components['schemas']['CurriculumWarningDto'][];
-      syllabusIssues: components['schemas']['SyllabusReleaseIssueDto'][];
-      /** @description Liên kết CLO–PLO sẽ mất vì bản đề cương mới không còn mã CLO đó. */
-      droppedCloLinks: number;
-    };
-    FinalApprovalPreviewDto: {
-      requestId: string;
-      requestCode: string;
-      kind: components['schemas']['FinalApprovalKind'];
-      /** @description Dữ liệu gốc đã đổi; phải làm lại bản nháp. */
-      stale: boolean;
-      affectedPrograms: components['schemas']['FinalApprovalProgramDto'][];
-      /** @description Điều kiện chưa đạt của chính bản đề cương được đề xuất. */
-      copyIssues: string[];
-      /** @description Nhãn các thay đổi tác giả soạn. */
-      authoredLabels: string[];
-      /** @description Gán khóa tuyển sinh được khi tạo đúng một phiên bản. */
-      canAssignCohorts: boolean;
-      /** @description Người tạo đề xuất là Phòng Đào tạo nên được nạp học kỳ đã qua. */
-      canAllowPastSemester: boolean;
-    };
-    FinalApproveDto: {
-      /** @example QĐ-123/ĐHBK */
-      decisionNumber: string;
-      /** Format: date */
-      signedDate: string;
-      effectiveSemesterId: string;
-      remark?: string | null;
-      /** @description Cho phép ban hành vào học kỳ đã bắt đầu; chỉ hiệu lực với đề xuất do Phòng Đào tạo tạo. */
-      allowPastSemester?: boolean;
-      /** @description Chỉ khi đề xuất tạo đúng một phiên bản. */
-      cohortIds?: string[];
-    };
-    DecisionRemarkDto: {
-      remark: string;
-    };
-    /** @enum {string} */
-    OverrideAction: 'APPROVE' | 'RETURN' | 'REJECT';
-    OverrideDecisionDto: {
-      action: components['schemas']['OverrideAction'];
-      reason: string;
-    };
-    ApprovalRoundDto: {
-      submissionRound: number;
-      /** @description ISO time the round was submitted */
-      submittedAt: string;
-      steps: components['schemas']['ApprovalStepDto'][];
-    };
-    ApprovalHistoryDto: {
-      /** @description Newest round first */
-      rounds: components['schemas']['ApprovalRoundDto'][];
-    };
-    CommentDto: {
-      id: string;
-      author: components['schemas']['UserRefDto'];
-      content: string;
-      createdAt: string;
-    };
-    CreateCommentDto: {
-      content: string;
-    };
-    ApprovalQueueItemDto: {
-      requestId: string;
-      requestCode: string;
-      title: string;
-      requestType: components['schemas']['ChangeRequestType'];
-      status: components['schemas']['ChangeRequestStatus'];
-      /** @enum {number} */
-      approvalLevel: 1 | 2 | 3;
-      /** @description Group or program codes the caller stands for; null at level 3 */
-      standsFor: string | null;
-      createdBy: components['schemas']['UserRefDto'];
-      /** @description ISO time the round was submitted */
-      submittedAt: string;
-      /** @description Whole days since the request entered its level */
-      daysWaiting: number;
-    };
-    /** @enum {string} */
-    NotificationType:
-      | 'REQUEST_AWAITING_YOU'
-      | 'REQUEST_RETURNED'
-      | 'REQUEST_REJECTED'
-      | 'REQUEST_APPROVED'
-      | 'REQUEST_OVERRIDDEN'
-      | 'REQUEST_COMMENTED'
-      | 'REQUEST_EFFECTIVE';
-    /** @enum {string} */
-    NotificationReadStatus: 'UNREAD' | 'READ';
-    NotificationDto: {
-      id: string;
-      notificationType: components['schemas']['NotificationType'];
-      content: string;
-      changeRequestId: string | null;
-      readStatus: components['schemas']['NotificationReadStatus'];
-      createdAt: string;
-      readAt: string | null;
-    };
-    NotificationPageDto: {
-      items: components['schemas']['NotificationDto'][];
-      total: number;
-      page: number;
-      pageSize: number;
-    };
-    UnreadCountDto: {
-      count: number;
-    };
-    CreateSemesterDto: {
-      /** @example 2026-2027-1 */
-      semesterCode: string;
-      /** @example 2026-2027 */
-      academicYear: string;
-      termInYear: number;
-      /** Format: date */
-      startDate?: string | null;
-    };
-    UpdateSemesterDto: {
-      /** @example 2026-2027-1 */
-      semesterCode?: string;
-      /** @example 2026-2027 */
-      academicYear?: string;
-      termInYear?: number;
-      /** Format: date */
-      startDate?: string | null;
-    };
-    CreateCohortDto: {
-      /** @example K2026 */
-      cohortCode: string;
-      /** @example 2026 */
-      intakeYear: number;
-    };
-    UpdateCohortDto: {
-      /** @example K2026 */
-      cohortCode?: string;
-      /** @example 2026 */
-      intakeYear?: number;
-    };
-    ReleaseCheckDto: {
-      versionId: string;
-      canRelease: boolean;
-      consistencyIssues: components['schemas']['CurriculumWarningDto'][];
-      syllabusIssues: components['schemas']['SyllabusReleaseIssueDto'][];
-    };
-    ReleaseVersionDto: {
-      /** @example QĐ-123/ĐHBK */
-      decisionNumber: string;
-      /** Format: date */
-      signedDate: string;
-      effectiveSemesterId: string;
-      /**
-       * @default 1.0
-       * @example 1.0
-       */
-      versionNumber: string;
-      cohortIds: string[];
-    };
-    CohortDto: {
-      id: string;
-      cohortCode: string;
-      intakeYear: number;
-    };
-    VersionOriginRequestDto: {
-      id: string;
-      requestCode: string;
-    };
-    VersionLinkDto: {
-      id: string;
-      versionNumber: string | null;
-    };
-    SyllabusPinDto: {
-      id: string;
-      revisionNumber: number;
-      status: components['schemas']['SyllabusStatus'];
-    };
-    VersionRowDto: {
-      itemId: string;
-      plannedSemester: number;
-      courseId: string;
-      courseCode: string;
-      courseName: string;
-      /** @example 3 */
-      credits: string;
-      syllabus: components['schemas']['SyllabusPinDto'] | null;
-    };
-    VersionDetailDto: {
-      id: string;
-      versionNumber: string | null;
-      status: components['schemas']['ProgramVersionStatus'];
-      decisionNumber: string | null;
-      /** Format: date */
-      signedDate: string | null;
-      publishedAt: string | null;
-      effectiveSemester: components['schemas']['SemesterDto'] | null;
-      cohorts: components['schemas']['CohortDto'][];
-      originRequest: components['schemas']['VersionOriginRequestDto'] | null;
-      /** @description Phiên bản đính chính đã ban hành thay cho phiên bản này. */
-      correctedBy: components['schemas']['VersionLinkDto'] | null;
-      programId: string;
-      programCode: string;
-      programName: string;
-      majorCode: string;
-      majorName: string;
-      semesterCount: number;
-      /** @example 150 */
-      totalCredits: string;
-      /** @example 120 */
-      compulsoryCredits: string;
-      /** @example 30 */
-      electiveCredits: string;
-      publishedBy: components['schemas']['UserRefDto'] | null;
-      previousVersion: components['schemas']['VersionLinkDto'] | null;
-      correctionOf: components['schemas']['VersionLinkDto'] | null;
-      correctionReason: string | null;
-      /** @description Bản nháp đính chính chưa ban hành. */
-      isCorrectionDraft: boolean;
-      /** @description Bản nháp đính chính đang mở của phiên bản này (chỉ người có quyền đính chính thấy). */
-      openCorrection: components['schemas']['VersionLinkDto'] | null;
-      /** @description Người xem được phép bắt đầu đính chính phiên bản này. */
-      canCorrect: boolean;
-      rows: components['schemas']['VersionRowDto'][];
-    };
-    VersionRefDto: {
-      id: string;
-      versionNumber: string | null;
-      status: components['schemas']['ProgramVersionStatus'];
-      decisionNumber: string | null;
-      /** Format: date */
-      signedDate: string | null;
-      publishedAt: string | null;
-      effectiveSemester: components['schemas']['SemesterDto'] | null;
-      cohorts: components['schemas']['CohortDto'][];
-      originRequest: components['schemas']['VersionOriginRequestDto'] | null;
-      /** @description Phiên bản đính chính đã ban hành thay cho phiên bản này. */
-      correctedBy: components['schemas']['VersionLinkDto'] | null;
-    };
-    VersionListDto: {
-      versions: components['schemas']['VersionRefDto'][];
-    };
-    IssueCorrectionDto: {
-      reason: string;
-      /** @default true */
-      moveCohorts: boolean;
-    };
-  };
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    schemas: {
+        HealthDto: {
+            /** @enum {string} */
+            status: "ok" | "error";
+            /** @enum {string} */
+            database: "up" | "down";
+            /** @enum {string} */
+            redis: "up" | "down";
+        };
+        LoginDto: {
+            username: string;
+            password: string;
+        };
+        OrgUnitRefDto: {
+            id: string;
+            unitCode: string;
+            unitName: string;
+        };
+        MeRoleDto: {
+            roleCode: string;
+            roleName: string;
+            /** @enum {string} */
+            scopeType: "SYSTEM" | "UNIT" | "ASSIGNMENT";
+            scopeUnit: components["schemas"]["OrgUnitRefDto"] | null;
+            derived: boolean;
+        };
+        /** @enum {string} */
+        PermissionCode: "orgUnit.manage" | "subjectGroup.view" | "user.manage" | "permission.view" | "permission.manage" | "director.assign" | "delegation.manage" | "integrationClient.manage" | "sync.configure" | "auditLog.view" | "course.view" | "course.edit" | "courseRelation.edit" | "program.view" | "program.editInfo" | "program.clone" | "curriculum.edit" | "curriculum.importExportExcel" | "version.assignCohort" | "outcome.view" | "plo.edit" | "clo.edit" | "syllabus.view" | "syllabus.edit" | "gradingFormula.edit" | "changeRequest.view" | "changeRequest.create" | "changeRequest.createOrganizational" | "changeRequest.override" | "changeRequest.comment" | "changeRequest.statistics" | "version.publish" | "version.correct" | "version.viewHistory" | "version.compare" | "semester.manage" | "data.importExcel" | "report.exportAccreditation" | "report.benchmark" | "student.viewProgress" | "student.viewRegistrationEligibility" | "graduation.view" | "graduation.audit";
+        MeDto: {
+            id: string;
+            username: string;
+            userCode: string;
+            fullName: string;
+            email: string | null;
+            mustChangePassword: boolean;
+            orgUnit: components["schemas"]["OrgUnitRefDto"] | null;
+            roles: components["schemas"]["MeRoleDto"][];
+            permissions: components["schemas"]["PermissionCode"][];
+        };
+        FieldErrorDto: {
+            field: string;
+            constraints: string[];
+        };
+        ErrorResponseDto: {
+            statusCode: number;
+            code: string;
+            message: string;
+            details?: components["schemas"]["FieldErrorDto"][];
+            path: string;
+            timestamp: string;
+        };
+        ChangePasswordDto: {
+            currentPassword: string;
+            newPassword: string;
+        };
+        UserSummaryDto: {
+            id: string;
+            username: string;
+            userCode: string;
+            fullName: string;
+            email: string | null;
+            orgUnit: components["schemas"]["OrgUnitRefDto"] | null;
+            /** @enum {string} */
+            status: "ACTIVE" | "DISABLED";
+            activeRoleCodes: string[];
+        };
+        UserPageDto: {
+            items: components["schemas"]["UserSummaryDto"][];
+            total: number;
+            page: number;
+            pageSize: number;
+        };
+        CreateUserDto: {
+            username: string;
+            userCode: string;
+            fullName: string;
+            email?: string;
+            orgUnitId?: string;
+        };
+        UserDetailDto: {
+            id: string;
+            username: string;
+            userCode: string;
+            fullName: string;
+            email: string | null;
+            orgUnit: components["schemas"]["OrgUnitRefDto"] | null;
+            /** @enum {string} */
+            status: "ACTIVE" | "DISABLED";
+            activeRoleCodes: string[];
+            mustChangePassword: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        CreatedUserDto: {
+            user: components["schemas"]["UserDetailDto"];
+            temporaryPassword: string;
+        };
+        UpdateUserDto: {
+            userCode?: string;
+            fullName?: string;
+            email?: string | null;
+            orgUnitId?: string | null;
+        };
+        TemporaryPasswordDto: {
+            temporaryPassword: string;
+        };
+        RoleRefDto: {
+            id: string;
+            roleCode: string;
+            roleName: string;
+        };
+        UserRefDto: {
+            id: string;
+            fullName: string;
+        };
+        /** @enum {string} */
+        ValidityState: "ACTIVE" | "SCHEDULED" | "EXPIRED" | "REVOKED";
+        RoleAssignmentDto: {
+            id: string | null;
+            role: components["schemas"]["RoleRefDto"];
+            /** @enum {string} */
+            scopeType: "SYSTEM" | "UNIT" | "ASSIGNMENT";
+            scopeUnit: components["schemas"]["OrgUnitRefDto"] | null;
+            /** Format: date */
+            validFrom: string | null;
+            /** Format: date */
+            validTo: string | null;
+            assignedBy: components["schemas"]["UserRefDto"] | null;
+            /** Format: date-time */
+            createdAt: string | null;
+            /** Format: date-time */
+            revokedAt: string | null;
+            revokedBy: components["schemas"]["UserRefDto"] | null;
+            state: components["schemas"]["ValidityState"];
+            derived: boolean;
+        };
+        CreateRoleAssignmentDto: {
+            roleId: string;
+            /** @enum {string} */
+            scopeType: "SYSTEM" | "UNIT";
+            scopeUnitId?: string;
+            /** Format: date */
+            validFrom: string;
+            /** Format: date */
+            validTo?: string;
+        };
+        RoleDto: {
+            id: string;
+            roleCode: string;
+            roleName: string;
+            description: string | null;
+            isSystemRole: boolean;
+            /** @enum {string} */
+            scopeSource: "NONE" | "PROGRAM_DIRECTOR" | "SUBJECT_GROUP_COORDINATOR" | "SUBJECT_GROUP_MEMBER" | "OWN_ENROLLMENT";
+            assignable: boolean;
+        };
+        PermissionDto: {
+            id: string;
+            permissionCode: components["schemas"]["PermissionCode"];
+            permissionName: string;
+            /** @enum {string} */
+            functionGroup: "SYSTEM_ADMIN" | "COURSE_CATALOG" | "PROGRAM" | "LEARNING_OUTCOME" | "SYLLABUS" | "APPROVAL" | "VERSION" | "DATA_REPORT" | "STUDENT_LOOKUP";
+            description: string | null;
+            source: string | null;
+        };
+        MatrixCellDto: {
+            roleCode: string;
+            permissionCode: components["schemas"]["PermissionCode"];
+            /** @enum {string} */
+            mode: "DIRECT" | "VIA_REQUEST";
+            /** @enum {string} */
+            scope: "ALL" | "SCOPED";
+            /** Format: date-time */
+            updatedAt: string;
+            updatedBy: components["schemas"]["UserRefDto"] | null;
+        };
+        MatrixCellKeyDto: {
+            roleCode: string;
+            permissionCode: components["schemas"]["PermissionCode"];
+        };
+        PermissionMatrixDto: {
+            roles: components["schemas"]["RoleDto"][];
+            permissions: components["schemas"]["PermissionDto"][];
+            cells: components["schemas"]["MatrixCellDto"][];
+            lockedCells: components["schemas"]["MatrixCellKeyDto"][];
+        };
+        SetRolePermissionDto: {
+            /** @enum {string} */
+            mode: "DIRECT" | "VIA_REQUEST";
+            /** @enum {string} */
+            scope: "ALL" | "SCOPED";
+        };
+        OrgUnitDto: {
+            id: string;
+            unitCode: string;
+            unitName: string;
+            /** @enum {string} */
+            unitType: "UNIVERSITY" | "FACULTY" | "OFFICE";
+            parentUnitId: string | null;
+            /** @enum {string} */
+            status: "ACTIVE" | "INACTIVE";
+        };
+        CreateOrgUnitDto: {
+            unitCode: string;
+            unitName: string;
+            /** @enum {string} */
+            unitType: "FACULTY" | "OFFICE";
+            parentUnitId: string;
+        };
+        UpdateOrgUnitDto: {
+            unitName?: string;
+            parentUnitId?: string;
+        };
+        /** @enum {string} */
+        SubjectGroupStatus: "ACTIVE" | "INACTIVE";
+        SubjectGroupSummaryDto: {
+            id: string;
+            groupCode: string;
+            groupName: string;
+            status: components["schemas"]["SubjectGroupStatus"];
+            faculty: components["schemas"]["OrgUnitRefDto"];
+            activeMemberCount: number;
+            activeCoordinators: components["schemas"]["UserRefDto"][];
+            hasActiveCoordinator: boolean;
+        };
+        CreateSubjectGroupDto: {
+            groupCode: string;
+            groupName: string;
+            facultyId: string;
+        };
+        /** @enum {string} */
+        UserStatus: "ACTIVE" | "DISABLED";
+        MemberUserDto: {
+            id: string;
+            userCode: string;
+            fullName: string;
+            status: components["schemas"]["UserStatus"];
+        };
+        /** @enum {string} */
+        SubjectGroupMemberRole: "MEMBER" | "COORDINATOR";
+        SubjectGroupMemberDto: {
+            id: string;
+            lecturer: components["schemas"]["MemberUserDto"];
+            memberRole: components["schemas"]["SubjectGroupMemberRole"];
+            /** Format: date */
+            validFrom: string;
+            /** Format: date */
+            validTo: string | null;
+            state: components["schemas"]["ValidityState"];
+            assignedBy: components["schemas"]["UserRefDto"] | null;
+            createdAt: string;
+            revokedAt: string | null;
+            revokedBy: components["schemas"]["UserRefDto"] | null;
+        };
+        SubjectGroupDetailDto: {
+            id: string;
+            groupCode: string;
+            groupName: string;
+            status: components["schemas"]["SubjectGroupStatus"];
+            faculty: components["schemas"]["OrgUnitRefDto"];
+            activeMemberCount: number;
+            activeCoordinators: components["schemas"]["UserRefDto"][];
+            hasActiveCoordinator: boolean;
+            members: components["schemas"]["SubjectGroupMemberDto"][];
+            createdAt: string;
+            updatedAt: string;
+        };
+        UpdateSubjectGroupDto: {
+            groupName?: string;
+            facultyId?: string;
+        };
+        CourseRefDto: {
+            id: string;
+            courseCode: string;
+            courseName: string;
+        };
+        SubjectGroupDeactivationImpactDto: {
+            activeMemberCount: number;
+            activeCoordinators: components["schemas"]["UserRefDto"][];
+            courses: components["schemas"]["CourseRefDto"][];
+        };
+        AddSubjectGroupMemberDto: {
+            lecturerId: string;
+            memberRole: components["schemas"]["SubjectGroupMemberRole"];
+            /** Format: date */
+            validFrom: string;
+            /** Format: date */
+            validTo?: string;
+        };
+        EndSubjectGroupMemberDto: {
+            /** Format: date */
+            validTo: string;
+        };
+        SubjectGroupRefDto: {
+            id: string;
+            groupCode: string;
+            groupName: string;
+            status: components["schemas"]["SubjectGroupStatus"];
+        };
+        UserSubjectGroupMembershipDto: {
+            id: string;
+            lecturer: components["schemas"]["MemberUserDto"];
+            memberRole: components["schemas"]["SubjectGroupMemberRole"];
+            /** Format: date */
+            validFrom: string;
+            /** Format: date */
+            validTo: string | null;
+            state: components["schemas"]["ValidityState"];
+            assignedBy: components["schemas"]["UserRefDto"] | null;
+            createdAt: string;
+            revokedAt: string | null;
+            revokedBy: components["schemas"]["UserRefDto"] | null;
+            subjectGroup: components["schemas"]["SubjectGroupRefDto"];
+        };
+        /** @enum {string} */
+        CourseType: "THEORY" | "PRACTICE" | "LAB" | "PROJECT" | "CAPSTONE" | "INTERNSHIP" | "CONDITIONAL";
+        /** @enum {string} */
+        CourseStatus: "ACTIVE" | "DISCONTINUED" | "CANCELLED";
+        CourseSummaryDto: {
+            id: string;
+            courseCode: string;
+            courseName: string;
+            englishName: string | null;
+            /** @example 2.5 */
+            credits: string;
+            courseType: components["schemas"]["CourseType"];
+            status: components["schemas"]["CourseStatus"];
+            ownerFaculty: components["schemas"]["OrgUnitRefDto"];
+            ownerGroup: components["schemas"]["SubjectGroupRefDto"] | null;
+            isForeign: boolean;
+        };
+        CoursePageDto: {
+            items: components["schemas"]["CourseSummaryDto"][];
+            total: number;
+            page: number;
+            pageSize: number;
+        };
+        CreateCourseDto: {
+            courseCode: string;
+            courseName: string;
+            englishName?: string | null;
+            /** @example 2.5 */
+            credits: string;
+            courseType: components["schemas"]["CourseType"];
+            ownerFacultyId: string;
+            ownerGroupId?: string | null;
+        };
+        CourseUsageDto: {
+            programId: string;
+            programCode: string;
+            programName: string;
+            versionLabel: string | null;
+            plannedSemester: number;
+        };
+        /** @enum {string} */
+        EditPath: "DIRECT" | "VIA_REQUEST";
+        RelatedCourseDto: {
+            id: string;
+            courseCode: string;
+            courseName: string;
+            /** @example 3 */
+            credits: string;
+            status: components["schemas"]["CourseStatus"];
+        };
+        CourseEquivalenceDto: {
+            id: string;
+            groupCode: string;
+            members: components["schemas"]["RelatedCourseDto"][];
+        };
+        CourseDetailDto: {
+            id: string;
+            courseCode: string;
+            courseName: string;
+            englishName: string | null;
+            /** @example 2.5 */
+            credits: string;
+            courseType: components["schemas"]["CourseType"];
+            status: components["schemas"]["CourseStatus"];
+            ownerFaculty: components["schemas"]["OrgUnitRefDto"];
+            ownerGroup: components["schemas"]["SubjectGroupRefDto"] | null;
+            isForeign: boolean;
+            programsUsing: components["schemas"]["CourseUsageDto"][];
+            editPath: components["schemas"]["EditPath"] | null;
+            canChangeStatus: boolean;
+            equivalenceGroup: components["schemas"]["CourseEquivalenceDto"] | null;
+            createdAt: string;
+            updatedAt: string;
+        };
+        UpdateCourseDto: {
+            courseName?: string;
+            englishName?: string | null;
+            /** @example 2.5 */
+            credits?: string;
+            courseType?: components["schemas"]["CourseType"];
+            ownerFacultyId?: string;
+            ownerGroupId?: string | null;
+        };
+        DiscontinueCourseDto: {
+            /** @description Học phần thay thế; quan hệ Thay thế được tạo cùng lúc với việc ngừng mở lớp. */
+            replacementCourseId?: string;
+        };
+        /** @enum {string} */
+        CourseRelationType: "PRIOR" | "PREREQUISITE" | "COREQUISITE" | "REPLACEMENT";
+        CourseRelationDto: {
+            id: string;
+            relationType: components["schemas"]["CourseRelationType"];
+            sourceCourse: components["schemas"]["RelatedCourseDto"];
+            targetCourse: components["schemas"]["RelatedCourseDto"];
+            minScore: string | null;
+            editPath: components["schemas"]["EditPath"] | null;
+        };
+        CreateCourseRelationDto: {
+            sourceCourseId: string;
+            targetCourseId: string;
+            relationType: components["schemas"]["CourseRelationType"];
+            /** @example 2 */
+            minScore?: string | null;
+        };
+        UpdateCourseRelationDto: {
+            /** @example 2 */
+            minScore: string | null;
+        };
+        EquivalenceGroupDto: {
+            id: string;
+            groupCode: string;
+            note: string | null;
+            members: components["schemas"]["RelatedCourseDto"][];
+            updatedAt: string;
+        };
+        EquivalenceGroupPageDto: {
+            items: components["schemas"]["EquivalenceGroupDto"][];
+            total: number;
+            page: number;
+            pageSize: number;
+        };
+        CreateEquivalenceGroupDto: {
+            groupCode: string;
+            note?: string | null;
+            courseIds: string[];
+        };
+        UpdateEquivalenceGroupDto: {
+            groupCode?: string;
+            note?: string | null;
+        };
+        AddEquivalenceMemberDto: {
+            courseId: string;
+        };
+        MergeEquivalenceGroupsDto: {
+            /** @description Nhóm sẽ bị xóa; học phần của nó chuyển sang nhóm được giữ. */
+            otherGroupId: string;
+        };
+        /** @enum {string} */
+        DegreeLevel: "ENGINEER" | "BACHELOR";
+        /** @enum {string} */
+        ProgramStatus: "ACTIVE" | "INACTIVE";
+        /** @enum {string} */
+        ProgramVersionStatus: "DRAFT" | "PENDING" | "ACTIVE" | "HISTORICAL";
+        ProgramVersionRefDto: {
+            id: string;
+            versionNumber: string | null;
+            status: components["schemas"]["ProgramVersionStatus"];
+        };
+        ProgramSummaryDto: {
+            id: string;
+            programCode: string;
+            degreeLevel: components["schemas"]["DegreeLevel"];
+            status: components["schemas"]["ProgramStatus"];
+            faculty: components["schemas"]["OrgUnitRefDto"];
+            programName: string;
+            currentVersion: components["schemas"]["ProgramVersionRefDto"];
+            directors: components["schemas"]["UserRefDto"][];
+        };
+        ProgramPageDto: {
+            items: components["schemas"]["ProgramSummaryDto"][];
+            total: number;
+            page: number;
+            pageSize: number;
+        };
+        CreateProgramDto: {
+            programCode: string;
+            /** @description Khoa quản lý; mặc định là Khoa CNTT. */
+            facultyId?: string;
+            degreeLevel: components["schemas"]["DegreeLevel"];
+            programName: string;
+            majorCode: string;
+            majorName: string;
+            semesterCount: number;
+            /** @example 130 */
+            totalCredits: string;
+            /** @example 122 */
+            compulsoryCredits: string;
+            /** @example 8 */
+            electiveCredits: string;
+        };
+        ProgramVersionInfoDto: {
+            id: string;
+            versionNumber: string | null;
+            status: components["schemas"]["ProgramVersionStatus"];
+            programName: string;
+            majorCode: string;
+            majorName: string;
+            semesterCount: number;
+            /** @example 150 */
+            totalCredits: string;
+            /** @example 140 */
+            compulsoryCredits: string;
+            /** @example 10 */
+            electiveCredits: string;
+            updatedAt: string;
+        };
+        ProgramClonedFromDto: {
+            programId: string;
+            programCode: string;
+            version: components["schemas"]["ProgramVersionRefDto"];
+        };
+        ProgramDetailDto: {
+            id: string;
+            programCode: string;
+            degreeLevel: components["schemas"]["DegreeLevel"];
+            status: components["schemas"]["ProgramStatus"];
+            faculty: components["schemas"]["OrgUnitRefDto"];
+            programName: string;
+            currentVersion: components["schemas"]["ProgramVersionRefDto"];
+            directors: components["schemas"]["UserRefDto"][];
+            currentVersionInfo: components["schemas"]["ProgramVersionInfoDto"];
+            draftVersion: components["schemas"]["ProgramVersionInfoDto"] | null;
+            versions: components["schemas"]["ProgramVersionRefDto"][];
+            clonedFrom: components["schemas"]["ProgramClonedFromDto"] | null;
+            editPath: components["schemas"]["EditPath"] | null;
+            canManage: boolean;
+            canClone: boolean;
+            createdAt: string;
+            updatedAt: string;
+        };
+        UpdateProgramDto: {
+            degreeLevel?: components["schemas"]["DegreeLevel"];
+            programName?: string;
+            majorCode?: string;
+            majorName?: string;
+            semesterCount?: number;
+            /** @example 130 */
+            totalCredits?: string;
+            /** @example 122 */
+            compulsoryCredits?: string;
+            /** @example 8 */
+            electiveCredits?: string;
+        };
+        CloneProgramDto: {
+            programCode: string;
+            programName: string;
+            /** @description Phiên bản nguồn; mặc định là phiên bản hiện hành. */
+            sourceVersionId?: string;
+        };
+        ProgramDirectorDto: {
+            id: string;
+            director: components["schemas"]["UserRefDto"];
+            /** Format: date */
+            validFrom: string;
+            /** Format: date */
+            validTo: string | null;
+            state: components["schemas"]["ValidityState"];
+            assignedBy: components["schemas"]["UserRefDto"] | null;
+            revokedAt: string | null;
+            revokedBy: components["schemas"]["UserRefDto"] | null;
+        };
+        AssignDirectorDto: {
+            directorId: string;
+            /** Format: date */
+            validFrom: string;
+            /** Format: date */
+            validTo?: string;
+        };
+        EndDirectorDto: {
+            /** Format: date */
+            validTo: string;
+        };
+        VersionInfoProgramDto: {
+            id: string;
+            programCode: string;
+            degreeLevel: components["schemas"]["DegreeLevel"];
+        };
+        /** @enum {string} */
+        ChangeRequestStatus: "DRAFT" | "PENDING_COORDINATOR" | "PENDING_DIRECTOR" | "PENDING_ACADEMIC_OFFICE" | "APPROVED" | "EFFECTIVE" | "REJECTED" | "WITHDRAWN";
+        RequestRefDto: {
+            id: string;
+            requestCode: string;
+            status: components["schemas"]["ChangeRequestStatus"];
+        };
+        VersionInfoEditDto: {
+            id: string;
+            versionNumber: string | null;
+            status: components["schemas"]["ProgramVersionStatus"];
+            programName: string;
+            majorCode: string;
+            majorName: string;
+            semesterCount: number;
+            /** @example 150 */
+            totalCredits: string;
+            /** @example 140 */
+            compulsoryCredits: string;
+            /** @example 10 */
+            electiveCredits: string;
+            updatedAt: string;
+            program: components["schemas"]["VersionInfoProgramDto"];
+            sourceRequest: components["schemas"]["RequestRefDto"] | null;
+            canEdit: boolean;
+        };
+        UpdateVersionInfoDto: {
+            programName?: string;
+            majorCode?: string;
+            majorName?: string;
+            semesterCount?: number;
+            /** @example 130 */
+            totalCredits?: string;
+            /** @example 122 */
+            compulsoryCredits?: string;
+            /** @example 8 */
+            electiveCredits?: string;
+        };
+        CurriculumVersionDto: {
+            id: string;
+            programId: string;
+            programCode: string;
+            programName: string;
+            versionNumber: string | null;
+            status: components["schemas"]["ProgramVersionStatus"];
+            semesterCount: number;
+            sourceRequest: components["schemas"]["RequestRefDto"] | null;
+        };
+        CurriculumElectiveGroupRefDto: {
+            id: string;
+            groupCode: string;
+        };
+        /** @enum {string} */
+        CurriculumRequisiteType: "PRIOR" | "PREREQUISITE" | "COREQUISITE";
+        CurriculumRequisiteDto: {
+            id: string;
+            sourceCourse: components["schemas"]["RelatedCourseDto"];
+            relationType: components["schemas"]["CurriculumRequisiteType"];
+            /** @example 2 */
+            minScore: string | null;
+            /** @description Học kỳ mà học phần điều kiện đang xếp trong khung này; null khi nó không có trong khung. */
+            sourceSemester: number | null;
+        };
+        CurriculumItemDto: {
+            id: string;
+            /** @description TT: vị trí 1-based theo (học kỳ, thứ tự). */
+            displayOrder: number;
+            plannedSemester: number;
+            sortOrder: number;
+            course: components["schemas"]["RelatedCourseDto"];
+            /** @description The course has a syllabus revision (EC-44). */
+            hasSyllabus: boolean;
+            blockSymbol: string | null;
+            blockName: string | null;
+            isElective: boolean;
+            electiveGroup: components["schemas"]["CurriculumElectiveGroupRefDto"] | null;
+            htDa: boolean;
+            tqDa: boolean;
+            /** @example 2 */
+            minStudiedScore: string | null;
+            /** @example 2 */
+            minTransferScore: string | null;
+            note: string | null;
+            requisites: components["schemas"]["CurriculumRequisiteDto"][];
+            canEdit: boolean;
+        };
+        SemesterTotalDto: {
+            semester: number;
+            /** @example 17 */
+            totalCredits: string;
+            /** @example 15 */
+            compulsoryCredits: string;
+            /** @example 2 */
+            electiveCredits: string;
+            itemCount: number;
+        };
+        BlockTotalDto: {
+            symbol: string | null;
+            blockName: string | null;
+            /** @example 30 */
+            totalCredits: string;
+            itemCount: number;
+        };
+        KnowledgeBlockDto: {
+            blockCode: string;
+            blockName: string;
+            /** @example 40 */
+            requiredCredits: string | null;
+        };
+        ElectiveGroupDto: {
+            id: string;
+            groupCode: string;
+            groupName: string;
+            minCredits: string | null;
+            minCourses: number | null;
+            itemIds: string[];
+            /** @example 15 */
+            listedCredits: string;
+            itemCount: number;
+        };
+        CreditBreakdownDto: {
+            /** @example 98 */
+            compulsory: string;
+            /** @example 50 */
+            elective: string;
+            /** @example 148 */
+            total: string;
+        };
+        ProgramCreditsDto: {
+            computed: components["schemas"]["CreditBreakdownDto"];
+            declared: components["schemas"]["CreditBreakdownDto"];
+            mismatch: boolean;
+        };
+        /** @enum {string} */
+        CurriculumWarningCode: "EMPTY_SEMESTER" | "REQUISITE_NOT_EARLIER" | "REQUISITE_OUTSIDE" | "ELECTIVE_WITHOUT_GROUP" | "DUPLICATE_COURSE" | "GROUP_MINIMUM_UNREACHABLE" | "REQUISITE_CYCLE" | "CREDIT_MISMATCH" | "CREDIT_MISMATCH_ACCEPTED" | "MISSING_SYLLABUS";
+        /** @enum {string} */
+        WarningSeverity: "ERROR" | "HIGH" | "INFO";
+        CurriculumWarningDto: {
+            code: components["schemas"]["CurriculumWarningCode"];
+            severity: components["schemas"]["WarningSeverity"];
+            message: string;
+            semester: number | null;
+            itemId: string | null;
+            groupId: string | null;
+        };
+        CurriculumDto: {
+            version: components["schemas"]["CurriculumVersionDto"];
+            editPath: components["schemas"]["EditPath"] | null;
+            canEditStructure: boolean;
+            canAddItems: boolean;
+            items: components["schemas"]["CurriculumItemDto"][];
+            semesters: components["schemas"]["SemesterTotalDto"][];
+            blocks: components["schemas"]["BlockTotalDto"][];
+            knowledgeBlocks: components["schemas"]["KnowledgeBlockDto"][];
+            electiveGroups: components["schemas"]["ElectiveGroupDto"][];
+            programCredits: components["schemas"]["ProgramCreditsDto"];
+            warnings: components["schemas"]["CurriculumWarningDto"][];
+        };
+        CreateCurriculumItemDto: {
+            courseId: string;
+            plannedSemester: number;
+            blockSymbol?: string | null;
+            isElective: boolean;
+            htDa?: boolean;
+            tqDa?: boolean;
+            /** @example 4 */
+            minStudiedScore?: string | null;
+            /** @example 4 */
+            minTransferScore?: string | null;
+            note?: string | null;
+        };
+        ReorderCurriculumDto: {
+            plannedSemester: number;
+            /** @description Mọi dòng của học kỳ, theo thứ tự mới. */
+            itemIds: string[];
+        };
+        CreateElectiveGroupDto: {
+            groupCode: string;
+            groupName: string;
+            /** @example 6 */
+            minCredits?: string | null;
+            minCourses?: number | null;
+        };
+        UpdateCurriculumItemDto: {
+            plannedSemester?: number;
+            blockSymbol?: string | null;
+            isElective?: boolean;
+            htDa?: boolean;
+            tqDa?: boolean;
+            /** @example 4 */
+            minStudiedScore?: string | null;
+            /** @example 4 */
+            minTransferScore?: string | null;
+            note?: string | null;
+        };
+        RequisiteInputDto: {
+            sourceCourseId: string;
+            relationType: components["schemas"]["CurriculumRequisiteType"];
+            /** @example 4 */
+            minScore?: string | null;
+        };
+        ReplaceRequisitesDto: {
+            requisites: components["schemas"]["RequisiteInputDto"][];
+        };
+        UpdateElectiveGroupDto: {
+            groupCode?: string;
+            groupName?: string;
+            /** @example 6 */
+            minCredits?: string | null;
+            minCourses?: number | null;
+        };
+        AssignGroupItemsDto: {
+            itemIds: string[];
+        };
+        ConsistencyVersionDto: {
+            id: string;
+            programId: string;
+            programCode: string;
+            programName: string;
+            versionNumber: string | null;
+            status: components["schemas"]["ProgramVersionStatus"];
+        };
+        CreditAcceptedByDto: {
+            id: string;
+            fullName: string;
+        };
+        CreditAcceptanceDto: {
+            reason: string;
+            /** @example -2 */
+            compulsoryGap: string;
+            /** @example 0 */
+            electiveGap: string;
+            acceptedBy: components["schemas"]["CreditAcceptedByDto"];
+            acceptedAt: string;
+        };
+        CreditCheckDto: {
+            declared: components["schemas"]["CreditBreakdownDto"];
+            computed: components["schemas"]["CreditBreakdownDto"];
+            /** @description Tính từ khung trừ khai báo; có thể âm. */
+            gap: components["schemas"]["CreditBreakdownDto"];
+            mismatch: boolean;
+            acceptance: components["schemas"]["CreditAcceptanceDto"] | null;
+            acceptanceCurrent: boolean;
+        };
+        GroupRequirementDto: {
+            id: string;
+            groupCode: string;
+            groupName: string;
+            minCredits: string | null;
+            minCourses: number | null;
+            /**
+             * @description Phần nhóm cộng vào tổng.
+             * @example 6
+             */
+            requiredCredits: string;
+            /** @example 15 */
+            listedCredits: string;
+            itemCount: number;
+        };
+        ConsistencyIssueDto: {
+            code: components["schemas"]["CurriculumWarningCode"];
+            severity: components["schemas"]["WarningSeverity"];
+            message: string;
+            semester: number | null;
+            itemId: string | null;
+            groupId: string | null;
+        };
+        ConsistencyReportDto: {
+            version: components["schemas"]["ConsistencyVersionDto"];
+            checkedAt: string;
+            credits: components["schemas"]["CreditCheckDto"];
+            groups: components["schemas"]["GroupRequirementDto"][];
+            issues: components["schemas"]["ConsistencyIssueDto"][];
+            errorCount: number;
+            warningCount: number;
+            /** @description errorCount === 0: what assertPasses decides. */
+            passes: boolean;
+            canAcceptMismatch: boolean;
+        };
+        AcceptCreditMismatchDto: {
+            reason: string;
+            /** @example -2 */
+            compulsoryGap: string;
+            /** @example 0 */
+            electiveGap: string;
+        };
+        OutcomeVersionDto: {
+            id: string;
+            programId: string;
+            programCode: string;
+            programName: string;
+            versionNumber: string | null;
+            status: components["schemas"]["ProgramVersionStatus"];
+            sourceRequest: components["schemas"]["RequestRefDto"] | null;
+        };
+        PloDto: {
+            id: string;
+            ploCode: string;
+            description: string;
+            englishDescription: string | null;
+            competencyGroup: string | null;
+            /** @description 1-based, contiguous */
+            sortOrder: number;
+            /** @description Course cells that carry this PLO */
+            courseCount: number;
+            /** @description CLO links that go with the PLO if deleted */
+            cloLinkCount: number;
+        };
+        PloListDto: {
+            editPath: components["schemas"]["EditPath"] | null;
+            /** @description Draft version and a direct edit path */
+            canEdit: boolean;
+            version: components["schemas"]["OutcomeVersionDto"];
+            plos: components["schemas"]["PloDto"][];
+        };
+        CreatePloDto: {
+            /**
+             * @description Trimmed and upper-cased
+             * @example PLO1
+             */
+            ploCode: string;
+            description: string;
+            englishDescription?: string | null;
+            competencyGroup?: string | null;
+        };
+        ReorderOutcomeRowsDto: {
+            ids: string[];
+        };
+        UpdatePloDto: {
+            /**
+             * @description Trimmed and upper-cased
+             * @example PLO1
+             */
+            ploCode?: string;
+            description?: string;
+            englishDescription?: string | null;
+            competencyGroup?: string | null;
+        };
+        PloHeaderDto: {
+            id: string;
+            ploCode: string;
+            description: string;
+        };
+        CoursePloCourseDto: {
+            id: string;
+            courseCode: string;
+            courseName: string;
+            /** @example 3 */
+            credits: string;
+        };
+        CoursePloCellDto: {
+            ploId: string;
+            /** @example 0.5 */
+            weight: string;
+            /** @description CLO links that go with the cell if cleared */
+            cloLinkCount: number;
+        };
+        CoursePloRowDto: {
+            itemId: string;
+            plannedSemester: number;
+            course: components["schemas"]["CoursePloCourseDto"];
+            /** @description Mapped PLOs only */
+            cells: components["schemas"]["CoursePloCellDto"][];
+        };
+        CoursePloMatrixDto: {
+            editPath: components["schemas"]["EditPath"] | null;
+            /** @description Draft version and a direct edit path */
+            canEdit: boolean;
+            version: components["schemas"]["OutcomeVersionDto"];
+            plos: components["schemas"]["PloHeaderDto"][];
+            rows: components["schemas"]["CoursePloRowDto"][];
+        };
+        SetPloWeightDto: {
+            /** @example 0.5 */
+            weight: string;
+        };
+        MatrixCourseRefDto: {
+            id: string;
+            courseCode: string;
+            courseName: string;
+        };
+        CloRefDto: {
+            id: string;
+            cloCode: string;
+            description: string;
+            englishDescription: string | null;
+        };
+        CloPloLinkDto: {
+            cloId: string;
+            ploId: string;
+        };
+        ProgramCloPloRowDto: {
+            itemId: string;
+            plannedSemester: number;
+            course: components["schemas"]["MatrixCourseRefDto"];
+            revisionNumber: number | null;
+            clos: components["schemas"]["CloRefDto"][];
+            mappedPloIds: string[];
+            links: components["schemas"]["CloPloLinkDto"][];
+        };
+        ProgramCloPloMatrixDto: {
+            version: components["schemas"]["OutcomeVersionDto"];
+            plos: components["schemas"]["PloHeaderDto"][];
+            rows: components["schemas"]["ProgramCloPloRowDto"][];
+        };
+        ItemRefDto: {
+            id: string;
+            plannedSemester: number;
+            course: components["schemas"]["MatrixCourseRefDto"];
+        };
+        /** @enum {string} */
+        SyllabusStatus: "DRAFT" | "PUBLISHED" | "HISTORICAL";
+        ItemCloPloRevisionDto: {
+            id: string;
+            revisionNumber: number;
+            status: components["schemas"]["SyllabusStatus"];
+        };
+        ItemPloColumnDto: {
+            id: string;
+            ploCode: string;
+            description: string;
+            /** @description null = the course does not map this PLO; the column is off */
+            weight: string | null;
+        };
+        ItemCloPloMatrixDto: {
+            editPath: components["schemas"]["EditPath"] | null;
+            /** @description Draft version and a direct edit path */
+            canEdit: boolean;
+            version: components["schemas"]["OutcomeVersionDto"];
+            item: components["schemas"]["ItemRefDto"];
+            /** @description null = the course has no syllabus */
+            revision: components["schemas"]["ItemCloPloRevisionDto"] | null;
+            clos: components["schemas"]["CloRefDto"][];
+            plos: components["schemas"]["ItemPloColumnDto"][];
+            links: components["schemas"]["CloPloLinkDto"][];
+        };
+        ReplaceCloPloLinksDto: {
+            links: components["schemas"]["CloPloLinkDto"][];
+        };
+        CloGapDto: {
+            itemId: string;
+            courseCode: string;
+            courseName: string;
+            cloId: string;
+            cloCode: string;
+            cloDescription: string;
+        };
+        CourseGapDto: {
+            itemId: string;
+            courseCode: string;
+            courseName: string;
+            plannedSemester: number;
+        };
+        OutcomeCoverageDto: {
+            version: components["schemas"]["OutcomeVersionDto"];
+            plosWithoutCourse: components["schemas"]["PloHeaderDto"][];
+            closWithoutPlo: components["schemas"]["CloGapDto"][];
+            coursesWithoutPlo: components["schemas"]["CourseGapDto"][];
+            /** @description Courses skipped from the CLO list for lack of a syllabus */
+            coursesWithoutSyllabus: number;
+            /** @description Course lists hold only the caller’s groups */
+            filteredToGroups: boolean;
+        };
+        SyllabusCourseDto: {
+            id: string;
+            courseCode: string;
+            courseName: string;
+            englishName: string | null;
+            /** @example 3 */
+            credits: string;
+            status: components["schemas"]["CourseStatus"];
+        };
+        WeeklyContentDto: {
+            id: string;
+            weekLabel: string;
+            /** @description 1-based, contiguous */
+            sortOrder: number;
+            /** @description Sanitized HTML */
+            content: string;
+            teachingActivities: string | null;
+            /** @description In CLO order */
+            cloIds: string[];
+        };
+        /** @enum {string} */
+        AttachmentFileType: "PDF" | "DOCX" | "XLSX" | "IMAGE";
+        SyllabusAttachmentDto: {
+            id: string;
+            /** @description Original name, UTF-8 decoded */
+            fileName: string;
+            fileType: components["schemas"]["AttachmentFileType"];
+            sizeBytes: number;
+            uploadedBy: components["schemas"]["UserRefDto"];
+            recordedAt: string;
+            canDelete: boolean;
+        };
+        CloDto: {
+            id: string;
+            cloCode: string;
+            description: string;
+            englishDescription: string | null;
+            cognitiveLevel: string | null;
+            /** @description 1-based, contiguous */
+            sortOrder: number;
+            /** @description Codes of the programs that link this CLO to a PLO, sorted */
+            linkedPrograms: string[];
+        };
+        SyllabusDto: {
+            id: string;
+            /** @description Null on the working copy of a change request */
+            revisionNumber: number | null;
+            status: components["schemas"]["SyllabusStatus"];
+            sourceRequest: components["schemas"]["RequestRefDto"] | null;
+            /** @description Sanitized HTML; null = empty section */
+            courseDescription: string | null;
+            /** @description Sanitized HTML; null = empty section */
+            englishDescription: string | null;
+            /** @description Sanitized HTML; null = empty section */
+            objectives: string | null;
+            /** @description Sanitized HTML; null = empty section */
+            teachingMethods: string | null;
+            /** @description Sanitized HTML; null = empty section */
+            assessmentMethods: string | null;
+            /** @description Sanitized HTML; null = empty section */
+            references: string | null;
+            publishedAt: string | null;
+            updatedAt: string;
+            weeklyContents: components["schemas"]["WeeklyContentDto"][];
+            attachments: components["schemas"]["SyllabusAttachmentDto"][];
+            clos: components["schemas"]["CloDto"][];
+        };
+        AttachmentRulesDto: {
+            maxBytes: number;
+            fileTypes: components["schemas"]["AttachmentFileType"][];
+        };
+        SyllabusVersionRefDto: {
+            id: string;
+            programId: string;
+            programCode: string;
+            versionNumber: string | null;
+        };
+        CourseSyllabusDto: {
+            course: components["schemas"]["SyllabusCourseDto"];
+            programsUsing: components["schemas"]["CourseUsageDto"][];
+            published: components["schemas"]["SyllabusDto"] | null;
+            draft: components["schemas"]["SyllabusDto"] | null;
+            canCreate: boolean;
+            /** @description A Draft exists and its CLOs are directly editable */
+            canEditClos: boolean;
+            editPath: components["schemas"]["EditPath"] | null;
+            attachmentRules: components["schemas"]["AttachmentRulesDto"];
+            /** @description The caller may add a signed file to the published revision (files are only ever added once a revision is published) */
+            canAttachToPublished: boolean;
+            /** @description Set when the answer is the revision pinned by this version */
+            version: components["schemas"]["SyllabusVersionRefDto"] | null;
+        };
+        UpdateSyllabusDto: {
+            courseDescription?: string | null;
+            englishDescription?: string | null;
+            objectives?: string | null;
+            teachingMethods?: string | null;
+            assessmentMethods?: string | null;
+            references?: string | null;
+        };
+        CreateWeeklyContentDto: {
+            /** @example Tuần 1 */
+            weekLabel: string;
+            /** @description HTML; sanitized on save */
+            content: string;
+            teachingActivities?: string | null;
+            /** @description CLOs of the same syllabus this week covers; omitted = keep */
+            cloIds?: string[];
+        };
+        ReorderWeeklyContentsDto: {
+            ids: string[];
+        };
+        UpdateWeeklyContentDto: {
+            /** @example Tuần 1 */
+            weekLabel?: string;
+            /** @description HTML; sanitized on save */
+            content?: string;
+            teachingActivities?: string | null;
+            /** @description CLOs of the same syllabus this week covers; omitted = keep */
+            cloIds?: string[];
+        };
+        CreateCloDto: {
+            /**
+             * @description Trimmed and upper-cased
+             * @example CLO1
+             */
+            cloCode: string;
+            description: string;
+            englishDescription?: string | null;
+            cognitiveLevel?: string | null;
+        };
+        ReorderClosDto: {
+            ids: string[];
+        };
+        UpdateCloDto: {
+            /**
+             * @description Trimmed and upper-cased
+             * @example CLO1
+             */
+            cloCode?: string;
+            description?: string;
+            englishDescription?: string | null;
+            cognitiveLevel?: string | null;
+        };
+        UploadAttachmentFormDto: {
+            /** Format: binary */
+            file: string;
+        };
+        /** @enum {string} */
+        ChangeRequestType: "GRADING_FORMULA" | "OUTCOME" | "SYLLABUS_CONTENT" | "CURRICULUM" | "COURSE_RELATION" | "PROGRAM_INFO" | "ORGANIZATION";
+        /** @enum {string} */
+        RequestOrigin: "UNIVERSITY" | "FACULTY";
+        /** @enum {string} */
+        ChangeTargetType: "COURSE" | "PROGRAM" | "SUBJECT_GROUP";
+        RequestTargetDto: {
+            targetType: components["schemas"]["ChangeTargetType"];
+            id: string;
+            code: string;
+            name: string;
+        };
+        ChangeRequestSummaryDto: {
+            id: string;
+            requestCode: string;
+            requestType: components["schemas"]["ChangeRequestType"];
+            target: components["schemas"]["RequestTargetDto"];
+            title: string;
+            status: components["schemas"]["ChangeRequestStatus"];
+            origin: components["schemas"]["RequestOrigin"];
+            /** @description 0 = never submitted */
+            submissionRound: number;
+            /** @description When the request entered its current level; null outside PENDING_* */
+            levelEnteredAt: string | null;
+            daysWaiting: number | null;
+            createdBy: components["schemas"]["UserRefDto"];
+            createdAt: string;
+            updatedAt: string;
+        };
+        ChangeRequestPageDto: {
+            items: components["schemas"]["ChangeRequestSummaryDto"][];
+            total: number;
+            page: number;
+            pageSize: number;
+        };
+        ConflictDto: {
+            id: string;
+            requestCode: string;
+            title: string;
+            status: components["schemas"]["ChangeRequestStatus"];
+            createdBy: components["schemas"]["UserRefDto"];
+        };
+        UserOptionDto: {
+            id: string;
+            userCode: string;
+            fullName: string;
+        };
+        CreateChangeRequestDto: {
+            /** @description GRADING_FORMULA is refused until F-12 */
+            requestType: components["schemas"]["ChangeRequestType"];
+            targetType: components["schemas"]["ChangeTargetType"];
+            targetId: string;
+            title: string;
+            reason: string;
+            origin: components["schemas"]["RequestOrigin"];
+            /** @description Required when origin is UNIVERSITY */
+            basisDocumentNumber?: string | null;
+        };
+        /** @enum {string} */
+        WorkspaceKind: "PROGRAM_VERSION" | "SYLLABUS";
+        RequestWorkspaceDto: {
+            kind: components["schemas"]["WorkspaceKind"];
+            /** @description Version id or syllabus id of the copy */
+            copyId: string;
+            programId: string | null;
+            courseId: string | null;
+            /** @example Phiên bản 2.1 */
+            baseLabel: string;
+            isStale: boolean;
+        };
+        /** @enum {string} */
+        AuthoredEntityType: "COURSE_FIELD" | "COURSE_RELATION" | "ORG_MEMBERSHIP" | "ORG_DIRECTOR";
+        AuthoredItemDto: {
+            id: string;
+            entityType: components["schemas"]["AuthoredEntityType"];
+            itemKey: string;
+            label: string;
+            oldValue: Record<string, never> | null;
+            newValue: Record<string, never> | null;
+        };
+        /** @enum {string} */
+        ChangeDocumentType: "SUBMISSION" | "MINUTES" | "COUNCIL_MINUTES" | "REVIEW_MINUTES" | "OFFICIAL_LETTER";
+        ChangeRequestDocumentDto: {
+            id: string;
+            documentType: components["schemas"]["ChangeDocumentType"];
+            fileName: string;
+            fileType: components["schemas"]["AttachmentFileType"];
+            sizeBytes: number;
+            uploadedBy: components["schemas"]["UserRefDto"];
+            createdAt: string;
+            /** @description Null = no approver has seen it yet */
+            seenInRound: number | null;
+            canRemove: boolean;
+        };
+        StepGroupRefDto: {
+            id: string;
+            groupCode: string;
+            groupName: string;
+        };
+        StepProgramRefDto: {
+            id: string;
+            programCode: string;
+        };
+        /** @enum {string} */
+        ApprovalAction: "PENDING" | "APPROVE" | "RETURN" | "REJECT";
+        /** @enum {string} */
+        ApprovalStepKind: "NORMAL" | "SKIPPED" | "OVERRIDE";
+        ApprovalStepDto: {
+            id: string;
+            /** @enum {number} */
+            approvalLevel: 1 | 2 | 3;
+            levelName: string;
+            approver: components["schemas"]["UserRefDto"] | null;
+            forSubjectGroup: components["schemas"]["StepGroupRefDto"] | null;
+            forProgram: components["schemas"]["StepProgramRefDto"] | null;
+            action: components["schemas"]["ApprovalAction"];
+            isSkipped: boolean;
+            skipReason: string | null;
+            remark: string | null;
+            recordedAt: string | null;
+            /** @description Who acted; differs from approver on an override */
+            performedBy: components["schemas"]["UserRefDto"] | null;
+            isOverride: boolean;
+            kind: components["schemas"]["ApprovalStepKind"];
+        };
+        RequestActionsDto: {
+            canEdit: boolean;
+            canDelete: boolean;
+            canSubmit: boolean;
+            canWithdraw: boolean;
+            canUpload: boolean;
+            canApprove: boolean;
+            /** @description Đề xuất dữ liệu đang chờ Phòng Đào tạo và người xem được phép phê duyệt cuối (MH-43). */
+            canFinalApprove: boolean;
+            canReturn: boolean;
+            canReject: boolean;
+            canOverride: boolean;
+            canComment: boolean;
+        };
+        SemesterDto: {
+            id: string;
+            semesterCode: string;
+            academicYear: string;
+            termInYear: number;
+            /** Format: date */
+            startDate: string | null;
+        };
+        ReleasedVersionDto: {
+            id: string;
+            programId: string;
+            programCode: string;
+            versionNumber: string | null;
+            status: components["schemas"]["ProgramVersionStatus"];
+        };
+        RequestReleaseDto: {
+            decisionNumber: string;
+            /** Format: date */
+            signedDate: string;
+            effectiveSemester: components["schemas"]["SemesterDto"] | null;
+            pastSemesterAllowed: boolean;
+            versions: components["schemas"]["ReleasedVersionDto"][];
+        };
+        ChangeRequestDetailDto: {
+            id: string;
+            requestCode: string;
+            requestType: components["schemas"]["ChangeRequestType"];
+            target: components["schemas"]["RequestTargetDto"];
+            title: string;
+            status: components["schemas"]["ChangeRequestStatus"];
+            origin: components["schemas"]["RequestOrigin"];
+            /** @description 0 = never submitted */
+            submissionRound: number;
+            /** @description When the request entered its current level; null outside PENDING_* */
+            levelEnteredAt: string | null;
+            daysWaiting: number | null;
+            createdBy: components["schemas"]["UserRefDto"];
+            createdAt: string;
+            updatedAt: string;
+            reason: string;
+            basisDocumentNumber: string | null;
+            workspace: components["schemas"]["RequestWorkspaceDto"] | null;
+            authoredItems: components["schemas"]["AuthoredItemDto"][];
+            documents: components["schemas"]["ChangeRequestDocumentDto"][];
+            /** @description Current round only; empty before the first submit */
+            steps: components["schemas"]["ApprovalStepDto"][];
+            conflicts: components["schemas"]["ConflictDto"][];
+            permissions: components["schemas"]["RequestActionsDto"];
+            release: components["schemas"]["RequestReleaseDto"] | null;
+        };
+        UpdateChangeRequestDto: {
+            title?: string;
+            reason?: string;
+            origin?: components["schemas"]["RequestOrigin"];
+            /** @description Required when origin is UNIVERSITY */
+            basisDocumentNumber?: string | null;
+        };
+        AuthoredItemInputBase: {
+            /** @enum {string} */
+            operation: "SET_COURSE_FIELD" | "ADD_RELATION" | "UPDATE_RELATION" | "REMOVE_RELATION" | "ADD_MEMBER" | "END_MEMBERSHIP" | "ASSIGN_DIRECTOR" | "END_DIRECTOR";
+        };
+        ReplaceAuthoredItemsDto: {
+            /** @description The whole list: items not sent are removed */
+            items: components["schemas"]["AuthoredItemInputBase"][];
+        };
+        /** @enum {string} */
+        DiffChange: "ADDED" | "REMOVED" | "CHANGED";
+        DiffFieldDto: {
+            name: string;
+            label: string;
+            before: string | null;
+            after: string | null;
+        };
+        DiffRowDto: {
+            itemKey: string;
+            label: string;
+            change: components["schemas"]["DiffChange"];
+            fields: components["schemas"]["DiffFieldDto"][];
+        };
+        DiffSectionDto: {
+            entityType: string;
+            title: string;
+            rows: components["schemas"]["DiffRowDto"][];
+        };
+        ChangeDiffDto: {
+            /** @description True while a Draft: computed from the working copy at read time */
+            live: boolean;
+            sections: components["schemas"]["DiffSectionDto"][];
+        };
+        AffectedProgramDto: {
+            id: string;
+            programCode: string;
+            programName: string;
+        };
+        PreviewApproverDto: {
+            name: string;
+            scope: string | null;
+            skipReason: string | null;
+        };
+        PreviewLevelDto: {
+            /** @enum {number} */
+            approvalLevel: 1 | 2 | 3;
+            levelName: string;
+            approvers: components["schemas"]["PreviewApproverDto"][];
+        };
+        BlockingIssueDto: {
+            /** @example STALE_BASE */
+            code: string;
+            message: string;
+        };
+        SubmitPreviewDto: {
+            itemCount: number;
+            affectedPrograms: components["schemas"]["AffectedProgramDto"][];
+            levels: components["schemas"]["PreviewLevelDto"][];
+            blockingIssues: components["schemas"]["BlockingIssueDto"][];
+        };
+        UploadDocumentFormDto: {
+            documentType: components["schemas"]["ChangeDocumentType"];
+            /** Format: binary */
+            file: string;
+        };
+        ApproveDecisionDto: {
+            remark?: Record<string, never>;
+        };
+        /** @enum {string} */
+        FinalApprovalKind: "PROGRAM_VERSION" | "SYLLABUS" | "AUTHORED";
+        /** @enum {string} */
+        SyllabusIssueCode: "MISSING_SYLLABUS" | "SYLLABUS_INCOMPLETE";
+        SyllabusReleaseIssueDto: {
+            courseId: string;
+            courseCode: string;
+            code: components["schemas"]["SyllabusIssueCode"];
+            /** @description Điều kiện chưa đạt, theo mã (rỗng khi chưa có đề cương). */
+            details: string[];
+        };
+        FinalApprovalProgramDto: {
+            programId: string;
+            programCode: string;
+            baseVersionId: string;
+            baseVersionNumber: string | null;
+            nextVersionNumber: string;
+            consistencyIssues: components["schemas"]["CurriculumWarningDto"][];
+            syllabusIssues: components["schemas"]["SyllabusReleaseIssueDto"][];
+            /** @description Liên kết CLO–PLO sẽ mất vì bản đề cương mới không còn mã CLO đó. */
+            droppedCloLinks: number;
+        };
+        FinalApprovalPreviewDto: {
+            requestId: string;
+            requestCode: string;
+            kind: components["schemas"]["FinalApprovalKind"];
+            /** @description Dữ liệu gốc đã đổi; phải làm lại bản nháp. */
+            stale: boolean;
+            affectedPrograms: components["schemas"]["FinalApprovalProgramDto"][];
+            /** @description Điều kiện chưa đạt của chính bản đề cương được đề xuất. */
+            copyIssues: string[];
+            /** @description Nhãn các thay đổi tác giả soạn. */
+            authoredLabels: string[];
+            /** @description Gán khóa tuyển sinh được khi tạo đúng một phiên bản. */
+            canAssignCohorts: boolean;
+            /** @description Người tạo đề xuất là Phòng Đào tạo nên được nạp học kỳ đã qua. */
+            canAllowPastSemester: boolean;
+        };
+        FinalApproveDto: {
+            /** @example QĐ-123/ĐHBK */
+            decisionNumber: string;
+            /** Format: date */
+            signedDate: string;
+            effectiveSemesterId: string;
+            remark?: string | null;
+            /** @description Cho phép ban hành vào học kỳ đã bắt đầu; chỉ hiệu lực với đề xuất do Phòng Đào tạo tạo. */
+            allowPastSemester?: boolean;
+            /** @description Chỉ khi đề xuất tạo đúng một phiên bản. */
+            cohortIds?: string[];
+        };
+        DecisionRemarkDto: {
+            remark: string;
+        };
+        /** @enum {string} */
+        OverrideAction: "APPROVE" | "RETURN" | "REJECT";
+        OverrideDecisionDto: {
+            action: components["schemas"]["OverrideAction"];
+            reason: string;
+        };
+        ApprovalRoundDto: {
+            submissionRound: number;
+            /** @description ISO time the round was submitted */
+            submittedAt: string;
+            steps: components["schemas"]["ApprovalStepDto"][];
+        };
+        ApprovalHistoryDto: {
+            /** @description Newest round first */
+            rounds: components["schemas"]["ApprovalRoundDto"][];
+        };
+        CommentDto: {
+            id: string;
+            author: components["schemas"]["UserRefDto"];
+            content: string;
+            createdAt: string;
+        };
+        CreateCommentDto: {
+            content: string;
+        };
+        ApprovalQueueItemDto: {
+            requestId: string;
+            requestCode: string;
+            title: string;
+            requestType: components["schemas"]["ChangeRequestType"];
+            status: components["schemas"]["ChangeRequestStatus"];
+            /** @enum {number} */
+            approvalLevel: 1 | 2 | 3;
+            /** @description Group or program codes the caller stands for; null at level 3 */
+            standsFor: string | null;
+            createdBy: components["schemas"]["UserRefDto"];
+            /** @description ISO time the round was submitted */
+            submittedAt: string;
+            /** @description Whole days since the request entered its level */
+            daysWaiting: number;
+        };
+        /** @enum {string} */
+        NotificationType: "REQUEST_AWAITING_YOU" | "REQUEST_RETURNED" | "REQUEST_REJECTED" | "REQUEST_APPROVED" | "REQUEST_OVERRIDDEN" | "REQUEST_COMMENTED" | "REQUEST_EFFECTIVE";
+        /** @enum {string} */
+        NotificationReadStatus: "UNREAD" | "READ";
+        NotificationDto: {
+            id: string;
+            notificationType: components["schemas"]["NotificationType"];
+            content: string;
+            changeRequestId: string | null;
+            readStatus: components["schemas"]["NotificationReadStatus"];
+            createdAt: string;
+            readAt: string | null;
+        };
+        NotificationPageDto: {
+            items: components["schemas"]["NotificationDto"][];
+            total: number;
+            page: number;
+            pageSize: number;
+        };
+        UnreadCountDto: {
+            count: number;
+        };
+        CreateSemesterDto: {
+            /** @example 2026-2027-1 */
+            semesterCode: string;
+            /** @example 2026-2027 */
+            academicYear: string;
+            termInYear: number;
+            /** Format: date */
+            startDate?: string | null;
+        };
+        UpdateSemesterDto: {
+            /** @example 2026-2027-1 */
+            semesterCode?: string;
+            /** @example 2026-2027 */
+            academicYear?: string;
+            termInYear?: number;
+            /** Format: date */
+            startDate?: string | null;
+        };
+        CreateCohortDto: {
+            /** @example K2026 */
+            cohortCode: string;
+            /** @example 2026 */
+            intakeYear: number;
+        };
+        UpdateCohortDto: {
+            /** @example K2026 */
+            cohortCode?: string;
+            /** @example 2026 */
+            intakeYear?: number;
+        };
+        ReleaseCheckDto: {
+            versionId: string;
+            canRelease: boolean;
+            consistencyIssues: components["schemas"]["CurriculumWarningDto"][];
+            syllabusIssues: components["schemas"]["SyllabusReleaseIssueDto"][];
+        };
+        ReleaseVersionDto: {
+            /** @example QĐ-123/ĐHBK */
+            decisionNumber: string;
+            /** Format: date */
+            signedDate: string;
+            effectiveSemesterId: string;
+            /**
+             * @default 1.0
+             * @example 1.0
+             */
+            versionNumber: string;
+            cohortIds: string[];
+        };
+        CohortDto: {
+            id: string;
+            cohortCode: string;
+            intakeYear: number;
+        };
+        VersionOriginRequestDto: {
+            id: string;
+            requestCode: string;
+        };
+        VersionLinkDto: {
+            id: string;
+            versionNumber: string | null;
+        };
+        SyllabusPinDto: {
+            id: string;
+            revisionNumber: number;
+            status: components["schemas"]["SyllabusStatus"];
+        };
+        VersionRowDto: {
+            itemId: string;
+            plannedSemester: number;
+            courseId: string;
+            courseCode: string;
+            courseName: string;
+            /** @example 3 */
+            credits: string;
+            syllabus: components["schemas"]["SyllabusPinDto"] | null;
+        };
+        VersionDetailDto: {
+            id: string;
+            versionNumber: string | null;
+            status: components["schemas"]["ProgramVersionStatus"];
+            decisionNumber: string | null;
+            /** Format: date */
+            signedDate: string | null;
+            publishedAt: string | null;
+            effectiveSemester: components["schemas"]["SemesterDto"] | null;
+            cohorts: components["schemas"]["CohortDto"][];
+            originRequest: components["schemas"]["VersionOriginRequestDto"] | null;
+            /** @description Phiên bản đính chính đã ban hành thay cho phiên bản này. */
+            correctedBy: components["schemas"]["VersionLinkDto"] | null;
+            programId: string;
+            programCode: string;
+            programName: string;
+            majorCode: string;
+            majorName: string;
+            semesterCount: number;
+            /** @example 150 */
+            totalCredits: string;
+            /** @example 120 */
+            compulsoryCredits: string;
+            /** @example 30 */
+            electiveCredits: string;
+            publishedBy: components["schemas"]["UserRefDto"] | null;
+            previousVersion: components["schemas"]["VersionLinkDto"] | null;
+            correctionOf: components["schemas"]["VersionLinkDto"] | null;
+            correctionReason: string | null;
+            /** @description Bản nháp đính chính chưa ban hành. */
+            isCorrectionDraft: boolean;
+            /** @description Bản nháp đính chính đang mở của phiên bản này (chỉ người có quyền đính chính thấy). */
+            openCorrection: components["schemas"]["VersionLinkDto"] | null;
+            /** @description Người xem được phép bắt đầu đính chính phiên bản này. */
+            canCorrect: boolean;
+            rows: components["schemas"]["VersionRowDto"][];
+        };
+        VersionRefDto: {
+            id: string;
+            versionNumber: string | null;
+            status: components["schemas"]["ProgramVersionStatus"];
+            decisionNumber: string | null;
+            /** Format: date */
+            signedDate: string | null;
+            publishedAt: string | null;
+            effectiveSemester: components["schemas"]["SemesterDto"] | null;
+            cohorts: components["schemas"]["CohortDto"][];
+            originRequest: components["schemas"]["VersionOriginRequestDto"] | null;
+            /** @description Phiên bản đính chính đã ban hành thay cho phiên bản này. */
+            correctedBy: components["schemas"]["VersionLinkDto"] | null;
+        };
+        VersionListDto: {
+            versions: components["schemas"]["VersionRefDto"][];
+        };
+        IssueCorrectionDto: {
+            reason: string;
+            /** @default true */
+            moveCohorts: boolean;
+        };
+        /** @enum {string} */
+        IssuedVersionStatus: "PENDING" | "ACTIVE" | "HISTORICAL";
+        IssuedVersionDto: {
+            id: string;
+            versionNumber: string;
+            status: components["schemas"]["IssuedVersionStatus"];
+            decisionNumber: string;
+            effectiveSemester: components["schemas"]["SemesterDto"];
+        };
+        /** @enum {string} */
+        VersionCompareSection: "INFO" | "CURRICULUM" | "ELECTIVE_GROUPS" | "PLOS" | "MATRICES" | "SYLLABI";
+        SyllabusComparisonLinkDto: {
+            courseId: string;
+            beforeSyllabusId: string;
+            afterSyllabusId: string;
+        };
+        VersionCompareRowDto: {
+            itemKey: string;
+            label: string;
+            change: components["schemas"]["DiffChange"];
+            fields: components["schemas"]["DiffFieldDto"][];
+            syllabusComparison: components["schemas"]["SyllabusComparisonLinkDto"] | null;
+        };
+        VersionCompareSectionDto: {
+            key: components["schemas"]["VersionCompareSection"];
+            title: string;
+            rows: components["schemas"]["VersionCompareRowDto"][];
+        };
+        VersionComparisonDto: {
+            programId: string;
+            before: components["schemas"]["IssuedVersionDto"];
+            after: components["schemas"]["IssuedVersionDto"];
+            sections: components["schemas"]["VersionCompareSectionDto"][];
+        };
+        PinnedSyllabusComparisonDto: {
+            programId: string;
+            courseId: string;
+            courseCode: string;
+            beforeVersionId: string;
+            afterVersionId: string;
+            before: components["schemas"]["SyllabusPinDto"];
+            after: components["schemas"]["SyllabusPinDto"];
+            sections: components["schemas"]["DiffSectionDto"][];
+        };
+        CohortVersionAssignmentDto: {
+            id: string;
+            cohort: components["schemas"]["CohortDto"];
+            version: components["schemas"]["IssuedVersionDto"];
+            fromSemester: components["schemas"]["SemesterDto"];
+            createdAt: string;
+        };
+        CohortVersionListDto: {
+            programId: string;
+            revision: string;
+            assignments: components["schemas"]["CohortVersionAssignmentDto"][];
+        };
+        AssignCohortVersionsDto: {
+            cohortIds: string[];
+            programVersionId: string;
+            fromSemesterId: string;
+            expectedRevision: string;
+        };
+        UpdateCohortVersionDto: {
+            fromSemesterId: string;
+            expectedRevision: string;
+        };
+        /** @enum {string} */
+        AppliedVersionState: "ASSIGNED" | "UNASSIGNED";
+        AppliedCohortVersionDto: {
+            programId: string;
+            cohort: components["schemas"]["CohortDto"];
+            semester: components["schemas"]["SemesterDto"];
+            state: components["schemas"]["AppliedVersionState"];
+            assignment: components["schemas"]["CohortVersionAssignmentDto"] | null;
+        };
+        /** @enum {string} */
+        ImportType: "COURSE_CATALOG" | "CURRICULUM" | "STUDENT_LIST" | "ACADEMIC_RESULT";
+        ImportTypeOptionDto: {
+            importType: components["schemas"]["ImportType"];
+            needsVersion: boolean;
+        };
+        ImportTargetDto: {
+            versionId: string;
+            programId: string;
+            programCode: string;
+            programName: string;
+        };
+        CreateImportFormDto: {
+            importType: components["schemas"]["ImportType"];
+            versionId?: string;
+            /** Format: binary */
+            file: string;
+        };
+        ImportProgramDto: {
+            id: string;
+            programCode: string;
+            programName: string;
+        };
+        /** @enum {string} */
+        ImportBatchStatus: "VALIDATING" | "DRY_RUN" | "COMMITTING" | "COMMITTED" | "ABORTED";
+        ImportFormatErrorDto: {
+            column: string | null;
+            message: string;
+        };
+        ImportIssueDto: {
+            rowNumber: number | null;
+            severity: components["schemas"]["WarningSeverity"];
+            code: string;
+            column: string | null;
+            message: string;
+        };
+        ImportReportDto: {
+            formatErrors: components["schemas"]["ImportFormatErrorDto"][];
+            issues: components["schemas"]["ImportIssueDto"][];
+        };
+        ImportBatchDetailDto: {
+            id: string;
+            importType: components["schemas"]["ImportType"];
+            fileName: string;
+            performedBy: components["schemas"]["UserRefDto"];
+            program: components["schemas"]["ImportProgramDto"] | null;
+            versionId: string | null;
+            totalRows: number;
+            successRows: number;
+            errorRows: number;
+            status: components["schemas"]["ImportBatchStatus"];
+            /** Format: date-time */
+            recordedAt: string;
+            /** Format: date-time */
+            finishedAt: string | null;
+            report: components["schemas"]["ImportReportDto"] | null;
+            canCommit: boolean;
+            fileAvailable: boolean;
+        };
+        ImportBatchSummaryDto: {
+            id: string;
+            importType: components["schemas"]["ImportType"];
+            fileName: string;
+            performedBy: components["schemas"]["UserRefDto"];
+            program: components["schemas"]["ImportProgramDto"] | null;
+            versionId: string | null;
+            totalRows: number;
+            successRows: number;
+            errorRows: number;
+            status: components["schemas"]["ImportBatchStatus"];
+            /** Format: date-time */
+            recordedAt: string;
+            /** Format: date-time */
+            finishedAt: string | null;
+        };
+        ImportBatchPageDto: {
+            items: components["schemas"]["ImportBatchSummaryDto"][];
+            total: number;
+            page: number;
+            pageSize: number;
+        };
+    };
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  HealthController_check: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HealthDto'];
-        };
-      };
-      503: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HealthDto'];
-        };
-      };
-    };
-  };
-  AuthController_login: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['LoginDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['MeDto'];
-        };
-      };
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ErrorResponseDto'];
-        };
-      };
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ErrorResponseDto'];
-        };
-      };
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ErrorResponseDto'];
-        };
-      };
-    };
-  };
-  AuthController_logout: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  AuthController_me: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['MeDto'];
-        };
-      };
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ErrorResponseDto'];
-        };
-      };
-    };
-  };
-  AuthController_changePassword: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ChangePasswordDto'];
-      };
-    };
-    responses: {
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ErrorResponseDto'];
-        };
-      };
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ErrorResponseDto'];
-        };
-      };
-    };
-  };
-  UsersController_list: {
-    parameters: {
-      query?: {
-        page?: number;
-        pageSize?: number;
-        q?: string;
-        orgUnitId?: string;
-        status?: 'ACTIVE' | 'DISABLED';
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['UserPageDto'];
-        };
-      };
-    };
-  };
-  UsersController_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateUserDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CreatedUserDto'];
-        };
-      };
-    };
-  };
-  UsersController_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        userId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['UserDetailDto'];
-        };
-      };
-    };
-  };
-  UsersController_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        userId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateUserDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['UserDetailDto'];
-        };
-      };
-    };
-  };
-  UsersController_disable: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        userId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['UserDetailDto'];
-        };
-      };
-    };
-  };
-  UsersController_enable: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        userId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['UserDetailDto'];
-        };
-      };
-    };
-  };
-  UsersController_resetPassword: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        userId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TemporaryPasswordDto'];
-        };
-      };
-    };
-  };
-  UsersController_history: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        userId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['RoleAssignmentDto'][];
-        };
-      };
-    };
-  };
-  UsersController_assign: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        userId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateRoleAssignmentDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['RoleAssignmentDto'];
-        };
-      };
-    };
-  };
-  UsersController_revoke: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        userId: string;
-        assignmentId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['RoleAssignmentDto'];
-        };
-      };
-    };
-  };
-  PermissionsController_roles: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['RoleDto'][];
-        };
-      };
-    };
-  };
-  PermissionsController_matrix: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['PermissionMatrixDto'];
-        };
-      };
-    };
-  };
-  PermissionsController_setCell: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        roleCode: string;
-        permissionCode: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SetRolePermissionDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['MatrixCellDto'];
-        };
-      };
-    };
-  };
-  PermissionsController_clearCell: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        roleCode: string;
-        permissionCode: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  OrgUnitsController_list: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['OrgUnitDto'][];
-        };
-      };
-    };
-  };
-  OrgUnitsController_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateOrgUnitDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['OrgUnitDto'];
-        };
-      };
-    };
-  };
-  OrgUnitsController_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        unitId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateOrgUnitDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['OrgUnitDto'];
-        };
-      };
-    };
-  };
-  OrgUnitsController_deactivate: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        unitId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['OrgUnitDto'];
-        };
-      };
-    };
-  };
-  OrgUnitsController_activate: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        unitId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['OrgUnitDto'];
-        };
-      };
-    };
-  };
-  SubjectGroupsController_list: {
-    parameters: {
-      query?: {
-        facultyId?: string;
-        status?: components['schemas']['SubjectGroupStatus'];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SubjectGroupSummaryDto'][];
-        };
-      };
-    };
-  };
-  SubjectGroupsController_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateSubjectGroupDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SubjectGroupSummaryDto'];
-        };
-      };
-    };
-  };
-  SubjectGroupsController_detail: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        groupId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SubjectGroupDetailDto'];
-        };
-      };
-    };
-  };
-  SubjectGroupsController_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        groupId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateSubjectGroupDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SubjectGroupSummaryDto'];
-        };
-      };
-    };
-  };
-  SubjectGroupsController_impact: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        groupId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SubjectGroupDeactivationImpactDto'];
-        };
-      };
-    };
-  };
-  SubjectGroupsController_deactivate: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        groupId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SubjectGroupSummaryDto'];
-        };
-      };
-    };
-  };
-  SubjectGroupsController_activate: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        groupId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SubjectGroupSummaryDto'];
-        };
-      };
-    };
-  };
-  SubjectGroupsController_addMember: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        groupId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['AddSubjectGroupMemberDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SubjectGroupMemberDto'];
-        };
-      };
-    };
-  };
-  SubjectGroupsController_endMember: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        groupId: string;
-        memberId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['EndSubjectGroupMemberDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SubjectGroupMemberDto'][];
-        };
-      };
-    };
-  };
-  SubjectGroupsController_revokeMember: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        groupId: string;
-        memberId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SubjectGroupMemberDto'];
-        };
-      };
-    };
-  };
-  SubjectGroupMembershipsController_list: {
-    parameters: {
-      query: {
-        userId: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['UserSubjectGroupMembershipDto'][];
-        };
-      };
-    };
-  };
-  CoursesController_list: {
-    parameters: {
-      query?: {
-        page?: number;
-        pageSize?: number;
-        q?: string;
-        ownerFacultyId?: string;
-        ownerGroupId?: string;
-        courseType?: components['schemas']['CourseType'];
-        status?: components['schemas']['CourseStatus'][];
-        foreign?: boolean;
-        sort?: 'courseCode' | 'courseName' | 'credits' | 'updatedAt';
-        order?: 'asc' | 'desc';
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CoursePageDto'];
-        };
-      };
-    };
-  };
-  CoursesController_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateCourseDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CourseDetailDto'];
-        };
-      };
-    };
-  };
-  CoursesController_detail: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        courseId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CourseDetailDto'];
-        };
-      };
-    };
-  };
-  CoursesController_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        courseId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateCourseDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CourseDetailDto'];
-        };
-      };
-    };
-  };
-  CoursesController_discontinue: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        courseId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['DiscontinueCourseDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CourseDetailDto'];
-        };
-      };
-    };
-  };
-  CoursesController_reopen: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        courseId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CourseDetailDto'];
-        };
-      };
-    };
-  };
-  CoursesController_cancel: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        courseId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CourseDetailDto'];
-        };
-      };
-    };
-  };
-  CourseRelationsController_list: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        courseId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CourseRelationDto'][];
-        };
-      };
-    };
-  };
-  CourseRelationsController_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateCourseRelationDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CourseRelationDto'];
-        };
-      };
-    };
-  };
-  CourseRelationsController_remove: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        relationId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  CourseRelationsController_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        relationId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateCourseRelationDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CourseRelationDto'];
-        };
-      };
-    };
-  };
-  EquivalenceGroupsController_list: {
-    parameters: {
-      query?: {
-        page?: number;
-        pageSize?: number;
-        /** @description Mã nhóm hoặc mã học phần của một thành viên */
-        q?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['EquivalenceGroupPageDto'];
-        };
-      };
-    };
-  };
-  EquivalenceGroupsController_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateEquivalenceGroupDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['EquivalenceGroupDto'];
-        };
-      };
-    };
-  };
-  EquivalenceGroupsController_detail: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        groupId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['EquivalenceGroupDto'];
-        };
-      };
-    };
-  };
-  EquivalenceGroupsController_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        groupId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateEquivalenceGroupDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['EquivalenceGroupDto'];
-        };
-      };
-    };
-  };
-  EquivalenceGroupsController_addMember: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        groupId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['AddEquivalenceMemberDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['EquivalenceGroupDto'];
-        };
-      };
-    };
-  };
-  EquivalenceGroupsController_removeMember: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        groupId: string;
-        courseId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['EquivalenceGroupDto'];
-        };
-      };
-    };
-  };
-  EquivalenceGroupsController_merge: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        groupId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['MergeEquivalenceGroupsDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['EquivalenceGroupDto'];
-        };
-      };
-    };
-  };
-  EquivalenceGroupsController_dissolve: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        groupId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ProgramsController_list: {
-    parameters: {
-      query?: {
-        page?: number;
-        pageSize?: number;
-        q?: string;
-        degreeLevel?: components['schemas']['DegreeLevel'];
-        status?: components['schemas']['ProgramStatus'];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ProgramPageDto'];
-        };
-      };
-    };
-  };
-  ProgramsController_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateProgramDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ProgramDetailDto'];
-        };
-      };
-    };
-  };
-  ProgramsController_detail: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        programId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ProgramDetailDto'];
-        };
-      };
-    };
-  };
-  ProgramsController_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        programId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateProgramDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ProgramDetailDto'];
-        };
-      };
-    };
-  };
-  ProgramsController_deactivate: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        programId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ProgramDetailDto'];
-        };
-      };
-    };
-  };
-  ProgramsController_reactivate: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        programId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ProgramDetailDto'];
-        };
-      };
-    };
-  };
-  ProgramsController_clone: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        programId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CloneProgramDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ProgramDetailDto'];
-        };
-      };
-    };
-  };
-  ProgramsController_listDirectors: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        programId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ProgramDirectorDto'][];
-        };
-      };
-    };
-  };
-  ProgramsController_assign: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        programId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['AssignDirectorDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ProgramDirectorDto'];
-        };
-      };
-    };
-  };
-  ProgramsController_end: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        programId: string;
-        assignmentId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['EndDirectorDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ProgramDirectorDto'];
-        };
-      };
-    };
-  };
-  ProgramsController_revoke: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        programId: string;
-        assignmentId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ProgramDirectorDto'];
-        };
-      };
-    };
-  };
-  ProgramVersionInfoController_read: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        versionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['VersionInfoEditDto'];
-        };
-      };
-    };
-  };
-  ProgramVersionInfoController_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        versionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateVersionInfoDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['VersionInfoEditDto'];
-        };
-      };
-    };
-  };
-  ProgramVersionsCurriculumController_read: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        versionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CurriculumDto'];
-        };
-      };
-    };
-  };
-  ProgramVersionsCurriculumController_createItem: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        versionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateCurriculumItemDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CurriculumItemDto'];
-        };
-      };
-    };
-  };
-  ProgramVersionsCurriculumController_reorder: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        versionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ReorderCurriculumDto'];
-      };
-    };
-    responses: {
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ProgramVersionsCurriculumController_createGroup: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        versionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateElectiveGroupDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ElectiveGroupDto'];
-        };
-      };
-    };
-  };
-  CurriculumItemsController_remove: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        itemId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  CurriculumItemsController_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        itemId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateCurriculumItemDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CurriculumItemDto'];
-        };
-      };
-    };
-  };
-  CurriculumItemsController_replaceRequisites: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        itemId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ReplaceRequisitesDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CurriculumItemDto'];
-        };
-      };
-    };
-  };
-  ElectiveGroupsController_remove: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        groupId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ElectiveGroupsController_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        groupId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateElectiveGroupDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ElectiveGroupDto'];
-        };
-      };
-    };
-  };
-  ElectiveGroupsController_assignItems: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        groupId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['AssignGroupItemsDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ElectiveGroupDto'];
-        };
-      };
-    };
-  };
-  ConsistencyController_report: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        versionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ConsistencyReportDto'];
-        };
-      };
-    };
-  };
-  ConsistencyController_accept: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        versionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['AcceptCreditMismatchDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ConsistencyReportDto'];
-        };
-      };
-    };
-  };
-  OutcomesController_listPlos: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        versionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['PloListDto'];
-        };
-      };
-    };
-  };
-  OutcomesController_createPlo: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        versionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreatePloDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['PloDto'];
-        };
-      };
-    };
-  };
-  OutcomesController_reorderPlos: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        versionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ReorderOutcomeRowsDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['PloDto'][];
-        };
-      };
-    };
-  };
-  OutcomesController_removePlo: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        ploId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  OutcomesController_updatePlo: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        ploId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdatePloDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['PloDto'];
-        };
-      };
-    };
-  };
-  OutcomesController_coursePloMatrix: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        versionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CoursePloMatrixDto'];
-        };
-      };
-    };
-  };
-  OutcomesController_setWeight: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        itemId: string;
-        ploId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SetPloWeightDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CoursePloCellDto'];
-        };
-      };
-    };
-  };
-  OutcomesController_removeWeight: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        itemId: string;
-        ploId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  OutcomesController_programCloPloMatrix: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        versionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ProgramCloPloMatrixDto'];
-        };
-      };
-    };
-  };
-  OutcomesController_itemCloPloMatrix: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        itemId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ItemCloPloMatrixDto'];
-        };
-      };
-    };
-  };
-  OutcomesController_replaceLinks: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        itemId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ReplaceCloPloLinksDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ItemCloPloMatrixDto'];
-        };
-      };
-    };
-  };
-  OutcomesController_outcomeCoverage: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        versionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['OutcomeCoverageDto'];
-        };
-      };
-    };
-  };
-  SyllabiController_forCourse: {
-    parameters: {
-      query?: {
-        /** @description A change request's id: show its working copy as the Draft */
-        requestId?: string;
-        /** @description A program version whose curriculum holds the course: show the revision that version pins as the published one */
-        versionId?: string;
-      };
-      header?: never;
-      path: {
-        courseId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CourseSyllabusDto'];
-        };
-      };
-    };
-  };
-  SyllabiController_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        courseId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CourseSyllabusDto'];
-        };
-      };
-    };
-  };
-  SyllabiController_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        syllabusId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateSyllabusDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SyllabusDto'];
-        };
-      };
-    };
-  };
-  SyllabiController_createWeek: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        syllabusId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateWeeklyContentDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['WeeklyContentDto'];
-        };
-      };
-    };
-  };
-  SyllabiController_reorderWeeks: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        syllabusId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ReorderWeeklyContentsDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['WeeklyContentDto'][];
-        };
-      };
-    };
-  };
-  SyllabiController_removeWeek: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        weeklyContentId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  SyllabiController_updateWeek: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        weeklyContentId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateWeeklyContentDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['WeeklyContentDto'];
-        };
-      };
-    };
-  };
-  SyllabiController_createClo: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        syllabusId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateCloDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CloDto'];
-        };
-      };
-    };
-  };
-  SyllabiController_reorderClos: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        syllabusId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ReorderClosDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CloDto'][];
-        };
-      };
-    };
-  };
-  SyllabiController_removeClo: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        cloId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  SyllabiController_updateClo: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        cloId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateCloDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CloDto'];
-        };
-      };
-    };
-  };
-  SyllabiController_upload: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        syllabusId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'multipart/form-data': components['schemas']['UploadAttachmentFormDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SyllabusAttachmentDto'];
-        };
-      };
-    };
-  };
-  SyllabiController_download: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        attachmentId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  SyllabiController_removeAttachment: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        attachmentId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ChangeRequestsController_list: {
-    parameters: {
-      query?: {
-        page?: number;
-        pageSize?: number;
-        status?: components['schemas']['ChangeRequestStatus'];
-        requestType?: components['schemas']['ChangeRequestType'];
-        origin?: components['schemas']['RequestOrigin'];
-        createdById?: string;
-        mine?: boolean;
-        /** @description Only requests waiting at their current level for this many days or more */
-        minDaysWaiting?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ChangeRequestPageDto'];
-        };
-      };
-    };
-  };
-  ChangeRequestsController_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateChangeRequestDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ChangeRequestDetailDto'];
-        };
-      };
-    };
-  };
-  ChangeRequestsController_conflicts: {
-    parameters: {
-      query: {
-        targetType: components['schemas']['ChangeTargetType'];
-        targetId: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ConflictDto'][];
-        };
-      };
-    };
-  };
-  ChangeRequestsController_userOptions: {
-    parameters: {
-      query?: {
-        q?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['UserOptionDto'][];
-        };
-      };
-    };
-  };
-  ChangeRequestsController_read: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ChangeRequestDetailDto'];
-        };
-      };
-    };
-  };
-  ChangeRequestsController_remove: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ChangeRequestsController_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateChangeRequestDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ChangeRequestDetailDto'];
-        };
-      };
-    };
-  };
-  ChangeRequestsController_rebase: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ChangeRequestDetailDto'];
-        };
-      };
-    };
-  };
-  ChangeRequestsController_replaceItems: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ReplaceAuthoredItemsDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ChangeRequestDetailDto'];
-        };
-      };
-    };
-  };
-  ChangeRequestsController_diff: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ChangeDiffDto'];
-        };
-      };
-    };
-  };
-  ChangeRequestsController_preview: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SubmitPreviewDto'];
-        };
-      };
-    };
-  };
-  ChangeRequestsController_submit: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ChangeRequestDetailDto'];
-        };
-      };
-    };
-  };
-  ChangeRequestsController_withdraw: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ChangeRequestDetailDto'];
-        };
-      };
-    };
-  };
-  ChangeRequestsController_upload: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'multipart/form-data': components['schemas']['UploadDocumentFormDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ChangeRequestDocumentDto'];
-        };
-      };
-    };
-  };
-  ChangeRequestDocumentsController_download: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        documentId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ChangeRequestDocumentsController_remove: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        documentId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ApprovalController_approve: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ApproveDecisionDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ChangeRequestDetailDto'];
-        };
-      };
-    };
-  };
-  ApprovalController_finalApproval: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['FinalApprovalPreviewDto'];
-        };
-      };
-    };
-  };
-  ApprovalController_finalApprove: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['FinalApproveDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ChangeRequestDetailDto'];
-        };
-      };
-    };
-  };
-  ApprovalController_returnToDraft: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['DecisionRemarkDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ChangeRequestDetailDto'];
-        };
-      };
-    };
-  };
-  ApprovalController_reject: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['DecisionRemarkDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ChangeRequestDetailDto'];
-        };
-      };
-    };
-  };
-  ApprovalController_override: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['OverrideDecisionDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ChangeRequestDetailDto'];
-        };
-      };
-    };
-  };
-  ApprovalController_readHistory: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ApprovalHistoryDto'];
-        };
-      };
-    };
-  };
-  ApprovalController_listComments: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CommentDto'][];
-        };
-      };
-    };
-  };
-  ApprovalController_createComment: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateCommentDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CommentDto'];
-        };
-      };
-    };
-  };
-  ApprovalQueueController_read: {
-    parameters: {
-      query?: {
-        requestType?: components['schemas']['ChangeRequestType'];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ApprovalQueueItemDto'][];
-        };
-      };
-    };
-  };
-  NotificationsController_list: {
-    parameters: {
-      query?: {
-        page?: number;
-        pageSize?: number;
-        /** @description Only unread ones */
-        unread?: boolean;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['NotificationPageDto'];
-        };
-      };
-    };
-  };
-  NotificationsController_unreadCount: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['UnreadCountDto'];
-        };
-      };
-    };
-  };
-  NotificationsController_markAllRead: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['UnreadCountDto'];
-        };
-      };
-    };
-  };
-  NotificationsController_markRead: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['NotificationDto'];
-        };
-      };
-    };
-  };
-  SemestersController_listSemesters: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  SemestersController_createSemester: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateSemesterDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  SemestersController_updateSemester: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateSemesterDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  SemestersController_listCohorts: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  SemestersController_createCohort: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateCohortDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  SemestersController_updateCohort: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateCohortDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ReleasesController_check: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        programId: string;
-        versionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ReleaseCheckDto'];
-        };
-      };
-    };
-  };
-  ReleasesController_release: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        programId: string;
-        versionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ReleaseVersionDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['VersionDetailDto'];
-        };
-      };
-    };
-  };
-  VersionHistoryController_list: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        programId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['VersionListDto'];
-        };
-      };
-    };
-  };
-  VersionHistoryController_detail: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        programId: string;
-        versionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['VersionDetailDto'];
-        };
-      };
-    };
-  };
-  CorrectionsController_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        programId: string;
-        versionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['VersionDetailDto'];
-        };
-      };
-    };
-  };
-  CorrectionsController_issue: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        programId: string;
-        versionId: string;
-        correctionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['IssueCorrectionDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['VersionDetailDto'];
-        };
-      };
-    };
-  };
-  CorrectionsController_discard: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        programId: string;
-        versionId: string;
-        correctionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
+    HealthController_check: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HealthDto"];
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HealthDto"];
+                };
+            };
+        };
+    };
+    AuthController_login: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeDto"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AuthController_logout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_me: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AuthController_changePassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangePasswordDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    UsersController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                q?: string;
+                orgUnitId?: string;
+                status?: "ACTIVE" | "DISABLED";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserPageDto"];
+                };
+            };
+        };
+    };
+    UsersController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateUserDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreatedUserDto"];
+                };
+            };
+        };
+    };
+    UsersController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserDetailDto"];
+                };
+            };
+        };
+    };
+    UsersController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateUserDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserDetailDto"];
+                };
+            };
+        };
+    };
+    UsersController_disable: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserDetailDto"];
+                };
+            };
+        };
+    };
+    UsersController_enable: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserDetailDto"];
+                };
+            };
+        };
+    };
+    UsersController_resetPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TemporaryPasswordDto"];
+                };
+            };
+        };
+    };
+    UsersController_history: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoleAssignmentDto"][];
+                };
+            };
+        };
+    };
+    UsersController_assign: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateRoleAssignmentDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoleAssignmentDto"];
+                };
+            };
+        };
+    };
+    UsersController_revoke: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+                assignmentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoleAssignmentDto"];
+                };
+            };
+        };
+    };
+    PermissionsController_roles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoleDto"][];
+                };
+            };
+        };
+    };
+    PermissionsController_matrix: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PermissionMatrixDto"];
+                };
+            };
+        };
+    };
+    PermissionsController_setCell: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                roleCode: string;
+                permissionCode: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetRolePermissionDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatrixCellDto"];
+                };
+            };
+        };
+    };
+    PermissionsController_clearCell: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                roleCode: string;
+                permissionCode: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OrgUnitsController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrgUnitDto"][];
+                };
+            };
+        };
+    };
+    OrgUnitsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateOrgUnitDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrgUnitDto"];
+                };
+            };
+        };
+    };
+    OrgUnitsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                unitId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateOrgUnitDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrgUnitDto"];
+                };
+            };
+        };
+    };
+    OrgUnitsController_deactivate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                unitId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrgUnitDto"];
+                };
+            };
+        };
+    };
+    OrgUnitsController_activate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                unitId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrgUnitDto"];
+                };
+            };
+        };
+    };
+    SubjectGroupsController_list: {
+        parameters: {
+            query?: {
+                facultyId?: string;
+                status?: components["schemas"]["SubjectGroupStatus"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectGroupSummaryDto"][];
+                };
+            };
+        };
+    };
+    SubjectGroupsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateSubjectGroupDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectGroupSummaryDto"];
+                };
+            };
+        };
+    };
+    SubjectGroupsController_detail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectGroupDetailDto"];
+                };
+            };
+        };
+    };
+    SubjectGroupsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateSubjectGroupDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectGroupSummaryDto"];
+                };
+            };
+        };
+    };
+    SubjectGroupsController_impact: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectGroupDeactivationImpactDto"];
+                };
+            };
+        };
+    };
+    SubjectGroupsController_deactivate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectGroupSummaryDto"];
+                };
+            };
+        };
+    };
+    SubjectGroupsController_activate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectGroupSummaryDto"];
+                };
+            };
+        };
+    };
+    SubjectGroupsController_addMember: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddSubjectGroupMemberDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectGroupMemberDto"];
+                };
+            };
+        };
+    };
+    SubjectGroupsController_endMember: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+                memberId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EndSubjectGroupMemberDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectGroupMemberDto"][];
+                };
+            };
+        };
+    };
+    SubjectGroupsController_revokeMember: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+                memberId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectGroupMemberDto"];
+                };
+            };
+        };
+    };
+    SubjectGroupMembershipsController_list: {
+        parameters: {
+            query: {
+                userId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserSubjectGroupMembershipDto"][];
+                };
+            };
+        };
+    };
+    CoursesController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                q?: string;
+                ownerFacultyId?: string;
+                ownerGroupId?: string;
+                courseType?: components["schemas"]["CourseType"];
+                status?: components["schemas"]["CourseStatus"][];
+                foreign?: boolean;
+                sort?: "courseCode" | "courseName" | "credits" | "updatedAt";
+                order?: "asc" | "desc";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoursePageDto"];
+                };
+            };
+        };
+    };
+    CoursesController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCourseDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseDetailDto"];
+                };
+            };
+        };
+    };
+    CoursesController_detail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseDetailDto"];
+                };
+            };
+        };
+    };
+    CoursesController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCourseDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseDetailDto"];
+                };
+            };
+        };
+    };
+    CoursesController_discontinue: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DiscontinueCourseDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseDetailDto"];
+                };
+            };
+        };
+    };
+    CoursesController_reopen: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseDetailDto"];
+                };
+            };
+        };
+    };
+    CoursesController_cancel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseDetailDto"];
+                };
+            };
+        };
+    };
+    CourseRelationsController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseRelationDto"][];
+                };
+            };
+        };
+    };
+    CourseRelationsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCourseRelationDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseRelationDto"];
+                };
+            };
+        };
+    };
+    CourseRelationsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                relationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CourseRelationsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                relationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCourseRelationDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseRelationDto"];
+                };
+            };
+        };
+    };
+    EquivalenceGroupsController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                /** @description Mã nhóm hoặc mã học phần của một thành viên */
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EquivalenceGroupPageDto"];
+                };
+            };
+        };
+    };
+    EquivalenceGroupsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateEquivalenceGroupDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EquivalenceGroupDto"];
+                };
+            };
+        };
+    };
+    EquivalenceGroupsController_detail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EquivalenceGroupDto"];
+                };
+            };
+        };
+    };
+    EquivalenceGroupsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateEquivalenceGroupDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EquivalenceGroupDto"];
+                };
+            };
+        };
+    };
+    EquivalenceGroupsController_addMember: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddEquivalenceMemberDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EquivalenceGroupDto"];
+                };
+            };
+        };
+    };
+    EquivalenceGroupsController_removeMember: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+                courseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EquivalenceGroupDto"];
+                };
+            };
+        };
+    };
+    EquivalenceGroupsController_merge: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MergeEquivalenceGroupsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EquivalenceGroupDto"];
+                };
+            };
+        };
+    };
+    EquivalenceGroupsController_dissolve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ProgramsController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                q?: string;
+                degreeLevel?: components["schemas"]["DegreeLevel"];
+                status?: components["schemas"]["ProgramStatus"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProgramPageDto"];
+                };
+            };
+        };
+    };
+    ProgramsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateProgramDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProgramDetailDto"];
+                };
+            };
+        };
+    };
+    ProgramsController_detail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                programId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProgramDetailDto"];
+                };
+            };
+        };
+    };
+    ProgramsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                programId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProgramDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProgramDetailDto"];
+                };
+            };
+        };
+    };
+    ProgramsController_deactivate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                programId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProgramDetailDto"];
+                };
+            };
+        };
+    };
+    ProgramsController_reactivate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                programId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProgramDetailDto"];
+                };
+            };
+        };
+    };
+    ProgramsController_clone: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                programId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CloneProgramDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProgramDetailDto"];
+                };
+            };
+        };
+    };
+    ProgramsController_listDirectors: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                programId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProgramDirectorDto"][];
+                };
+            };
+        };
+    };
+    ProgramsController_assign: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                programId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignDirectorDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProgramDirectorDto"];
+                };
+            };
+        };
+    };
+    ProgramsController_end: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                programId: string;
+                assignmentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EndDirectorDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProgramDirectorDto"];
+                };
+            };
+        };
+    };
+    ProgramsController_revoke: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                programId: string;
+                assignmentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProgramDirectorDto"];
+                };
+            };
+        };
+    };
+    ProgramVersionInfoController_read: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VersionInfoEditDto"];
+                };
+            };
+        };
+    };
+    ProgramVersionInfoController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateVersionInfoDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VersionInfoEditDto"];
+                };
+            };
+        };
+    };
+    ProgramVersionsCurriculumController_read: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CurriculumDto"];
+                };
+            };
+        };
+    };
+    ProgramVersionsCurriculumController_createItem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCurriculumItemDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CurriculumItemDto"];
+                };
+            };
+        };
+    };
+    ProgramVersionsCurriculumController_reorder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderCurriculumDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ProgramVersionsCurriculumController_createGroup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateElectiveGroupDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ElectiveGroupDto"];
+                };
+            };
+        };
+    };
+    CurriculumItemsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                itemId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CurriculumItemsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                itemId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCurriculumItemDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CurriculumItemDto"];
+                };
+            };
+        };
+    };
+    CurriculumItemsController_replaceRequisites: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                itemId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReplaceRequisitesDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CurriculumItemDto"];
+                };
+            };
+        };
+    };
+    ElectiveGroupsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ElectiveGroupsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateElectiveGroupDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ElectiveGroupDto"];
+                };
+            };
+        };
+    };
+    ElectiveGroupsController_assignItems: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignGroupItemsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ElectiveGroupDto"];
+                };
+            };
+        };
+    };
+    ConsistencyController_report: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsistencyReportDto"];
+                };
+            };
+        };
+    };
+    ConsistencyController_accept: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AcceptCreditMismatchDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsistencyReportDto"];
+                };
+            };
+        };
+    };
+    OutcomesController_listPlos: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PloListDto"];
+                };
+            };
+        };
+    };
+    OutcomesController_createPlo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreatePloDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PloDto"];
+                };
+            };
+        };
+    };
+    OutcomesController_reorderPlos: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderOutcomeRowsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PloDto"][];
+                };
+            };
+        };
+    };
+    OutcomesController_removePlo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ploId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OutcomesController_updatePlo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ploId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePloDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PloDto"];
+                };
+            };
+        };
+    };
+    OutcomesController_coursePloMatrix: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoursePloMatrixDto"];
+                };
+            };
+        };
+    };
+    OutcomesController_setWeight: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                itemId: string;
+                ploId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetPloWeightDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoursePloCellDto"];
+                };
+            };
+        };
+    };
+    OutcomesController_removeWeight: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                itemId: string;
+                ploId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OutcomesController_programCloPloMatrix: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProgramCloPloMatrixDto"];
+                };
+            };
+        };
+    };
+    OutcomesController_itemCloPloMatrix: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                itemId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemCloPloMatrixDto"];
+                };
+            };
+        };
+    };
+    OutcomesController_replaceLinks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                itemId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReplaceCloPloLinksDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemCloPloMatrixDto"];
+                };
+            };
+        };
+    };
+    OutcomesController_outcomeCoverage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutcomeCoverageDto"];
+                };
+            };
+        };
+    };
+    SyllabiController_forCourse: {
+        parameters: {
+            query?: {
+                /** @description A change request's id: show its working copy as the Draft */
+                requestId?: string;
+                /** @description A program version whose curriculum holds the course: show the revision that version pins as the published one */
+                versionId?: string;
+            };
+            header?: never;
+            path: {
+                courseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseSyllabusDto"];
+                };
+            };
+        };
+    };
+    SyllabiController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseSyllabusDto"];
+                };
+            };
+        };
+    };
+    SyllabiController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                syllabusId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateSyllabusDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SyllabusDto"];
+                };
+            };
+        };
+    };
+    SyllabiController_createWeek: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                syllabusId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateWeeklyContentDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeeklyContentDto"];
+                };
+            };
+        };
+    };
+    SyllabiController_reorderWeeks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                syllabusId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderWeeklyContentsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeeklyContentDto"][];
+                };
+            };
+        };
+    };
+    SyllabiController_removeWeek: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                weeklyContentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SyllabiController_updateWeek: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                weeklyContentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateWeeklyContentDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeeklyContentDto"];
+                };
+            };
+        };
+    };
+    SyllabiController_createClo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                syllabusId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCloDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CloDto"];
+                };
+            };
+        };
+    };
+    SyllabiController_reorderClos: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                syllabusId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderClosDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CloDto"][];
+                };
+            };
+        };
+    };
+    SyllabiController_removeClo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cloId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SyllabiController_updateClo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cloId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCloDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CloDto"];
+                };
+            };
+        };
+    };
+    SyllabiController_upload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                syllabusId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["UploadAttachmentFormDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SyllabusAttachmentDto"];
+                };
+            };
+        };
+    };
+    SyllabiController_download: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                attachmentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SyllabiController_removeAttachment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                attachmentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ChangeRequestsController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                status?: components["schemas"]["ChangeRequestStatus"];
+                requestType?: components["schemas"]["ChangeRequestType"];
+                origin?: components["schemas"]["RequestOrigin"];
+                createdById?: string;
+                mine?: boolean;
+                /** @description Only requests waiting at their current level for this many days or more */
+                minDaysWaiting?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequestPageDto"];
+                };
+            };
+        };
+    };
+    ChangeRequestsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateChangeRequestDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequestDetailDto"];
+                };
+            };
+        };
+    };
+    ChangeRequestsController_conflicts: {
+        parameters: {
+            query: {
+                targetType: components["schemas"]["ChangeTargetType"];
+                targetId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConflictDto"][];
+                };
+            };
+        };
+    };
+    ChangeRequestsController_userOptions: {
+        parameters: {
+            query?: {
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserOptionDto"][];
+                };
+            };
+        };
+    };
+    ChangeRequestsController_read: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequestDetailDto"];
+                };
+            };
+        };
+    };
+    ChangeRequestsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ChangeRequestsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateChangeRequestDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequestDetailDto"];
+                };
+            };
+        };
+    };
+    ChangeRequestsController_rebase: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequestDetailDto"];
+                };
+            };
+        };
+    };
+    ChangeRequestsController_replaceItems: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReplaceAuthoredItemsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequestDetailDto"];
+                };
+            };
+        };
+    };
+    ChangeRequestsController_diff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeDiffDto"];
+                };
+            };
+        };
+    };
+    ChangeRequestsController_preview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubmitPreviewDto"];
+                };
+            };
+        };
+    };
+    ChangeRequestsController_submit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequestDetailDto"];
+                };
+            };
+        };
+    };
+    ChangeRequestsController_withdraw: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequestDetailDto"];
+                };
+            };
+        };
+    };
+    ChangeRequestsController_upload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["UploadDocumentFormDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequestDocumentDto"];
+                };
+            };
+        };
+    };
+    ChangeRequestDocumentsController_download: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                documentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ChangeRequestDocumentsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                documentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ApprovalController_approve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApproveDecisionDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequestDetailDto"];
+                };
+            };
+        };
+    };
+    ApprovalController_finalApproval: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FinalApprovalPreviewDto"];
+                };
+            };
+        };
+    };
+    ApprovalController_finalApprove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FinalApproveDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequestDetailDto"];
+                };
+            };
+        };
+    };
+    ApprovalController_returnToDraft: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecisionRemarkDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequestDetailDto"];
+                };
+            };
+        };
+    };
+    ApprovalController_reject: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecisionRemarkDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequestDetailDto"];
+                };
+            };
+        };
+    };
+    ApprovalController_override: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OverrideDecisionDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequestDetailDto"];
+                };
+            };
+        };
+    };
+    ApprovalController_readHistory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalHistoryDto"];
+                };
+            };
+        };
+    };
+    ApprovalController_listComments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommentDto"][];
+                };
+            };
+        };
+    };
+    ApprovalController_createComment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCommentDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommentDto"];
+                };
+            };
+        };
+    };
+    ApprovalQueueController_read: {
+        parameters: {
+            query?: {
+                requestType?: components["schemas"]["ChangeRequestType"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalQueueItemDto"][];
+                };
+            };
+        };
+    };
+    NotificationsController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                /** @description Only unread ones */
+                unread?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationPageDto"];
+                };
+            };
+        };
+    };
+    NotificationsController_unreadCount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnreadCountDto"];
+                };
+            };
+        };
+    };
+    NotificationsController_markAllRead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnreadCountDto"];
+                };
+            };
+        };
+    };
+    NotificationsController_markRead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationDto"];
+                };
+            };
+        };
+    };
+    SemestersController_listSemesters: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SemestersController_createSemester: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateSemesterDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SemestersController_updateSemester: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateSemesterDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SemestersController_listCohorts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SemestersController_createCohort: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCohortDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SemestersController_updateCohort: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCohortDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ReleasesController_check: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                programId: string;
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReleaseCheckDto"];
+                };
+            };
+        };
+    };
+    ReleasesController_release: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                programId: string;
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReleaseVersionDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VersionDetailDto"];
+                };
+            };
+        };
+    };
+    VersionHistoryController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                programId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VersionListDto"];
+                };
+            };
+        };
+    };
+    VersionHistoryController_detail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                programId: string;
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VersionDetailDto"];
+                };
+            };
+        };
+    };
+    CorrectionsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                programId: string;
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VersionDetailDto"];
+                };
+            };
+        };
+    };
+    CorrectionsController_issue: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                programId: string;
+                versionId: string;
+                correctionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IssueCorrectionDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VersionDetailDto"];
+                };
+            };
+        };
+    };
+    CorrectionsController_discard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                programId: string;
+                versionId: string;
+                correctionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    VersionComparisonController_compare: {
+        parameters: {
+            query: {
+                beforeVersionId: string;
+                afterVersionId: string;
+            };
+            header?: never;
+            path: {
+                programId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VersionComparisonDto"];
+                };
+            };
+        };
+    };
+    VersionComparisonController_syllabi: {
+        parameters: {
+            query: {
+                beforeVersionId: string;
+                afterVersionId: string;
+            };
+            header?: never;
+            path: {
+                programId: string;
+                courseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PinnedSyllabusComparisonDto"];
+                };
+            };
+        };
+    };
+    CohortVersionsController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                programId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CohortVersionListDto"];
+                };
+            };
+        };
+    };
+    CohortVersionsController_assign: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                programId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignCohortVersionsDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CohortVersionListDto"];
+                };
+            };
+        };
+    };
+    CohortVersionsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                programId: string;
+                assignmentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCohortVersionDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CohortVersionListDto"];
+                };
+            };
+        };
+    };
+    CohortVersionsController_applied: {
+        parameters: {
+            query: {
+                semesterId: string;
+            };
+            header?: never;
+            path: {
+                programId: string;
+                cohortId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppliedCohortVersionDto"];
+                };
+            };
+        };
+    };
+    ImportsController_types: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportTypeOptionDto"][];
+                };
+            };
+        };
+    };
+    ImportsController_targets: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportTargetDto"][];
+                };
+            };
+        };
+    };
+    ImportsController_template: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                importType: "COURSE_CATALOG" | "CURRICULUM" | "STUDENT_LIST" | "ACADEMIC_RESULT";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ImportsController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                importType?: components["schemas"]["ImportType"];
+                status?: components["schemas"]["ImportBatchStatus"];
+                mine?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportBatchPageDto"];
+                };
+            };
+        };
+    };
+    ImportsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["CreateImportFormDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportBatchDetailDto"];
+                };
+            };
+        };
+    };
+    ImportsController_detail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                batchId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportBatchDetailDto"];
+                };
+            };
+        };
+    };
+    ImportsController_commit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                batchId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportBatchDetailDto"];
+                };
+            };
+        };
+    };
+    ImportsController_file: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                batchId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CurriculumExportController_export: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
 }

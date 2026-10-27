@@ -1,4 +1,4 @@
-import { getJson, sendJson } from '../../../shared/api/client';
+import { downloadFile, getJson, sendJson } from '../../../shared/api/client';
 import type { components } from '../../../shared/api/schema';
 
 export type Curriculum = components['schemas']['CurriculumDto'];
@@ -34,6 +34,11 @@ const groupPath = (groupId: string) =>
 
 export const fetchCurriculum = (versionId: string) =>
   getJson<Curriculum>(`${versionPath(versionId)}/curriculum`);
+export const exportCurriculum = (versionId: string) =>
+  downloadFile(
+    `${versionPath(versionId)}/curriculum/export`,
+    'Khung-chuong-trinh.xlsx',
+  );
 export const createItem = (
   versionId: string,
   body: CreateCurriculumItemRequest,

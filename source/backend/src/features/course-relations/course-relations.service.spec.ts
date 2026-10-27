@@ -184,6 +184,7 @@ describe('CourseRelationsService', () => {
       return Promise.resolve([]);
     });
     usage = {
+      releasedCourseIds: vi.fn().mockResolvedValue(new Set()),
       inReleasedVersion: vi.fn().mockResolvedValue(false),
       hasStudyResults: vi.fn().mockResolvedValue(false),
       programsUsing: vi.fn().mockResolvedValue([]),

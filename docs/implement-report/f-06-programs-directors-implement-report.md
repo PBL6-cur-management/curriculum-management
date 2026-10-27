@@ -105,3 +105,10 @@ Không có lệch về hợp đồng API, tên lỗi, DTO hay thứ tự tuyến
 - `ProgramVersion` có hai chỉ mục duy nhất từng phần viết tay; mọi migration sau phải giữ chúng, và kiểm thử đầu-cuối chạm thẳng chúng để lỡ ai "dọn" thì hỏng.
 - Một tệp hằng chỉ một tính năng dùng rồi tính năng thứ hai cần thì dời lên `shared/` ngay (tooltip đề xuất, mẫu tín chỉ) thay vì import chéo hoặc sao chép.
 - Kiểm thử trang có `Select` của AntD: dùng `findByTitle` để chọn mục trong danh sách thả khi cùng chữ đã có trong bảng.
+
+## Quyết định bổ sung — US-021 AC3
+
+- **Ngày**: 2026-10-25. **Người quyết định**: người dùng.
+- Chốt cách chứng minh tại **Lệch 7** (dòng 64): **sửa tiêu chí chấp nhận, không đổi ma trận quyền**. Người vừa là R3 của chương trình A vừa là R5 của nhóm G sửa học phần trong G được, nhưng PATCH chương trình B không được phân công vẫn trả 403; đây là hai vế chứng minh phạm vi chương trình và phạm vi nhóm độc lập.
+- Bỏ vế “học phần ngoài nhóm → 403” khỏi tiêu chí: `course.edit` của R3 là `D` toàn trường (`source/backend/prisma/seed-data/permission-catalog.ts:117`), F-04 cho sửa trực tiếp học phần của Khoa chưa ban hành (`source/backend/src/shared/courses/course-edit-state.ts:10`, `source/backend/src/shared/authz/edit-path.ts:79`). Vì vậy R3 kiêm R5 sửa học phần ngoài G trong trường hợp đó là đúng hành vi, không phải lỗi cần thu hẹp quyền.
+- Đã bổ sung điều khoản làm rõ US-021 AC3 và cập nhật ghi chú F06-TC_014. Dòng US-021 AC3 trong kế hoạch F-06 đã đúng hai vế nên giữ nguyên. Không thay đổi mã nguồn, ma trận quyền hoặc kết quả kiểm thử đã ghi.

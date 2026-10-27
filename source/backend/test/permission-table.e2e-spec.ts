@@ -90,6 +90,7 @@ describe('permission table', () => {
   }
 
   async function countWrites(path: string): Promise<number> {
+    if (path.startsWith('/api/imports')) return prisma.importBatch.count();
     if (path.startsWith('/api/org-units')) return prisma.orgUnit.count();
     if (path.startsWith('/api/semesters')) return prisma.semester.count();
     if (path.startsWith('/api/cohorts')) return prisma.cohort.count();
@@ -119,6 +120,7 @@ describe('permission table', () => {
     if (path.startsWith('/api/equivalence-groups')) {
       return prisma.equivalentCourseGroup.count();
     }
+    if (path.includes('/cohort-versions')) return prisma.cohortVersion.count();
     if (path.startsWith('/api/programs')) {
       return path.includes('/directors')
         ? prisma.programDirectorAssignment.count()

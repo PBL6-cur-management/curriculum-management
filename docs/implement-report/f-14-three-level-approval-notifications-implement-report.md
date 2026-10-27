@@ -58,3 +58,10 @@ Prettier và build sạch ở cả hai.
 - `RequestNotifier`: thêm `effective` và `REQUEST_EFFECTIVE` (§2c của F-15); không tự tính người nhận. `levelEnteredAt` xóa qua `close`.
 - Mọi đường đưa đề xuất vào hoặc ra `PENDING_*` phải qua recorder hoặc `submit` / `withdraw` của F-13 để `levelEnteredAt` không lệch.
 - Bản làm việc của đề xuất bị Từ chối / Rút đã bị xóa; mục đã lưu ở `ChangeItem` vẫn đọc được.
+
+## Quyết định bổ sung — bản làm việc khi Từ chối/Thu hồi
+
+- **Ngày**: 2026-10-25. **Người quyết định**: người dùng.
+- Chốt lệch số 2: giữ hành vi hiện tại, **xóa bản làm việc** khi đề xuất chuyển sang `REJECTED` hoặc `WITHDRAWN`; không giữ bản sao chỉ đọc. `WorkingCopyService.discard` chạy cùng giao dịch đóng đề xuất (`source/backend/src/features/change-requests/approval.service.ts:228`, `source/backend/src/features/change-requests/submission.service.ts:235`).
+- Diff từng thay đổi vẫn lưu trong `ChangeItem`; `RequestItemsService.current` đọc các mục đã lưu cho đề xuất không còn Nháp (`source/backend/src/features/change-requests/request-items.service.ts:45`). Vì vậy vẫn xem được nội dung bị từ chối; giữ bản làm việc đã đóng chỉ thêm việc dọn dẹp mà không có nơi đọc.
+- F-15 đã dựng mà không triển khai D14 cũ về giữ bản sao chỉ đọc. Đã sửa tại chỗ D14 và gotcha của kế hoạch F-15, cùng dòng phạm vi kế hoạch F-14 để phản ánh quyết định; phương án giữ bản sao chỉ đọc vẫn nằm trong cột phương án bị loại của D14. Không thay đổi mã nguồn.

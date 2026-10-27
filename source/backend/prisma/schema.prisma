@@ -13,6 +13,21 @@ enum UserStatus {
   DISABLED
 }
 
+enum ImportType {
+  COURSE_CATALOG
+  CURRICULUM
+  STUDENT_LIST
+  ACADEMIC_RESULT
+}
+
+enum ImportBatchStatus {
+  VALIDATING
+  DRY_RUN
+  COMMITTING
+  COMMITTED
+  ABORTED
+}
+
 enum OrgUnitType {
   UNIVERSITY
   FACULTY
@@ -186,6 +201,7 @@ model OrgUnit {
 }
 
 model User {
+  importBatches             ImportBatch[]               @relation("ImportBatchPerformedBy")
   id                        String                      @id @default(cuid(2))
   userCode                  String                      @unique
   fullName                  String
@@ -322,6 +338,7 @@ model SubjectGroupMember {
 }
 
 model Program {
+  importBatches  ImportBatch[]               @relation("ImportBatchProgram")
   id             String                      @id @default(cuid(2))
   programCode    String                      @unique
   facultyId      String
@@ -344,6 +361,7 @@ model Program {
 // Two partial unique indexes are added by hand in the migration (not modelled by Prisma): see database_and_models.md.
 // A row with sourceRequestId is the working copy of a change request (F-13), not a version of the program.
 model ProgramVersion {
+  importBatches               ImportBatch[]        @relation("ImportBatchVersion")
   id                          String               @id @default(cuid(2))
   programId                   String
   program                     Program              @relation("ProgramVersions", fields: [programId], references: [id], onDelete: Restrict)
@@ -398,6 +416,40 @@ model ProgramVersion {
   @@index([programId, status])
   @@index([originRequestId, status])
   @@index([status, effectiveSemesterId, createdAt])
+}
+
+model ImportBatch {
+  id            String            @id @default(cuid(2))
+  importType    ImportType
+  fileName      String
+  performedById String
+  performedBy   User              @relation("ImportBatchPerformedBy", fields: [performedById], references: [id], onDelete: Restrict)
+  programId     String?
+  program       Program?          @relation("ImportBatchProgram", fields: [programId], references: [id], onDelete: Restrict)
+  versionId     String?
+  version       ProgramVersion?   @relation("ImportBatchVersion", fields: [versionId], references: [id], onDelete: SetNull)
+  status        ImportBatchStatus
+  totalRows     Int               @default(0)
+  successRows   Int               @default(0)
+  errorRows     Int               @default(0)
+  errorReport   Json?
+  recordedAt    DateTime          @default(now())
+  finishedAt    DateTime?
+  file          ImportBatchFile?
+
+  @@index([performedById, recordedAt])
+  @@index([programId, recordedAt])
+  @@index([status, recordedAt])
+}
+
+model ImportBatchFile {
+  batchId   String      @id
+  batch     ImportBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  content   Bytes
+  sizeBytes Int
+  expiresAt DateTime
+
+  @@index([expiresAt])
 }
 
 model Semester {

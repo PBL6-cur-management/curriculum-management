@@ -14,6 +14,10 @@ import { ReleasesController } from './releases.controller.js';
 import { ReleasesService } from './releases.service.js';
 import { VersionHistoryController } from './version-history.controller.js';
 import { VersionHistoryReader } from './version-history.reader.js';
+import { VersionComparisonController } from './version-comparison.controller.js';
+import { VersionComparisonService } from './version-comparison.service.js';
+import { CohortVersionsController } from './cohort-versions.controller.js';
+import { CohortVersionsService } from './cohort-versions.service.js';
 
 @Module({
   imports: [
@@ -26,11 +30,15 @@ import { VersionHistoryReader } from './version-history.reader.js';
     ReleasesController,
     VersionHistoryController,
     CorrectionsController,
+    VersionComparisonController,
+    CohortVersionsController,
   ],
   providers: [
     ReleasesService,
     CorrectionsService,
     VersionHistoryReader,
+    VersionComparisonService,
+    CohortVersionsService,
     ReleaseActivationScheduler,
     ReleaseActivationProcessor,
   ],

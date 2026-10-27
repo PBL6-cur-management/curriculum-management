@@ -28,6 +28,7 @@ import { ChangeRequestsModule } from './features/change-requests/change-requests
 import { NotificationsModule } from './features/notifications/notifications.module.js';
 import { ReleasesModule } from './features/releases/releases.module.js';
 import { SemestersModule } from './features/semesters/semesters.module.js';
+import { ImportsModule } from './features/imports/imports.module.js';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { SemestersModule } from './features/semesters/semesters.module.js';
     NotificationsModule,
     SemestersModule,
     ReleasesModule,
+    ImportsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: CsrfGuard },

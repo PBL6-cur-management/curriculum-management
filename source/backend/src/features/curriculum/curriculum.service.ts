@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { CourseStatus, type Prisma } from '../../generated/prisma/client.js';
+import { type Prisma } from '../../generated/prisma/client.js';
+import { isCourseAddable } from '../../shared/curriculum/curriculum-row-rules.js';
 import type { AccessContext } from '../../shared/authz/access-context.js';
 import { AppException } from '../../shared/exception/app.exception.js';
 import { itemTarget } from '../../shared/curriculum/item-target.js';
@@ -57,7 +58,7 @@ export class CurriculumService {
       version,
       itemTarget(version, course),
     );
-    if (course.status !== CourseStatus.ACTIVE) {
+    if (!isCourseAddable(course.status)) {
       throw new AppException(CURRICULUM_ERRORS.COURSE_NOT_ACTIVE);
     }
     assertSemesterInRange(version, dto.plannedSemester);

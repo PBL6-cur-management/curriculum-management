@@ -239,3 +239,58 @@ Format:
 - Thêm runner `with-env.ts`, template ba overrides và scripts `real:migrate`, `real:seed`, `real:seed:dut`, `real:dev`; thiếu override file thì dừng, không fallback database mặc định và không có script demo cho môi trường thật. Tách database/files/queue prefix; Redis và port 3000 vẫn dùng chung mặc định.
 - Typecheck, Prettier check và type-aware oxlint exit 0; không chạy tsx, Vitest hoặc database/Prisma commands. Kết quả runtime V-01 là kết quả trước refactor, chưa chạy lại trong lượt này.
 - Người dùng tự tạo `.env.real`, tạo database ICU `vi-VN`, chạy `pnpm real:migrate; pnpm real:seed; pnpm real:seed:dut`; vẫn cần xác nhận năm defaults DUT. Không sửa spent plan hoặc các phần report lịch sử.
+
+## [DOCS-MVP-DECISIONS] Chốt quyết định F-06/F-14 và viết 5 ca xuyên tính năng MVP
+**Date**: 2026-10-25
+**Files changed**: `docs/implementation/{f-15-release-version-snapshots,f-14-three-level-approval-notifications}-implementation-plan.md`, `docs/planning/user-stories.md`, `docs/testing/test-cases/f-06-programs-directors-test-cases.md`, `docs/implement-report/{f-14-three-level-approval-notifications,f-06-programs-directors}-implement-report.md`, `docs/progress/{todo,current_work,handoff,progress_log}.md`, `source/e2e/specs/mvp-flow.spec.ts`, `docs/testing/test-cases/mvp-flow-test-cases.md`, `docs/testing/test-cases/README.md`, `docs/testing/README.md`
+- Người dùng quyết định giữ xóa bản làm việc khi Từ chối/Thu hồi bằng `WorkingCopyService.discard`; diff vẫn đọc từ `ChangeItem`. Sửa D14 và gotcha kế hoạch F-15 tại chỗ, giữ phương án chỉ đọc trong cột bị loại; cập nhật phạm vi kế hoạch F-14, chỉ nối thêm báo cáo lịch sử.
+- Người dùng quyết định sửa US-021 AC3, không đổi ma trận quyền: sửa học phần trong G được, PATCH chương trình B không phân công trả 403; không yêu cầu học phần ngoài G trả 403 vì R3 có `course.edit` D toàn trường theo F-04. Dòng kiểm thử trong kế hoạch F-06 đã khớp nên không sửa.
+- Ghi nhận PR #1 đã gộp vào `main` tại `181af11`. Phần A chỉ ghi quyết định và đồng bộ tài liệu; phần B thêm `source/e2e/specs/mvp-flow.spec.ts` với 5 ca serial MVP-TC_001..005, tài liệu ca kiểm thử bảng 14 cột và liên kết tại cả `docs/testing/test-cases/README.md` lẫn `docs/testing/README.md`. Không sửa backend/frontend hoặc fixtures, không ghi sync marker.
+- MVP-TC_001 tạo CTĐT qua UI, dựng học phần/đề cương riêng bằng fixtures, phân công Giám đốc qua API; MVP-TC_002 đi UI khung, nhất quán và ban hành đầu tiên vào học kỳ đã bắt đầu, kiểm tra `1.0` là `ACTIVE` và `currentVersion` đang áp dụng qua HTTP/UI.
+- MVP-TC_003 để R5 sửa nội dung đề cương trên bản sao và gửi đề xuất qua UI; MVP-TC_004 cho R4 rồi R3 duyệt thật qua UI; MVP-TC_005 để R1 duyệt cuối vào học kỳ tương lai, kiểm tra `1.1` là `PENDING`, `1.0` vẫn là bản `ACTIVE` duy nhất/đang áp dụng và nội dung ghim cũ/mới giữ đúng phiên bản.
+- Build-verifier xác nhận `pnpm typecheck` trong `source/e2e` exit 0; **chỉ xác minh kiểu**, không chạy Playwright. Output:
+
+```text
+> ctdt-e2e@ typecheck E:\PBL6\curriculum-management\source\e2e
+> tsc --noEmit
+```
+
+- **5 ca mới chưa thực thi**; cột kết quả thực thi để trống, không cộng thêm ca Passed hoặc thay kết quả kiểm thử cũ. Bước tiếp theo là chạy đầy đủ 5 ca và hoàn tất kiểm chứng `mvp-flow.spec.ts`, rồi các ca thủ công.
+- Chưa bao phủ việc chuyển bản `1.1` từ `PENDING` sang `ACTIVE` khi đến ngày bắt đầu học kỳ; khuyến nghị kiểm chứng worker kích hoạt thật khi đến ngày (`source/backend/src/features/releases/release-activation.processor.ts:38`, scheduler chạy khi khởi động và hằng ngày). F-15 `createdByAcademicOffice` vẫn chờ người dùng quyết định.
+
+## [DOCS-MVP-LIVE-RESULTS] Ghi kết quả caller chạy luồng MVP và các giới hạn còn mở
+**Date**: 2026-10-25
+**Files changed**: `docs/testing/test-cases/mvp-flow-test-cases.md`, `docs/progress/{todo,current_work,handoff,progress_log}.md`
+- Nguồn kết quả là caller chạy trên app dev ngày 2026-10-25; lượt này chỉ cập nhật tài liệu, không chạy lại Playwright hoặc sửa source.
+- Lần 1: MVP-TC_002 không tìm được nút vì accessible name “reload Chạy lại” khác locator exact. Caller đã sửa `source/e2e/specs/mvp-flow.spec.ts:56` thành `{ name: 'Chạy lại' }` (bỏ exact); lỗi test, không phải lỗi ứng dụng, không ghi vào `error_log.md`.
+- Lần 2: MVP-TC_002 thất bại sớm hơn tại `fixtures/select.ts:22` (`chooseOption`), qua `fixtures/curriculum.ts:27` (`prepareCurriculumItem`): combobox Học kỳ (`plannedSemester`) vẫn `aria-expanded=true` sau 10 giây dù đã chọn option. Cùng bước đạt ở lần 1/3/4; ghi flake fixture dùng chung 1/4 lần chạy, nguyên nhân chưa xác định, chưa sửa.
+- Lần 3 và 4 đều **14 Passed = 9 setup + MVP-TC_001..005**, **1.7 phút/lần**. Cập nhật cả 5 dòng ca thành Yes / Passed / 10/25/26 / Playwright (auto), giữ lịch sử hai lần đầu và ghi chú flake ở TC_002; không tính setup vào ca nghiệp vụ hoặc coi flake đã hết.
+- Đánh dấu luồng đã Passed; bước tiếp theo là 378 ca thủ công và xác nhận F-15 `createdByAcademicOffice` (vẫn mở). Chưa bao phủ bản `1.1` từ `PENDING → ACTIVE` qua `release-activation.processor.ts`; cần đúng ngày đầu học kỳ với worker thật đang chạy, rồi kiểm bản đang áp dụng đổi.
+- Ghi nhận implementation plan F-16, F-12, F-23, F-25 đang được các lượt khác viết song song; không đọc nội dung hoặc sửa `docs/implementation/`. Hai README chỉ mục không có số đếm kết quả cần đổi nên giữ nguyên; không sửa sync marker hoặc nhật ký trước lượt này.
+
+## [DOCS-POST-MVP-PLANS] Ghi nhận đủ 13 kế hoạch triển khai sau MVP
+**Date**: 2026-10-26 (đêm 2026-10-25/26)
+**Files changed**: `docs/implementation/README.md`, `docs/progress/{todo,current_work,progress_log}.md`
+- 13 implementation plan sau MVP đã được viết bằng các lượt Codex song song theo các đợt phụ thuộc: F-12/F-16/F-23/F-25/F-26/F-27 → F-17/F-24 → F-18/F-19/F-22 → F-20/F-21. F-09 đã có kế hoạch từ trước.
+- Mỗi lượt chỉ tạo tệp kế hoạch của chính tính năng đó; chưa được người dùng review/phê duyệt, chưa triển khai và không có mã nguồn thay đổi trong đợt viết kế hoạch này.
+- Bổ sung liên kết chỉ mục/TODO, giữ 13 tính năng ở trạng thái chưa build; gom câu hỏi lịch sử, thư viện, chính sách/hạ tầng, thiết kế và hai hợp đồng liên kế hoạch để người dùng quyết định. Không sửa tệp kế hoạch hoặc kết quả MVP.
+
+## [DOCS-POST-MVP-DECISIONS] Chấp nhận kế hoạch với mặc định và chốt hợp đồng sau MVP
+**Date**: 2026-10-26
+**Files changed**: `docs/implementation/{README,f-12,f-15..f-25}-*-implementation-plan.md` (README là chỉ mục), `docs/design/{tech-stack,screen-inventory}.md`, `docs/planning/{feature-questions,user-stories,task-breakdown,test-plan}.md`, `docs/progress/{todo,current_work,handoff,progress_log}.md`
+- Người dùng chốt A1..A12/B1/B2: xác nhận cờ F-15; giữ thay thế hành chính hồi tố/lịch hiện tại, không hứa lịch sử bất biến và không thêm history/freeze; F-19 chụp đúng đầu vào mỗi lần xét.
+- Sửa tại chỗ BE-07 F-12: công thức mới chỉ học kỳ tương lai do người dùng chọn, dùng minor version và lỗi SEMESTER_ALREADY_STARTED hiện có; giữ ngoại lệ F-15 cho đề xuất không sửa công thức. F-21 dùng PortalProgressReader F-20; F-17 cho actor nullable/ghi nguồn trên đường SCHOOL_DB, không tự tạo tài khoản sync.
+- Duyệt @antv/g6 (F-24 build ghim phiên bản); chỉ ủy quyền cấp 1/2; xác nhận căn cứ gán khóa; từ chối tái kích hoạt/hồi tố sinh viên kết thúc; mirror lớp không tác dụng học vụ; PDF chương trình sinh viên ngoài phạm vi, giữ tải đề cương ký.
+- Đối soát US-107 AC2/CV-260/KB-093 về trọng số số thực, US-108 AC2 về lõi đóng băng/phần bổ sung hiện tại, MH-62/MH-44 về phạm vi quyền đã seed. C1..C9 chưa có câu trả lời của Khoa: build với mặc định, đầu vào vẫn còn nợ.
+- Đợt build kế tiếp F-09 → F-16 → F-12 → F-17; sau đó F-23, F-25, F-24 → F-18 → F-19 → F-22 → F-20 → F-21. F-26/F-27 hoãn theo người dùng, giữ nguyên kế hoạch, không xếp lịch. Chưa tính tính năng nào là đã build; giữ 378 ca thủ công, kiểm kích hoạt 1.1 và flake chooseOption.
+- Chỉ sửa tài liệu; không sửa source, không chạy build/test ứng dụng, không truy cập dữ liệu nhạy cảm hay dotenv. Kiểm tra bằng ba lệnh VERIFY được giao; output trong báo cáo lượt này.
+
+## 2026-10-26 — Hoàn tất F-09 Nhập, xuất Excel
+
+- Đã giao BE-01..BE-07 và FE-01..FE-05: mẫu XLSX danh mục/khung, upload 5 MB, chạy thử BullMQ với báo cáo theo dòng, xác nhận tái kiểm rồi ghi nguyên tử, lịch sử/tệp gốc 30 ngày, xuất khung để nhập lại giữ id; quyền và phạm vi R3 kiểm cả upload. Không mở loại sinh viên/kết quả hoặc Nháp của chương trình từng ban hành.
+- Orchestrator đã áp migration import_batches kèm hai CHECK và generate Prisma. Shutdown ImportsProcessor được sửa giữ grace 10 giây, worker.close(true), rồi queue.getBackend().close(true) trước hook Nest để tránh chờ Redis QUIT khi Redis đã dừng; health + imports e2e sau sửa đạt 16/16.
+- Kết quả orchestrator ngày 2026-10-26: backend whole unit 1134/1134 (có công việc F-16 trong tree, không có nghĩa F-16 đã xong); imports + permission-table + users e2e 171/171 trước shutdown fix. Frontend tsc -b/oxlint exit 0; F-09 cùng nhóm file chạy lại giới hạn 2 workers đạt 99/99; 19 lỗi full run trước là load timeout, không thuộc F-09.
+- Playwright F-09 lượt 1 sau sửa đạt 14/14 (9 auth setup + F09-TC_001..005), 1,6 phút; lượt 2 đạt 13/14, TC_001 vướng flake chooseOption đã biết ở select.ts:22 (spec thứ hai sau curriculum). Giữ TC_001 Passed kèm ghi Failed 1/2 lượt, chưa sửa fixture. Hai lỗi test-only TC_002/003 trước sửa (locator trùng; nhầm 400 thay vì 201/ABORTED) giữ trong Incident lịch sử.
+- TC doc: 27 Passed = 5 Playwright + 17 Backend e2e + 1 Backend unit + 4 Frontend unit; 3 Manual chưa chạy (015/016/025). Chỉ mục 14 tính năng được đếm lại: 789 ca = 408 Passed + 381 thủ công; 5 ca MVP xuyên tính năng theo dõi riêng. Còn nợ file Excel thật của Khoa, đang dùng nhãn SRS 4.3.
+- DOC-01 đã đồng bộ kiến trúc, CSDL và technical reference theo source. Data dictionary đã đủ hai bảng/trạng thái; sơ đồ §8 đã có transient/stale sweep, chỉ sửa số đếm 3 → 5. Bàn giao: F-16 FE đang triển khai → F-12 → F-17; giữ mọi đầu vào Khoa, kiểm kích hoạt 1.1 và việc hoãn F-26/F-27.
+- Lượt chốt này chỉ sửa tài liệu trong scope; không chạy lại ứng dụng/tests, không sửa source/fixture hoặc tài liệu F-16; kiểm Test-Path từng đường dẫn bổ sung vào tài liệu kiến trúc.
