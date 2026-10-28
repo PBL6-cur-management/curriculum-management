@@ -48,6 +48,16 @@ export const ACCEPTED_EXTENSIONS: Record<
 
 export const CREATE_SYLLABUS = 'Tạo đề cương';
 export const EDIT_SYLLABUS = 'Sửa đề cương';
+export const EDIT_GRADING = 'Sửa công thức điểm';
+export const GRADING_TAB_DISABLED_TOOLTIP =
+  'Bạn không có quyền sửa công thức điểm của bản đề cương này.';
+export const CONTENT_TAB_DISABLED_TOOLTIP =
+  'Bạn không có quyền sửa nội dung bản đề cương này.';
+export const LEAVE_TAB_TITLE = 'Có thay đổi chưa lưu';
+export const LEAVE_TAB_BODY =
+  'Chuyển tab sẽ bỏ các thay đổi chưa lưu ở tab này.';
+export const LEAVE_TAB_OK = 'Bỏ thay đổi';
+export const LEAVE_TAB_CANCEL = 'Ở lại';
 export const SYLLABUS_LINK = 'Đề cương';
 export const BACK_TO_COURSE = 'Về học phần';
 export const BACK_TO_SYLLABUS = 'Về trang đề cương';
@@ -85,14 +95,28 @@ export const COGNITIVE_LEVEL_SUGGESTIONS = [
 export const CLO_TAB_DISABLED_TOOLTIP =
   'Bạn không có quyền sửa CLO của bản đề cương này.';
 export const WEEKLY_CLO_COLUMN = 'CLO';
-export const cloDeleteConfirm = (programs: readonly string[]) =>
-  programs.length === 0
-    ? 'Xóa CLO này khỏi đề cương?'
-    : `CLO này đang gắn PLO ở chương trình ${programs.join(', ')}; xóa sẽ xóa các liên kết đó.`;
+export const cloDeleteConfirm = (
+  programs: readonly string[],
+  assessmentLinkCount = 0,
+) => {
+  const consequences = [
+    programs.length > 0
+      ? `CLO này đang gắn PLO ở chương trình ${programs.join(', ')}`
+      : null,
+    assessmentLinkCount > 0
+      ? `CLO này đang được ${assessmentLinkCount} thành phần đánh giá ánh xạ tới`
+      : null,
+  ].filter((part): part is string => part !== null);
+  return consequences.length === 0
+    ? 'Xóa CLO này khỏi đề cương? CLO chưa gắn PLO và chưa ánh xạ thành phần đánh giá nào.'
+    : `${consequences.join('; ')}; xóa sẽ xóa các liên kết đó.`;
+};
 export const EDITOR_TAB_LABELS = {
   content: 'Nội dung',
   weekly: WEEKLY_SECTION_LABEL,
   attachments: ATTACHMENTS_SECTION_LABEL,
   clos: 'CLO',
+  formula: 'Công thức điểm',
+  mapping: 'Ánh xạ đánh giá–CLO',
 } as const;
 export const REQUEST_COPY_TAB_LABEL = 'Bản nháp của đề xuất';

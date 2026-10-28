@@ -29,17 +29,15 @@ export const ORGANIZATION_TYPES = [
   'ORGANIZATION',
 ] as const satisfies readonly ChangeRequestType[];
 
-// F-12 builds the grading formula; the form lists it disabled.
-export const UNSUPPORTED_TYPES: readonly ChangeRequestType[] = [
-  'GRADING_FORMULA',
-];
+// Every type the backend creates is offered; kept as an empty list for the form's disabled-option check.
+export const UNSUPPORTED_TYPES: readonly ChangeRequestType[] = [];
 
 // Mirrors the backend editPermissionsFor: a type is offered to someone who holds one of these somewhere.
 export const EDIT_PERMISSIONS: Record<
   ChangeRequestType,
   readonly PermissionCode[]
 > = {
-  GRADING_FORMULA: [],
+  GRADING_FORMULA: [PERMISSIONS.gradingFormulaEdit],
   OUTCOME: [PERMISSIONS.ploEdit, PERMISSIONS.cloEdit],
   SYLLABUS_CONTENT: [PERMISSIONS.syllabusEdit],
   CURRICULUM: [PERMISSIONS.curriculumEdit],

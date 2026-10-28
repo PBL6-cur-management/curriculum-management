@@ -18,6 +18,7 @@ import {
 import type { BatchDetailRow } from './import-mapping.js';
 import { ImportsReader } from './imports.reader.js';
 import { ImportsService } from './imports.service.js';
+import type { StudentCredentialsService } from './student-credentials.service.js';
 import { COURSE_CATALOG_SHEET } from './sheets/course-catalog.sheet.js';
 import { writeSheet, writeTemplate } from './sheets/sheet-writer.js';
 
@@ -77,6 +78,7 @@ describe('ImportsService', () => {
   let findMany: ReturnType<typeof vi.fn>;
   let add: ReturnType<typeof vi.fn>;
   let visible: ReturnType<typeof vi.fn>;
+  let assertConfigured: ReturnType<typeof vi.fn>;
   let detail: ReturnType<typeof vi.fn>;
   let file: Express.Multer.File;
   beforeEach(async () => {
@@ -95,6 +97,7 @@ describe('ImportsService', () => {
     findFirst = vi.fn().mockResolvedValue(null);
     findMany = vi.fn().mockResolvedValue([]);
     add = vi.fn().mockResolvedValue({});
+    assertConfigured = vi.fn();
     visible = vi.fn().mockResolvedValue(batch());
     detail = vi
       .fn()
@@ -112,6 +115,7 @@ describe('ImportsService', () => {
         list: vi.fn(),
         file: vi.fn(),
       } as unknown as ImportsReader,
+      { assertConfigured } as unknown as StudentCredentialsService,
     );
     const buffer = Buffer.from(
       await writeSheet(COURSE_CATALOG_SHEET, {}, [{ courseCode: 'A' }]),
@@ -156,9 +160,22 @@ describe('ImportsService', () => {
         access(),
       ),
     ).rejects.toMatchObject({ code: 'IMPORT_VERSION_NOT_ALLOWED' });
+  });
+  it('refuses student imports to a non-R1 importer and checks the credential key first', async () => {
+    await expect(
+      service.create(
+        file,
+        { importType: ImportType.STUDENT_LIST },
+        access(PERMISSIONS.DATA_IMPORT_EXCEL, false),
+      ),
+    ).rejects.toBeDefined();
+    assertConfigured.mockImplementation(() => {
+      throw new Error('KEY_MISSING');
+    });
     await expect(
       service.create(file, { importType: ImportType.STUDENT_LIST }, access()),
-    ).rejects.toMatchObject({ code: 'IMPORT_TYPE_UNAVAILABLE' });
+    ).rejects.toThrow('KEY_MISSING');
+    expect(assertConfigured).toHaveBeenCalled();
   });
   it('refuses a scoped catalog importer and an ever-released program', async () => {
     await expect(
@@ -335,6 +352,8 @@ describe('ImportsService', () => {
     );
     expect(service.types(access())).toEqual([
       { importType: ImportType.COURSE_CATALOG, needsVersion: false },
+      { importType: ImportType.STUDENT_LIST, needsVersion: false },
+      { importType: ImportType.ACADEMIC_RESULT, needsVersion: false },
     ]);
     expect(
       service.types(access(PERMISSIONS.CURRICULUM_IMPORT_EXPORT_EXCEL, false)),

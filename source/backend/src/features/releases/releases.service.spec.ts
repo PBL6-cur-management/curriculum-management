@@ -225,6 +225,9 @@ describe('ReleasesService', () => {
           status: 'DRAFT',
           courseDescription: null,
           objectives: '<p>x</p>',
+          failingScore: null,
+          clos: [],
+          assessmentComponents: [],
         },
       ]);
 
@@ -233,7 +236,11 @@ describe('ReleasesService', () => {
         details: [
           {
             field: 'IT1',
-            constraints: ['SYLLABUS_INCOMPLETE', 'COURSE_DESCRIPTION_EMPTY'],
+            constraints: [
+              'SYLLABUS_INCOMPLETE',
+              'COURSE_DESCRIPTION_EMPTY',
+              'ASSESSMENT_FORMULA_EMPTY',
+            ],
           },
           { field: 'IT2', constraints: ['MISSING_SYLLABUS'] },
         ],

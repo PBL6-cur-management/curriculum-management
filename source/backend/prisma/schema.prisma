@@ -201,6 +201,8 @@ model OrgUnit {
 }
 
 model User {
+  student                   Student?                    @relation("StudentAccount")
+  createdEnrollments        ProgramEnrollment[]         @relation("EnrollmentCreator")
   importBatches             ImportBatch[]               @relation("ImportBatchPerformedBy")
   id                        String                      @id @default(cuid(2))
   userCode                  String                      @unique
@@ -255,6 +257,7 @@ model SubjectGroup {
 }
 
 model Course {
+  academicResults      AcademicResult[]
   id                   String                 @id @default(cuid(2))
   courseCode           String                 @unique
   courseName           String
@@ -338,6 +341,7 @@ model SubjectGroupMember {
 }
 
 model Program {
+  enrollments    ProgramEnrollment[]
   importBatches  ImportBatch[]               @relation("ImportBatchProgram")
   id             String                      @id @default(cuid(2))
   programCode    String                      @unique
@@ -361,6 +365,8 @@ model Program {
 // Two partial unique indexes are added by hand in the migration (not modelled by Prisma): see database_and_models.md.
 // A row with sourceRequestId is the working copy of a change request (F-13), not a version of the program.
 model ProgramVersion {
+  enrollmentsApplied          ProgramEnrollment[]  @relation("EnrollmentAppliedVersion")
+  enrollmentsAdmitted         ProgramEnrollment[]  @relation("EnrollmentAdmissionVersion")
   importBatches               ImportBatch[]        @relation("ImportBatchVersion")
   id                          String               @id @default(cuid(2))
   programId                   String
@@ -419,23 +425,24 @@ model ProgramVersion {
 }
 
 model ImportBatch {
-  id            String            @id @default(cuid(2))
-  importType    ImportType
-  fileName      String
-  performedById String
-  performedBy   User              @relation("ImportBatchPerformedBy", fields: [performedById], references: [id], onDelete: Restrict)
-  programId     String?
-  program       Program?          @relation("ImportBatchProgram", fields: [programId], references: [id], onDelete: Restrict)
-  versionId     String?
-  version       ProgramVersion?   @relation("ImportBatchVersion", fields: [versionId], references: [id], onDelete: SetNull)
-  status        ImportBatchStatus
-  totalRows     Int               @default(0)
-  successRows   Int               @default(0)
-  errorRows     Int               @default(0)
-  errorReport   Json?
-  recordedAt    DateTime          @default(now())
-  finishedAt    DateTime?
-  file          ImportBatchFile?
+  studentCredentialDelivery StudentCredentialDelivery?
+  id                        String                     @id @default(cuid(2))
+  importType                ImportType
+  fileName                  String
+  performedById             String
+  performedBy               User                       @relation("ImportBatchPerformedBy", fields: [performedById], references: [id], onDelete: Restrict)
+  programId                 String?
+  program                   Program?                   @relation("ImportBatchProgram", fields: [programId], references: [id], onDelete: Restrict)
+  versionId                 String?
+  version                   ProgramVersion?            @relation("ImportBatchVersion", fields: [versionId], references: [id], onDelete: SetNull)
+  status                    ImportBatchStatus
+  totalRows                 Int                        @default(0)
+  successRows               Int                        @default(0)
+  errorRows                 Int                        @default(0)
+  errorReport               Json?
+  recordedAt                DateTime                   @default(now())
+  finishedAt                DateTime?
+  file                      ImportBatchFile?
 
   @@index([performedById, recordedAt])
   @@index([programId, recordedAt])
@@ -453,39 +460,47 @@ model ImportBatchFile {
 }
 
 model Semester {
-  id                     String           @id @default(cuid(2))
-  semesterCode           String           @unique
+  admittedStudents       Student[]           @relation("StudentAdmissionSemester")
+  statusStudents         Student[]           @relation("StudentStatusSemester")
+  enrollmentsFrom        ProgramEnrollment[] @relation("EnrollmentFromSemester")
+  enrollmentsUntil       ProgramEnrollment[] @relation("EnrollmentUntilSemester")
+  academicResults        AcademicResult[]
+  id                     String              @id @default(cuid(2))
+  semesterCode           String              @unique
   academicYear           String
   termInYear             Int
-  startDate              DateTime?        @db.Date
-  effectiveVersions      ProgramVersion[] @relation("EffectiveSemester")
-  effectiveRequests      ChangeRequest[]  @relation("RequestEffectiveSemester")
-  startingCohortVersions CohortVersion[]  @relation("CohortStartSemester")
-  createdAt              DateTime         @default(now())
-  updatedAt              DateTime         @updatedAt
+  startDate              DateTime?           @db.Date
+  effectiveVersions      ProgramVersion[]    @relation("EffectiveSemester")
+  effectiveRequests      ChangeRequest[]     @relation("RequestEffectiveSemester")
+  startingCohortVersions CohortVersion[]     @relation("CohortStartSemester")
+  createdAt              DateTime            @default(now())
+  updatedAt              DateTime            @updatedAt
 
   @@unique([academicYear, termInYear])
 }
 
 model Cohort {
-  id         String          @id @default(cuid(2))
-  cohortCode String          @unique
-  intakeYear Int
-  versions   CohortVersion[]
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
+  students    Student[]
+  enrollments ProgramEnrollment[]
+  id          String              @id @default(cuid(2))
+  cohortCode  String              @unique
+  intakeYear  Int
+  versions    CohortVersion[]
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
 }
 
 // Which version a cohort studies under, from which semester (F-16 reassigns; F-15 writes at release and correction).
 model CohortVersion {
-  id               String         @id @default(cuid(2))
+  enrollments      ProgramEnrollment[]
+  id               String              @id @default(cuid(2))
   cohortId         String
-  cohort           Cohort         @relation(fields: [cohortId], references: [id], onDelete: Restrict)
+  cohort           Cohort              @relation(fields: [cohortId], references: [id], onDelete: Restrict)
   programVersionId String
-  programVersion   ProgramVersion @relation(fields: [programVersionId], references: [id], onDelete: Restrict)
+  programVersion   ProgramVersion      @relation(fields: [programVersionId], references: [id], onDelete: Restrict)
   fromSemesterId   String
-  fromSemester     Semester       @relation("CohortStartSemester", fields: [fromSemesterId], references: [id], onDelete: Restrict)
-  createdAt        DateTime       @default(now())
+  fromSemester     Semester            @relation("CohortStartSemester", fields: [fromSemesterId], references: [id], onDelete: Restrict)
+  createdAt        DateTime            @default(now())
 
   @@unique([cohortId, programVersionId])
   @@index([programVersionId])
@@ -681,35 +696,38 @@ enum AttachmentFileType {
 // The partial unique indexes (one Draft, one Published per course) and the CHECKs are added by hand in the migration.
 // revisionNumber is null only on the working copy of a change request (sourceRequestId set, F-13).
 model Syllabus {
-  id                 String               @id @default(cuid(2))
-  courseId           String
-  course             Course               @relation(fields: [courseId], references: [id], onDelete: Restrict)
-  revisionNumber     Int?
-  status             SyllabusStatus       @default(DRAFT)
-  courseDescription  String?
-  englishDescription String?
-  objectives         String?
-  teachingMethods    String?
-  assessmentMethods  String?
-  references         String?
-  previousVersionId  String?              @unique
-  previousVersion    Syllabus?            @relation("SyllabusLineage", fields: [previousVersionId], references: [id], onDelete: Restrict)
-  nextVersion        Syllabus?            @relation("SyllabusLineage")
-  publishedAt        DateTime?
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
-  weeklyContents     WeeklyContent[]
-  attachments        SyllabusAttachment[]
-  clos               CLO[]
-  sourceRequestId    String?              @unique
-  sourceRequest      ChangeRequest?       @relation("SyllabusRequestCopy", fields: [sourceRequestId], references: [id], onDelete: Restrict)
-  baseRevisionId     String?
-  baseRevision       Syllabus?            @relation("SyllabusBase", fields: [baseRevisionId], references: [id], onDelete: Restrict)
-  requestCopies      Syllabus[]           @relation("SyllabusBase")
+  id                   String                @id @default(cuid(2))
+  courseId             String
+  course               Course                @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  revisionNumber       Int?
+  status               SyllabusStatus        @default(DRAFT)
+  courseDescription    String?
+  englishDescription   String?
+  objectives           String?
+  teachingMethods      String?
+  assessmentMethods    String?
+  references           String?
+  previousVersionId    String?               @unique
+  previousVersion      Syllabus?             @relation("SyllabusLineage", fields: [previousVersionId], references: [id], onDelete: Restrict)
+  nextVersion          Syllabus?             @relation("SyllabusLineage")
+  publishedAt          DateTime?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  weeklyContents       WeeklyContent[]
+  attachments          SyllabusAttachment[]
+  clos                 CLO[]
+  sourceRequestId      String?               @unique
+  sourceRequest        ChangeRequest?        @relation("SyllabusRequestCopy", fields: [sourceRequestId], references: [id], onDelete: Restrict)
+  baseRevisionId       String?
+  baseRevision         Syllabus?             @relation("SyllabusBase", fields: [baseRevisionId], references: [id], onDelete: Restrict)
+  requestCopies        Syllabus[]            @relation("SyllabusBase")
   // The request whose final approval published this revision (F-15).
-  originRequestId    String?
-  originRequest      ChangeRequest?       @relation("SyllabusOrigin", fields: [originRequestId], references: [id], onDelete: Restrict)
-  pinnedItems        CurriculumItem[]     @relation("CurriculumItemSyllabus")
+  originRequestId      String?
+  originRequest        ChangeRequest?        @relation("SyllabusOrigin", fields: [originRequestId], references: [id], onDelete: Restrict)
+  pinnedItems          CurriculumItem[]      @relation("CurriculumItemSyllabus")
+  // Course-level cutoff declaration; a unit-neutral number, never evaluated against scores.
+  failingScore         Decimal?              @db.Decimal(9, 2)
+  assessmentComponents AssessmentComponent[]
 
   @@unique([courseId, revisionNumber])
 }
@@ -762,9 +780,9 @@ model PLO {
 
 // A CLO belongs to a syllabus revision, so every program using the course shares it (DEC-03).
 model CLO {
-  id                 String             @id @default(cuid(2))
+  id                 String                 @id @default(cuid(2))
   syllabusId         String
-  syllabus           Syllabus           @relation(fields: [syllabusId], references: [id], onDelete: Cascade)
+  syllabus           Syllabus               @relation(fields: [syllabusId], references: [id], onDelete: Cascade)
   cloCode            String
   description        String
   englishDescription String?
@@ -772,8 +790,9 @@ model CLO {
   sortOrder          Int
   ploLinks           CLOPLOMapping[]
   weeklyLinks        WeeklyContentCLO[]
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
+  assessmentLinks    AssessmentCLOMapping[]
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
 
   @@unique([syllabusId, cloCode])
   @@index([syllabusId, sortOrder])
@@ -973,4 +992,172 @@ model ChangeRequestDocument {
   createdAt       DateTime           @default(now())
 
   @@index([changeRequestId, createdAt])
+}
+
+// Declarative grade formula rows owned by one syllabus revision. The CHECKs are added by hand in the migration.
+model AssessmentComponent {
+  id                 String                 @id @default(cuid(2))
+  syllabusId         String
+  syllabus           Syllabus               @relation(fields: [syllabusId], references: [id], onDelete: Cascade)
+  componentCode      String
+  componentName      String
+  weight             Decimal                @db.Decimal(5, 2)
+  assessmentForm     String?
+  isConditional      Boolean                @default(false)
+  conditionThreshold Decimal?               @db.Decimal(9, 2)
+  failingScore       Decimal?               @db.Decimal(9, 2)
+  mappings           AssessmentCLOMapping[]
+
+  @@unique([syllabusId, componentCode])
+}
+
+// A sparse cell of the assessment x CLO grid; cloWeight null still means mapped.
+model AssessmentCLOMapping {
+  id                    String              @id @default(cuid(2))
+  assessmentComponentId String
+  assessmentComponent   AssessmentComponent @relation(fields: [assessmentComponentId], references: [id], onDelete: Cascade)
+  cloId                 String
+  clo                   CLO                 @relation(fields: [cloId], references: [id], onDelete: Cascade)
+  cloWeight             Decimal?            @db.Decimal(5, 2)
+
+  @@unique([assessmentComponentId, cloId])
+  @@index([cloId])
+}
+
+enum StudentStatus {
+  STUDYING
+  ON_LEAVE
+  WITHDRAWN
+  GRADUATED
+}
+
+enum StudentDataSource {
+  EXCEL
+  SCHOOL_DB
+}
+
+enum EnrollmentType {
+  PRIMARY
+  SECOND_MAJOR
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  TRANSFERRED
+  ENDED
+}
+
+enum AcademicResultStatus {
+  PASSED
+  FAILED
+  IN_PROGRESS
+  EXEMPT
+}
+
+model Student {
+  id                  String              @id @default(cuid(2))
+  studentCode         String              @unique
+  fullName            String
+  cohortId            String
+  cohort              Cohort              @relation(fields: [cohortId], references: [id], onDelete: Restrict)
+  admissionSemesterId String
+  admissionSemester   Semester            @relation("StudentAdmissionSemester", fields: [admissionSemesterId], references: [id], onDelete: Restrict)
+  statusSemesterId    String
+  statusSemester      Semester            @relation("StudentStatusSemester", fields: [statusSemesterId], references: [id], onDelete: Restrict)
+  major               String
+  status              StudentStatus       @default(STUDYING)
+  dataSource          StudentDataSource   @default(EXCEL)
+  userId              String?             @unique
+  user                User?               @relation("StudentAccount", fields: [userId], references: [id], onDelete: Restrict)
+  enrollments         ProgramEnrollment[]
+  academicResults     AcademicResult[]
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  @@index([cohortId, status])
+  @@index([fullName, id])
+}
+
+model ProgramEnrollment {
+  id                   String             @id @default(cuid(2))
+  studentId            String
+  student              Student            @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  programId            String
+  program              Program            @relation(fields: [programId], references: [id], onDelete: Restrict)
+  cohortId             String
+  cohort               Cohort             @relation(fields: [cohortId], references: [id], onDelete: Restrict)
+  appliedVersionId     String
+  appliedVersion       ProgramVersion     @relation("EnrollmentAppliedVersion", fields: [appliedVersionId], references: [id], onDelete: Restrict)
+  admissionVersionId   String
+  admissionVersion     ProgramVersion     @relation("EnrollmentAdmissionVersion", fields: [admissionVersionId], references: [id], onDelete: Restrict)
+  cohortAssignmentId   String?
+  cohortAssignment     CohortVersion?     @relation(fields: [cohortAssignmentId], references: [id], onDelete: Restrict)
+  fromSemesterId       String
+  fromSemester         Semester           @relation("EnrollmentFromSemester", fields: [fromSemesterId], references: [id], onDelete: Restrict)
+  untilSemesterId      String?
+  untilSemester        Semester?          @relation("EnrollmentUntilSemester", fields: [untilSemesterId], references: [id], onDelete: Restrict)
+  previousEnrollmentId String?            @unique
+  previousEnrollment   ProgramEnrollment? @relation("EnrollmentHistory", fields: [previousEnrollmentId], references: [id], onDelete: Restrict)
+  nextEnrollment       ProgramEnrollment? @relation("EnrollmentHistory")
+  enrollmentType       EnrollmentType
+  isException          Boolean            @default(false)
+  basisDecision        String?
+  status               EnrollmentStatus   @default(ACTIVE)
+  createdById          String?
+  createdBy            User?              @relation("EnrollmentCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  @@index([studentId, programId])
+  @@index([programId, cohortId, status, isException])
+}
+
+model AcademicResult {
+  id          String                 @id @default(cuid(2))
+  studentId   String
+  student     Student                @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  courseId    String
+  course      Course                 @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  semesterId  String
+  semester    Semester               @relation(fields: [semesterId], references: [id], onDelete: Restrict)
+  score10     Decimal?               @db.Decimal(4, 2)
+  score4      Decimal?               @db.Decimal(3, 2)
+  letterGrade String?
+  status      AcademicResultStatus
+  dataSource  StudentDataSource      @default(EXCEL)
+  revision    Int                    @default(1)
+  changes     AcademicResultChange[]
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+
+  @@unique([studentId, courseId, semesterId])
+  @@index([studentId, semesterId])
+}
+
+model AcademicResultChange {
+  id               String         @id @default(cuid(2))
+  academicResultId String
+  academicResult   AcademicResult @relation(fields: [academicResultId], references: [id], onDelete: Restrict)
+  revision         Int
+  before           Json?
+  after            Json
+  recordedAt       DateTime       @default(now())
+
+  @@unique([academicResultId, revision])
+  @@index([recordedAt, id])
+}
+
+model StudentCredentialDelivery {
+  batchId      String      @id
+  batch        ImportBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  accountCount Int
+  ciphertext   Bytes?
+  iv           Bytes?
+  authTag      Bytes?
+  keyId        String?
+  expiresAt    DateTime
+  downloadedAt DateTime?
+  createdAt    DateTime    @default(now())
+
+  @@index([expiresAt])
 }

@@ -12,6 +12,7 @@ export interface WorkspaceLink {
 }
 
 export const SYLLABUS_CLO_TAB = 'clos';
+export const SYLLABUS_FORMULA_TAB = 'formula';
 
 // Where the creator edits a request's working copy: the existing screens, pointed at the copy.
 export function workspaceLinks(
@@ -27,6 +28,15 @@ export function workspaceLinks(
     if (type === 'OUTCOME') {
       query.set(TAB_PARAM, SYLLABUS_CLO_TAB);
       return [{ label: 'Sửa CLO của đề cương', to: `${base}?${query}` }];
+    }
+    if (type === 'GRADING_FORMULA') {
+      query.set(TAB_PARAM, SYLLABUS_FORMULA_TAB);
+      return [
+        {
+          label: 'Sửa công thức điểm và ánh xạ CLO',
+          to: `${base}?${query}`,
+        },
+      ];
     }
     return [{ label: 'Sửa nội dung đề cương', to: `${base}?${query}` }];
   }

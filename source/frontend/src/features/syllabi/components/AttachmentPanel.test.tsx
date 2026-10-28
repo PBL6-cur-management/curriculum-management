@@ -33,6 +33,8 @@ function renderPanel(
           syllabus={current}
           attachmentRules={RULES}
           canEditClos
+          canEditContent
+          canEditGradingFormula={false}
         />
       </App>
     </QueryClientProvider>,

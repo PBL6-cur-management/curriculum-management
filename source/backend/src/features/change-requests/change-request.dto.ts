@@ -93,7 +93,6 @@ export class CreateChangeRequestDto {
   @ApiProperty({
     enum: CREATABLE_TYPES,
     enumName: 'ChangeRequestType',
-    description: 'GRADING_FORMULA is refused until F-12',
   })
   @IsIn(CREATABLE_TYPES)
   requestType!: ChangeRequestType;

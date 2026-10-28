@@ -3,6 +3,7 @@ import request from 'supertest';
 import { ProgramStatus } from '../../src/generated/prisma/client.js';
 import { PrismaService } from '../../src/shared/prisma/prisma.service.js';
 import { toIsoDay, todayDate } from '../../src/shared/time/today.js';
+import { makeAssessmentReady } from './assessments.js';
 import { addCurriculumItem } from './curriculum.js';
 import { createProgram } from './programs.js';
 
@@ -64,7 +65,7 @@ export const READY_SYLLABUS = {
 };
 
 // Leaves the course with a syllabus that DC-03 lets through: a missing one is created, a Draft is completed,
-// a published one is left alone. Returns the Draft id, or null when the revision is already published.
+// a published one is left alone; the Draft also gets a grade formula that covers every CLO. Returns the Draft id, or null when the revision is already published.
 export async function makeSyllabusReady(
   agent: Agent,
   courseId: string,
@@ -86,6 +87,7 @@ export async function makeSyllabusReady(
     .set(CSRF)
     .send({ ...READY_SYLLABUS, ...content })
     .expect(200);
+  await makeAssessmentReady(agent, courseId, state.draft.id as string);
   return state.draft.id as string;
 }
 

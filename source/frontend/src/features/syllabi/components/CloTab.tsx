@@ -57,7 +57,10 @@ export function CloTab({ courseId, syllabus }: EditorTabProps) {
           </Button>
           <Popconfirm
             title={`Xóa ${clo.cloCode}?`}
-            description={cloDeleteConfirm(clo.linkedPrograms)}
+            description={cloDeleteConfirm(
+              clo.linkedPrograms,
+              clo.assessmentLinkCount,
+            )}
             okText="Xóa"
             cancelText="Hủy"
             okButtonProps={{ danger: true }}

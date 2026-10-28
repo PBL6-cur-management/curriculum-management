@@ -1252,6 +1252,38 @@ export interface paths {
         patch: operations["SyllabiController_updateClo"];
         trace?: never;
     };
+    "/api/syllabi/{syllabusId}/grading-formula": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["SyllabiController_replaceGradingFormula"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/syllabi/{syllabusId}/assessment-clo-mappings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["SyllabiController_replaceAssessmentMappings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/syllabi/{syllabusId}/attachments": {
         parameters: {
             query?: never;
@@ -3191,6 +3223,44 @@ export interface components {
             sortOrder: number;
             /** @description Codes of the programs that link this CLO to a PLO, sorted */
             linkedPrograms: string[];
+            /** @description Assessment components mapped to this CLO in this revision */
+            assessmentLinkCount: number;
+        };
+        AssessmentCloMappingDto: {
+            cloId: string;
+            /** @description Percent; null is still a mapped cell */
+            cloWeight: string | null;
+        };
+        AssessmentComponentDto: {
+            id: string;
+            componentCode: string;
+            componentName: string;
+            /** @example 30 */
+            weight: string;
+            assessmentForm: string | null;
+            isConditional: boolean;
+            conditionThreshold: string | null;
+            failingScore: string | null;
+            mappings: components["schemas"]["AssessmentCloMappingDto"][];
+        };
+        /** @enum {string} */
+        AssessmentWarningCode: "ASSESSMENT_CLO_UNCOVERED";
+        AssessmentWarningDto: {
+            code: components["schemas"]["AssessmentWarningCode"];
+            cloId: string;
+            cloCode: string;
+            message: string;
+        };
+        GradeFormulaDto: {
+            failingScore: string | null;
+            /**
+             * @description Sum of the components' weights
+             * @example 100
+             */
+            totalWeight: string;
+            components: components["schemas"]["AssessmentComponentDto"][];
+            /** @description One per CLO that no component assesses, in CLO order */
+            warnings: components["schemas"]["AssessmentWarningDto"][];
         };
         SyllabusDto: {
             id: string;
@@ -3215,6 +3285,8 @@ export interface components {
             weeklyContents: components["schemas"]["WeeklyContentDto"][];
             attachments: components["schemas"]["SyllabusAttachmentDto"][];
             clos: components["schemas"]["CloDto"][];
+            /** @description Empty aggregate when the revision has no formula */
+            gradingFormula: components["schemas"]["GradeFormulaDto"];
         };
         AttachmentRulesDto: {
             maxBytes: number;
@@ -3235,6 +3307,10 @@ export interface components {
             /** @description A Draft exists and its CLOs are directly editable */
             canEditClos: boolean;
             editPath: components["schemas"]["EditPath"] | null;
+            /** @description Path for the grade formula and assessment mappings (gradingFormula.edit); null when there is no such cell or in a pinned read */
+            gradingEditPath: components["schemas"]["EditPath"] | null;
+            /** @description A Draft exists and its grade formula is directly editable */
+            canEditGradingFormula: boolean;
             attachmentRules: components["schemas"]["AttachmentRulesDto"];
             /** @description The caller may add a signed file to the published revision (files are only ever added once a revision is published) */
             canAttachToPublished: boolean;
@@ -3293,6 +3369,42 @@ export interface components {
             englishDescription?: string | null;
             cognitiveLevel?: string | null;
         };
+        AssessmentComponentInputDto: {
+            /** @description A component of this revision to keep; omit to create */
+            id?: string;
+            /**
+             * @description Trimmed and upper-cased
+             * @example GK
+             */
+            componentCode: string;
+            componentName: string;
+            /**
+             * @description Percent, above 0 up to 100
+             * @example 30
+             */
+            weight: string;
+            assessmentForm?: string | null;
+            isConditional: boolean;
+            /** @description Required when conditional; dropped otherwise */
+            conditionThreshold?: string | null;
+            failingScore?: string | null;
+        };
+        ReplaceGradeFormulaDto: {
+            /** @description updatedAt of the revision the form was loaded from */
+            expectedUpdatedAt: string;
+            failingScore: string | null;
+            components: components["schemas"]["AssessmentComponentInputDto"][];
+        };
+        AssessmentMappingInputDto: {
+            assessmentComponentId: string;
+            cloId: string;
+            cloWeight?: string | null;
+        };
+        ReplaceAssessmentMappingsDto: {
+            /** @description updatedAt of the revision the grid was loaded from */
+            expectedUpdatedAt: string;
+            mappings: components["schemas"]["AssessmentMappingInputDto"][];
+        };
         UploadAttachmentFormDto: {
             /** Format: binary */
             file: string;
@@ -3345,7 +3457,6 @@ export interface components {
             fullName: string;
         };
         CreateChangeRequestDto: {
-            /** @description GRADING_FORMULA is refused until F-12 */
             requestType: components["schemas"]["ChangeRequestType"];
             targetType: components["schemas"]["ChangeTargetType"];
             targetId: string;
@@ -6341,6 +6452,56 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CloDto"];
+                };
+            };
+        };
+    };
+    SyllabiController_replaceGradingFormula: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                syllabusId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReplaceGradeFormulaDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GradeFormulaDto"];
+                };
+            };
+        };
+    };
+    SyllabiController_replaceAssessmentMappings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                syllabusId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReplaceAssessmentMappingsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GradeFormulaDto"];
                 };
             };
         };

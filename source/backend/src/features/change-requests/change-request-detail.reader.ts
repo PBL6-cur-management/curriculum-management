@@ -49,7 +49,6 @@ const NO_NUMBER = 'chưa đánh số';
 // These end at level 3 with the plain Đồng ý; every other type is released on MH-43.
 const NO_FINAL_APPROVAL: readonly ChangeRequestType[] = [
   ChangeRequestType.ORGANIZATION,
-  ChangeRequestType.GRADING_FORMULA,
 ];
 const AUTHORED_ENTITIES: string[] = Object.values(AUTHORED_ENTITY);
 

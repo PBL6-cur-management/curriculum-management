@@ -13,6 +13,24 @@ function setup() {
       teachingMethods: null,
       assessmentMethods: null,
       references: null,
+      failingScore: '4',
+      assessmentComponents: [
+        {
+          id: 'old-a1',
+          componentCode: 'GK',
+          componentName: 'Giữa kỳ',
+          weight: '100',
+          assessmentForm: null,
+          isConditional: true,
+          conditionThreshold: '0',
+          failingScore: null,
+          mappings: [
+            { cloId: 'old-clo1', cloWeight: null },
+            { cloId: 'old-clo2', cloWeight: '50' },
+            { cloId: 'foreign', cloWeight: '10' },
+          ],
+        },
+      ],
       clos: [
         {
           id: 'old-clo1',
@@ -67,13 +85,29 @@ function setup() {
   const weeklyContentCLO = {
     createMany: vi.fn().mockResolvedValue({ count: 1 }),
   };
+  const assessmentComponent = {
+    create: vi.fn().mockResolvedValue({ id: 'na1' }),
+  };
+  const assessmentCLOMapping = {
+    createMany: vi.fn().mockResolvedValue({ count: 2 }),
+  };
   const tx = {
     syllabus,
     cLO,
     weeklyContent,
     weeklyContentCLO,
+    assessmentComponent,
+    assessmentCLOMapping,
   } as unknown as Prisma.TransactionClient;
-  return { tx, syllabus, cLO, weeklyContent, weeklyContentCLO };
+  return {
+    tx,
+    syllabus,
+    cLO,
+    weeklyContent,
+    weeklyContentCLO,
+    assessmentComponent,
+    assessmentCLOMapping,
+  };
 }
 
 describe('copySyllabusRevision', () => {
@@ -119,5 +153,25 @@ describe('copySyllabusRevision', () => {
     expect(
       JSON.stringify(syllabus.findUniqueOrThrow.mock.calls[0][0]),
     ).not.toContain('attachments');
+  });
+
+  it('copies the grade formula and re-points each assessment link at the copy CLO', async () => {
+    const { tx, syllabus, assessmentComponent, assessmentCLOMapping } = setup();
+    await copySyllabusRevision(tx, 'base', { sourceRequestId: 'cr1' });
+
+    expect(syllabus.create.mock.calls[0][0].data.failingScore).toBe('4');
+    expect(assessmentComponent.create.mock.calls[0][0].data).toMatchObject({
+      syllabusId: 'copy',
+      componentCode: 'GK',
+      weight: '100',
+      isConditional: true,
+      conditionThreshold: '0',
+    });
+    expect(assessmentCLOMapping.createMany).toHaveBeenCalledWith({
+      data: [
+        { assessmentComponentId: 'na1', cloId: 'new-clo1', cloWeight: null },
+        { assessmentComponentId: 'na1', cloId: 'new-clo2', cloWeight: '50' },
+      ],
+    });
   });
 });

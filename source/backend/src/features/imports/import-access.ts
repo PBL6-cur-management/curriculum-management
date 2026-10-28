@@ -15,13 +15,22 @@ import {
   programEditState,
   programTarget,
 } from '../../shared/programs/program-target.js';
+import { holdsStudentImport } from '../../shared/students/student-access.js';
 import { IMPORT_ERRORS } from './import-errors.js';
+
+// Personal data: visible to a current R1 import holder only, never through ownership or a broad permission held elsewhere.
+export const STUDENT_IMPORT_TYPES: readonly ImportType[] = [
+  ImportType.STUDENT_LIST,
+  ImportType.ACADEMIC_RESULT,
+];
+export const isStudentImportType = (importType: ImportType): boolean =>
+  STUDENT_IMPORT_TYPES.includes(importType);
 
 export const IMPORT_TYPE_SUPPORT = {
   COURSE_CATALOG: { enabled: true, needsVersion: false },
   CURRICULUM: { enabled: true, needsVersion: true },
-  STUDENT_LIST: { enabled: false, needsVersion: false },
-  ACADEMIC_RESULT: { enabled: false, needsVersion: false },
+  STUDENT_LIST: { enabled: true, needsVersion: false },
+  ACADEMIC_RESULT: { enabled: true, needsVersion: false },
 } as const satisfies Record<
   ImportType,
   { enabled: boolean; needsVersion: boolean }
@@ -89,11 +98,18 @@ export function programScope(access: AccessContext): Prisma.ProgramWhereInput {
 export function visibleBatches(
   access: AccessContext,
 ): Prisma.ImportBatchWhereInput {
+  const ordinary = { importType: { notIn: [...STUDENT_IMPORT_TYPES] } };
   const visible: Prisma.ImportBatchWhereInput[] = [
-    { performedById: access.userId },
+    { performedById: access.userId, ...ordinary },
   ];
   if (access.scopeFor(PERMISSIONS.DATA_IMPORT_EXCEL).all)
-    visible.push({ importType: { not: ImportType.CURRICULUM } });
+    visible.push({
+      importType: {
+        notIn: [ImportType.CURRICULUM, ...STUDENT_IMPORT_TYPES],
+      },
+    });
+  if (holdsStudentImport(access))
+    visible.push({ importType: { in: [...STUDENT_IMPORT_TYPES] } });
   if (access.has(PERMISSIONS.CURRICULUM_IMPORT_EXPORT_EXCEL))
     visible.push({
       importType: ImportType.CURRICULUM,

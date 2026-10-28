@@ -21,6 +21,16 @@ export type UpdateWeeklyContentRequest =
 export type Clo = components['schemas']['CloDto'];
 export type CreateCloRequest = components['schemas']['CreateCloDto'];
 export type UpdateCloRequest = components['schemas']['UpdateCloDto'];
+export type GradeFormula = components['schemas']['GradeFormulaDto'];
+export type AssessmentComponent =
+  components['schemas']['AssessmentComponentDto'];
+export type AssessmentCloMapping =
+  components['schemas']['AssessmentCloMappingDto'];
+export type AssessmentWarning = components['schemas']['AssessmentWarningDto'];
+export type ReplaceGradeFormulaRequest =
+  components['schemas']['ReplaceGradeFormulaDto'];
+export type ReplaceAssessmentMappingsRequest =
+  components['schemas']['ReplaceAssessmentMappingsDto'];
 export type SyllabusSectionField = keyof UpdateSyllabusRequest;
 
 const coursePath = (courseId: string) =>
@@ -49,6 +59,24 @@ export const updateSyllabus = (
   syllabusId: string,
   body: UpdateSyllabusRequest,
 ) => sendJson<Syllabus>('PATCH', syllabusPath(syllabusId), body);
+export const replaceGradeFormula = (
+  syllabusId: string,
+  body: ReplaceGradeFormulaRequest,
+) =>
+  sendJson<GradeFormula>(
+    'PUT',
+    `${syllabusPath(syllabusId)}/grading-formula`,
+    body,
+  );
+export const replaceAssessmentMappings = (
+  syllabusId: string,
+  body: ReplaceAssessmentMappingsRequest,
+) =>
+  sendJson<GradeFormula>(
+    'PUT',
+    `${syllabusPath(syllabusId)}/assessment-clo-mappings`,
+    body,
+  );
 export const createWeek = (
   syllabusId: string,
   body: CreateWeeklyContentRequest,

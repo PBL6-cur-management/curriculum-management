@@ -4,6 +4,7 @@ import {
   IsInt,
   IsNotEmpty,
   IsOptional,
+  Matches,
   MinLength,
   IsString,
   Max,
@@ -17,6 +18,8 @@ const SESSION_SECRET_MIN_LENGTH = 32;
 const DEFAULT_SESSION_IDLE_MINUTES = 60;
 const DEFAULT_FILES_ROOT = 'files';
 const DEFAULT_ATTACHMENT_MAX_MB = 20;
+// 32 bytes in base64: 43 characters and one padding sign.
+const CREDENTIAL_KEY_PATTERN = /^[A-Za-z0-9+/]{43}=$/;
 
 // Keep the explicit types: implicit conversion reads design:type, which is Object for an unannotated property,
 // so a numeric variable would stay a string and fail @IsInt.
@@ -64,6 +67,14 @@ export class Env {
   @IsString()
   @IsNotEmpty()
   BULLMQ_PREFIX?: string;
+
+  // AES-256 key (base64 of 32 bytes) that protects the one-time initial-password file. Absent: the app starts, but a student import that must create accounts is refused.
+  @IsOptional()
+  @Matches(CREDENTIAL_KEY_PATTERN, {
+    message:
+      'STUDENT_CREDENTIAL_ENCRYPTION_KEY must be the base64 of exactly 32 bytes',
+  })
+  STUDENT_CREDENTIAL_ENCRYPTION_KEY?: string;
 }
 
 export function validateEnv(raw: Record<string, unknown>): Env {

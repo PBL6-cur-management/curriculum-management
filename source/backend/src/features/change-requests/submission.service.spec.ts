@@ -70,13 +70,18 @@ describe('SubmissionService', () => {
     approvalStep: { createMany: vi.fn() },
     programVersion: { findUnique: vi.fn() },
     course: { findUniqueOrThrow: vi.fn() },
+    curriculumItem: { findMany: vi.fn() },
+    syllabus: { findUnique: vi.fn(), findMany: vi.fn() },
     $executeRaw: vi.fn().mockResolvedValue(0),
+    $queryRaw: vi.fn().mockResolvedValue([]),
   };
   const prisma = {
     $transaction: vi.fn((run: (client: unknown) => unknown) => run(tx)),
     changeRequest: { findFirst: vi.fn() },
     programVersion: { findUnique: vi.fn() },
     course: { findUniqueOrThrow: vi.fn() },
+    curriculumItem: { findMany: vi.fn() },
+    syllabus: { findUnique: vi.fn(), findMany: vi.fn() },
   };
   const requests = { findOwnDraft: vi.fn() };
   const items = { current: vi.fn() };
@@ -100,6 +105,9 @@ describe('SubmissionService', () => {
       affectedPrograms: [],
     });
     tx.changeRequest.updateMany.mockResolvedValue({ count: 1 });
+    tx.curriculumItem.findMany.mockResolvedValue([]);
+    prisma.curriculumItem.findMany.mockResolvedValue([]);
+    tx.$queryRaw.mockResolvedValue([]);
     tx.programVersion.findUnique.mockResolvedValue({ id: 'copy1' });
     prisma.programVersion.findUnique.mockResolvedValue({ id: 'copy1' });
     prisma.changeRequest.findFirst.mockResolvedValue({
@@ -255,6 +263,125 @@ describe('SubmissionService', () => {
       expect(tx.approvalStep.createMany).not.toHaveBeenCalled();
       expect(tx.changeRequest.update).not.toHaveBeenCalled();
       expect(notifier.arrived).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('grade formula gate', () => {
+    const gradingRequest = {
+      ...base,
+      requestType: ChangeRequestType.GRADING_FORMULA,
+      targetType: ChangeTargetType.COURSE,
+      courseId: 'c1',
+      programId: null,
+    };
+    const COVERED = {
+      failingScore: null,
+      clos: [{ id: 'k1', cloCode: 'CLO1', sortOrder: 1 }],
+      assessmentComponents: [
+        {
+          id: 'a1',
+          componentCode: 'GK',
+          weight: '100',
+          isConditional: false,
+          conditionThreshold: null,
+          failingScore: null,
+          mappings: [{ cloId: 'k1', cloWeight: null }],
+        },
+      ],
+    };
+
+    beforeEach(() => {
+      requests.findOwnDraft.mockResolvedValue(gradingRequest);
+      prisma.course.findUniqueOrThrow.mockResolvedValue({
+        id: 'c1',
+        ownerGroupId: null,
+        ownerFaculty: { unitCode: 'KHOA_CNTT' },
+      });
+      tx.course.findUniqueOrThrow.mockResolvedValue({
+        id: 'c1',
+        ownerGroupId: null,
+        ownerFaculty: { unitCode: 'KHOA_CNTT' },
+      });
+      tx.syllabus.findUnique.mockImplementation(
+        (args: { select: Record<string, unknown> }) =>
+          Promise.resolve(
+            'sourceRequestId' in args.select
+              ? { sourceRequestId: 'cr1' }
+              : COVERED,
+          ),
+      );
+    });
+
+    it('blocks submit inside the claimed transaction, locks the copy and stores nothing', async () => {
+      tx.syllabus.findUnique.mockImplementation(
+        (args: { select: Record<string, unknown> }) =>
+          Promise.resolve(
+            'sourceRequestId' in args.select
+              ? { sourceRequestId: 'cr1', id: 'copy' }
+              : { ...COVERED, assessmentComponents: [] },
+          ),
+      );
+
+      await expect(service.submit('cr1', ACCESS)).rejects.toMatchObject({
+        code: 'ASSESSMENT_NOT_READY',
+      });
+      expect(tx.$queryRaw).toHaveBeenCalled();
+      expect(tx.changeItem.createMany).not.toHaveBeenCalled();
+      expect(tx.approvalStep.createMany).not.toHaveBeenCalled();
+    });
+
+    it('blocks a program workspace whose pinned revision has no grade formula', async () => {
+      requests.findOwnDraft.mockResolvedValue(base);
+      tx.curriculumItem.findMany.mockResolvedValue([
+        { courseId: 'c1', syllabusId: 'p1', course: { courseCode: 'IT001' } },
+      ]);
+      tx.syllabus.findMany.mockResolvedValue([
+        {
+          id: 'p1',
+          courseId: 'c1',
+          status: 'PUBLISHED',
+          courseDescription: '<p>a</p>',
+          objectives: '<p>b</p>',
+          ...COVERED,
+          assessmentComponents: [],
+        },
+      ]);
+
+      await expect(service.submit('cr1', ACCESS)).rejects.toMatchObject({
+        code: 'ASSESSMENT_NOT_READY',
+      });
+      expect(tx.approvalStep.createMany).not.toHaveBeenCalled();
+    });
+
+    it('submits a complete formula', async () => {
+      await service.submit('cr1', ACCESS);
+
+      expect(tx.approvalStep.createMany).toHaveBeenCalled();
+    });
+
+    it('reports each uncovered CLO as its own blocker in the preview', async () => {
+      prisma.syllabus.findUnique.mockImplementation(
+        (args: { select: Record<string, unknown> }) =>
+          Promise.resolve(
+            'clos' in args.select
+              ? {
+                  ...COVERED,
+                  clos: [
+                    ...COVERED.clos,
+                    { id: 'k2', cloCode: 'CLO2', sortOrder: 2 },
+                  ],
+                }
+              : { id: 'copy' },
+          ),
+      );
+
+      const result = await service.preview('cr1', ACCESS);
+
+      expect(
+        result.blockingIssues.filter(
+          (found) => found.code === 'ASSESSMENT_CLO_UNCOVERED',
+        ),
+      ).toHaveLength(1);
     });
   });
 

@@ -29,12 +29,12 @@ import type {
   FinalApprovalPreviewDto,
   FinalApproveDto,
 } from './final-approval.dto.js';
+import { hasGradingChanges } from './grading-changes.js';
 import { FinalApprovalPreviewReader } from './final-approval.preview.js';
 import { findVisibleRequest } from './request-visibility.js';
 
 const NOT_FINAL_TYPES: readonly ChangeRequestType[] = [
   ChangeRequestType.ORGANIZATION,
-  ChangeRequestType.GRADING_FORMULA,
 ];
 
 // MH-43 (US-072): level 3 of a data request. One transaction claims the request, re-checks that it is still current,
@@ -84,6 +84,7 @@ export class FinalApprovalService {
         dto,
         semester.startDate,
         today,
+        await hasGradingChanges(tx, request.id),
       );
       await lockRequisiteGraph(tx);
       const now = new Date();
@@ -139,14 +140,19 @@ export class FinalApprovalService {
   }
 
   // A semester that has begun is for the academic office's own requests only, and only when it says so (F15-03);
-  // a started semester is never taken silently, nor a future one marked as past.
+  // a started semester is never taken silently, nor a future one marked as past. Grade formula changes have no
+  // such exception: a class already running keeps its formula, whoever filed the request.
   private assertSemesterAllowed(
     request: ChangeRequest,
     dto: FinalApproveDto,
     startDate: Date,
     today: Date,
+    changesGrading: boolean,
   ): boolean {
     if (startDate > today) return false;
+    if (changesGrading) {
+      throw new AppException(RELEASE_ERRORS.SEMESTER_ALREADY_STARTED);
+    }
     if (dto.allowPastSemester && request.createdByAcademicOffice) return true;
     throw new AppException(RELEASE_ERRORS.SEMESTER_ALREADY_STARTED);
   }

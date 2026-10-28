@@ -18,11 +18,12 @@
 - [F-15 Ban hành phiên bản](./f-15-release-version-snapshots-test-cases.md)
 - [MVP Luồng xuyên tính năng](./mvp-flow-test-cases.md)
 
-- [F-16 So sánh phiên bản, gán khóa](./f-16-version-compare-cohort-assignment-test-cases.md) — 27 ca: 22 Automated (backend e2e/frontend unit; 5 ca Playwright), 5 Manual; chưa chạy, orchestrator điền kết quả browser walk.
+- [F-16 So sánh phiên bản, gán khóa](./f-16-version-compare-cohort-assignment-test-cases.md) — 27 ca: 22 tự động Passed ngày 10/27/26 (5 Playwright, 7 Backend e2e, 10 Frontend unit); 5 Manual chưa chạy (023..027). TC_008/014 Failed lượt 1 do helper fixture, Passed lượt 2 sau sửa; không phải lỗi ứng dụng.
+- [F-12 Công thức điểm, ánh xạ đánh giá–CLO](./f-12-grade-formula-assessment-clo-test-cases.md) — 26 ca: 21 tự động Passed ngày 10/27/26 (4 Playwright, 14 Backend e2e, 3 nhóm Frontend unit); 5 Manual chưa chạy (022..026). TC_004 Failed lượt 1 do lưới ánh xạ dựng lại bằng dữ liệu cũ (lỗi ứng dụng, đã sửa), Passed lượt sau.
 
 ## Tổng kết thực thi theo chỉ mục
 
-Đếm trực tiếp các dòng TC trong 14 tài liệu tính năng ngày 2026-10-26: **789 ca = 408 tự động Passed + 381 thủ công chưa chạy**. F-09 bổ sung 30 ca (27 tự động Passed + 3 Manual); 13 tính năng MVP giữ 759 ca (381 Passed + 378 thủ công). Không cộng 9 auth setup, không đếm trùng các tầng automation của cùng TC. Năm ca MVP xuyên tính năng trong mvp-flow-test-cases.md đã Passed, được theo dõi riêng, không cộng vào tổng theo tính năng này.
+Đếm trực tiếp các dòng TC trong 16 tài liệu tính năng ngày 2026-10-27: **842 ca = 451 tự động Passed + 391 thủ công chưa chạy**. Phân rã: 13 tính năng MVP 759/381/378 (tổng/Passed/thủ công); F-09 30/27/3; F-16 27/22/5; F-12 26/21/5. Không cộng 9 auth setup, không đếm trùng các tầng automation của cùng TC. Năm ca MVP xuyên tính năng trong mvp-flow-test-cases.md đã Passed, được theo dõi riêng, không cộng vào tổng theo tính năng này.
 
 ## Mục đích và phạm vi
 
@@ -42,27 +43,27 @@ Tên file: `f-xx-<slug>-test-cases.md`, ví dụ `f-04-course-catalog-test-cases
 
 Giữ đúng thứ tự, không đổi tên hoặc thêm cột:
 
-| TC_ID | Target item | Sub-target item | AC | Test summary | Pre-Condition | Steps | Test Data | Expected Result | Is Test? | Test Result | Executed On | Executed By | Note |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| TC_ID | Target item | Sub-target item | AC  | Test summary | Pre-Condition | Steps | Test Data | Expected Result | Is Test? | Test Result | Executed On | Executed By | Note |
+| ----- | ----------- | --------------- | --- | ------------ | ------------- | ----- | --------- | --------------- | -------- | ----------- | ----------- | ----------- | ---- |
 
 Năm cột cuối (`Is Test?`, `Test Result`, `Executed On`, `Executed By`, `Note`) thuộc nhóm **Developer** của bảng tính nhóm. Markdown không gộp ô tiêu đề nên mỗi file nhắc lại điều này ngay trước bảng.
 
-| Cột | Quy ước |
-|---|---|
-| TC_ID | `F04-TC_001`, `F04-TC_002`, … tăng liên tiếp trong file; đổi prefix theo feature. Không tái sử dụng ID đã công bố cho hành vi khác. |
-| Target item | Màn hình/chức năng kèm MH-xx, ví dụ `Danh mục học phần (MH-16)`. |
-| Sub-target item | Chức năng con, ví dụ Thêm học phần, Lọc, Phân quyền. Chỉ điền Target và Sub-target ở dòng đầu mỗi nhóm; dòng tiếp theo để trống cả hai. |
-| AC | `US-012 AC3`, `KB-001`, `NT-B1-03`; nhiều mã cách nhau bằng `; `. Dùng `Bổ sung` cho ca biên có nguồn trong code nhưng không thuộc AC nào. |
-| Test summary | Một câu bắt đầu `Kiểm tra …`. |
-| Pre-Condition | Trạng thái cụ thể và tài khoản/vai/phạm vi; có thể ghi `F04-TC_003 đã đạt` khi kiểm tay. Automation phải tự dựng dữ liệu và không dựa thứ tự ca. |
-| Steps | `1. …; 2. …; 3. …`: người dùng bấm/nhập gì; dùng `<br>` nếu cần xuống dòng. |
-| Test Data | Giá trị cụ thể hoặc `—`; ký hiệu `<suffix>` phải được giải thích và thay bằng giá trị riêng khi kiểm tay. |
+| Cột             | Quy ước                                                                                                                                                       |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TC_ID           | `F04-TC_001`, `F04-TC_002`, … tăng liên tiếp trong file; đổi prefix theo feature. Không tái sử dụng ID đã công bố cho hành vi khác.                           |
+| Target item     | Màn hình/chức năng kèm MH-xx, ví dụ `Danh mục học phần (MH-16)`.                                                                                              |
+| Sub-target item | Chức năng con, ví dụ Thêm học phần, Lọc, Phân quyền. Chỉ điền Target và Sub-target ở dòng đầu mỗi nhóm; dòng tiếp theo để trống cả hai.                       |
+| AC              | `US-012 AC3`, `KB-001`, `NT-B1-03`; nhiều mã cách nhau bằng `; `. Dùng `Bổ sung` cho ca biên có nguồn trong code nhưng không thuộc AC nào.                    |
+| Test summary    | Một câu bắt đầu `Kiểm tra …`.                                                                                                                                 |
+| Pre-Condition   | Trạng thái cụ thể và tài khoản/vai/phạm vi; có thể ghi `F04-TC_003 đã đạt` khi kiểm tay. Automation phải tự dựng dữ liệu và không dựa thứ tự ca.              |
+| Steps           | `1. …; 2. …; 3. …`: người dùng bấm/nhập gì; dùng `<br>` nếu cần xuống dòng.                                                                                   |
+| Test Data       | Giá trị cụ thể hoặc `—`; ký hiệu `<suffix>` phải được giải thích và thay bằng giá trị riêng khi kiểm tay.                                                     |
 | Expected Result | Chỉ kết quả quan sát được. Trích đúng nhãn, lỗi/toast tiếng Việt trong frontend/backend; không ghi truy vấn, bảng dữ liệu hoặc chi tiết thực thi làm kết quả. |
-| Is Test? | `Yes` hoặc `No`. Mới viết luôn `No`, kể cả đã có spec. Chỉ `Yes` khi thực sự thử thực thi ca. |
-| Test Result | `Passed`, `Failed`, `Blocked`, `N/A`; mới viết để trống. `Blocked` khi không đủ điều kiện để thực thi; `N/A` khi đã được xác nhận không áp dụng và ghi lý do. |
-| Executed On | Ngày thực thi `MM/DD/YY`, ví dụ `10/21/26`; chưa thực thi để trống. |
-| Executed By | Tên người thực thi hoặc `Playwright (auto)`; chưa thực thi để trống. |
-| Note | Ca có test phải ghi `Tự động: F04-TC_xxx trong specs/f-04-course-catalog.spec.ts`; thêm lệch, giới hạn và nguồn. Không ghi Passed chỉ vì có code. |
+| Is Test?        | `Yes` hoặc `No`. Mới viết luôn `No`, kể cả đã có spec. Chỉ `Yes` khi thực sự thử thực thi ca.                                                                 |
+| Test Result     | `Passed`, `Failed`, `Blocked`, `N/A`; mới viết để trống. `Blocked` khi không đủ điều kiện để thực thi; `N/A` khi đã được xác nhận không áp dụng và ghi lý do. |
+| Executed On     | Ngày thực thi `MM/DD/YY`, ví dụ `10/21/26`; chưa thực thi để trống.                                                                                           |
+| Executed By     | Tên người thực thi hoặc `Playwright (auto)`; chưa thực thi để trống.                                                                                          |
+| Note            | Ca có test phải ghi `Tự động: F04-TC_xxx trong specs/f-04-course-catalog.spec.ts`; thêm lệch, giới hạn và nguồn. Không ghi Passed chỉ vì có code.             |
 
 ### Đánh số AC và truy vết
 

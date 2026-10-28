@@ -40,6 +40,7 @@ function access(code: PermissionCode, all: boolean) {
     },
   ]);
 }
+const STUDENT_TYPES = [ImportType.STUDENT_LIST, ImportType.ACADEMIC_RESULT];
 const VERSION: ImportVersionRow = {
   id: 'version',
   programId: 'program',
@@ -61,11 +62,9 @@ describe('import access', () => {
     );
   });
   it.each([ImportType.STUDENT_LIST, ImportType.ACADEMIC_RESULT])(
-    'refuses unavailable %s',
+    'supports %s',
     (type) => {
-      expect(() => assertSupported(type)).toThrow(
-        expect.objectContaining({ code: 'IMPORT_TYPE_UNAVAILABLE' }),
-      );
+      expect(() => assertSupported(type)).not.toThrow();
     },
   );
   it.each([
@@ -125,7 +124,7 @@ describe('import access', () => {
       access(PERMISSIONS.CURRICULUM_IMPORT_EXPORT_EXCEL, false),
     );
     expect(where.OR).toEqual([
-      { performedById: 'user' },
+      { performedById: 'user', importType: { notIn: STUDENT_TYPES } },
       {
         importType: ImportType.CURRICULUM,
         program: {
@@ -134,7 +133,36 @@ describe('import access', () => {
       },
     ]);
     expect(visibleBatches(new AccessContext('u', []))).toEqual({
-      OR: [{ performedById: 'u' }],
+      OR: [{ performedById: 'u', importType: { notIn: STUDENT_TYPES } }],
     });
+  });
+  it('shows student batches only to a current R1 import holder', () => {
+    const r1 = new AccessContext('user', [
+      {
+        assignmentId: null,
+        roleId: 'role',
+        roleCode: 'R1',
+        roleName: 'R1',
+        scopeSource: 'NONE',
+        scopeType: 'SYSTEM',
+        scopeUnit: null,
+        scope: {
+          all: false,
+          orgUnitIds: new Set(),
+          programIds: new Set(),
+          subjectGroupIds: new Set(),
+          studentIds: new Set(),
+        },
+        permissions: new Map([
+          [PERMISSIONS.DATA_IMPORT_EXCEL, { mode: 'DIRECT', scope: 'ALL' }],
+        ]),
+      },
+    ]);
+    expect(visibleBatches(r1).OR).toContainEqual({
+      importType: { in: STUDENT_TYPES },
+    });
+    expect(
+      visibleBatches(access(PERMISSIONS.DATA_IMPORT_EXCEL, true)).OR,
+    ).not.toContainEqual({ importType: { in: STUDENT_TYPES } });
   });
 });

@@ -68,6 +68,8 @@ export const IMPORT_ABORT_MESSAGE = {
   STALE: 'Lần nhập bị gián đoạn quá lâu; hãy nhập lại.',
   CHANGED_SINCE_DRY_RUN:
     'Dữ liệu đã thay đổi kể từ lần chạy thử và tệp nay có LỖI; xem báo cáo mới.',
+  ACCESS_REVOKED:
+    'Tài khoản thực hiện không còn quyền nhập dữ liệu sinh viên; hãy nhập lại bằng tài khoản có quyền.',
   VERSION_GONE:
     'Phiên bản đích không còn là bản nháp hoặc chương trình đã ban hành.',
 } as const;

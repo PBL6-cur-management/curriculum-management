@@ -120,7 +120,7 @@ describe('SyllabusEditorPage', () => {
   });
 
   it('shows an info result instead of the form when the syllabus needs a change request', async () => {
-    renderPage(courseSyllabus({ editPath: 'VIA_REQUEST' }));
+    renderPage(courseSyllabus({ editPath: 'VIA_REQUEST', canEditClos: false }));
     expect(
       await screen.findByText(/không sửa trực tiếp được/),
     ).toBeInTheDocument();
@@ -130,6 +130,31 @@ describe('SyllabusEditorPage', () => {
     expect(screen.queryByRole('tab')).not.toBeInTheDocument();
   });
 
+  it('lets a grading-only editor in, with the text tabs off and the formula tab open', async () => {
+    renderPage(
+      courseSyllabus({
+        editPath: null,
+        canEditClos: false,
+        gradingEditPath: 'DIRECT',
+        canEditGradingFormula: true,
+      }),
+      '/courses/c1/syllabus/edit',
+    );
+    expect(
+      await screen.findByRole('tab', {
+        name: 'Công thức điểm',
+        selected: true,
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Nội dung' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+    expect(
+      screen.getByRole('tab', { name: 'Ánh xạ đánh giá–CLO' }),
+    ).not.toHaveAttribute('aria-disabled', 'true');
+  });
+
   it('shows no form when there is no Draft', async () => {
     renderPage(courseSyllabus({ draft: null }));
     expect(
@@ -137,7 +162,7 @@ describe('SyllabusEditorPage', () => {
     ).toBeInTheDocument();
   });
 
-  it('lists the programs using the course before editing and offers four tabs (US-039 AC3, F-11)', async () => {
+  it('lists the programs using the course before editing and offers six tabs (US-039 AC3, F-11, F-12)', async () => {
     renderPage(courseSyllabus());
     expect(
       await screen.findByText(/dùng chung cho các chương trình sau/),
@@ -149,6 +174,8 @@ describe('SyllabusEditorPage', () => {
       'Nội dung theo tuần',
       'Tệp đính kèm',
       'CLO',
+      'Công thức điểm',
+      'Ánh xạ đánh giá–CLO',
     ]);
   });
 

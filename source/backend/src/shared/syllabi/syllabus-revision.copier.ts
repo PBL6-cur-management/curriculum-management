@@ -2,7 +2,7 @@ import { SyllabusStatus, type Prisma } from '../../generated/prisma/client.js';
 import { sanitizeRichText } from '../rich-text/sanitize-rich-text.js';
 import { SYLLABUS_SECTION_FIELDS } from './syllabus-sections.js';
 
-// Copies a revision's text, weeks, CLOs and week–CLO links into a request's working copy. Attachments stay with
+// Copies a revision's text, weeks, CLOs, week–CLO links, grade formula and assessment–CLO links into a request's working copy. Attachments stay with
 // their revision. The copy has no revision number: F-15 numbers it when it publishes (Syllabus_number_unless_copy).
 // Every rich-text value goes through sanitizeRichText again; a copy is a write like any other.
 export async function copySyllabusRevision(
@@ -18,6 +18,10 @@ export async function copySyllabusRevision(
         orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }],
       },
       clos: { orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }] },
+      assessmentComponents: {
+        include: { mappings: true },
+        orderBy: [{ componentCode: 'asc' }, { id: 'asc' }],
+      },
     },
   });
   const sections = Object.fromEntries(
@@ -34,6 +38,7 @@ export async function copySyllabusRevision(
       ...sections,
       sourceRequestId: copy.sourceRequestId,
       baseRevisionId: from.id,
+      failingScore: from.failingScore,
     },
     select: { id: true },
   });
@@ -69,6 +74,30 @@ export async function copySyllabusRevision(
       return cloId ? [{ weeklyContentId: id, cloId }] : [];
     });
     if (links.length > 0) await tx.weeklyContentCLO.createMany({ data: links });
+  }
+  for (const component of from.assessmentComponents) {
+    const { id } = await tx.assessmentComponent.create({
+      data: {
+        syllabusId: created.id,
+        componentCode: component.componentCode,
+        componentName: component.componentName,
+        weight: component.weight,
+        assessmentForm: component.assessmentForm,
+        isConditional: component.isConditional,
+        conditionThreshold: component.conditionThreshold,
+        failingScore: component.failingScore,
+      },
+      select: { id: true },
+    });
+    const links = component.mappings.flatMap((link) => {
+      const cloId = newCloByOld.get(link.cloId);
+      return cloId
+        ? [{ assessmentComponentId: id, cloId, cloWeight: link.cloWeight }]
+        : [];
+    });
+    if (links.length > 0) {
+      await tx.assessmentCLOMapping.createMany({ data: links });
+    }
   }
   return created.id;
 }

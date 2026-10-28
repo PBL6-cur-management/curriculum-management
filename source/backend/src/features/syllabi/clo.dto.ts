@@ -71,9 +71,12 @@ export class CloDto {
     description: 'Codes of the programs that link this CLO to a PLO, sorted',
   })
   linkedPrograms!: string[];
+  @ApiProperty({
+    description: 'Assessment components mapped to this CLO in this revision',
+  })
+  assessmentLinkCount!: number;
 }
 
-// F-12 adds the assessment usage to this include and to the delete confirmation.
 export const CLO_INCLUDE = {
   ploLinks: {
     select: {
@@ -90,6 +93,7 @@ export const CLO_INCLUDE = {
       },
     },
   },
+  _count: { select: { assessmentLinks: true } },
 } as const satisfies Prisma.CLOInclude;
 export type CloRow = Prisma.CLOGetPayload<{ include: typeof CLO_INCLUDE }>;
 
@@ -107,5 +111,6 @@ export function toCloDto(row: CloRow): CloDto {
     cognitiveLevel: row.cognitiveLevel,
     sortOrder: row.sortOrder,
     linkedPrograms: [...programs].sort(),
+    assessmentLinkCount: row._count.assessmentLinks,
   };
 }

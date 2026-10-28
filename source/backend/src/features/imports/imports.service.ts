@@ -12,6 +12,10 @@ import { AppException } from '../../shared/exception/app.exception.js';
 import { COMMON_ERRORS } from '../../shared/exception/error-codes.js';
 import { uploadedFileName } from '../../shared/files/uploaded-file-name.js';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
+import {
+  assertStudentImport,
+  holdsStudentImport,
+} from '../../shared/students/student-access.js';
 import { CreateImportDto, ImportListQueryDto } from './dto/import.dto.js';
 import type {
   ImportBatchDetailDto,
@@ -23,6 +27,7 @@ import {
   assertSupported,
   IMPORT_TYPE_SUPPORT,
   IMPORT_VERSION_SELECT,
+  isStudentImportType,
   programScope,
 } from './import-access.js';
 import {
@@ -44,9 +49,23 @@ import {
 } from './import-mapping.js';
 import { readImportSheet } from './import-validation.js';
 import { ImportsReader } from './imports.reader.js';
+import {
+  ACADEMIC_RESULT_SHEET,
+  RESULT_IDENTITY_COLUMNS,
+} from './sheets/academic-result.sheet.js';
 import { COURSE_CATALOG_SHEET } from './sheets/course-catalog.sheet.js';
 import { CURRICULUM_SHEET } from './sheets/curriculum.sheet.js';
 import { writeTemplate } from './sheets/sheet-writer.js';
+import {
+  STUDENT_IDENTITY_COLUMNS,
+  STUDENT_LIST_SHEET,
+} from './sheets/student-list.sheet.js';
+import {
+  ACADEMIC_RESULT_INSTRUCTIONS,
+  STUDENT_LIST_INSTRUCTIONS,
+  writeIdentityTemplate,
+} from './sheets/student-template.js';
+import { StudentCredentialsService } from './student-credentials.service.js';
 
 @Injectable()
 export class ImportsService {
@@ -55,6 +74,7 @@ export class ImportsService {
     @InjectQueue(IMPORT_QUEUE)
     private readonly queue: Queue<ImportJobData, void, ImportJobName>,
     private readonly reader: ImportsReader,
+    private readonly credentials: StudentCredentialsService,
   ) {}
 
   types(access: AccessContext): ImportTypeOptionDto[] {
@@ -66,6 +86,11 @@ export class ImportsService {
       });
     if (access.has(PERMISSIONS.CURRICULUM_IMPORT_EXPORT_EXCEL))
       types.push({ importType: ImportType.CURRICULUM, needsVersion: true });
+    if (holdsStudentImport(access))
+      types.push(
+        { importType: ImportType.STUDENT_LIST, needsVersion: false },
+        { importType: ImportType.ACADEMIC_RESULT, needsVersion: false },
+      );
     return types;
   }
 
@@ -106,6 +131,24 @@ export class ImportsService {
 
   async template(importType: ImportType, access: AccessContext) {
     assertSupported(importType);
+    if (isStudentImportType(importType)) {
+      assertStudentImport(access);
+      return {
+        content:
+          importType === ImportType.STUDENT_LIST
+            ? await writeIdentityTemplate(
+                STUDENT_LIST_SHEET,
+                STUDENT_IDENTITY_COLUMNS,
+                STUDENT_LIST_INSTRUCTIONS,
+              )
+            : await writeIdentityTemplate(
+                ACADEMIC_RESULT_SHEET,
+                RESULT_IDENTITY_COLUMNS,
+                ACADEMIC_RESULT_INSTRUCTIONS,
+              ),
+        fileName: `${importType}_mau${XLSX_EXTENSION}`,
+      };
+    }
     if (importType === ImportType.COURSE_CATALOG) assertCatalogImport(access);
     else if (!access.has(PERMISSIONS.CURRICULUM_IMPORT_EXPORT_EXCEL))
       throw new AppException(COMMON_ERRORS.PERMISSION_DENIED);
@@ -138,7 +181,11 @@ export class ImportsService {
     const version = dto.versionId
       ? await this.assertVersion(dto.versionId, access)
       : null;
-    if (!version) assertCatalogImport(access);
+    if (isStudentImportType(dto.importType)) {
+      assertStudentImport(access);
+      if (dto.importType === ImportType.STUDENT_LIST)
+        this.credentials.assertConfigured();
+    } else if (!version) assertCatalogImport(access);
     const parsed = await readImportSheet(dto.importType, file.buffer);
     const invalid = parsed.sheet.formatErrors.length > 0;
     const row = await this.prisma.importBatch.create({
@@ -204,6 +251,10 @@ export class ImportsService {
       if (!batch.versionId)
         throw new AppException(IMPORT_ERRORS.VERSION_NOT_FOUND);
       await this.assertVersion(batch.versionId, access);
+    } else if (isStudentImportType(batch.importType)) {
+      assertStudentImport(access);
+      if (batch.importType === ImportType.STUDENT_LIST)
+        this.credentials.assertConfigured();
     } else assertCatalogImport(access);
     const report = fromReportJson(batch.errorReport);
     if (

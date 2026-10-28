@@ -106,7 +106,12 @@ describe('InitialReleasePage (MH-45)', () => {
             courseId: 'c3',
             courseCode: 'IT003',
             code: 'SYLLABUS_INCOMPLETE',
-            details: ['COURSE_DESCRIPTION_EMPTY', 'OBJECTIVES_EMPTY'],
+            details: [
+              'COURSE_DESCRIPTION_EMPTY',
+              'OBJECTIVES_EMPTY',
+              'ASSESSMENT_FORMULA_EMPTY',
+              'ASSESSMENT_CLO_UNCOVERED',
+            ],
           },
         ],
       }),
@@ -119,7 +124,9 @@ describe('InitialReleasePage (MH-45)', () => {
     expect(screen.queryByText('Học phần IT002 chưa có đề cương.')).toBeNull();
     expect(screen.getByText(/Chưa có đề cương/)).toBeInTheDocument();
     expect(
-      screen.getByText(/chưa có mô tả học phần; chưa có mục tiêu học phần/),
+      screen.getByText(
+        /chưa có mô tả học phần; chưa có mục tiêu học phần; chưa khai báo công thức điểm; còn CLO chưa được đánh giá/,
+      ),
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Ban hành' })).toBeDisabled();
   });

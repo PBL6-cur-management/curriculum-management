@@ -27,6 +27,8 @@ import { WARNING_SEVERITY } from '../../shared/curriculum/curriculum-warnings.js
 import { AppException } from '../../shared/exception/app.exception.js';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
 import { todayDate } from '../../shared/time/today.js';
+import { ASSESSMENT_ERRORS } from '../../shared/syllabi/grade-formula.errors.js';
+import { assessmentBlockers } from './assessment-blockers.js';
 import { ChangeRequestDetailReader } from './change-request-detail.reader.js';
 import { SUBMISSION_ERRORS } from './change-request-feature.errors.js';
 import type { ChangeRequestDetailDto } from './change-request-response.dto.js';
@@ -86,6 +88,7 @@ export class SubmissionService {
           })),
       );
     }
+    issues.push(...(await assessmentBlockers(this.prisma, request, false)));
     let plan: RoutingPlan = { steps: [], affectedPrograms: [] };
     try {
       plan = await this.routing.plan(
@@ -126,6 +129,16 @@ export class SubmissionService {
         // F-08: a framework with errors cannot be submitted; the lock keeps a catalog edge from landing between check and write.
         await lockRequisiteGraph(tx);
         await this.checker.assertPasses(copyId, tx);
+      }
+      const blockers = await assessmentBlockers(tx, request, true);
+      if (blockers.length > 0) {
+        throw new AppException(
+          ASSESSMENT_ERRORS.NOT_READY,
+          blockers.map((blocker) => ({
+            field: blocker.code,
+            constraints: [blocker.message],
+          })),
+        );
       }
       if (await this.stale.isStale(tx, request)) {
         throw new AppException(SUBMISSION_ERRORS.STALE_BASE);

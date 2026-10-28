@@ -108,6 +108,21 @@ describe('WorkingCopyService', () => {
     });
   });
 
+  it('copies the published revision for a grading-formula request', async () => {
+    await service.create(
+      tx,
+      owner({
+        requestType: ChangeRequestType.GRADING_FORMULA,
+        targetType: ChangeTargetType.COURSE,
+        programId: null,
+        courseId: 'c1',
+      }),
+    );
+    expect(copySyllabusRevision).toHaveBeenCalledWith(tx, 's-base', {
+      sourceRequestId: 'cr1',
+    });
+  });
+
   it('makes a program copy for an outcome request on a program and a syllabus copy on a course', async () => {
     await service.create(tx, owner({ requestType: ChangeRequestType.OUTCOME }));
     expect(programVersion.create).toHaveBeenCalledOnce();

@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import type { Prisma } from '../../generated/prisma/client.js';
 import type { AccessContext } from '../../shared/authz/access-context.js';
 import { PERMISSIONS } from '../../shared/authz/permission-codes.js';
 import { AppException } from '../../shared/exception/app.exception.js';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
 import { mapUniqueViolation } from '../../shared/prisma/unique-violation.js';
+import { lockSyllabusAssessment } from '../../shared/syllabi/syllabus-assessment-lock.js';
 import {
   assertDraftWrite,
   SYLLABUS_ACCESS_SELECT,
@@ -43,6 +45,7 @@ export class ClosService {
       PERMISSIONS.CLO_EDIT,
     );
     return this.prisma.$transaction(async (tx) => {
+      await this.lockAndRecheck(tx, syllabusId, access);
       const count = await tx.cLO.count({ where: { syllabusId } });
       if (count >= SYLLABUS_LIMITS.CLOS_MAX) {
         throw new AppException(SYLLABUS_ERRORS.CLOS_LIMIT);
@@ -84,6 +87,7 @@ export class ClosService {
       PERMISSIONS.CLO_EDIT,
     );
     return this.prisma.$transaction(async (tx) => {
+      await this.lockAndRecheck(tx, row.syllabusId, access);
       try {
         const updated = await tx.cLO.update({
           where: { id: cloId },
@@ -123,6 +127,7 @@ export class ClosService {
       PERMISSIONS.CLO_EDIT,
     );
     await this.prisma.$transaction(async (tx) => {
+      await this.lockAndRecheck(tx, row.syllabusId, access);
       await tx.cLO.delete({ where: { id: cloId } });
       const rest = await tx.cLO.findMany({
         where: { syllabusId: row.syllabusId },
@@ -148,6 +153,7 @@ export class ClosService {
       PERMISSIONS.CLO_EDIT,
     );
     return this.prisma.$transaction(async (tx) => {
+      await this.lockAndRecheck(tx, syllabusId, access);
       const rows = await tx.cLO.findMany({
         where: { syllabusId },
         select: { id: true },
@@ -173,6 +179,25 @@ export class ClosService {
       });
       return ordered.map(toCloDto);
     });
+  }
+
+  // A CLO change can reopen coverage warnings, so it queues behind submission and release on the same locks and
+  // judges access again once it holds them.
+  private async lockAndRecheck(
+    tx: Prisma.TransactionClient,
+    syllabusId: string,
+    access: AccessContext,
+  ): Promise<void> {
+    await lockSyllabusAssessment(tx, syllabusId);
+    await assertDraftWrite(
+      tx,
+      access,
+      await tx.syllabus.findUnique({
+        where: { id: syllabusId },
+        select: SYLLABUS_ACCESS_SELECT,
+      }),
+      PERMISSIONS.CLO_EDIT,
+    );
   }
 
   private findRevision(syllabusId: string): Promise<SyllabusAccessRow | null> {

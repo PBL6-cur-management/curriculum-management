@@ -18,6 +18,12 @@ const initial: Syllabus = {
   weeklyContents: [],
   attachments: [],
   clos: [],
+  gradingFormula: {
+    failingScore: null,
+    totalWeight: '0',
+    components: [],
+    warnings: [],
+  },
 };
 
 describe('changedSections', () => {

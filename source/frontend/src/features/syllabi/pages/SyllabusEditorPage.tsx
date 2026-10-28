@@ -1,5 +1,14 @@
-import { Alert, Flex, Result, Skeleton, Tabs, Tooltip, Typography } from 'antd';
-import { useState } from 'react';
+import {
+  Alert,
+  App,
+  Flex,
+  Result,
+  Skeleton,
+  Tabs,
+  Tooltip,
+  Typography,
+} from 'antd';
+import { useCallback, useState } from 'react';
 import { generatePath, Link, useParams, useSearchParams } from 'react-router';
 import { ROUTES } from '../../../routes';
 import { ApiError } from '../../../shared/api/client';
@@ -10,35 +19,51 @@ import {
 import { RequestDraftBanner } from '../../../shared/change-requests/RequestDraftBanner';
 import { ProgramsUsingList } from '../../../shared/courses/ProgramsUsingList';
 import { AttachmentPanel } from '../components/AttachmentPanel';
+import { AssessmentCloTab } from '../components/AssessmentCloTab';
 import { CloTab } from '../components/CloTab';
+import { GradeFormulaTab } from '../components/GradeFormulaTab';
 import { SyllabusContentForm } from '../components/SyllabusContentForm';
 import { WeeklyContentTable } from '../components/WeeklyContentTable';
 import {
   BACK_TO_SYLLABUS,
   CLO_TAB_DISABLED_TOOLTIP,
+  CONTENT_TAB_DISABLED_TOOLTIP,
   EDITOR_TAB_LABELS,
+  GRADING_TAB_DISABLED_TOOLTIP,
+  LEAVE_TAB_BODY,
+  LEAVE_TAB_CANCEL,
+  LEAVE_TAB_OK,
+  LEAVE_TAB_TITLE,
   NOT_DIRECTLY_EDITABLE,
   PROGRAMS_USING_NOTICE,
 } from '../constants/syllabusLabels';
 import { useCourseSyllabus } from '../hooks/useSyllabus';
 import type { EditorTabProps } from '../types';
 
-// The order users see; F-12 appends the grading formula and mapping tabs after the CLO tab.
+// The order users see. Each tab is enabled by the right that writes it: text, weekly rows and files by syllabus.edit,
+// CLOs by clo.edit, formula and mappings by gradingFormula.edit.
+const contentRight = (props: EditorTabProps) => props.canEditContent;
 const EDITOR_TABS = [
   {
     key: 'content',
     label: EDITOR_TAB_LABELS.content,
     render: (props: EditorTabProps) => <SyllabusContentForm {...props} />,
+    enabled: contentRight,
+    disabledHint: CONTENT_TAB_DISABLED_TOOLTIP,
   },
   {
     key: 'weekly',
     label: EDITOR_TAB_LABELS.weekly,
     render: (props: EditorTabProps) => <WeeklyContentTable {...props} />,
+    enabled: contentRight,
+    disabledHint: CONTENT_TAB_DISABLED_TOOLTIP,
   },
   {
     key: 'attachments',
     label: EDITOR_TAB_LABELS.attachments,
     render: (props: EditorTabProps) => <AttachmentPanel {...props} />,
+    enabled: contentRight,
+    disabledHint: CONTENT_TAB_DISABLED_TOOLTIP,
   },
   {
     key: 'clos',
@@ -47,6 +72,20 @@ const EDITOR_TABS = [
     // CLOs are written with clo.edit, not syllabus.edit; the tab stays visible but off without it.
     enabled: (props: EditorTabProps) => props.canEditClos,
     disabledHint: CLO_TAB_DISABLED_TOOLTIP,
+  },
+  {
+    key: 'formula',
+    label: EDITOR_TAB_LABELS.formula,
+    render: (props: EditorTabProps) => <GradeFormulaTab {...props} />,
+    enabled: (props: EditorTabProps) => props.canEditGradingFormula,
+    disabledHint: GRADING_TAB_DISABLED_TOOLTIP,
+  },
+  {
+    key: 'mapping',
+    label: EDITOR_TAB_LABELS.mapping,
+    render: (props: EditorTabProps) => <AssessmentCloTab {...props} />,
+    enabled: (props: EditorTabProps) => props.canEditGradingFormula,
+    disabledHint: GRADING_TAB_DISABLED_TOOLTIP,
   },
 ] satisfies readonly EditorTab[];
 
@@ -60,10 +99,13 @@ interface EditorTab {
 
 export function SyllabusEditorPage() {
   const { courseId = '' } = useParams();
+  const { modal } = App.useApp();
   const [searchParams] = useSearchParams();
   const requestId = searchParams.get(REQUEST_ID_PARAM) ?? undefined;
-  const initialTab = searchParams.get(TAB_PARAM) ?? EDITOR_TABS[0].key;
-  const [activeTab, setActiveTab] = useState(initialTab);
+  const requestedTab = searchParams.get(TAB_PARAM) ?? EDITOR_TABS[0].key;
+  const [chosenTab, setChosenTab] = useState(requestedTab);
+  const [dirty, setDirty] = useState(false);
+  const onDirtyChange = useCallback((value: boolean) => setDirty(value), []);
   const { data, isPending, error } = useCourseSyllabus(courseId, requestId);
   if (isPending) return <Skeleton active />;
   if (!data) {
@@ -80,12 +122,14 @@ export function SyllabusEditorPage() {
     programsUsing,
     attachmentRules,
     canEditClos,
+    canEditGradingFormula,
   } = data;
+  const canEditContent = editPath === 'DIRECT';
   const backBase = generatePath(ROUTES.syllabus, { courseId });
   const backLink = requestId
     ? `${backBase}?${REQUEST_ID_PARAM}=${encodeURIComponent(requestId)}`
     : backBase;
-  if (!draft || editPath !== 'DIRECT')
+  if (!draft || !(canEditContent || canEditClos || canEditGradingFormula))
     return (
       <Result
         status="info"
@@ -98,7 +142,43 @@ export function SyllabusEditorPage() {
     syllabus: draft,
     attachmentRules,
     canEditClos,
+    canEditContent,
+    canEditGradingFormula,
+    onDirtyChange,
+    onNavigateTab: (tabKey) => goTo(tabKey),
   };
+  // A request's copy carries no attachments; the request has its own documents.
+  const shownTabs = EDITOR_TABS.filter(
+    (tab) => !(draft.sourceRequest && tab.key === 'attachments'),
+  );
+  const isEnabled = (tab: EditorTab) =>
+    tab.enabled ? tab.enabled(tabProps) : true;
+  // A link that names a tab the caller cannot use lands on the first one they can.
+  const activeTab = shownTabs.some(
+    (tab) => tab.key === chosenTab && isEnabled(tab),
+  )
+    ? chosenTab
+    : (shownTabs.find(isEnabled)?.key ?? chosenTab);
+
+  function goTo(tabKey: string) {
+    if (tabKey === activeTab) return;
+    if (!dirty) {
+      setChosenTab(tabKey);
+      return;
+    }
+    modal.confirm({
+      title: LEAVE_TAB_TITLE,
+      content: LEAVE_TAB_BODY,
+      okText: LEAVE_TAB_OK,
+      cancelText: LEAVE_TAB_CANCEL,
+      okButtonProps: { danger: true },
+      onOk: () => {
+        setDirty(false);
+        setChosenTab(tabKey);
+      },
+    });
+  }
+
   return (
     <Flex vertical gap="middle">
       <Flex justify="space-between" align="center" wrap gap="small">
@@ -116,12 +196,9 @@ export function SyllabusEditorPage() {
       />
       <Tabs
         activeKey={activeTab}
-        onChange={setActiveTab}
-        items={EDITOR_TABS.filter(
-          // A request's copy carries no attachments; the request has its own documents.
-          (tab) => !(draft.sourceRequest && tab.key === 'attachments'),
-        ).map((tab: EditorTab) => {
-          const disabled = tab.enabled ? !tab.enabled(tabProps) : false;
+        onChange={goTo}
+        items={shownTabs.map((tab: EditorTab) => {
+          const disabled = !isEnabled(tab);
           return {
             key: tab.key,
             label: disabled ? (

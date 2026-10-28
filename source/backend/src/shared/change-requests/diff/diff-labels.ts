@@ -13,6 +13,9 @@ export const DIFF_SECTION_ORDER: readonly string[] = [
   SNAPSHOT_ENTITY.SYLLABUS_FIELD,
   SNAPSHOT_ENTITY.WEEKLY_CONTENTS,
   SNAPSHOT_ENTITY.CLO,
+  SNAPSHOT_ENTITY.FORMULA,
+  SNAPSHOT_ENTITY.COMPONENT,
+  SNAPSHOT_ENTITY.CLO_MAPPING,
   AUTHORED_ENTITY.COURSE_FIELD,
   AUTHORED_ENTITY.COURSE_RELATION,
   AUTHORED_ENTITY.ORG_MEMBERSHIP,
@@ -30,6 +33,9 @@ export const DIFF_SECTION_TITLES: Record<string, string> = {
   [SNAPSHOT_ENTITY.SYLLABUS_FIELD]: 'Nội dung đề cương',
   [SNAPSHOT_ENTITY.WEEKLY_CONTENTS]: 'Nội dung theo tuần',
   [SNAPSHOT_ENTITY.CLO]: 'Chuẩn đầu ra học phần (CLO)',
+  [SNAPSHOT_ENTITY.FORMULA]: 'Công thức điểm',
+  [SNAPSHOT_ENTITY.COMPONENT]: 'Thành phần đánh giá',
+  [SNAPSHOT_ENTITY.CLO_MAPPING]: 'Ánh xạ thành phần–CLO',
   [AUTHORED_ENTITY.COURSE_FIELD]: 'Thông tin học phần',
   [AUTHORED_ENTITY.COURSE_RELATION]: 'Quan hệ học phần',
   [AUTHORED_ENTITY.ORG_MEMBERSHIP]: 'Thành viên nhóm chuyên môn',
@@ -105,6 +111,12 @@ export const DIFF_FIELD_LABELS: Record<string, string> = {
   validTo: 'Đến ngày',
   lecturer: 'Giảng viên',
   director: 'Người được phân công',
+  componentName: 'Tên thành phần',
+  assessmentForm: 'Hình thức đánh giá',
+  isConditional: 'Điều kiện',
+  conditionThreshold: 'Ngưỡng điều kiện',
+  failingScore: 'Điểm liệt',
+  cloWeight: 'Trọng số CLO',
 };
 
 // Values that hold rich text: printed as plain text in the diff.
@@ -114,4 +126,5 @@ export const BOOLEAN_FIELDS: ReadonlySet<string> = new Set([
   'htDa',
   'tqDa',
   'linked',
+  'isConditional',
 ]);

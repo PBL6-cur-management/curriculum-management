@@ -124,6 +124,39 @@ describe('SyllabusPage', () => {
     );
   });
 
+  it('offers a grading request, and no content request, to someone who may only propose grading changes', async () => {
+    renderPage(
+      courseSyllabus({ editPath: null, gradingEditPath: 'VIA_REQUEST' }),
+    );
+    expect(
+      (
+        await screen.findByRole('button', {
+          name: 'Đề xuất sửa công thức điểm',
+        })
+      ).closest('a'),
+    ).toHaveAttribute(
+      'href',
+      '/change-requests/new?type=GRADING_FORMULA&targetType=COURSE&targetId=c1',
+    );
+    expect(
+      screen.queryByRole('button', { name: 'Tạo đề xuất' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('sends a grading-only editor straight to the formula tab', async () => {
+    renderPage(
+      courseSyllabus({
+        editPath: null,
+        gradingEditPath: 'DIRECT',
+        canEditGradingFormula: true,
+      }),
+    );
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Sửa công thức điểm' }),
+    );
+    expect(await screen.findByText('Màn sửa')).toBeInTheDocument();
+  });
+
   it('offers editing of the Draft by the direct path', async () => {
     renderPage(courseSyllabus());
     fireEvent.click(

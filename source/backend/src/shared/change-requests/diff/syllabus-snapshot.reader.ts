@@ -6,6 +6,7 @@ import { SNAPSHOT_ENTITY, type SnapshotEntry } from './snapshot-entry.js';
 import { entry, scalar } from './snapshot-scalar.js';
 
 const WEEKS_KEY = 'weeks';
+const FORMULA_KEY = 'failingScore';
 
 // Weeks are one item: reordering or retitling weeks has no stable key per row, so they compare as one text.
 export async function readSyllabusSnapshot(
@@ -22,6 +23,12 @@ export async function readSyllabusSnapshot(
         },
       },
       clos: { orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }] },
+      assessmentComponents: {
+        orderBy: [{ componentCode: 'asc' }, { id: 'asc' }],
+        include: {
+          mappings: { include: { clo: { select: { cloCode: true } } } },
+        },
+      },
     },
   });
   return [
@@ -48,6 +55,40 @@ export async function readSyllabusSnapshot(
         cognitiveLevel: clo.cognitiveLevel,
         sortOrder: scalar(clo.sortOrder),
       }),
+    ),
+    entry(
+      SNAPSHOT_ENTITY.FORMULA,
+      FORMULA_KEY,
+      'Điểm liệt của học phần',
+      row.id,
+      { failingScore: scalar(row.failingScore) },
+    ),
+    ...row.assessmentComponents.map((component) =>
+      entry(
+        SNAPSHOT_ENTITY.COMPONENT,
+        component.componentCode,
+        component.componentCode,
+        component.id,
+        {
+          componentName: component.componentName,
+          weight: scalar(component.weight),
+          assessmentForm: component.assessmentForm,
+          isConditional: scalar(component.isConditional),
+          conditionThreshold: scalar(component.conditionThreshold),
+          failingScore: scalar(component.failingScore),
+        },
+      ),
+    ),
+    ...row.assessmentComponents.flatMap((component) =>
+      component.mappings.map((mapping) =>
+        entry(
+          SNAPSHOT_ENTITY.CLO_MAPPING,
+          `${component.componentCode}/${mapping.clo.cloCode}`,
+          `${component.componentCode} – ${mapping.clo.cloCode}`,
+          mapping.id,
+          { cloWeight: scalar(mapping.cloWeight) },
+        ),
+      ),
     ),
   ];
 }

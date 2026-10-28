@@ -6,6 +6,9 @@ import {
   type Prisma,
 } from '../../generated/prisma/client.js';
 import type { CourseUsageReader } from '../../shared/courses/course-usage.reader.js';
+import type { AppliedProgramVersionReader } from '../../shared/releases/applied-program-version.reader.js';
+import type { StudentAccountProvisioner } from '../../shared/students/student-account.provisioner.js';
+import type { StudentCredentialsService } from './student-credentials.service.js';
 import type { PrismaService } from '../../shared/prisma/prisma.service.js';
 import {
   IMPORT_JOB,
@@ -38,6 +41,7 @@ describe('ImportsProcessor', () => {
   let raw: ReturnType<typeof vi.fn>;
   let queryRaw: ReturnType<typeof vi.fn>;
   let scheduler: ReturnType<typeof vi.fn>;
+  let purgeExpired: ReturnType<typeof vi.fn>;
   let closeQueue: ReturnType<typeof vi.fn>;
   let closeBackend: ReturnType<typeof vi.fn>;
   const batch = (status: ImportBatchStatus = ImportBatchStatus.VALIDATING) => ({
@@ -72,6 +76,7 @@ describe('ImportsProcessor', () => {
       (run: (tx: Prisma.TransactionClient) => Promise<void>) => run(prisma),
     );
     scheduler = vi.fn().mockResolvedValue({});
+    purgeExpired = vi.fn().mockResolvedValue(0);
     closeQueue = vi.fn().mockResolvedValue(undefined);
     closeBackend = vi.fn().mockResolvedValue(undefined);
     prisma = {
@@ -90,6 +95,9 @@ describe('ImportsProcessor', () => {
         close: closeQueue,
         getBackend: () => ({ close: closeBackend }),
       } as unknown as Queue<ImportJobData, void>,
+      {} as AppliedProgramVersionReader,
+      { purgeExpired } as unknown as StudentCredentialsService,
+      {} as StudentAccountProvisioner,
     );
     vi.mocked(readImportSheet).mockResolvedValue({
       importType: ImportType.COURSE_CATALOG,

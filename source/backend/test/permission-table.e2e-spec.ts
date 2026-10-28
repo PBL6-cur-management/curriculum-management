@@ -91,6 +91,9 @@ describe('permission table', () => {
 
   async function countWrites(path: string): Promise<number> {
     if (path.startsWith('/api/imports')) return prisma.importBatch.count();
+    if (path.startsWith('/api/students')) {
+      return prisma.programEnrollment.count();
+    }
     if (path.startsWith('/api/org-units')) return prisma.orgUnit.count();
     if (path.startsWith('/api/semesters')) return prisma.semester.count();
     if (path.startsWith('/api/cohorts')) return prisma.cohort.count();

@@ -416,11 +416,15 @@ describe('semesters, cohorts and the first release (F-15)', () => {
         expect.objectContaining({
           courseCode: courses[1].courseCode,
           code: 'SYLLABUS_INCOMPLETE',
-          details: ['COURSE_DESCRIPTION_EMPTY', 'OBJECTIVES_EMPTY'],
+          details: [
+            'COURSE_DESCRIPTION_EMPTY',
+            'OBJECTIVES_EMPTY',
+            'ASSESSMENT_FORMULA_EMPTY',
+          ],
         }),
         expect.objectContaining({
           courseCode: courses[2].courseCode,
-          details: ['COURSE_DESCRIPTION_EMPTY'],
+          details: ['COURSE_DESCRIPTION_EMPTY', 'ASSESSMENT_FORMULA_EMPTY'],
         }),
       ]);
 
@@ -596,6 +600,7 @@ describe('semesters, cohorts and the first release (F-15)', () => {
         .set(CSRF)
         .send({ links: [{ cloId: clo.body.id, ploId: plo.id }] })
         .expect(200);
+      await makeSyllabusReady(admin, courses[0].id);
 
       await releaseViaApi(app, admin, {
         programId,

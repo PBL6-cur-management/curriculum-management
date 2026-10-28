@@ -467,6 +467,7 @@ describe('final approval, fan-out and activation (US-072, US-073, US-075, MH-43)
             .expect(201)
         ).body.id;
       }
+      await makeSyllabusReady(admin, course.id);
       const programs: { programId: string; versionId: string }[] = [];
       for (let index = 0; index < 4; index += 1) {
         const program = await createProgram(app, { programCode: code('FAQ') });

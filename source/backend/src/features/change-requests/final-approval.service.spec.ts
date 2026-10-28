@@ -69,6 +69,7 @@ describe('FinalApprovalService', () => {
       update: ReturnType<typeof vi.fn>;
     };
     semester: { findUnique: ReturnType<typeof vi.fn> };
+    changeItem: { count: ReturnType<typeof vi.fn> };
     $executeRaw: ReturnType<typeof vi.fn>;
   };
   let recorder: Record<string, ReturnType<typeof vi.fn>>;
@@ -99,6 +100,7 @@ describe('FinalApprovalService', () => {
           startDate: FUTURE,
         }),
       },
+      changeItem: { count: vi.fn().mockResolvedValue(0) },
       $executeRaw: vi.fn(step('graph-lock')),
     };
     recorder = {
@@ -293,6 +295,39 @@ describe('FinalApprovalService', () => {
         ).toBe(true);
       });
 
+      it('refuses a started semester for grading changes even from the academic office with the flag set', async () => {
+        db.semester.findUnique.mockResolvedValue({
+          id: 'sem',
+          semesterCode: 'old',
+          startDate: PAST,
+        });
+        db.changeRequest.findUniqueOrThrow.mockResolvedValue({
+          ...request,
+          requestType: ChangeRequestType.OUTCOME,
+          createdByAcademicOffice: true,
+        });
+        db.changeItem.count.mockResolvedValue(2);
+
+        await expect(
+          service.approve('r1', { ...dto, allowPastSemester: true }, OFFICE),
+        ).rejects.toMatchObject({ code: 'SEMESTER_ALREADY_STARTED' });
+        expect(applier.apply).not.toHaveBeenCalled();
+        expect(db.changeItem.count).toHaveBeenCalledWith({
+          where: {
+            changeRequestId: 'r1',
+            entityType: { in: ['FORMULA', 'COMPONENT', 'CLO_MAPPING'] },
+          },
+        });
+      });
+
+      it('lets a grading change into a future semester', async () => {
+        db.changeItem.count.mockResolvedValue(1);
+
+        await service.approve('r1', dto, OFFICE);
+
+        expect(applier.apply).toHaveBeenCalled();
+      });
+
       it('never marks a future semester as past, whatever the flag says', async () => {
         db.changeRequest.findUniqueOrThrow.mockResolvedValue({
           ...request,
@@ -313,22 +348,27 @@ describe('FinalApprovalService', () => {
   });
 
   describe('who may call', () => {
-    it('keeps organisational and grading-formula requests on the plain approve', async () => {
-      for (const requestType of [
-        ChangeRequestType.ORGANIZATION,
-        ChangeRequestType.GRADING_FORMULA,
-      ]) {
-        db.changeRequest.findFirst.mockResolvedValue({
-          ...request,
-          requestType,
-        });
-        await expect(service.approve('r1', dto, OFFICE)).rejects.toMatchObject({
-          code: 'FINAL_APPROVAL_NOT_APPLICABLE',
-        });
-        await expect(service.preview('r1', OFFICE)).rejects.toMatchObject({
-          code: 'FINAL_APPROVAL_NOT_APPLICABLE',
-        });
-      }
+    it('keeps organisational requests on the plain approve', async () => {
+      db.changeRequest.findFirst.mockResolvedValue({
+        ...request,
+        requestType: ChangeRequestType.ORGANIZATION,
+      });
+      await expect(service.approve('r1', dto, OFFICE)).rejects.toMatchObject({
+        code: 'FINAL_APPROVAL_NOT_APPLICABLE',
+      });
+      await expect(service.preview('r1', OFFICE)).rejects.toMatchObject({
+        code: 'FINAL_APPROVAL_NOT_APPLICABLE',
+      });
+    });
+
+    it('lets a grading-formula request reach final approval', async () => {
+      db.changeRequest.findFirst.mockResolvedValue({
+        ...request,
+        requestType: ChangeRequestType.GRADING_FORMULA,
+      });
+      await expect(service.approve('r1', dto, OFFICE)).resolves.toEqual({
+        id: 'r1',
+      });
     });
 
     it('refuses the creator, even a creator who is in the academic office', async () => {

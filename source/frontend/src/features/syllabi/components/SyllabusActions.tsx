@@ -1,11 +1,18 @@
-import { App, Button } from 'antd';
+import { App, Button, Flex } from 'antd';
 import { generatePath, useNavigate } from 'react-router';
 import { ROUTES } from '../../../routes';
-import { REQUEST_ID_PARAM } from '../../../shared/change-requests/requestParams';
+import {
+  REQUEST_ID_PARAM,
+  TAB_PARAM,
+} from '../../../shared/change-requests/requestParams';
 import { CreateRequestButton } from '../../../shared/change-requests/CreateRequestButton';
 import { errorMessage } from '../../../shared/forms/applyFieldErrors';
 import type { CourseSyllabus } from '../api/syllabi';
-import { CREATE_SYLLABUS, EDIT_SYLLABUS } from '../constants/syllabusLabels';
+import {
+  CREATE_SYLLABUS,
+  EDIT_GRADING,
+  EDIT_SYLLABUS,
+} from '../constants/syllabusLabels';
 import { useCreateSyllabus } from '../hooks/useSyllabus';
 
 interface SyllabusActionsProps {
@@ -43,8 +50,8 @@ export function SyllabusActions({ data }: SyllabusActionsProps) {
         {CREATE_SYLLABUS}
       </Button>
     );
-  if (data.editPath === 'VIA_REQUEST' && !copy)
-    return (
+  const contentAction =
+    data.editPath === 'VIA_REQUEST' && !copy ? (
       <CreateRequestButton
         prefill={{
           type: 'SYLLABUS_CONTENT',
@@ -52,10 +59,39 @@ export function SyllabusActions({ data }: SyllabusActionsProps) {
           targetId: data.course.id,
         }}
       />
-    );
-  if (data.editPath === 'DIRECT' && data.draft)
-    return (
+    ) : data.editPath === 'DIRECT' && data.draft ? (
       <Button onClick={() => void navigate(editorPath)}>{EDIT_SYLLABUS}</Button>
-    );
-  return null;
+    ) : null;
+  // The editor already opens every tab the caller may use, so a separate grading action is only for callers
+  // who cannot edit the text directly.
+  const gradingAction =
+    data.gradingEditPath === 'VIA_REQUEST' && !copy ? (
+      <CreateRequestButton
+        label="Đề xuất sửa công thức điểm"
+        prefill={{
+          type: 'GRADING_FORMULA',
+          targetType: 'COURSE',
+          targetId: data.course.id,
+        }}
+      />
+    ) : data.gradingEditPath === 'DIRECT' &&
+      data.draft &&
+      data.editPath !== 'DIRECT' ? (
+      <Button
+        onClick={() =>
+          void navigate(
+            `${editorPath}${editorPath.includes('?') ? '&' : '?'}${TAB_PARAM}=formula`,
+          )
+        }
+      >
+        {EDIT_GRADING}
+      </Button>
+    ) : null;
+  if (!contentAction && !gradingAction) return null;
+  return (
+    <Flex gap="small" wrap>
+      {contentAction}
+      {gradingAction}
+    </Flex>
+  );
 }

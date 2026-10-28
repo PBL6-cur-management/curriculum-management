@@ -27,18 +27,19 @@ Tệp này ghi những gì **đã có migration** trong `source/backend/prisma/`
 
 ## Database Configuration
 
-| Mục | Giá trị |
-|---|---|
-| Hệ quản trị | PostgreSQL 18, ảnh Debian |
-| Quy tắc so sánh | ICU `vi-VN`, đặt lúc tạo cơ sở dữ liệu; `PrismaService` dừng ứng dụng nếu sai |
-| Truy cập | Prisma 7.10.0, `@prisma/adapter-pg` |
-| Lược đồ | `source/backend/prisma/schema.prisma` |
-| Migration | `source/backend/prisma/migrations/` (`prisma.config.ts`) |
-| Phiên bản lược đồ hiện tại | `20261019131021_release_versions` (13 migration) |
+| Mục                        | Giá trị                                                                       |
+| -------------------------- | ----------------------------------------------------------------------------- |
+| Hệ quản trị                | PostgreSQL 18, ảnh Debian                                                     |
+| Quy tắc so sánh            | ICU `vi-VN`, đặt lúc tạo cơ sở dữ liệu; `PrismaService` dừng ứng dụng nếu sai |
+| Truy cập                   | Prisma 7.10.0, `@prisma/adapter-pg`                                           |
+| Lược đồ                    | `source/backend/prisma/schema.prisma`                                         |
+| Migration                  | `source/backend/prisma/migrations/` (`prisma.config.ts`)                      |
+| Phiên bản lược đồ hiện tại | `20261019131021_release_versions` (13 migration)                              |
 
 ### Migration Rule
 
 Không xóa tạo lại cơ sở dữ liệu khi đổi lược đồ. Mỗi thay đổi:
+
 1. Sửa `schema.prisma`.
 2. `pnpm prisma:migrate` sinh và áp một migration có tên; đưa thư mục migration vào git.
 3. Ghi thay đổi vào tệp này.
@@ -47,15 +48,15 @@ Nhật ký kiểm toán (NFR-10, bảng `AuditLog`) hoãn theo F01-07 — `docs/
 
 ### Quy ước lược đồ (quyết định, áp từ migration đầu tiên)
 
-| Mục | Quy ước | Nguồn |
-|---|---|---|
-| Khóa chính | `id String @id @default(cuid(2))`; khóa do Prisma Client sinh, `INSERT` thô phải tự cấp `id` | F00-10 |
-| Tên bảng, cột | Model PascalCase số ít, trường camelCase, không `@map` (trừ bảng `session` của `connect-pg-simple`) | `source/backend/README.md` |
-| Dấu thời gian | Mọi bảng nghiệp vụ có `createdAt @default(now())`, `updatedAt @updatedAt` | F-01 D11 |
-| Khóa ngoại | Cột vô hướng `<quanHệ>Id` cạnh trường quan hệ đặt tên như từ điển dữ liệu (`parentUnit` + `parentUnitId`); mặc định `onDelete: Restrict` | F-02 D1 |
-| Ngày không giờ | `@db.Date`, gửi `YYYY-MM-DD`, so với hôm nay theo `Asia/Ho_Chi_Minh` (`todayDate()`) | F-02 D13 |
-| Liệt kê | `enum` của Prisma, giá trị `SCREAMING_SNAKE` | F00-12 |
-| Tín chỉ, điểm | `Decimal(5,2)` tín chỉ, `Decimal(4,2)` điểm; trả JSON dạng chuỗi | F00-11 |
+| Mục            | Quy ước                                                                                                                                  | Nguồn                      |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| Khóa chính     | `id String @id @default(cuid(2))`; khóa do Prisma Client sinh, `INSERT` thô phải tự cấp `id`                                             | F00-10                     |
+| Tên bảng, cột  | Model PascalCase số ít, trường camelCase, không `@map` (trừ bảng `session` của `connect-pg-simple`)                                      | `source/backend/README.md` |
+| Dấu thời gian  | Mọi bảng nghiệp vụ có `createdAt @default(now())`, `updatedAt @updatedAt`                                                                | F-01 D11                   |
+| Khóa ngoại     | Cột vô hướng `<quanHệ>Id` cạnh trường quan hệ đặt tên như từ điển dữ liệu (`parentUnit` + `parentUnitId`); mặc định `onDelete: Restrict` | F-02 D1                    |
+| Ngày không giờ | `@db.Date`, gửi `YYYY-MM-DD`, so với hôm nay theo `Asia/Ho_Chi_Minh` (`todayDate()`)                                                     | F-02 D13                   |
+| Liệt kê        | `enum` của Prisma, giá trị `SCREAMING_SNAKE`                                                                                             | F00-12                     |
+| Tín chỉ, điểm  | `Decimal(5,2)` tín chỉ, `Decimal(4,2)` điểm; trả JSON dạng chuỗi                                                                         | F00-11                     |
 
 ---
 
@@ -75,155 +76,163 @@ Migration `20261019085325_curriculum` (F-07) sinh bằng `prisma migrate dev --c
 
 Sáu migration sau (F-08..F-15) đều sinh bằng `prisma migrate dev --create-only` trên PostgreSQL 18 thật (container `ctdt-dev-pg`, ICU `vi-VN`), nối tay phần Prisma không mô hình hóa, áp bằng `migrate dev` (lần hai "Already in sync"); đã áp trên Testcontainers. `ctdt-dev-pg` đã có F-11, F-13, F-14, F-15; cơ sở dữ liệu phát triển của người dùng cần `pnpm prisma:migrate` rồi `pnpm prisma:seed`.
 
-| Migration | Tính năng | Thêm | Viết tay (đừng "dọn" khỏi `migration.sql`) |
-|---|---|---|---|
-| `20261019092846_credit_mismatch_acceptance` | F-08 | 5 cột `ProgramVersion.creditMismatch*` | `CHECK ProgramVersion_credit_acceptance_complete` (năm cột cùng có hoặc cùng trống) |
-| `20261019095730_syllabi` | F-10 | `Syllabus`, `WeeklyContent`, `SyllabusAttachment`; enum `SyllabusStatus`, `AttachmentFileType` | chỉ mục từng phần `Syllabus_one_draft`, `Syllabus_one_published`; `CHECK` `Syllabus_revision_positive`, `Syllabus_published_has_time`, `WeeklyContent_order_positive`, `SyllabusAttachment_size_positive` |
-| `20261019102707_outcomes` | F-11 | `PLO`, `CLO`, `WeeklyContentCLO`, `CoursePLOMapping`, `CLOPLOMapping` | `CHECK CoursePLOMapping_weight_range` (0 < trọng số ≤ 1) |
-| `20261019110535_change_requests` | F-13 | `ChangeRequest`, `ChangeItem`, `ApprovalLevelConfig`, `ApprovalStep`, `ChangeRequestDocument`; cột `sourceRequestId`, `baseVersionId`/`baseRevisionId` trên `ProgramVersion`, `Syllabus`; `Syllabus.revisionNumber` thành null được | dãy `change_request_code_seq`; `CHECK` `ChangeRequest_target_key` (đúng một khóa đối tượng), `ChangeRequest_basis_required`, `ChangeRequest_round_nonneg`, `ApprovalStep_level_range`, `ApprovalStep_skip_reason`, `ChangeRequestDocument_size_positive`, `Syllabus_number_unless_copy`; tạo lại `ProgramVersion_one_draft`, `Syllabus_one_draft` chỉ tính bản không thuộc đề xuất (`sourceRequestId IS NULL`) |
-| `20261019122753_approval_comments_notifications` | F-14 | `Comment`, `Notification`; enum `NotificationType`, `NotificationReadStatus`; cột `ChangeRequest.levelEnteredAt` | — |
-| `20261019131021_release_versions` | F-15 | `Semester`, `Cohort`, `CohortVersion`; cột ban hành trên `ProgramVersion`, `ChangeRequest`; `CurriculumItem.courseNameSnapshot`, `creditsSnapshot`, `syllabusId`; `Syllabus.originRequestId`, `ProgramVersion.correctionOfId` | tạo lại `ProgramVersion_one_draft` thêm `AND "correctionOfId" IS NULL`; `CHECK` `ProgramVersion_published_has_time` (bản rời Nháp có `publishedAt`; điền ngược từ `updatedAt`), `Semester_term_positive` |
+| Migration                                        | Tính năng | Thêm                                                                                                                                                                                                                                | Viết tay (đừng "dọn" khỏi `migration.sql`)                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------ | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `20261019092846_credit_mismatch_acceptance`      | F-08      | 5 cột `ProgramVersion.creditMismatch*`                                                                                                                                                                                              | `CHECK ProgramVersion_credit_acceptance_complete` (năm cột cùng có hoặc cùng trống)                                                                                                                                                                                                                                                                                                                            |
+| `20261019095730_syllabi`                         | F-10      | `Syllabus`, `WeeklyContent`, `SyllabusAttachment`; enum `SyllabusStatus`, `AttachmentFileType`                                                                                                                                      | chỉ mục từng phần `Syllabus_one_draft`, `Syllabus_one_published`; `CHECK` `Syllabus_revision_positive`, `Syllabus_published_has_time`, `WeeklyContent_order_positive`, `SyllabusAttachment_size_positive`                                                                                                                                                                                                      |
+| `20261019102707_outcomes`                        | F-11      | `PLO`, `CLO`, `WeeklyContentCLO`, `CoursePLOMapping`, `CLOPLOMapping`                                                                                                                                                               | `CHECK CoursePLOMapping_weight_range` (0 < trọng số ≤ 1)                                                                                                                                                                                                                                                                                                                                                       |
+| `20261019110535_change_requests`                 | F-13      | `ChangeRequest`, `ChangeItem`, `ApprovalLevelConfig`, `ApprovalStep`, `ChangeRequestDocument`; cột `sourceRequestId`, `baseVersionId`/`baseRevisionId` trên `ProgramVersion`, `Syllabus`; `Syllabus.revisionNumber` thành null được | dãy `change_request_code_seq`; `CHECK` `ChangeRequest_target_key` (đúng một khóa đối tượng), `ChangeRequest_basis_required`, `ChangeRequest_round_nonneg`, `ApprovalStep_level_range`, `ApprovalStep_skip_reason`, `ChangeRequestDocument_size_positive`, `Syllabus_number_unless_copy`; tạo lại `ProgramVersion_one_draft`, `Syllabus_one_draft` chỉ tính bản không thuộc đề xuất (`sourceRequestId IS NULL`) |
+| `20261019122753_approval_comments_notifications` | F-14      | `Comment`, `Notification`; enum `NotificationType`, `NotificationReadStatus`; cột `ChangeRequest.levelEnteredAt`                                                                                                                    | —                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `20261019131021_release_versions`                | F-15      | `Semester`, `Cohort`, `CohortVersion`; cột ban hành trên `ProgramVersion`, `ChangeRequest`; `CurriculumItem.courseNameSnapshot`, `creditsSnapshot`, `syllabusId`; `Syllabus.originRequestId`, `ProgramVersion.correctionOfId`       | tạo lại `ProgramVersion_one_draft` thêm `AND "correctionOfId" IS NULL`; `CHECK` `ProgramVersion_published_has_time` (bản rời Nháp có `publishedAt`; điền ngược từ `updatedAt`), `Semester_term_positive`                                                                                                                                                                                                       |
 
 Migration `20261018151319_access_control` (F-02) sinh bằng `prisma migrate dev --create-only --name access_control`; đã áp trên cơ sở dữ liệu phát triển. Thêm `OrgUnit` tối thiểu, `Role`, `Permission`, `RolePermission`, `RoleAssignment` và `User.orgUnitId`.
 
 ### `User` — table `User`
-| Column | Type | Notes |
-|---|---|---|
-| `id` | `String` | `cuid(2)` |
-| `userCode` | `String` | Duy nhất (`User_userCode_key`) |
-| `fullName` | `String` | |
-| `email` | `String?` | |
-| `status` | `UserStatus` | Mặc định `ACTIVE`; `DISABLED` không đăng nhập được và mất phiên ở yêu cầu kế tiếp |
-| `username` | `String` | Duy nhất (`User_username_key`); lưu dạng đã chuẩn hóa (`shared/auth/username.ts`) |
-| `passwordHash` | `String` | Argon2id |
-| `mustChangePassword` | `Boolean` | Mặc định `false`; `true` thì chỉ gọi được `me`, đổi mật khẩu, đăng xuất |
-| `orgUnitId` | `String?` | FK `OrgUnit`; chỉ mục |
-| `createdAt` / `updatedAt` | `DateTime` | `now()` / `@updatedAt` |
 
+| Column                    | Type         | Notes                                                                             |
+| ------------------------- | ------------ | --------------------------------------------------------------------------------- |
+| `id`                      | `String`     | `cuid(2)`                                                                         |
+| `userCode`                | `String`     | Duy nhất (`User_userCode_key`)                                                    |
+| `fullName`                | `String`     |                                                                                   |
+| `email`                   | `String?`    |                                                                                   |
+| `status`                  | `UserStatus` | Mặc định `ACTIVE`; `DISABLED` không đăng nhập được và mất phiên ở yêu cầu kế tiếp |
+| `username`                | `String`     | Duy nhất (`User_username_key`); lưu dạng đã chuẩn hóa (`shared/auth/username.ts`) |
+| `passwordHash`            | `String`     | Argon2id                                                                          |
+| `mustChangePassword`      | `Boolean`    | Mặc định `false`; `true` thì chỉ gọi được `me`, đổi mật khẩu, đăng xuất           |
+| `orgUnitId`               | `String?`    | FK `OrgUnit`; chỉ mục                                                             |
+| `createdAt` / `updatedAt` | `DateTime`   | `now()` / `@updatedAt`                                                            |
 
 ### `OrgUnit` — table `OrgUnit`
-| Column | Type | Notes |
-|---|---|---|
-| `id` | `String` | `cuid(2)` |
-| `unitCode` | `String` | Duy nhất |
-| `unitName` | `String` | |
-| `unitType` | `OrgUnitType` | |
-| `parentUnitId` | `String?` | FK `OrgUnit` (cây), chỉ mục |
-| `status` | `OrgUnitStatus` | Mặc định `ACTIVE` |
-| `createdAt` / `updatedAt` | `DateTime` | |
+
+| Column                    | Type            | Notes                       |
+| ------------------------- | --------------- | --------------------------- |
+| `id`                      | `String`        | `cuid(2)`                   |
+| `unitCode`                | `String`        | Duy nhất                    |
+| `unitName`                | `String`        |                             |
+| `unitType`                | `OrgUnitType`   |                             |
+| `parentUnitId`            | `String?`       | FK `OrgUnit` (cây), chỉ mục |
+| `status`                  | `OrgUnitStatus` | Mặc định `ACTIVE`           |
+| `createdAt` / `updatedAt` | `DateTime`      |                             |
 
 Cột không đổi từ F-02; F-03 thêm quan hệ ngược `subjectGroups`, F-04 thêm `ownedCourses`. Loại đơn vị cha hợp lệ là hằng `ALLOWED_PARENT_TYPES` (`features/org-units/org-unit-hierarchy.ts`): `FACULTY` và `OFFICE` chỉ nằm dưới `UNIVERSITY`; đổi cha chạy kiểm chu trình ở service. Không có thao tác xóa đơn vị — chỉ `INACTIVE` / `ACTIVE`.
 
 ### `SubjectGroup` — table `SubjectGroup`
-| Column | Type | Notes |
-|---|---|---|
-| `id` | `String` | `cuid(2)` |
-| `groupCode` | `String` | Duy nhất, không sửa sau khi tạo |
-| `groupName` | `String` | |
-| `facultyId` | `String` | FK `OrgUnit`, chỉ mục; phải là đơn vị `FACULTY` (kiểm ở service) |
-| `status` | `SubjectGroupStatus` | Mặc định `ACTIVE` |
-| `createdAt` / `updatedAt` | `DateTime` | |
+
+| Column                    | Type                 | Notes                                                            |
+| ------------------------- | -------------------- | ---------------------------------------------------------------- |
+| `id`                      | `String`             | `cuid(2)`                                                        |
+| `groupCode`               | `String`             | Duy nhất, không sửa sau khi tạo                                  |
+| `groupName`               | `String`             |                                                                  |
+| `facultyId`               | `String`             | FK `OrgUnit`, chỉ mục; phải là đơn vị `FACULTY` (kiểm ở service) |
+| `status`                  | `SubjectGroupStatus` | Mặc định `ACTIVE`                                                |
+| `createdAt` / `updatedAt` | `DateTime`           |                                                                  |
 
 ### `SubjectGroupMember` — table `SubjectGroupMember`
-| Column | Type | Notes |
-|---|---|---|
-| `id` | `String` | `cuid(2)` |
-| `subjectGroupId` | `String` | FK `SubjectGroup`, chỉ mục |
-| `lecturerId` | `String` | FK `User`, chỉ mục |
-| `memberRole` | `SubjectGroupMemberRole` | `MEMBER` hoặc `COORDINATOR` — hai hàng riêng |
-| `validFrom` / `validTo` | `Date` / `Date?` | `@db.Date` |
-| `assignedById` | `String?` | FK `User` |
-| `revokedAt` / `revokedById` | `DateTime?` / `String?` | Thu hồi chỉ ghi hai cột này |
-| `createdAt` / `updatedAt` | `DateTime` | |
+
+| Column                      | Type                     | Notes                                        |
+| --------------------------- | ------------------------ | -------------------------------------------- |
+| `id`                        | `String`                 | `cuid(2)`                                    |
+| `subjectGroupId`            | `String`                 | FK `SubjectGroup`, chỉ mục                   |
+| `lecturerId`                | `String`                 | FK `User`, chỉ mục                           |
+| `memberRole`                | `SubjectGroupMemberRole` | `MEMBER` hoặc `COORDINATOR` — hai hàng riêng |
+| `validFrom` / `validTo`     | `Date` / `Date?`         | `@db.Date`                                   |
+| `assignedById`              | `String?`                | FK `User`                                    |
+| `revokedAt` / `revokedById` | `DateTime?` / `String?`  | Thu hồi chỉ ghi hai cột này                  |
+| `createdAt` / `updatedAt`   | `DateTime`               |                                              |
 
 Không có ràng buộc duy nhất hay loại trừ ở cơ sở dữ liệu: service chặn hai hàng chưa thu hồi cùng (nhóm, người, vai trò) chồng thời gian (`MEMBERSHIP_OVERLAP`) và đòi hàng `COORDINATOR` nằm trọn trong một hàng `MEMBER` cùng người, cùng nhóm (`COORDINATOR_NOT_MEMBER`). Một nhóm có thể có nhiều Điều phối. Kết thúc thành viên chỉ rút ngắn `validTo` và cắt các hàng Điều phối bên trong; hàng không bị xóa hay kéo dài.
 
 ### `Course` — table `Course`
-| Column | Type | Notes |
-|---|---|---|
-| `id` | `String` | `cuid(2)` |
-| `courseCode` | `String` | Duy nhất (`Course_courseCode_key`); cắt khoảng trắng, viết hoa khi ghi; không sửa sau khi tạo (DTO sửa không có trường này) |
-| `courseName` | `String` | Tiếng Việt; chỉ mục (`Course_courseName_idx`) cho sắp xếp |
-| `englishName` | `String?` | Rỗng lưu `null` |
-| `credits` | `Decimal(5,2)` | `numeric(5,2)`; gửi và nhận dạng chuỗi (`"2.5"`, `"0"`), `toWireDecimal` bỏ số 0 thừa |
-| `courseType` | `CourseType` | |
-| `status` | `CourseStatus` | Mặc định `ACTIVE`; `CANCELLED` là trạng thái cuối |
-| `ownerFacultyId` | `String` | FK `OrgUnit` (`Restrict`), chỉ mục; phải là `FACULTY` đang hoạt động (kiểm ở service) |
-| `ownerGroupId` | `String?` | FK `SubjectGroup` (`Restrict`), chỉ mục; nếu có phải là nhóm `ACTIVE` của chính `ownerFaculty` (kiểm ở service) |
-| `equivalenceGroupId` | `String?` | FK `EquivalentCourseGroup` (`SetNull`), chỉ mục (F-05); một học phần thuộc nhiều nhất một nhóm tương đương |
-| `createdAt` / `updatedAt` | `DateTime` | |
+
+| Column                    | Type           | Notes                                                                                                                       |
+| ------------------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `id`                      | `String`       | `cuid(2)`                                                                                                                   |
+| `courseCode`              | `String`       | Duy nhất (`Course_courseCode_key`); cắt khoảng trắng, viết hoa khi ghi; không sửa sau khi tạo (DTO sửa không có trường này) |
+| `courseName`              | `String`       | Tiếng Việt; chỉ mục (`Course_courseName_idx`) cho sắp xếp                                                                   |
+| `englishName`             | `String?`      | Rỗng lưu `null`                                                                                                             |
+| `credits`                 | `Decimal(5,2)` | `numeric(5,2)`; gửi và nhận dạng chuỗi (`"2.5"`, `"0"`), `toWireDecimal` bỏ số 0 thừa                                       |
+| `courseType`              | `CourseType`   |                                                                                                                             |
+| `status`                  | `CourseStatus` | Mặc định `ACTIVE`; `CANCELLED` là trạng thái cuối                                                                           |
+| `ownerFacultyId`          | `String`       | FK `OrgUnit` (`Restrict`), chỉ mục; phải là `FACULTY` đang hoạt động (kiểm ở service)                                       |
+| `ownerGroupId`            | `String?`      | FK `SubjectGroup` (`Restrict`), chỉ mục; nếu có phải là nhóm `ACTIVE` của chính `ownerFaculty` (kiểm ở service)             |
+| `equivalenceGroupId`      | `String?`      | FK `EquivalentCourseGroup` (`SetNull`), chỉ mục (F-05); một học phần thuộc nhiều nhất một nhóm tương đương                  |
+| `createdAt` / `updatedAt` | `DateTime`     |                                                                                                                             |
 
 Không có thao tác xóa học phần — chỉ chuyển trạng thái. Quan hệ ngược: `OrgUnit.ownedCourses`, `SubjectGroup.ownedCourses`. "Học phần khoa khác" = `ownerFaculty.unitCode` khác `HOME_FACULTY_CODE` (`KHOA_CNTT`, `src/shared/org-units/home-faculty.ts`); không lưu thành cột. Quan hệ ngược `relationsAsSource`, `relationsAsTarget` (F-05). Tìm kiếm: `ILIKE '%q%'` trên mã và tên không dùng được chỉ mục; chấp nhận ở quy mô vài trăm dòng (đo 500 dòng trong đầu-cuối).
 
 ### `CourseRelation` — table `CourseRelation` (F-05)
-| Column | Type | Notes |
-|---|---|---|
-| `id` | `String` | `cuid(2)` |
-| `sourceCourseId` | `String` | FK `Course` (`Restrict`): học phần học trước / tiên quyết / song hành, hoặc học phần bị ngừng (với `REPLACEMENT`) |
-| `targetCourseId` | `String` | FK `Course` (`Restrict`), chỉ mục: học phần **có** yêu cầu, hoặc học phần thay thế |
-| `relationType` | `CourseRelationType` | `PRIOR`, `PREREQUISITE`, `COREQUISITE`, `REPLACEMENT`; quan hệ "tương đương" (loại thứ năm của FR-18) là thành viên nhóm, không nằm ở đây |
-| `minScore` | `Decimal(4,2)?` | Ngưỡng điểm thang 4 (0..4, tối đa 2 số lẻ), chỉ `PREREQUISITE`; gửi và nhận dạng chuỗi |
-| `createdAt` / `updatedAt` | `DateTime` | |
+
+| Column                    | Type                 | Notes                                                                                                                                     |
+| ------------------------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                      | `String`             | `cuid(2)`                                                                                                                                 |
+| `sourceCourseId`          | `String`             | FK `Course` (`Restrict`): học phần học trước / tiên quyết / song hành, hoặc học phần bị ngừng (với `REPLACEMENT`)                         |
+| `targetCourseId`          | `String`             | FK `Course` (`Restrict`), chỉ mục: học phần **có** yêu cầu, hoặc học phần thay thế                                                        |
+| `relationType`            | `CourseRelationType` | `PRIOR`, `PREREQUISITE`, `COREQUISITE`, `REPLACEMENT`; quan hệ "tương đương" (loại thứ năm của FR-18) là thành viên nhóm, không nằm ở đây |
+| `minScore`                | `Decimal(4,2)?`      | Ngưỡng điểm thang 4 (0..4, tối đa 2 số lẻ), chỉ `PREREQUISITE`; gửi và nhận dạng chuỗi                                                    |
+| `createdAt` / `updatedAt` | `DateTime`           |                                                                                                                                           |
 
 Duy nhất `(sourceCourseId, targetCourseId, relationType)` (`CourseRelation_sourceCourseId_targetCourseId_relationType_key`). **Hai ràng buộc `CHECK` viết tay trong `migration.sql`** (Prisma không mô hình hóa `CHECK` và không diff chúng nên giữ qua các migration sau — đừng "dọn" khỏi SQL): `CourseRelation_not_self` (`sourceCourseId <> targetCourseId`) và `CourseRelation_minScore_prerequisite_only` (`minScore IS NULL OR relationType = 'PREREQUISITE'`). Xóa quan hệ là xóa thật, không xóa mềm (D12). Quan hệ thuộc về một học phần ("học phần sở hữu"): đích với `PRIOR`/`PREREQUISITE`/`COREQUISITE`, nguồn với `REPLACEMENT`; phạm vi và đường sửa kiểm trên học phần đó. Chu trình trên các cạnh `PRIOR` + `PREREQUISITE` do service chặn (BR-11), không phải cơ sở dữ liệu.
 
 ### `EquivalentCourseGroup` — table `EquivalentCourseGroup` (F-05)
-| Column | Type | Notes |
-|---|---|---|
-| `id` | `String` | `cuid(2)` |
-| `groupCode` | `String` | Duy nhất; cắt khoảng trắng, viết hoa khi ghi; tối đa 20 ký tự |
-| `note` | `String?` | Tối đa 500 ký tự; rỗng lưu `null` |
-| `createdAt` / `updatedAt` | `DateTime` | |
+
+| Column                    | Type       | Notes                                                         |
+| ------------------------- | ---------- | ------------------------------------------------------------- |
+| `id`                      | `String`   | `cuid(2)`                                                     |
+| `groupCode`               | `String`   | Duy nhất; cắt khoảng trắng, viết hoa khi ghi; tối đa 20 ký tự |
+| `note`                    | `String?`  | Tối đa 500 ký tự; rỗng lưu `null`                             |
+| `createdAt` / `updatedAt` | `DateTime` |                                                               |
 
 Thành viên là `Course.equivalenceGroupId` (không có bảng nối, M-4). Nhóm có ít nhất 2 học phần (service giữ); giải thể xóa nhóm sau khi xóa `equivalenceGroupId` của các thành viên (`SetNull` là lưới an toàn). Nhóm nằm ngoài ảnh chụp phiên bản nên R1 sửa trực tiếp bất cứ lúc nào (EC-16, E-11).
 
 ### `Program` — table `Program` (F-06)
-| Column | Type | Notes |
-|---|---|---|
-| `id` | `String` | `cuid(2)` |
-| `programCode` | `String` | Duy nhất (`Program_programCode_key`); cắt khoảng trắng, không sửa sau khi tạo; tối đa 20 ký tự |
-| `facultyId` | `String` | FK `OrgUnit` (`Restrict`), chỉ mục; mặc định Khoa CNTT khi tạo |
-| `degreeLevel` | `DegreeLevel` | `ENGINEER` Kỹ sư, `BACHELOR` Cử nhân (FR-24) |
-| `status` | `ProgramStatus` | Mặc định `ACTIVE`; không xóa chương trình, chỉ `INACTIVE` / `ACTIVE` (EC-50) |
-| `clonedFromId` | `String?` | FK `ProgramVersion` (`Restrict`): phiên bản được dùng làm nền khi nhân bản (FR-25) |
-| `createdAt` / `updatedAt` | `DateTime` | |
+
+| Column                    | Type            | Notes                                                                                          |
+| ------------------------- | --------------- | ---------------------------------------------------------------------------------------------- |
+| `id`                      | `String`        | `cuid(2)`                                                                                      |
+| `programCode`             | `String`        | Duy nhất (`Program_programCode_key`); cắt khoảng trắng, không sửa sau khi tạo; tối đa 20 ký tự |
+| `facultyId`               | `String`        | FK `OrgUnit` (`Restrict`), chỉ mục; mặc định Khoa CNTT khi tạo                                 |
+| `degreeLevel`             | `DegreeLevel`   | `ENGINEER` Kỹ sư, `BACHELOR` Cử nhân (FR-24)                                                   |
+| `status`                  | `ProgramStatus` | Mặc định `ACTIVE`; không xóa chương trình, chỉ `INACTIVE` / `ACTIVE` (EC-50)                   |
+| `clonedFromId`            | `String?`       | FK `ProgramVersion` (`Restrict`): phiên bản được dùng làm nền khi nhân bản (FR-25)             |
+| `createdAt` / `updatedAt` | `DateTime`      |                                                                                                |
 
 Quan hệ: `faculty` (`ProgramFaculty`), `clonedFrom` (`ProgramClonedFrom`), `versions` (`ProgramVersions`), `directors`. `OrgUnit` thêm `programs`, `User` thêm `programDirectorships`, `grantedDirectorships`, `revokedDirectorships`. Đối tượng phân quyền của chương trình là `{ programIds: [id], orgUnitIds: [facultyId] }` (`programTarget`).
 
 ### `ProgramVersion` — table `ProgramVersion` (F-06)
-| Column | Type | Notes |
-|---|---|---|
-| `id` | `String` | `cuid(2)` |
-| `programId` | `String` | FK `Program` (`Restrict`) |
-| `versionNumber` | `String?` | Trống khi còn Nháp; F-15 điền khi ban hành |
-| `status` | `ProgramVersionStatus` | `DRAFT`, `PENDING`, `ACTIVE`, `HISTORICAL`; mặc định `DRAFT` |
-| `programName`, `majorCode`, `majorName` | `String` | Mô tả nằm ở phiên bản (M-3) để bản đã ban hành giữ mô tả riêng |
-| `semesterCount` | `Int` | 1..12 (`PROGRAM_LIMITS.SEMESTERS_MAX`, mặc định kế hoạch) |
-| `totalCredits`, `compulsoryCredits`, `electiveCredits` | `Decimal(5,2)` | Gửi và nhận dạng chuỗi; bắt buộc + tự chọn = tổng (BR-03, `assertCreditsAddUp`) |
-| `createdAt` / `updatedAt` | `DateTime` | |
+
+| Column                                                 | Type                   | Notes                                                                           |
+| ------------------------------------------------------ | ---------------------- | ------------------------------------------------------------------------------- |
+| `id`                                                   | `String`               | `cuid(2)`                                                                       |
+| `programId`                                            | `String`               | FK `Program` (`Restrict`)                                                       |
+| `versionNumber`                                        | `String?`              | Trống khi còn Nháp; F-15 điền khi ban hành                                      |
+| `status`                                               | `ProgramVersionStatus` | `DRAFT`, `PENDING`, `ACTIVE`, `HISTORICAL`; mặc định `DRAFT`                    |
+| `programName`, `majorCode`, `majorName`                | `String`               | Mô tả nằm ở phiên bản (M-3) để bản đã ban hành giữ mô tả riêng                  |
+| `semesterCount`                                        | `Int`                  | 1..12 (`PROGRAM_LIMITS.SEMESTERS_MAX`, mặc định kế hoạch)                       |
+| `totalCredits`, `compulsoryCredits`, `electiveCredits` | `Decimal(5,2)`         | Gửi và nhận dạng chuỗi; bắt buộc + tự chọn = tổng (BR-03, `assertCreditsAddUp`) |
+| `createdAt` / `updatedAt`                              | `DateTime`             |                                                                                 |
 
 Duy nhất `(programId, versionNumber)` (nhiều `NULL` được qua, vì PostgreSQL coi `NULL` là khác nhau) và chỉ mục `(programId, status)`. **Hai chỉ mục duy nhất từng phần viết tay trong `migration.sql`** (Prisma không mô hình hóa và không diff chúng nên giữ qua các migration sau — đừng "dọn" khỏi SQL): `ProgramVersion_one_draft` và `ProgramVersion_one_active` (`WHERE "status" = 'ACTIVE'`) — mỗi chương trình có nhiều nhất một bản Nháp thường và một bản Đang hiệu lực (BR-22). `ProgramVersion_one_draft` đã tạo lại hai lần, nay là `("programId") WHERE "status" = 'DRAFT' AND "sourceRequestId" IS NULL AND "correctionOfId" IS NULL` — bản làm việc của đề xuất (F-13) và Nháp đính chính (F-15) nằm cạnh Nháp thường.
 
 Cột thêm sau F-06:
 
-| Cột | Tính năng | Ghi chú |
-|---|---|---|
-| `creditMismatchReason`, `creditMismatchCompulsoryGap`, `creditMismatchElectiveGap` (`Decimal(5,2)?`), `creditMismatchAcceptedById` → `User`, `creditMismatchAcceptedAt` | F-08 | Chấp nhận chênh lệch tín chỉ; năm cột cùng có hoặc cùng trống (CHECK) |
-| `sourceRequestId?` (duy nhất) → `ChangeRequest`, `baseVersionId?` → `ProgramVersion` | F-13 | Có `sourceRequestId` = bản làm việc của đề xuất; `baseVersion` = bản đã ban hành nó chép từ |
-| `decisionNumber?`, `signedDate Date?`, `effectiveSemesterId?` → `Semester`, `publishedById?` → `User`, `publishedAt?`, `previousVersionId?` → `ProgramVersion` | F-15 | Thông tin ban hành; `publishedAt` có đúng khi `status <> DRAFT` (CHECK) |
-| `originRequestId?` → `ChangeRequest` | F-15 | Đề xuất sinh ra phiên bản này; không duy nhất (một đề xuất đề cương sinh nhiều phiên bản). Khi ban hành, bản làm việc chuyển `sourceRequestId` → `originRequestId` |
-| `correctionOfId?` (duy nhất) → `ProgramVersion`, `correctionReason?` | F-15 | Nháp đính chính và bản đính chính đã ban hành |
+| Cột                                                                                                                                                                     | Tính năng | Ghi chú                                                                                                                                                            |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `creditMismatchReason`, `creditMismatchCompulsoryGap`, `creditMismatchElectiveGap` (`Decimal(5,2)?`), `creditMismatchAcceptedById` → `User`, `creditMismatchAcceptedAt` | F-08      | Chấp nhận chênh lệch tín chỉ; năm cột cùng có hoặc cùng trống (CHECK)                                                                                              |
+| `sourceRequestId?` (duy nhất) → `ChangeRequest`, `baseVersionId?` → `ProgramVersion`                                                                                    | F-13      | Có `sourceRequestId` = bản làm việc của đề xuất; `baseVersion` = bản đã ban hành nó chép từ                                                                        |
+| `decisionNumber?`, `signedDate Date?`, `effectiveSemesterId?` → `Semester`, `publishedById?` → `User`, `publishedAt?`, `previousVersionId?` → `ProgramVersion`          | F-15      | Thông tin ban hành; `publishedAt` có đúng khi `status <> DRAFT` (CHECK)                                                                                            |
+| `originRequestId?` → `ChangeRequest`                                                                                                                                    | F-15      | Đề xuất sinh ra phiên bản này; không duy nhất (một đề xuất đề cương sinh nhiều phiên bản). Khi ban hành, bản làm việc chuyển `sourceRequestId` → `originRequestId` |
+| `correctionOfId?` (duy nhất) → `ProgramVersion`, `correctionReason?`                                                                                                    | F-15      | Nháp đính chính và bản đính chính đã ban hành                                                                                                                      |
 
 `versionNumber` dạng `major.minor` (`src/shared/releases/version-number.ts`). Chỉ mục thêm: `(originRequestId, status)`, `(status, effectiveSemesterId, createdAt)`. Quan hệ ngược `clones` (các chương trình nhân bản từ phiên bản này).
 
 ### Khung chương trình (F-07)
 
-| Bảng | Cột chính | Ghi chú |
-|---|---|---|
-| `KnowledgeBlock` | `blockCode` (duy nhất), `blockName`, `requiredCredits Decimal(5,2)?` | Danh mục dùng chung, nạp bằng seed (hiện rỗng: chưa có tệp Excel); ký hiệu trên dòng khung là chuỗi tự do, không khóa ngoại (F07-02) |
-| `ElectiveGroup` | `versionId` → `ProgramVersion` (`Cascade`), `groupCode`, `groupName`, `minCredits Decimal(5,2)?`, `minCourses Int?` | Duy nhất `(versionId, groupCode)`; có cả hai mức thì phải đạt cả hai |
-| `CurriculumItem` | `versionId` (`Cascade`), `plannedSemester`, `sortOrder` (trong một học kỳ, TT suy ra), `courseId` (`Restrict`), `blockSymbol?`, `isElective`, `electiveGroupId?` (`SetNull`), `htDa`, `tqDa`, `minStudiedScore`, `minTransferScore` (`Decimal(4,2)?`), `note?`; F-15: `courseNameSnapshot?`, `creditsSnapshot Decimal(5,2)?`, `syllabusId?` → `Syllabus` (`Restrict`) | Duy nhất `(versionId, courseId)`; bản Nháp đọc tên, tín chỉ trực tiếp từ `Course` và đề cương Đã ban hành-không-thì-Nháp; khi ban hành `VersionPublisher` ghi ảnh chụp (chỉ khi còn null) và ghim bản đề cương |
-| `CurriculumRequisite` | `itemId` (`Cascade`), `sourceCourseId` (`Restrict`), `relationType` (dùng lại `CourseRelationType`), `minScore Decimal(4,2)?` | Duy nhất `(itemId, sourceCourseId, relationType)`; chép từ `CourseRelation` lúc thêm dòng, sửa riêng cho khung, đóng băng cùng phiên bản |
+| Bảng                  | Cột chính                                                                                                                                                                                                                                                                                                                                                             | Ghi chú                                                                                                                                                                                                        |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `KnowledgeBlock`      | `blockCode` (duy nhất), `blockName`, `requiredCredits Decimal(5,2)?`                                                                                                                                                                                                                                                                                                  | Danh mục dùng chung, nạp bằng seed (hiện rỗng: chưa có tệp Excel); ký hiệu trên dòng khung là chuỗi tự do, không khóa ngoại (F07-02)                                                                           |
+| `ElectiveGroup`       | `versionId` → `ProgramVersion` (`Cascade`), `groupCode`, `groupName`, `minCredits Decimal(5,2)?`, `minCourses Int?`                                                                                                                                                                                                                                                   | Duy nhất `(versionId, groupCode)`; có cả hai mức thì phải đạt cả hai                                                                                                                                           |
+| `CurriculumItem`      | `versionId` (`Cascade`), `plannedSemester`, `sortOrder` (trong một học kỳ, TT suy ra), `courseId` (`Restrict`), `blockSymbol?`, `isElective`, `electiveGroupId?` (`SetNull`), `htDa`, `tqDa`, `minStudiedScore`, `minTransferScore` (`Decimal(4,2)?`), `note?`; F-15: `courseNameSnapshot?`, `creditsSnapshot Decimal(5,2)?`, `syllabusId?` → `Syllabus` (`Restrict`) | Duy nhất `(versionId, courseId)`; bản Nháp đọc tên, tín chỉ trực tiếp từ `Course` và đề cương Đã ban hành-không-thì-Nháp; khi ban hành `VersionPublisher` ghi ảnh chụp (chỉ khi còn null) và ghim bản đề cương |
+| `CurriculumRequisite` | `itemId` (`Cascade`), `sourceCourseId` (`Restrict`), `relationType` (dùng lại `CourseRelationType`), `minScore Decimal(4,2)?`                                                                                                                                                                                                                                         | Duy nhất `(itemId, sourceCourseId, relationType)`; chép từ `CourseRelation` lúc thêm dòng, sửa riêng cho khung, đóng băng cùng phiên bản                                                                       |
 
 Sáu `CHECK` viết tay (Prisma không mô hình hóa; không xóa khi dọn `migration.sql`): `CurriculumItem_group_needs_elective` (có nhóm thì phải tự chọn), `CurriculumItem_semester_positive`, `CurriculumItem_sort_positive`, `ElectiveGroup_has_minimum` (ít nhất một mức tối thiểu), `CurriculumRequisite_not_replacement`, `CurriculumRequisite_min_score_prerequisite` (chỉ `PREREQUISITE` có ngưỡng). Dòng phải cùng phiên bản với nhóm của nó: service kiểm (`ITEM_NOT_IN_VERSION`), SQL không diễn đạt được. Xóa nhóm để dòng còn tự chọn, không nhóm.
 
@@ -231,109 +240,115 @@ Seed (F-07): `seed-data/knowledge-blocks.ts` (danh sách rỗng) và, trong `see
 
 ### Đề cương (F-10)
 
-| Bảng | Cột chính | Ghi chú |
-|---|---|---|
-| `Syllabus` | `courseId` (`Restrict`), `revisionNumber Int?`, `status SyllabusStatus`, sáu mục văn bản HTML đã lọc (`courseDescription`, `englishDescription`, `objectives`, `teachingMethods`, `assessmentMethods`, `references`; null = trống), `previousVersionId?` (duy nhất, chuỗi bản), `publishedAt?`; F-13 `sourceRequestId?` (duy nhất), `baseRevisionId?`; F-15 `originRequestId?` | Duy nhất `(courseId, revisionNumber)`; một Nháp thường, một Đã ban hành mỗi học phần (chỉ mục từng phần). `revisionNumber` null chỉ ở bản làm việc của đề xuất (CHECK). Công bố: chuyển bản Đã ban hành sang `HISTORICAL` **trước** khi đặt Nháp thành `PUBLISHED` |
-| `WeeklyContent` | `syllabusId` (`Cascade`), `weekLabel`, `sortOrder` ≥ 1, `content`, `teachingActivities?` | Chỉ mục `(syllabusId, sortOrder)` |
-| `SyllabusAttachment` | `syllabusId` (`Restrict`), `fileName`, `fileType AttachmentFileType`, `filePath` (duy nhất, tương đối dưới `FILES_ROOT`, dấu `/`), `sizeBytes` > 0, `uploadedById` → `User`, `recordedAt` | Tệp nằm trên đĩa; xóa hàng không tự xóa tệp |
+| Bảng                 | Cột chính                                                                                                                                                                                                                                                                                                                                                                      | Ghi chú                                                                                                                                                                                                                                                            |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `Syllabus`           | `courseId` (`Restrict`), `revisionNumber Int?`, `status SyllabusStatus`, sáu mục văn bản HTML đã lọc (`courseDescription`, `englishDescription`, `objectives`, `teachingMethods`, `assessmentMethods`, `references`; null = trống), `previousVersionId?` (duy nhất, chuỗi bản), `publishedAt?`; F-13 `sourceRequestId?` (duy nhất), `baseRevisionId?`; F-15 `originRequestId?` | Duy nhất `(courseId, revisionNumber)`; một Nháp thường, một Đã ban hành mỗi học phần (chỉ mục từng phần). `revisionNumber` null chỉ ở bản làm việc của đề xuất (CHECK). Công bố: chuyển bản Đã ban hành sang `HISTORICAL` **trước** khi đặt Nháp thành `PUBLISHED` |
+| `WeeklyContent`      | `syllabusId` (`Cascade`), `weekLabel`, `sortOrder` ≥ 1, `content`, `teachingActivities?`                                                                                                                                                                                                                                                                                       | Chỉ mục `(syllabusId, sortOrder)`                                                                                                                                                                                                                                  |
+| `SyllabusAttachment` | `syllabusId` (`Restrict`), `fileName`, `fileType AttachmentFileType`, `filePath` (duy nhất, tương đối dưới `FILES_ROOT`, dấu `/`), `sizeBytes` > 0, `uploadedById` → `User`, `recordedAt`                                                                                                                                                                                      | Tệp nằm trên đĩa; xóa hàng không tự xóa tệp                                                                                                                                                                                                                        |
 
 ### Chuẩn đầu ra (F-11)
 
-| Bảng | Cột chính | Ghi chú |
-|---|---|---|
-| `PLO` | `versionId` → `ProgramVersion` (`Cascade`), `ploCode`, `description`, `englishDescription?`, `competencyGroup?`, `sortOrder` | Duy nhất `(versionId, ploCode)` |
-| `CLO` | `syllabusId` → `Syllabus` (`Cascade`), `cloCode`, `description`, `englishDescription?`, `cognitiveLevel?`, `sortOrder` | Thuộc bản đề cương nên mọi chương trình dùng học phần chung CLO (DEC-03); duy nhất `(syllabusId, cloCode)` |
-| `WeeklyContentCLO` | `weeklyContentId`, `cloId` (cả hai `Cascade`) | Duy nhất cặp |
-| `CoursePLOMapping` | `curriculumItemId` → `CurriculumItem`, `ploId` → `PLO` (cả hai `Cascade`), `weight Decimal(3,2)` | Duy nhất `(curriculumItemId, ploId)`; 0 < `weight` ≤ 1 (CHECK) |
-| `CLOPLOMapping` | `(curriculumItemId, ploId)` → `CoursePLOMapping` (khóa ngoại ghép, `Cascade`), `cloId` → `CLO` (`Cascade`) | Duy nhất `(curriculumItemId, cloId, ploId)`; liên kết không sống lâu hơn ô học phần–PLO |
+| Bảng               | Cột chính                                                                                                                    | Ghi chú                                                                                                    |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `PLO`              | `versionId` → `ProgramVersion` (`Cascade`), `ploCode`, `description`, `englishDescription?`, `competencyGroup?`, `sortOrder` | Duy nhất `(versionId, ploCode)`                                                                            |
+| `CLO`              | `syllabusId` → `Syllabus` (`Cascade`), `cloCode`, `description`, `englishDescription?`, `cognitiveLevel?`, `sortOrder`       | Thuộc bản đề cương nên mọi chương trình dùng học phần chung CLO (DEC-03); duy nhất `(syllabusId, cloCode)` |
+| `WeeklyContentCLO` | `weeklyContentId`, `cloId` (cả hai `Cascade`)                                                                                | Duy nhất cặp                                                                                               |
+| `CoursePLOMapping` | `curriculumItemId` → `CurriculumItem`, `ploId` → `PLO` (cả hai `Cascade`), `weight Decimal(3,2)`                             | Duy nhất `(curriculumItemId, ploId)`; 0 < `weight` ≤ 1 (CHECK)                                             |
+| `CLOPLOMapping`    | `(curriculumItemId, ploId)` → `CoursePLOMapping` (khóa ngoại ghép, `Cascade`), `cloId` → `CLO` (`Cascade`)                   | Duy nhất `(curriculumItemId, cloId, ploId)`; liên kết không sống lâu hơn ô học phần–PLO                    |
 
 ### Đề xuất, duyệt, thông báo (F-13, F-14)
 
-| Bảng | Cột chính | Ghi chú |
-|---|---|---|
-| `ChangeRequest` | `requestCode` (duy nhất, từ `change_request_code_seq`), `requestType`, `targetType`, `targetCode`, đúng một trong `courseId`/`programId`/`subjectGroupId` (CHECK), `createdById`, `title`, `reason`, `status ChangeRequestStatus`, `origin RequestOrigin`, `basisDocumentNumber?` (bắt buộc khi `UNIVERSITY`), `submissionRound` ≥ 0, `createdByAcademicOffice` (F-15 dùng), F-14 `levelEnteredAt?`; F-15 `decisionNumber?`, `signedDate?`, `effectiveSemesterId?`, `pastSemesterAllowed` | Bản làm việc qua quan hệ ngược `programCopy`/`syllabusCopy`; chỉ mục theo `status`, người tạo, từng khóa đối tượng |
-| `ChangeItem` | `changeRequestId` (`Cascade`), `sortOrder`, `entityType`, `itemKey`, `label`, `recordId?`, `oldValue`/`newValue Json?`, `baseVersion?` | Duy nhất `(changeRequestId, entityType, itemKey)`; ghi lúc gửi (loại có bản làm việc) hoặc soạn khi Nháp (loại học phần, tổ chức) |
-| `ApprovalLevelConfig` | `approvalLevel` (duy nhất), `levelName`, `roleId` → `Role` | Có bảng nhưng mã đọc tên cấp từ hằng `APPROVAL_LEVEL_NAMES` |
-| `ApprovalStep` | `changeRequestId` (`Cascade`), `submissionRound`, `approvalLevel` 1..3, `approverId?`, `forSubjectGroupId?`, `forProgramId?`, `action ApprovalAction`, `remark?`, `recordedAt?`, `isSkipped` + `skipReason` (CHECK), `performedById?`, `isOverride` | Một dòng mỗi người duyệt mỗi cấp mỗi lượt gửi; cấp 3 không có `approverId` |
-| `ChangeRequestDocument` | `changeRequestId` (`Restrict`), `documentType ChangeDocumentType`, `fileName`, `fileType`, `filePath` (duy nhất, dưới `FILES_ROOT`), `sizeBytes` > 0, `uploadedById`, `seenInRound?` | Văn bản quét kèm đề xuất |
-| `Comment` | `changeRequestId` (`Cascade`), `authorId`, `content`, `createdAt` | Không có `updatedAt`: không sửa, không xóa (US-067 AC3) |
-| `Notification` | `recipientId` (`Cascade`), `notificationType`, `content` (câu tiếng Việt dựng lúc sự kiện), `changeRequestId?` (`Cascade`), `readStatus`, `readAt?` | Chỉ trong ứng dụng; chỉ mục `(recipientId, readStatus, createdAt)`, `(changeRequestId)` |
+| Bảng                    | Cột chính                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Ghi chú                                                                                                                           |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `ChangeRequest`         | `requestCode` (duy nhất, từ `change_request_code_seq`), `requestType`, `targetType`, `targetCode`, đúng một trong `courseId`/`programId`/`subjectGroupId` (CHECK), `createdById`, `title`, `reason`, `status ChangeRequestStatus`, `origin RequestOrigin`, `basisDocumentNumber?` (bắt buộc khi `UNIVERSITY`), `submissionRound` ≥ 0, `createdByAcademicOffice` (F-15 dùng), F-14 `levelEnteredAt?`; F-15 `decisionNumber?`, `signedDate?`, `effectiveSemesterId?`, `pastSemesterAllowed` | Bản làm việc qua quan hệ ngược `programCopy`/`syllabusCopy`; chỉ mục theo `status`, người tạo, từng khóa đối tượng                |
+| `ChangeItem`            | `changeRequestId` (`Cascade`), `sortOrder`, `entityType`, `itemKey`, `label`, `recordId?`, `oldValue`/`newValue Json?`, `baseVersion?`                                                                                                                                                                                                                                                                                                                                                    | Duy nhất `(changeRequestId, entityType, itemKey)`; ghi lúc gửi (loại có bản làm việc) hoặc soạn khi Nháp (loại học phần, tổ chức) |
+| `ApprovalLevelConfig`   | `approvalLevel` (duy nhất), `levelName`, `roleId` → `Role`                                                                                                                                                                                                                                                                                                                                                                                                                                | Có bảng nhưng mã đọc tên cấp từ hằng `APPROVAL_LEVEL_NAMES`                                                                       |
+| `ApprovalStep`          | `changeRequestId` (`Cascade`), `submissionRound`, `approvalLevel` 1..3, `approverId?`, `forSubjectGroupId?`, `forProgramId?`, `action ApprovalAction`, `remark?`, `recordedAt?`, `isSkipped` + `skipReason` (CHECK), `performedById?`, `isOverride`                                                                                                                                                                                                                                       | Một dòng mỗi người duyệt mỗi cấp mỗi lượt gửi; cấp 3 không có `approverId`                                                        |
+| `ChangeRequestDocument` | `changeRequestId` (`Restrict`), `documentType ChangeDocumentType`, `fileName`, `fileType`, `filePath` (duy nhất, dưới `FILES_ROOT`), `sizeBytes` > 0, `uploadedById`, `seenInRound?`                                                                                                                                                                                                                                                                                                      | Văn bản quét kèm đề xuất                                                                                                          |
+| `Comment`               | `changeRequestId` (`Cascade`), `authorId`, `content`, `createdAt`                                                                                                                                                                                                                                                                                                                                                                                                                         | Không có `updatedAt`: không sửa, không xóa (US-067 AC3)                                                                           |
+| `Notification`          | `recipientId` (`Cascade`), `notificationType`, `content` (câu tiếng Việt dựng lúc sự kiện), `changeRequestId?` (`Cascade`), `readStatus`, `readAt?`                                                                                                                                                                                                                                                                                                                                       | Chỉ trong ứng dụng; chỉ mục `(recipientId, readStatus, createdAt)`, `(changeRequestId)`                                           |
 
 ### Học kỳ, khóa (F-15)
 
-| Bảng | Cột chính | Ghi chú |
-|---|---|---|
-| `Semester` | `semesterCode` (duy nhất), `academicYear`, `termInYear` ≥ 1, `startDate Date?` | Duy nhất `(academicYear, termInYear)`; seed giữ chỗ |
-| `Cohort` | `cohortCode` (duy nhất), `intakeYear` | Seed giữ chỗ |
+| Bảng            | Cột chính                                                                      | Ghi chú                                                                                                                               |
+| --------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `Semester`      | `semesterCode` (duy nhất), `academicYear`, `termInYear` ≥ 1, `startDate Date?` | Duy nhất `(academicYear, termInYear)`; seed giữ chỗ                                                                                   |
+| `Cohort`        | `cohortCode` (duy nhất), `intakeYear`                                          | Seed giữ chỗ                                                                                                                          |
 | `CohortVersion` | `cohortId`, `programVersionId`, `fromSemesterId` (đều `Restrict`), `createdAt` | Khóa học theo phiên bản nào từ học kỳ nào; F-15 ghi khi ban hành và đính chính, F-16 gán lại. Duy nhất `(cohortId, programVersionId)` |
 
 ### `ProgramDirectorAssignment` — table `ProgramDirectorAssignment` (F-06)
-| Column | Type | Notes |
-|---|---|---|
-| `id` | `String` | `cuid(2)` |
-| `programId` | `String` | FK `Program` (`Restrict`), chỉ mục |
-| `directorId` | `String` | FK `User` (`Restrict`), chỉ mục |
-| `validFrom` / `validTo` | `Date` / `Date?` | `@db.Date`; `validTo` trống = không thời hạn (tên SRS `startDate`, `endDate` đổi để dùng chung `shared/time/validity.ts`) |
-| `assignedById` | `String?` | FK `User` |
-| `revokedAt` / `revokedById` | `DateTime?` / `String?` | Thu hồi dòng nhập nhầm; dòng thu hồi vẫn nằm trong lịch sử |
-| `createdAt` | `DateTime` | Không có `updatedAt` (theo kế hoạch) |
+
+| Column                      | Type                    | Notes                                                                                                                     |
+| --------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `id`                        | `String`                | `cuid(2)`                                                                                                                 |
+| `programId`                 | `String`                | FK `Program` (`Restrict`), chỉ mục                                                                                        |
+| `directorId`                | `String`                | FK `User` (`Restrict`), chỉ mục                                                                                           |
+| `validFrom` / `validTo`     | `Date` / `Date?`        | `@db.Date`; `validTo` trống = không thời hạn (tên SRS `startDate`, `endDate` đổi để dùng chung `shared/time/validity.ts`) |
+| `assignedById`              | `String?`               | FK `User`                                                                                                                 |
+| `revokedAt` / `revokedById` | `DateTime?` / `String?` | Thu hồi dòng nhập nhầm; dòng thu hồi vẫn nằm trong lịch sử                                                                |
+| `createdAt`                 | `DateTime`              | Không có `updatedAt` (theo kế hoạch)                                                                                      |
 
 Dòng "còn hiệu lực" do `activeDirectorWhere(today)` (`src/shared/programs/active-director.ts`) định nghĩa: chưa thu hồi, trong khoảng ngày, **và** chương trình `ACTIVE`; bộ đọc phạm vi R3, tóm tắt chương trình và (sau này) tra người duyệt cấp 2 của F-14 cùng dùng. Không có ràng buộc cơ sở dữ liệu cho việc chồng thời hạn của cùng một người — `ProgramDirectorsService.assign` giữ (`overlapsPeriod`), hai Giám đốc khác nhau cùng thời gian là hợp lệ (US-020 AC3). Không xóa, không kéo dài tại chỗ.
 
 ### `Role` — table `Role`
-| Column | Type | Notes |
-|---|---|---|
-| `id` | `String` | `cuid(2)` |
-| `roleCode` | `String` | Duy nhất (R1..R6) |
-| `roleName` | `String` | |
-| `description` | `String?` | |
-| `isSystemRole` | `Boolean` | Mặc định `false` |
-| `scopeSource` | `ScopeSource` | Mặc định `NONE`; khác `NONE` là vai trò suy ra, không có hàng `RoleAssignment` |
-| `createdAt` / `updatedAt` | `DateTime` | |
+
+| Column                    | Type          | Notes                                                                          |
+| ------------------------- | ------------- | ------------------------------------------------------------------------------ |
+| `id`                      | `String`      | `cuid(2)`                                                                      |
+| `roleCode`                | `String`      | Duy nhất (R1..R6)                                                              |
+| `roleName`                | `String`      |                                                                                |
+| `description`             | `String?`     |                                                                                |
+| `isSystemRole`            | `Boolean`     | Mặc định `false`                                                               |
+| `scopeSource`             | `ScopeSource` | Mặc định `NONE`; khác `NONE` là vai trò suy ra, không có hàng `RoleAssignment` |
+| `createdAt` / `updatedAt` | `DateTime`    |                                                                                |
 
 ### `Permission` — table `Permission`
-| Column | Type | Notes |
-|---|---|---|
-| `id` | `String` | `cuid(2)` |
-| `permissionCode` | `String` | Duy nhất; khớp hằng `PERMISSIONS` |
-| `permissionName` | `String` | |
-| `functionGroup` | `FunctionGroup` | |
-| `description` / `source` | `String?` | |
-| `createdAt` / `updatedAt` | `DateTime` | |
+
+| Column                    | Type            | Notes                             |
+| ------------------------- | --------------- | --------------------------------- |
+| `id`                      | `String`        | `cuid(2)`                         |
+| `permissionCode`          | `String`        | Duy nhất; khớp hằng `PERMISSIONS` |
+| `permissionName`          | `String`        |                                   |
+| `functionGroup`           | `FunctionGroup` |                                   |
+| `description` / `source`  | `String?`       |                                   |
+| `createdAt` / `updatedAt` | `DateTime`      |                                   |
 
 ### `RolePermission` — table `RolePermission`
-| Column | Type | Notes |
-|---|---|---|
-| `id` | `String` | `cuid(2)` |
-| `roleId` | `String` | FK `Role` |
-| `permissionId` | `String` | FK `Permission`, chỉ mục |
-| `mode` | `PermissionMode` | |
-| `scope` | `PermissionScope` | |
-| `updatedById` | `String?` | FK `User` — người sửa ô gần nhất trên MH-15 |
-| `createdAt` / `updatedAt` | `DateTime` | |
+
+| Column                    | Type              | Notes                                       |
+| ------------------------- | ----------------- | ------------------------------------------- |
+| `id`                      | `String`          | `cuid(2)`                                   |
+| `roleId`                  | `String`          | FK `Role`                                   |
+| `permissionId`            | `String`          | FK `Permission`, chỉ mục                    |
+| `mode`                    | `PermissionMode`  |                                             |
+| `scope`                   | `PermissionScope` |                                             |
+| `updatedById`             | `String?`         | FK `User` — người sửa ô gần nhất trên MH-15 |
+| `createdAt` / `updatedAt` | `DateTime`        |                                             |
 
 Duy nhất (`roleId`, `permissionId`). Không có hàng = vai trò không có quyền đó.
 
 ### `RoleAssignment` — table `RoleAssignment`
-| Column | Type | Notes |
-|---|---|---|
-| `id` | `String` | `cuid(2)` |
-| `userId` | `String` | FK `User`, chỉ mục |
-| `roleId` | `String` | FK `Role` |
-| `scopeType` | `ScopeType` | Hàng chỉ mang `SYSTEM` hoặc `UNIT`; `ASSIGNMENT` chỉ xuất hiện lúc đọc cho vai trò suy ra |
-| `scopeUnitId` | `String?` | FK `OrgUnit`; có khi `UNIT` |
-| `validFrom` / `validTo` | `Date` / `Date?` | `@db.Date` |
-| `assignedById` | `String?` | FK `User` |
-| `revokedAt` / `revokedById` | `DateTime?` / `String?` | Thu hồi chỉ ghi hai cột này |
-| `createdAt` / `updatedAt` | `DateTime` | |
+
+| Column                      | Type                    | Notes                                                                                     |
+| --------------------------- | ----------------------- | ----------------------------------------------------------------------------------------- |
+| `id`                        | `String`                | `cuid(2)`                                                                                 |
+| `userId`                    | `String`                | FK `User`, chỉ mục                                                                        |
+| `roleId`                    | `String`                | FK `Role`                                                                                 |
+| `scopeType`                 | `ScopeType`             | Hàng chỉ mang `SYSTEM` hoặc `UNIT`; `ASSIGNMENT` chỉ xuất hiện lúc đọc cho vai trò suy ra |
+| `scopeUnitId`               | `String?`               | FK `OrgUnit`; có khi `UNIT`                                                               |
+| `validFrom` / `validTo`     | `Date` / `Date?`        | `@db.Date`                                                                                |
+| `assignedById`              | `String?`               | FK `User`                                                                                 |
+| `revokedAt` / `revokedById` | `DateTime?` / `String?` | Thu hồi chỉ ghi hai cột này                                                               |
+| `createdAt` / `updatedAt`   | `DateTime`              |                                                                                           |
 
 Duy nhất (`userId`, `roleId`, `scopeUnitId`, `validFrom`) — PostgreSQL coi `NULL` là khác nhau, nên kiểm trùng khoảng hiệu lực ở service mới là chặn thật. Hàng không bị sửa vai trò, phạm vi hay ngày; đây là lịch sử phân quyền (FR-10) thay cho bảng kiểm toán đã hoãn.
 
 ### `Session` — table `session`
-| Column | Type | Notes |
-|---|---|---|
-| `sid` | `VARCHAR` | Khóa chính (`session_pkey`) |
-| `sess` | `JSON` | Dữ liệu phiên (`userId`) |
+
+| Column   | Type           | Notes                        |
+| -------- | -------------- | ---------------------------- |
+| `sid`    | `VARCHAR`      | Khóa chính (`session_pkey`)  |
+| `sess`   | `JSON`         | Dữ liệu phiên (`userId`)     |
 | `expire` | `TIMESTAMP(6)` | Chỉ mục `IDX_session_expire` |
 
 Hình dạng do `connect-pg-simple` quy định (`createTableIfMissing: false`, bảng do migration tạo); mã ứng dụng không đọc ghi bảng này qua Prisma.
@@ -342,34 +357,34 @@ Hình dạng do `connect-pg-simple` quy định (`createTableIfMissing: false`, 
 
 ## Supporting Enums
 
-| Enum | Giá trị |
-|---|---|
-| `UserStatus` | `ACTIVE`, `DISABLED` |
-| `OrgUnitType` | `UNIVERSITY`, `FACULTY`, `OFFICE` |
-| `OrgUnitStatus` | `ACTIVE`, `INACTIVE` |
-| `ScopeSource` | `NONE`, `PROGRAM_DIRECTOR`, `SUBJECT_GROUP_COORDINATOR`, `SUBJECT_GROUP_MEMBER`, `OWN_ENROLLMENT` |
-| `FunctionGroup` | `SYSTEM_ADMIN`, `COURSE_CATALOG`, `PROGRAM`, `LEARNING_OUTCOME`, `SYLLABUS`, `APPROVAL`, `VERSION`, `DATA_REPORT`, `STUDENT_LOOKUP` |
-| `PermissionMode` | `DIRECT`, `VIA_REQUEST` |
-| `PermissionScope` | `ALL`, `SCOPED` |
-| `ScopeType` | `SYSTEM`, `UNIT`, `ASSIGNMENT` |
-| `SubjectGroupStatus` | `ACTIVE`, `INACTIVE` |
-| `SubjectGroupMemberRole` | `MEMBER`, `COORDINATOR` |
-| `CourseType` | `THEORY`, `PRACTICE`, `LAB`, `PROJECT`, `CAPSTONE`, `INTERNSHIP`, `CONDITIONAL` |
-| `CourseStatus` | `ACTIVE`, `DISCONTINUED`, `CANCELLED` |
-| `CourseRelationType` | `PRIOR`, `PREREQUISITE`, `COREQUISITE`, `REPLACEMENT` |
-| `DegreeLevel` | `ENGINEER`, `BACHELOR` |
-| `ProgramStatus` | `ACTIVE`, `INACTIVE` |
-| `ProgramVersionStatus` | `DRAFT`, `PENDING`, `ACTIVE`, `HISTORICAL` |
-| `SyllabusStatus` | `DRAFT`, `PUBLISHED`, `HISTORICAL` |
-| `AttachmentFileType` | `PDF`, `DOCX`, `XLSX`, `IMAGE` |
-| `ChangeRequestType` | `GRADING_FORMULA`, `OUTCOME`, `SYLLABUS_CONTENT`, `CURRICULUM`, `COURSE_RELATION`, `PROGRAM_INFO`, `ORGANIZATION` |
-| `ChangeTargetType` | `COURSE`, `PROGRAM`, `SUBJECT_GROUP` |
-| `ChangeRequestStatus` | `DRAFT`, `PENDING_COORDINATOR`, `PENDING_DIRECTOR`, `PENDING_ACADEMIC_OFFICE`, `APPROVED`, `EFFECTIVE`, `REJECTED`, `WITHDRAWN` |
-| `RequestOrigin` | `UNIVERSITY`, `FACULTY` |
-| `ApprovalAction` | `PENDING`, `APPROVE`, `RETURN`, `REJECT` |
-| `NotificationType` | `REQUEST_AWAITING_YOU`, `REQUEST_RETURNED`, `REQUEST_REJECTED`, `REQUEST_APPROVED`, `REQUEST_OVERRIDDEN`, `REQUEST_COMMENTED`, `REQUEST_EFFECTIVE` |
-| `NotificationReadStatus` | `UNREAD`, `READ` |
-| `ChangeDocumentType` | `SUBMISSION`, `MINUTES`, `COUNCIL_MINUTES`, `REVIEW_MINUTES`, `OFFICIAL_LETTER` |
+| Enum                     | Giá trị                                                                                                                                            |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `UserStatus`             | `ACTIVE`, `DISABLED`                                                                                                                               |
+| `OrgUnitType`            | `UNIVERSITY`, `FACULTY`, `OFFICE`                                                                                                                  |
+| `OrgUnitStatus`          | `ACTIVE`, `INACTIVE`                                                                                                                               |
+| `ScopeSource`            | `NONE`, `PROGRAM_DIRECTOR`, `SUBJECT_GROUP_COORDINATOR`, `SUBJECT_GROUP_MEMBER`, `OWN_ENROLLMENT`                                                  |
+| `FunctionGroup`          | `SYSTEM_ADMIN`, `COURSE_CATALOG`, `PROGRAM`, `LEARNING_OUTCOME`, `SYLLABUS`, `APPROVAL`, `VERSION`, `DATA_REPORT`, `STUDENT_LOOKUP`                |
+| `PermissionMode`         | `DIRECT`, `VIA_REQUEST`                                                                                                                            |
+| `PermissionScope`        | `ALL`, `SCOPED`                                                                                                                                    |
+| `ScopeType`              | `SYSTEM`, `UNIT`, `ASSIGNMENT`                                                                                                                     |
+| `SubjectGroupStatus`     | `ACTIVE`, `INACTIVE`                                                                                                                               |
+| `SubjectGroupMemberRole` | `MEMBER`, `COORDINATOR`                                                                                                                            |
+| `CourseType`             | `THEORY`, `PRACTICE`, `LAB`, `PROJECT`, `CAPSTONE`, `INTERNSHIP`, `CONDITIONAL`                                                                    |
+| `CourseStatus`           | `ACTIVE`, `DISCONTINUED`, `CANCELLED`                                                                                                              |
+| `CourseRelationType`     | `PRIOR`, `PREREQUISITE`, `COREQUISITE`, `REPLACEMENT`                                                                                              |
+| `DegreeLevel`            | `ENGINEER`, `BACHELOR`                                                                                                                             |
+| `ProgramStatus`          | `ACTIVE`, `INACTIVE`                                                                                                                               |
+| `ProgramVersionStatus`   | `DRAFT`, `PENDING`, `ACTIVE`, `HISTORICAL`                                                                                                         |
+| `SyllabusStatus`         | `DRAFT`, `PUBLISHED`, `HISTORICAL`                                                                                                                 |
+| `AttachmentFileType`     | `PDF`, `DOCX`, `XLSX`, `IMAGE`                                                                                                                     |
+| `ChangeRequestType`      | `GRADING_FORMULA`, `OUTCOME`, `SYLLABUS_CONTENT`, `CURRICULUM`, `COURSE_RELATION`, `PROGRAM_INFO`, `ORGANIZATION`                                  |
+| `ChangeTargetType`       | `COURSE`, `PROGRAM`, `SUBJECT_GROUP`                                                                                                               |
+| `ChangeRequestStatus`    | `DRAFT`, `PENDING_COORDINATOR`, `PENDING_DIRECTOR`, `PENDING_ACADEMIC_OFFICE`, `APPROVED`, `EFFECTIVE`, `REJECTED`, `WITHDRAWN`                    |
+| `RequestOrigin`          | `UNIVERSITY`, `FACULTY`                                                                                                                            |
+| `ApprovalAction`         | `PENDING`, `APPROVE`, `RETURN`, `REJECT`                                                                                                           |
+| `NotificationType`       | `REQUEST_AWAITING_YOU`, `REQUEST_RETURNED`, `REQUEST_REJECTED`, `REQUEST_APPROVED`, `REQUEST_OVERRIDDEN`, `REQUEST_COMMENTED`, `REQUEST_EFFECTIVE` |
+| `NotificationReadStatus` | `UNREAD`, `READ`                                                                                                                                   |
+| `ChangeDocumentType`     | `SUBMISSION`, `MINUTES`, `COUNCIL_MINUTES`, `REVIEW_MINUTES`, `OFFICIAL_LETTER`                                                                    |
 
 Các enum sau Giá trị liệt kê lưu ở dạng `SCREAMING_SNAKE` như từ điển dữ liệu ghi (ví dụ `DRAFT`, `PENDING`, `ACTIVE`, `HISTORICAL`).
 
@@ -394,19 +409,41 @@ Học kỳ và khóa (F-15, gọi từ `seed.ts`): nạp học kỳ và khóa tu
 - Ngày học kỳ legacy **không bao giờ ghi đè** ngày hiện hữu, kể cả null; summary báo khác biệt. Lượt kiểm chứng giữ `2025-2026-1` ở `2025-09-08`, không đổi thành `2025-08-04`.
 - Không thay `1024034`, `DEMO*`, `KnowledgeBlock` hoặc đề cương giữ chỗ. Kết quả caller kiểm chứng trên PostgreSQL 18 ICU `vi-VN` dùng một lần: 24 programs, 46 versions, 3.295 items, 3.135 requisites, 156 groups; chạy lần hai created 0. Không suy ra database của người dùng đã nạp; chi tiết tại `docs/implement-report/dut-legacy-seed-implement-report.md` §V-01.
 
+## F-16 — lịch áp dụng trên lược đồ hiện hữu
+
+Nguồn: `source/backend/prisma/schema.prisma:453` (`Semester`, `Cohort`, `CohortVersion`), `source/backend/src/shared/releases/cohort-version-schedule.ts`, `source/backend/src/features/releases/cohort-versions.service.ts`. F-16 dùng lại dữ liệu F-15; **không thêm entity, cột, enum, migration, permission seed hoặc dependency**; không có bước reset/migrate database riêng cho F-16.
+
+- `CohortVersion` giữ `cohortId`, `programVersionId`, `fromSemesterId`, `createdAt`; ba FK `Restrict`, duy nhất `(cohortId, programVersionId)`, chỉ mục `programVersionId`. Một khóa không được có hai dòng cho cùng một phiên bản; sửa học kỳ dùng PATCH trên dòng hiện có, không tạo dòng lặp. Không có cột `toSemesterId`: khoảng áp dụng suy từ điểm bắt đầu kế tiếp theo chương trình/khóa.
+- Không có unique constraint database cho `(programId, cohortId, ngày bắt đầu)`: chương trình được suy qua `ProgramVersion`. Service kiểm trùng ngày `Semester.startDate` kể cả hai ID học kỳ khác nhau, dưới khóa hàng chương trình và giao dịch `Serializable`. Batch POST chỉ ghi các khóa được chọn, nguyên tử; PATCH chỉ đổi `fromSemesterId`, không đổi `createdAt` làm mốc tie.
+- Ngày áp dụng phải không sớm hơn `ProgramVersion.effectiveSemester.startDate`; thiếu ngày không được đoán từ `semesterCode`. Lịch gán sai hoặc tham chiếu bản chưa ban hành trả lỗi thay vì ngầm bỏ qua. As-of chọn ngày bắt đầu ≤ học kỳ hỏi, rồi phá tie bằng `createdAt` và `id` giảm dần; không có dòng phù hợp là chưa gán, không fallback ACTIVE (hợp đồng đầy đủ ở `general_architecture.md` §Bộ đọc phiên bản áp dụng).
+- `revision` là SHA-256 tính lúc đọc trên các dòng gán của chương trình và toàn bộ ID/ngày bắt đầu học kỳ, không lưu thành model mới; `expectedRevision` bảo vệ POST/PATCH khỏi xác nhận cũ. Ràng buộc duy nhất hiện hữu vẫn là hàng rào cuối (`P2002` → `COHORT_VERSION_EXISTS`); xung đột serialization (`P2034`) → `ASSIGNMENT_STATE_CHANGED`.
+- So sánh dùng lại tên/tín chỉ đóng băng, pin `CurriculumItem.syllabusId` và các nội dung phiên bản hiện hữu; không bổ sung bảng diff, không backfill snapshot từ dữ liệu sống. Ảnh chụp legacy thiếu dữ liệu phải báo `VERSION_SNAPSHOT_INCOMPLETE`, không coi là dữ liệu đầy đủ. F-17 chưa có adapter sinh viên; lịch này chưa chứng minh việc áp dụng ngoại lệ từng sinh viên.
+
 ## Nhập Excel (F-09) — lược đồ đã áp dụng
 
 Nguồn: `source/backend/prisma/schema.prisma`; migration `source/backend/prisma/migrations/20261026091026_import_batches/migration.sql`. Orchestrator xác nhận đã áp migration trên dev database và Testcontainers; prisma format/generate đã hoàn tất ngày 2026-10-26. Không suy ra mọi máy người dùng đã migrate.
 
-| Thành phần | Dữ liệu / ràng buộc |
-|---|---|
-| ImportType | COURSE_CATALOG, CURRICULUM, STUDENT_LIST, ACADEMIC_RESULT; F-09 chỉ mở API cho hai loại đầu |
-| ImportBatchStatus | VALIDATING, DRY_RUN, COMMITTING, COMMITTED, ABORTED |
-| ImportBatch | id cuid2; importType, fileName, performedById, programId?, versionId?, status; totalRows/successRows/errorRows mặc định 0; errorReport JSON; recordedAt, finishedAt? |
-| ImportBatchFile | batchId vừa PK vừa FK; content Bytes, sizeBytes, expiresAt. Tách nội dung khỏi truy vấn lịch sử; giữ 30 ngày |
-| Khóa ngoại | performedById → User và programId → Program: Restrict; versionId → ProgramVersion: SetNull; xóa batch cascade tệp |
-| Chỉ mục | batch: (performedById, recordedAt), (programId, recordedAt), (status, recordedAt); file: expiresAt |
-| ImportBatch_program_for_curriculum | (importType = CURRICULUM) tương đương (programId IS NOT NULL) |
-| ImportBatch_row_counts | Ba bộ đếm không âm; successRows + errorRows = totalRows |
+| Thành phần                         | Dữ liệu / ràng buộc                                                                                                                                                  |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ImportType                         | COURSE_CATALOG, CURRICULUM, STUDENT_LIST, ACADEMIC_RESULT; F-09 chỉ mở API cho hai loại đầu                                                                          |
+| ImportBatchStatus                  | VALIDATING, DRY_RUN, COMMITTING, COMMITTED, ABORTED                                                                                                                  |
+| ImportBatch                        | id cuid2; importType, fileName, performedById, programId?, versionId?, status; totalRows/successRows/errorRows mặc định 0; errorReport JSON; recordedAt, finishedAt? |
+| ImportBatchFile                    | batchId vừa PK vừa FK; content Bytes, sizeBytes, expiresAt. Tách nội dung khỏi truy vấn lịch sử; giữ 30 ngày                                                         |
+| Khóa ngoại                         | performedById → User và programId → Program: Restrict; versionId → ProgramVersion: SetNull; xóa batch cascade tệp                                                    |
+| Chỉ mục                            | batch: (performedById, recordedAt), (programId, recordedAt), (status, recordedAt); file: expiresAt                                                                   |
+| ImportBatch_program_for_curriculum | (importType = CURRICULUM) tương đương (programId IS NOT NULL)                                                                                                        |
+| ImportBatch_row_counts             | Ba bộ đếm không âm; successRows + errorRows = totalRows                                                                                                              |
 
 Hai CHECK được nối tay trong migration, không được bỏ khi sinh lại SQL. Dọn tệp không xóa batch/report; việc xóa phiên bản không làm mất lịch sử nhập. Ma trận liên quan dòng khung đã cascade từ CurriculumItem theo F-11; F-09 không thêm thay đổi lược đồ ngoài hai bảng và hai enum này.
+
+## Công thức điểm, ánh xạ đánh giá–CLO (F-12) — lược đồ đã áp dụng
+
+Migration `20261027154125_grade_formula_assessment_clo`, chỉ thêm, không sửa dữ liệu cũ. Nguồn: `source/backend/prisma/schema.prisma` (`AssessmentComponent`, `AssessmentCLOMapping`).
+
+| Đối tượng               | Cột chính                                                                                                                                                                                                                     |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Syllabus.failingScore` | `Decimal(9,2)` null: điểm liệt học phần                                                                                                                                                                                       |
+| `AssessmentComponent`   | `syllabusId` (Cascade), `componentCode`, `componentName`, `weight Decimal(5,2)`, `assessmentForm?`, `isConditional`, `conditionThreshold? Decimal(9,2)`, `failingScore? Decimal(9,2)`; duy nhất `(syllabusId, componentCode)` |
+| `AssessmentCLOMapping`  | `assessmentComponentId` và `cloId` (đều Cascade), `cloWeight? Decimal`; duy nhất `(assessmentComponentId, cloId)`; ô null vẫn là đã ánh xạ                                                                                    |
+
+Năm CHECK nối tay trong migration, không được bỏ khi sinh lại SQL: `Syllabus_failingScore_nonnegative`, `AssessmentComponent_weight_range` (0 < w ≤ 100), `AssessmentComponent_threshold_shape` (điều kiện thì có ngưỡng ≥ 0), `AssessmentComponent_failingScore_nonnegative`, `AssessmentCLOMapping_weight_range`. Tổng 100 và độ phủ CLO kiểm ở dịch vụ, không ở CHECK. Bản đề cương cũ không được điền công thức tự động. `prisma format` căn lại khoảng trắng toàn schema trong cùng lượt.

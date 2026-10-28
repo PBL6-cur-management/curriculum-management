@@ -86,6 +86,14 @@ const R5 = access(
   ],
   { subjectGroupIds: ['G1'] },
 );
+const GRADER = access(
+  [
+    VIEW_SYLLABUS,
+    VIEW_PROGRAMS,
+    { code: PERMISSIONS.GRADING_FORMULA_EDIT, mode: 'DIRECT' },
+  ],
+  { orgUnitIds: ['home'] },
+);
 const R6 = access([
   VIEW_SYLLABUS,
   { code: PERMISSIONS.PROGRAM_VIEW, mode: 'DIRECT' },
@@ -123,6 +131,8 @@ function revisionRow(status: SyllabusStatus, patch = {}) {
     weeklyContents: [],
     attachments: [],
     clos: [],
+    failingScore: null,
+    assessmentComponents: [],
     ...patch,
   };
 }
@@ -234,6 +244,72 @@ describe('SyllabiService', () => {
         editPath: 'VIA_REQUEST',
       });
       expect(result.published?.status).toBe(SyllabusStatus.PUBLISHED);
+    });
+  });
+
+  describe('grading capabilities', () => {
+    it('opens the formula to a grading-only holder without opening the text', async () => {
+      prisma.syllabus.findMany.mockResolvedValue([
+        revisionRow(SyllabusStatus.DRAFT),
+      ]);
+
+      const grader = await service.forCourse('c1', GRADER);
+      const author = await service.forCourse('c1', R3);
+
+      expect(grader).toMatchObject({
+        gradingEditPath: 'DIRECT',
+        canEditGradingFormula: true,
+        editPath: null,
+      });
+      expect(author).toMatchObject({
+        gradingEditPath: null,
+        canEditGradingFormula: false,
+      });
+    });
+
+    it('routes a released syllabus through a request and shows an empty aggregate when no formula exists', async () => {
+      prisma.syllabus.findMany.mockResolvedValue([
+        revisionRow(SyllabusStatus.PUBLISHED),
+      ]);
+      prisma.syllabus.findFirst.mockResolvedValue({ id: 's' });
+
+      const result = await service.forCourse('c1', GRADER);
+
+      expect(result).toMatchObject({
+        gradingEditPath: 'VIA_REQUEST',
+        canEditGradingFormula: false,
+      });
+      expect(result.published?.gradingFormula).toEqual({
+        failingScore: null,
+        totalWeight: '0',
+        components: [],
+        warnings: [],
+      });
+    });
+
+    it('names an uncovered CLO of the revision itself', async () => {
+      prisma.syllabus.findMany.mockResolvedValue([
+        revisionRow(SyllabusStatus.DRAFT, {
+          clos: [
+            {
+              id: 'k1',
+              cloCode: 'CLO1',
+              description: 'd',
+              englishDescription: null,
+              cognitiveLevel: null,
+              sortOrder: 1,
+              ploLinks: [],
+              _count: { assessmentLinks: 0 },
+            },
+          ],
+        }),
+      ]);
+
+      const result = await service.forCourse('c1', GRADER);
+
+      expect(result.draft?.gradingFormula.warnings).toMatchObject([
+        { code: 'ASSESSMENT_CLO_UNCOVERED', cloId: 'k1', cloCode: 'CLO1' },
+      ]);
     });
   });
 

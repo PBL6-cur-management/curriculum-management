@@ -3,6 +3,7 @@
 This plan builds EP-16 (US-078..US-080; CV-194..CV-199 and F-16's contribution to CV-200): released-version comparison (MH-48), completion of history navigation (MH-46/47), and explicit semester-effective cohort assignment (MH-50). It defines the shared, transaction-aware answer to “which program version applies to this cohort in this semester?” and the integration contract that B5 student-facing features must use. It does not build student records, student exceptions, registration eligibility, graduation, a portal, an integration API, or the unbuilt grading-formula feature.
 
 > **Companion documents**
+>
 > - Decisions: `docs/planning/feature-questions.md:249` (F16-01 = A; blank F16-02/03 = A).
 > - Epic and acceptance: `docs/planning/epics.md:156`, `docs/planning/epics.md:169`; stories `docs/planning/user-stories.md:951`, `docs/planning/user-stories.md:962`, `docs/planning/user-stories.md:972`.
 > - Requirements: `docs/requirement/REQUIREMENTS.md:544` (FR-72..74), `docs/requirement/REQUIREMENTS.md:948` (BR-22..26), DEC-01/08.
@@ -12,9 +13,9 @@ This plan builds EP-16 (US-078..US-080; CV-194..CV-199 and F-16's contribution t
 > - Test cases: `docs/planning/test-plan.md` KB-059, NT-B4-10/11/12, NT-B5-02; no separate F-16 test-case document exists at planning time.
 > - Conventions: `docs/implementation/README.md`; F-15 and F-09 implementation plans; `docs/architecture/general_architecture.md`, `docs/architecture/features_architecture.md`, `docs/architecture/database_and_models.md`; frontend `src/shared/design-system/DESIGN_SYSTEM.md`.
 
-**Status**: In progress — BE done, FE-01..FE-06 built, browser walk pending
+**Status**: Done — BE-01..BE-07, FE-01..FE-06 và DOC-01 hoàn tất; kiểm thử tự động đã xác nhận, còn nợ manual F16-TC_023..027 và C9.
 
-Backend built on 2026-10-26 against current source, with every §8 decision/default accepted by the user on that date. The orchestrator verified backend unit 1134/1134, existing release/correction/permission/users e2e and both new suites 18/18. FE-01 generated types were supplied by the orchestrator; FE-02..FE-06, the test-case document and Playwright spec are built. DOC-01 and browser execution are not part of this run. E2/E4 Faculty acceptance is not fabricated; U1/U2 remain unbuilt. The orchestrator owns browser verification.
+Ngày 2026-10-27, orchestrator xác nhận backend unit 1134/1134, hai suite F-16 e2e 18/18 và regression releases/corrections/permission-table/users đạt. Playwright lượt 2 đạt 14/14 (9 auth setup và 5 ca F-16), 1.3 phút, sau khi sửa hai lỗi helper ở lượt 1. Frontend F-16 scoped đạt 81/81; full suite lượt đầu dưới tải nặng đạt 469/478, 8 file lỗi chạy lại riêng đạt 58/58, không phải một lượt full suite xanh. DOC-01 đã đồng bộ kiến trúc, tiến độ, chỉ mục và kết quả TC. Toàn bộ quyết định/default §8 đã được người dùng chấp thuận ngày 2026-10-26; không suy diễn nghiệm thu Khoa từ dữ liệu tổng hợp. Manual F16-TC_023..027 và lịch/fixture nghiệm thu C9 còn nợ; U1/U2 không thuộc F-16.
 
 ---
 
@@ -22,91 +23,91 @@ Backend built on 2026-10-26 against current source, with every §8 decision/defa
 
 Everything below in one table. Read this; the rest is detail for whoever builds it.
 
-| What | Why | How and where |
-|---|---|---|
-| **Browse old versions without rebuilding history** | US-079; F-15 already supplies metadata, frozen rows and origin links | Keep the existing release history/detail APIs; add safe selection and missing group navigation in `features/releases/pages/VersionHistoryPage.tsx` and `VersionDetailPage.tsx` (FE-03/06) |
-| **Compare any two issued snapshots, including non-adjacent ones** | US-078 AC1/4; FR-72 | New frozen snapshot reader and direct natural-key diff; six content sections with Thêm / Bớt / Sửa, not a replay of proposals (BE-02/03, FE-04) |
-| **Show unchanged groups and the actual pinned syllabus difference** | US-078 AC2/3; F16-03 A | Keep empty sections, display “Không thay đổi”, and drill into the two version-derived syllabus pins (BE-01..03, FE-04) |
-| **Assign only explicitly selected cohorts from a selected semester** | US-080 AC1..3; F16-01 A; BR-26 | R1 batch POST and single-link semester correction; full confirmation, no implicit cohort migration or fabricated student counts (BE-05, FE-05) |
-| **One stable cohort/program/semester query for B5** | US-080 AC4; student records, eligibility, graduation, portal and dDUT must agree | Export `AppliedProgramVersionReader.forCohort/forCohorts` from `shared/releases`; require a semester and never fall back to Program ACTIVE (BE-04/06) |
-| **Keep assignment writes atomic and stale decisions visible** | Selected cohorts must change all-or-none; concurrent R1/release writers exist | Existing Program lock plus Serializable write transaction and schedule/calendar revision token; explicit 409/reconfirm (BE-04/05/07, FE-02/05) |
-| **Preserve built tables and feature boundaries** | This task cannot approve changed behavior in F-15 or unbuilt features | No migration, new permission seed, runtime package or student stub; preserve F-13 readers and F-15 publisher/correction/activation (BE-01..07) |
-| **Do not conceal the correction-history conflict** | A stable query cannot recreate cohort intervals the current correction writer rewrites | Characterize current code, fence the correction-stable acceptance slice and record E1; ordinary cohort scheduling remains buildable (BE-07, §8) |
+| What                                                                 | Why                                                                                    | How and where                                                                                                                                                                             |
+| -------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Browse old versions without rebuilding history**                   | US-079; F-15 already supplies metadata, frozen rows and origin links                   | Keep the existing release history/detail APIs; add safe selection and missing group navigation in `features/releases/pages/VersionHistoryPage.tsx` and `VersionDetailPage.tsx` (FE-03/06) |
+| **Compare any two issued snapshots, including non-adjacent ones**    | US-078 AC1/4; FR-72                                                                    | New frozen snapshot reader and direct natural-key diff; six content sections with Thêm / Bớt / Sửa, not a replay of proposals (BE-02/03, FE-04)                                           |
+| **Show unchanged groups and the actual pinned syllabus difference**  | US-078 AC2/3; F16-03 A                                                                 | Keep empty sections, display “Không thay đổi”, and drill into the two version-derived syllabus pins (BE-01..03, FE-04)                                                                    |
+| **Assign only explicitly selected cohorts from a selected semester** | US-080 AC1..3; F16-01 A; BR-26                                                         | R1 batch POST and single-link semester correction; full confirmation, no implicit cohort migration or fabricated student counts (BE-05, FE-05)                                            |
+| **One stable cohort/program/semester query for B5**                  | US-080 AC4; student records, eligibility, graduation, portal and dDUT must agree       | Export `AppliedProgramVersionReader.forCohort/forCohorts` from `shared/releases`; require a semester and never fall back to Program ACTIVE (BE-04/06)                                     |
+| **Keep assignment writes atomic and stale decisions visible**        | Selected cohorts must change all-or-none; concurrent R1/release writers exist          | Existing Program lock plus Serializable write transaction and schedule/calendar revision token; explicit 409/reconfirm (BE-04/05/07, FE-02/05)                                            |
+| **Preserve built tables and feature boundaries**                     | This task cannot approve changed behavior in F-15 or unbuilt features                  | No migration, new permission seed, runtime package or student stub; preserve F-13 readers and F-15 publisher/correction/activation (BE-01..07)                                            |
+| **Do not conceal the correction-history conflict**                   | A stable query cannot recreate cohort intervals the current correction writer rewrites | Characterize current code, fence the correction-stable acceptance slice and record E1; ordinary cohort scheduling remains buildable (BE-07, §8)                                           |
 
 **Key behaviours worth knowing**
 
-| Behaviour | Why it is this way |
-|---|---|
-| PENDING can apply to a future queried semester; HISTORICAL can still apply to an old cohort | Lifecycle status is not cohort entitlement. Resolver uses explicit assignments and semester starts, not worker timing |
-| A missing mapping returns UNASSIGNED; a missing date or invalid mapping is an error | “No assignment” and “cannot safely calculate” must not both become a guessed ACTIVE version |
-| Existing same-date ties are deterministic; new F-16 writes refuse another same-date mapping | Preserve F-15-owned data while avoiding new ambiguity; tie order is link.createdAt then link.id |
-| Editing a link's starting semester can deliberately change past answers | MH-50 permits schedule correction; warn/confirm. A later version switch is a new link, not moving the old row forward |
-| Current correction/calendar edits can change old assignment answers | E1/E3 decided 2026-10-26: accepted administrative retroactivity, no history/freeze work; the query is stable in contract, not an immutable ledger |
-| History's cohort column is membership of schedule links, not an as-of result | Existing serializer maps every linked cohort (`source/backend/src/features/releases/version-history.reader.ts:213`); MH-50's query gives the semester-specific answer |
+| Behaviour                                                                                   | Why it is this way                                                                                                                                                    |
+| ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PENDING can apply to a future queried semester; HISTORICAL can still apply to an old cohort | Lifecycle status is not cohort entitlement. Resolver uses explicit assignments and semester starts, not worker timing                                                 |
+| A missing mapping returns UNASSIGNED; a missing date or invalid mapping is an error         | “No assignment” and “cannot safely calculate” must not both become a guessed ACTIVE version                                                                           |
+| Existing same-date ties are deterministic; new F-16 writes refuse another same-date mapping | Preserve F-15-owned data while avoiding new ambiguity; tie order is link.createdAt then link.id                                                                       |
+| Editing a link's starting semester can deliberately change past answers                     | MH-50 permits schedule correction; warn/confirm. A later version switch is a new link, not moving the old row forward                                                 |
+| Current correction/calendar edits can change old assignment answers                         | E1/E3 decided 2026-10-26: accepted administrative retroactivity, no history/freeze work; the query is stable in contract, not an immutable ledger                     |
+| History's cohort column is membership of schedule links, not an as-of result                | Existing serializer maps every linked cohort (`source/backend/src/features/releases/version-history.reader.ts:213`); MH-50's query gives the semester-specific answer |
 
 **Not included**
 
-| Excluded | Why |
-|---|---|
-| Student identities, exceptions, dual-major/enrollment transitions and student counts | Unbuildable before F-17; its assumed adapter/transition contract is specified, not faked |
-| Assessment/formula diff and the exact formula B4 scenario | Unbuildable before F-12's real revision-addressed schema/reader; no parallel-plan assumption |
-| Excel import/export, reports, timeline, portal and dDUT routes | Other features; F-09 backend now exists in `source/backend/src/features/imports/`, but is not a prerequisite here |
-| Separate conversion-evidence persistence and stronger calendar/correction semantics | E1/E2/E3 decided 2026-10-26: no separate conversion-evidence store or history/freeze work |
-| Repeat intervals of the same cohort/version pair or mapping deletion | Existing `(cohortId, programVersionId)` uniqueness remains unchanged (`source/backend/prisma/schema.prisma:490`) |
+| Excluded                                                                             | Why                                                                                                               |
+| ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| Student identities, exceptions, dual-major/enrollment transitions and student counts | Unbuildable before F-17; its assumed adapter/transition contract is specified, not faked                          |
+| Assessment/formula diff and the exact formula B4 scenario                            | Unbuildable before F-12's real revision-addressed schema/reader; no parallel-plan assumption                      |
+| Excel import/export, reports, timeline, portal and dDUT routes                       | Other features; F-09 backend now exists in `source/backend/src/features/imports/`, but is not a prerequisite here |
+| Separate conversion-evidence persistence and stronger calendar/correction semantics  | E1/E2/E3 decided 2026-10-26: no separate conversion-evidence store or history/freeze work                         |
+| Repeat intervals of the same cohort/version pair or mapping deletion                 | Existing `(cohortId, programVersionId)` uniqueness remains unchanged (`source/backend/prisma/schema.prisma:490`)  |
 
 **Open questions**
 
-| Question | Resolved when | Default if unanswered |
-|---|---|---|
-| Do corrections preserve pre-conversion cohort answers? | Owner decides E1 | Preserve current F-15 behavior; do not certify correction-stable history |
-| Is a distinct conversion decision/basis mandatory? | Faculty decides E2 | Explicit R1 selection and displayed release decision only; separate evidence acceptance remains open |
-| Must all assignment-used semester dates be frozen? | Owner/Faculty decides E3 | Existing live-calendar policy; unknown dates fail closed |
-| What official calendar and sanitized 1024034 fixture establish acceptance? | Faculty supplies E4 inputs | Synthetic behavioral fixtures only, no institutional-data claim |
+| Question                                                                   | Resolved when              | Default if unanswered                                                                                |
+| -------------------------------------------------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Do corrections preserve pre-conversion cohort answers?                     | Owner decides E1           | Preserve current F-15 behavior; do not certify correction-stable history                             |
+| Is a distinct conversion decision/basis mandatory?                         | Faculty decides E2         | Explicit R1 selection and displayed release decision only; separate evidence acceptance remains open |
+| Must all assignment-used semester dates be frozen?                         | Owner/Faculty decides E3   | Existing live-calendar policy; unknown dates fail closed                                             |
+| What official calendar and sanitized 1024034 fixture establish acceptance? | Faculty supplies E4 inputs | Synthetic behavioral fixtures only, no institutional-data claim                                      |
 
 ---
 
 ## 1. Scope
 
-| In scope | Why |
-|---|---|
-| Compare any two issued versions of one program, including non-adjacent versions | US-078 AC1/4; FR-72 |
-| Six content groups, each with Thêm / Bớt / Sửa and explicit unchanged output | US-078 AC1/3; F16-03 A |
-| Pinned-syllabus difference drill-down using the two version contexts | US-078 AC2; never substitute the current syllabus |
-| Reuse existing history, frozen detail, origin request and approval-history navigation | US-079; no second history implementation |
-| Add and edit cohort application schedules; batch assignment to explicitly selected cohorts | US-080 AC1/2/5; MH-50 |
-| One exported, semester-explicit cohort resolver and one R1 diagnostic HTTP endpoint | US-080 AC4; CV-197; B5 integration contract |
-| Integration tests proving publication/activation alone do not reassign cohorts | US-080 AC3; F16-01 A |
-| Preserve current schema, release forms, permissions and correction writer | Scope fence; §8 E1 records the temporal limitation instead of silently changing F-15 |
+| In scope                                                                                   | Why                                                                                  |
+| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| Compare any two issued versions of one program, including non-adjacent versions            | US-078 AC1/4; FR-72                                                                  |
+| Six content groups, each with Thêm / Bớt / Sửa and explicit unchanged output               | US-078 AC1/3; F16-03 A                                                               |
+| Pinned-syllabus difference drill-down using the two version contexts                       | US-078 AC2; never substitute the current syllabus                                    |
+| Reuse existing history, frozen detail, origin request and approval-history navigation      | US-079; no second history implementation                                             |
+| Add and edit cohort application schedules; batch assignment to explicitly selected cohorts | US-080 AC1/2/5; MH-50                                                                |
+| One exported, semester-explicit cohort resolver and one R1 diagnostic HTTP endpoint        | US-080 AC4; CV-197; B5 integration contract                                          |
+| Integration tests proving publication/activation alone do not reassign cohorts             | US-080 AC3; F16-01 A                                                                 |
+| Preserve current schema, release forms, permissions and correction writer                  | Scope fence; §8 E1 records the temporal limitation instead of silently changing F-15 |
 
-| Out of scope | Deferred until |
-|---|---|
-| Student CRUD, materialized enrollment transitions, individual exceptions, dual-degree routing and student identity authorization | F-17; B5 contract below is a dependency, not an endpoint that exists |
-| Eligibility, graduation, portal, dDUT HTTP routes | F-18..F-21; consume the selected version, not Program's ACTIVE version |
-| Grading-formula/assessment tables and their version diff | F-12; no dependency on a concurrently written plan |
-| Excel import/export | F-09 backend is built in `source/backend/src/features/imports/`; no imports dependency is required to implement or test this feature |
-| Timeline, PDF, external reports, email and delegation | F-23..F-25; no imports from their unbuilt code |
-| General audit log or a new conversion-document store | Deferred audit decision; Faculty must settle separate conversion evidence (§8 E2) |
-| Repeating the same version twice in one cohort's schedule, deletion of mappings, immutable assignment-event history | Existing pair uniqueness is retained; any changed table behavior needs separate approval |
-| Repairing F-15's correction reassignment or freezing semester metadata | Escalations E1/E3; do not smuggle these into a migration |
+| Out of scope                                                                                                                     | Deferred until                                                                                                                       |
+| -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Student CRUD, materialized enrollment transitions, individual exceptions, dual-degree routing and student identity authorization | F-17; B5 contract below is a dependency, not an endpoint that exists                                                                 |
+| Eligibility, graduation, portal, dDUT HTTP routes                                                                                | F-18..F-21; consume the selected version, not Program's ACTIVE version                                                               |
+| Grading-formula/assessment tables and their version diff                                                                         | F-12; no dependency on a concurrently written plan                                                                                   |
+| Excel import/export                                                                                                              | F-09 backend is built in `source/backend/src/features/imports/`; no imports dependency is required to implement or test this feature |
+| Timeline, PDF, external reports, email and delegation                                                                            | F-23..F-25; no imports from their unbuilt code                                                                                       |
+| General audit log or a new conversion-document store                                                                             | Deferred audit decision; Faculty must settle separate conversion evidence (§8 E2)                                                    |
+| Repeating the same version twice in one cohort's schedule, deletion of mappings, immutable assignment-event history              | Existing pair uniqueness is retained; any changed table behavior needs separate approval                                             |
+| Repairing F-15's correction reassignment or freezing semester metadata                                                           | Escalations E1/E3; do not smuggle these into a migration                                                                             |
 
-| AC / task | Covered by |
-|---|---|
-| US-078 AC1: information, curriculum, electives, PLO, matrices and pins | BE-01/02/03/07; FE-04/06 |
-| US-078 AC2: syllabus-only change and a link to the two pinned revisions | BE-02/03/07; FE-03/04/06 |
-| US-078 AC3: every unchanged content group says “Không thay đổi” | BE-02/03; FE-04/06 |
-| US-078 AC4: direct endpoint-to-endpoint, non-adjacent comparison | BE-02/03/07; FE-04/06 |
-| US-079 AC1: versions, decisions, semester, status and assigned cohorts | Existing F-15 readers verified in §2; FE-03/06 |
-| US-079 AC2: full historical content, no edit controls | Existing F-15/07/11/10 readers; BE-07 and FE-03/06 regression coverage |
-| US-079 AC3: origin request and approval history | Existing origin link; FE-03/06 regression through request detail |
-| US-080 AC1: K2023 unchanged when K2025 is assigned another version | BE-04/05/07; FE-05/06 |
-| US-080 AC2: selected old cohorts switch only from the selected semester | BE-04/05/07; FE-05/06; correction exception E1 is not certified |
-| US-080 AC3: publication/activation without cohort selection does not switch anyone | BE-07; FE-05 explanatory copy |
-| US-080 AC4: latest starting semester not after requested semester | BE-04/05/07; FE-05/06 |
-| US-080 AC5: Draft assignment is refused | BE-01/05/07; FE-05/06 |
-| CV-194/195 | BE-02/03/07; FE-04 |
-| CV-196 | FE-03/06, preserve rather than rebuild F-15 |
-| CV-197/198/199 | BE-04/05/07; FE-05/06; synthetic 1024034 fixture |
-| CV-200 | §7 B4 acceptance gate; F-12 and Faculty-owned fixture/evidence dependencies remain explicit |
+| AC / task                                                                          | Covered by                                                                                  |
+| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| US-078 AC1: information, curriculum, electives, PLO, matrices and pins             | BE-01/02/03/07; FE-04/06                                                                    |
+| US-078 AC2: syllabus-only change and a link to the two pinned revisions            | BE-02/03/07; FE-03/04/06                                                                    |
+| US-078 AC3: every unchanged content group says “Không thay đổi”                    | BE-02/03; FE-04/06                                                                          |
+| US-078 AC4: direct endpoint-to-endpoint, non-adjacent comparison                   | BE-02/03/07; FE-04/06                                                                       |
+| US-079 AC1: versions, decisions, semester, status and assigned cohorts             | Existing F-15 readers verified in §2; FE-03/06                                              |
+| US-079 AC2: full historical content, no edit controls                              | Existing F-15/07/11/10 readers; BE-07 and FE-03/06 regression coverage                      |
+| US-079 AC3: origin request and approval history                                    | Existing origin link; FE-03/06 regression through request detail                            |
+| US-080 AC1: K2023 unchanged when K2025 is assigned another version                 | BE-04/05/07; FE-05/06                                                                       |
+| US-080 AC2: selected old cohorts switch only from the selected semester            | BE-04/05/07; FE-05/06; correction exception E1 is not certified                             |
+| US-080 AC3: publication/activation without cohort selection does not switch anyone | BE-07; FE-05 explanatory copy                                                               |
+| US-080 AC4: latest starting semester not after requested semester                  | BE-04/05/07; FE-05/06                                                                       |
+| US-080 AC5: Draft assignment is refused                                            | BE-01/05/07; FE-05/06                                                                       |
+| CV-194/195                                                                         | BE-02/03/07; FE-04                                                                          |
+| CV-196                                                                             | FE-03/06, preserve rather than rebuild F-15                                                 |
+| CV-197/198/199                                                                     | BE-04/05/07; FE-05/06; synthetic 1024034 fixture                                            |
+| CV-200                                                                             | §7 B4 acceptance gate; F-12 and Faculty-owned fixture/evidence dependencies remain explicit |
 
 ## 2. Contract verification
 
@@ -116,20 +117,20 @@ This section is the contract gate. **Existing** means verified source below, not
 
 Every path below has the existing `/api` prefix on the wire. New routes live outside `versions/:versionId` so a literal `compare` can never be swallowed by the existing detail parameter.
 
-| Endpoint | Verified at | Request | Response | Notes |
-|---|---|---|---|---|
-| `GET /api/programs/:programId/versions` | `source/backend/src/features/releases/version-history.controller.ts:16`; mapper `source/backend/src/features/releases/version-history.reader.ts:198` | Path only | `VersionListDto` | Ordered by `createdAt desc, id desc`, not numeric version; ALL-scope program viewers can see the plain Draft; request copies and correction Drafts are excluded (`version-history.reader.ts:79`). FE must filter issued comparison candidates. |
-| `GET /api/programs/:programId/versions/:versionId` | `source/backend/src/features/releases/version-history.controller.ts:26`; serializer `source/backend/src/features/releases/version-history.reader.ts:169` | Two path IDs | `VersionDetailDto` | Verifies membership in program; ordinary Draft not served, R1 correction Draft can be served. Detail has frozen rows and links, not embedded PLO/matrix collections (`version-history.reader.ts:102`, `:140`). |
-| `GET /api/semesters` | `source/backend/src/features/semesters/semesters.controller.ts:19`; `source/backend/src/shared/releases/semester.dto.ts:22` | None | `SemesterDto[]` | Any authenticated user; date may be null. No guessed academic-year parsing. |
-| `GET /api/cohorts` | `source/backend/src/features/semesters/semesters.controller.ts:44`; `source/backend/src/shared/releases/semester.dto.ts:32` | None | `CohortDto[]` | Any authenticated user; reuse the existing query/selector infrastructure. |
-| `GET /api/programs` | `source/backend/src/features/programs/programs.controller.ts:43`; serializer `source/backend/src/features/programs/program.dto.ts:168` | `q?`, `page`, `pageSize` | `ProgramPageDto` | R1 program picker when entering MH-50 from MH-10. Existing list requires PROGRAM_VIEW ALL, sorts by programCode and paginates (`source/backend/src/features/programs/programs.service.ts:49`). Its currentVersion is NOT cohort entitlement. |
-| `POST /api/programs/:programId/versions/:versionId/release` | `source/backend/src/features/releases/releases.controller.ts:36`; `source/backend/src/shared/releases/version.publisher.ts:91` | Existing `ReleaseVersionDto` | Existing `VersionDetailDto` | Regression fixture only, not a new FE call. Only selected `cohortIds` create links at the release semester. |
-| `GET /api/programs/:programId/version-comparison` | `source/backend/src/features/releases/version-comparison.controller.ts:20`; service `version-comparison.service.ts:41` | `beforeVersionId`, `afterVersionId` required | `VersionComparisonDto` | Source-verified, HTTP pending. Read-only; two issued rows of this exact program; same ID allowed and yields six unchanged sections; no writes to ChangeItem. |
-| `GET /api/programs/:programId/version-comparison/syllabi/:courseId` | `source/backend/src/features/releases/version-comparison.controller.ts:31`; service `version-comparison.service.ts:65` | Same two required version IDs | `PinnedSyllabusComparisonDto` | Source-verified, HTTP pending. Both course rows must exist in the compared versions; server derives and checks the two pins. Caller cannot inject arbitrary syllabus IDs. |
-| `GET /api/programs/:programId/cohort-versions` | `source/backend/src/features/releases/cohort-versions.controller.ts:35`; service `cohort-versions.service.ts:44` | Path only | `CohortVersionListDto` | Source-verified, HTTP pending. R1 management view of the whole schedule, including superseded/future links and a concurrency revision. |
-| `POST /api/programs/:programId/cohort-versions` | `source/backend/src/features/releases/cohort-versions.controller.ts:45`; service `cohort-versions.service.ts:58` | `AssignCohortVersionsDto` | `CohortVersionListDto` (201) | Source-verified, HTTP pending. All selected cohorts or none; append a different version at a new semester; no automatic all-cohorts default. |
-| `PATCH /api/programs/:programId/cohort-versions/:assignmentId` | `source/backend/src/features/releases/cohort-versions.controller.ts:56`; service `cohort-versions.service.ts:96` | `UpdateCohortVersionDto` | `CohortVersionListDto` (200) | Source-verified, HTTP pending. Correct only this link's starting semester; identity and createdAt remain unchanged. Historical-impact confirmation belongs to FE-05. |
-| `GET /api/programs/:programId/cohorts/:cohortId/applied-version` | `source/backend/src/features/releases/cohort-versions.controller.ts:68`; service `cohort-versions.service.ts:133` | Required `semesterId` | `AppliedCohortVersionDto` | Source-verified, HTTP pending. R1 diagnostic of the shared query; UNASSIGNED is successful, not an ACTIVE fallback. B5 uses the provider, not an HTTP round trip. |
+| Endpoint                                                            | Verified at                                                                                                                                              | Request                                      | Response                      | Notes                                                                                                                                                                                                                                          |
+| ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /api/programs/:programId/versions`                             | `source/backend/src/features/releases/version-history.controller.ts:16`; mapper `source/backend/src/features/releases/version-history.reader.ts:198`     | Path only                                    | `VersionListDto`              | Ordered by `createdAt desc, id desc`, not numeric version; ALL-scope program viewers can see the plain Draft; request copies and correction Drafts are excluded (`version-history.reader.ts:79`). FE must filter issued comparison candidates. |
+| `GET /api/programs/:programId/versions/:versionId`                  | `source/backend/src/features/releases/version-history.controller.ts:26`; serializer `source/backend/src/features/releases/version-history.reader.ts:169` | Two path IDs                                 | `VersionDetailDto`            | Verifies membership in program; ordinary Draft not served, R1 correction Draft can be served. Detail has frozen rows and links, not embedded PLO/matrix collections (`version-history.reader.ts:102`, `:140`).                                 |
+| `GET /api/semesters`                                                | `source/backend/src/features/semesters/semesters.controller.ts:19`; `source/backend/src/shared/releases/semester.dto.ts:22`                              | None                                         | `SemesterDto[]`               | Any authenticated user; date may be null. No guessed academic-year parsing.                                                                                                                                                                    |
+| `GET /api/cohorts`                                                  | `source/backend/src/features/semesters/semesters.controller.ts:44`; `source/backend/src/shared/releases/semester.dto.ts:32`                              | None                                         | `CohortDto[]`                 | Any authenticated user; reuse the existing query/selector infrastructure.                                                                                                                                                                      |
+| `GET /api/programs`                                                 | `source/backend/src/features/programs/programs.controller.ts:43`; serializer `source/backend/src/features/programs/program.dto.ts:168`                   | `q?`, `page`, `pageSize`                     | `ProgramPageDto`              | R1 program picker when entering MH-50 from MH-10. Existing list requires PROGRAM_VIEW ALL, sorts by programCode and paginates (`source/backend/src/features/programs/programs.service.ts:49`). Its currentVersion is NOT cohort entitlement.   |
+| `POST /api/programs/:programId/versions/:versionId/release`         | `source/backend/src/features/releases/releases.controller.ts:36`; `source/backend/src/shared/releases/version.publisher.ts:91`                           | Existing `ReleaseVersionDto`                 | Existing `VersionDetailDto`   | Regression fixture only, not a new FE call. Only selected `cohortIds` create links at the release semester.                                                                                                                                    |
+| `GET /api/programs/:programId/version-comparison`                   | `source/backend/src/features/releases/version-comparison.controller.ts:20`; service `version-comparison.service.ts:41`                                   | `beforeVersionId`, `afterVersionId` required | `VersionComparisonDto`        | Source-verified, HTTP pending. Read-only; two issued rows of this exact program; same ID allowed and yields six unchanged sections; no writes to ChangeItem.                                                                                   |
+| `GET /api/programs/:programId/version-comparison/syllabi/:courseId` | `source/backend/src/features/releases/version-comparison.controller.ts:31`; service `version-comparison.service.ts:65`                                   | Same two required version IDs                | `PinnedSyllabusComparisonDto` | Source-verified, HTTP pending. Both course rows must exist in the compared versions; server derives and checks the two pins. Caller cannot inject arbitrary syllabus IDs.                                                                      |
+| `GET /api/programs/:programId/cohort-versions`                      | `source/backend/src/features/releases/cohort-versions.controller.ts:35`; service `cohort-versions.service.ts:44`                                         | Path only                                    | `CohortVersionListDto`        | Source-verified, HTTP pending. R1 management view of the whole schedule, including superseded/future links and a concurrency revision.                                                                                                         |
+| `POST /api/programs/:programId/cohort-versions`                     | `source/backend/src/features/releases/cohort-versions.controller.ts:45`; service `cohort-versions.service.ts:58`                                         | `AssignCohortVersionsDto`                    | `CohortVersionListDto` (201)  | Source-verified, HTTP pending. All selected cohorts or none; append a different version at a new semester; no automatic all-cohorts default.                                                                                                   |
+| `PATCH /api/programs/:programId/cohort-versions/:assignmentId`      | `source/backend/src/features/releases/cohort-versions.controller.ts:56`; service `cohort-versions.service.ts:96`                                         | `UpdateCohortVersionDto`                     | `CohortVersionListDto` (200)  | Source-verified, HTTP pending. Correct only this link's starting semester; identity and createdAt remain unchanged. Historical-impact confirmation belongs to FE-05.                                                                           |
+| `GET /api/programs/:programId/cohorts/:cohortId/applied-version`    | `source/backend/src/features/releases/cohort-versions.controller.ts:68`; service `cohort-versions.service.ts:133`                                        | Required `semesterId`                        | `AppliedCohortVersionDto`     | Source-verified, HTTP pending. R1 diagnostic of the shared query; UNASSIGNED is successful, not an ACTIVE fallback. B5 uses the provider, not an HTTP round trip.                                                                              |
 
 **Existing linked screens, not new API/model adapters:** MH-47 already links to curriculum, PLO and both matrices (`source/frontend/src/features/releases/pages/VersionDetailPage.tsx:88`) and uses `FrozenRowsTable` for pinned syllabus navigation (`:107`). Those owning features keep their existing request/response adapters; do not replace them with comparison DTOs. The existing curriculum endpoint is `GET /api/program-versions/:versionId/curriculum` (`source/backend/src/features/curriculum/program-versions-curriculum.controller.ts:43`).
 
@@ -141,147 +142,147 @@ FE will alias generated OpenAPI types directly, not maintain parallel response m
 
 **`VersionListDto`, `VersionRefDto` and nested references** — `source/backend/src/features/releases/dto/version-detail.dto.ts`; actual mapping `source/backend/src/features/releases/version-history.reader.ts:198`.
 
-| Field | Wire type | Nullable | Source | Modeled as | Note |
-|---|---|---|---|---|---|
-| `VersionListDto.versions` | `VersionRefDto[]` | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:46`; `source/backend/src/features/releases/version-history.reader.ts:93` | `VersionList.versions` | Keep server order |
-| `id` | string | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:24`; `source/backend/src/features/releases/version-history.reader.ts:204` | `VersionRef.id` | Selection and route ID |
-| `versionNumber` | string | yes | `source/backend/src/features/releases/dto/version-detail.dto.ts:25`; `source/backend/src/features/releases/version-history.reader.ts:205` | `VersionRef.versionNumber` | Null for Draft; never use lexical numeric sorting |
-| `status` | `'DRAFT' \| 'PENDING' \| 'ACTIVE' \| 'HISTORICAL'` | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:26`; `source/backend/src/features/releases/version-history.reader.ts:206`; `source/backend/prisma/schema.prisma:63` | `VersionRef.status` | Exclude DRAFT from selectors, not from existing history API |
-| `decisionNumber` | string | yes | `source/backend/src/features/releases/dto/version-detail.dto.ts:28`; `source/backend/src/features/releases/version-history.reader.ts:207` | `VersionRef.decisionNumber` | Render em dash if null |
-| `signedDate` | ISO day string | yes | `source/backend/src/features/releases/dto/version-detail.dto.ts:29`; `source/backend/src/features/releases/version-history.reader.ts:208` | `VersionRef.signedDate` | Date-only, no timezone conversion in UI |
-| `publishedAt` | ISO instant string | yes | `source/backend/src/features/releases/dto/version-detail.dto.ts:31`; `source/backend/src/features/releases/version-history.reader.ts:209` | `VersionRef.publishedAt` | Issued filter also requires non-null publication facts |
-| `effectiveSemester` | `SemesterDto` | yes | `source/backend/src/features/releases/dto/version-detail.dto.ts:32`; `source/backend/src/features/releases/version-history.reader.ts:210` | `VersionRef.effectiveSemester` | Display metadata, not cohort activation rule |
-| `cohorts` | `CohortDto[]` | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:34`; `source/backend/src/features/releases/version-history.reader.ts:213` | `VersionRef.cohorts` | All links to version, not “currently follows” |
-| `originRequest` | `{id, requestCode}` | yes | `source/backend/src/features/releases/dto/version-detail.dto.ts:35`; `source/backend/src/features/releases/version-history.reader.ts:214` | `VersionRef.originRequest` | Existing history/request navigation |
-| `correctedBy` | `VersionLinkDto` | yes | `source/backend/src/features/releases/dto/version-detail.dto.ts:42`; `source/backend/src/features/releases/version-history.reader.ts:215` | `VersionRef.correctedBy` | Issued correction only, not an open Draft |
-| `VersionOriginRequestDto.id` | string | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:18`; `source/backend/src/features/releases/version-history.reader.ts:38` | Origin link ID | No request-detail mapping added |
-| `VersionOriginRequestDto.requestCode` | string | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:19`; `source/backend/src/features/releases/version-history.reader.ts:38` | Link label | Initial release can have no origin |
-| `VersionLinkDto.id` | string | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:13`; `source/backend/src/features/releases/version-history.reader.ts:216` | Version link ID | Also used below |
-| `VersionLinkDto.versionNumber` | string | yes | `source/backend/src/features/releases/dto/version-detail.dto.ts:14`; `source/backend/src/features/releases/version-history.reader.ts:216` | Version link label | Correction Draft can have no number |
+| Field                                 | Wire type                                          | Nullable | Source                                                                                                                                                                              | Modeled as                     | Note                                                        |
+| ------------------------------------- | -------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | ----------------------------------------------------------- |
+| `VersionListDto.versions`             | `VersionRefDto[]`                                  | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:46`; `source/backend/src/features/releases/version-history.reader.ts:93`                                            | `VersionList.versions`         | Keep server order                                           |
+| `id`                                  | string                                             | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:24`; `source/backend/src/features/releases/version-history.reader.ts:204`                                           | `VersionRef.id`                | Selection and route ID                                      |
+| `versionNumber`                       | string                                             | yes      | `source/backend/src/features/releases/dto/version-detail.dto.ts:25`; `source/backend/src/features/releases/version-history.reader.ts:205`                                           | `VersionRef.versionNumber`     | Null for Draft; never use lexical numeric sorting           |
+| `status`                              | `'DRAFT' \| 'PENDING' \| 'ACTIVE' \| 'HISTORICAL'` | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:26`; `source/backend/src/features/releases/version-history.reader.ts:206`; `source/backend/prisma/schema.prisma:63` | `VersionRef.status`            | Exclude DRAFT from selectors, not from existing history API |
+| `decisionNumber`                      | string                                             | yes      | `source/backend/src/features/releases/dto/version-detail.dto.ts:28`; `source/backend/src/features/releases/version-history.reader.ts:207`                                           | `VersionRef.decisionNumber`    | Render em dash if null                                      |
+| `signedDate`                          | ISO day string                                     | yes      | `source/backend/src/features/releases/dto/version-detail.dto.ts:29`; `source/backend/src/features/releases/version-history.reader.ts:208`                                           | `VersionRef.signedDate`        | Date-only, no timezone conversion in UI                     |
+| `publishedAt`                         | ISO instant string                                 | yes      | `source/backend/src/features/releases/dto/version-detail.dto.ts:31`; `source/backend/src/features/releases/version-history.reader.ts:209`                                           | `VersionRef.publishedAt`       | Issued filter also requires non-null publication facts      |
+| `effectiveSemester`                   | `SemesterDto`                                      | yes      | `source/backend/src/features/releases/dto/version-detail.dto.ts:32`; `source/backend/src/features/releases/version-history.reader.ts:210`                                           | `VersionRef.effectiveSemester` | Display metadata, not cohort activation rule                |
+| `cohorts`                             | `CohortDto[]`                                      | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:34`; `source/backend/src/features/releases/version-history.reader.ts:213`                                           | `VersionRef.cohorts`           | All links to version, not “currently follows”               |
+| `originRequest`                       | `{id, requestCode}`                                | yes      | `source/backend/src/features/releases/dto/version-detail.dto.ts:35`; `source/backend/src/features/releases/version-history.reader.ts:214`                                           | `VersionRef.originRequest`     | Existing history/request navigation                         |
+| `correctedBy`                         | `VersionLinkDto`                                   | yes      | `source/backend/src/features/releases/dto/version-detail.dto.ts:42`; `source/backend/src/features/releases/version-history.reader.ts:215`                                           | `VersionRef.correctedBy`       | Issued correction only, not an open Draft                   |
+| `VersionOriginRequestDto.id`          | string                                             | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:18`; `source/backend/src/features/releases/version-history.reader.ts:38`                                            | Origin link ID                 | No request-detail mapping added                             |
+| `VersionOriginRequestDto.requestCode` | string                                             | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:19`; `source/backend/src/features/releases/version-history.reader.ts:38`                                            | Link label                     | Initial release can have no origin                          |
+| `VersionLinkDto.id`                   | string                                             | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:13`; `source/backend/src/features/releases/version-history.reader.ts:216`                                           | Version link ID                | Also used below                                             |
+| `VersionLinkDto.versionNumber`        | string                                             | yes      | `source/backend/src/features/releases/dto/version-detail.dto.ts:14`; `source/backend/src/features/releases/version-history.reader.ts:216`                                           | Version link label             | Correction Draft can have no number                         |
 
 **`VersionDetailDto` additions to the inherited `VersionRefDto`** — same DTO file, mapped in `source/backend/src/features/releases/version-history.reader.ts:169`. Existing MH-47 consumes these unchanged.
 
-| Field | Wire type | Nullable | Source | Modeled as | Note |
-|---|---|---|---|---|---|
-| `programId` | string | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:69`; `source/backend/src/features/releases/version-history.reader.ts:170` | `VersionDetail.programId` | Parent route |
-| `programCode` | string | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:70`; `source/backend/src/features/releases/version-history.reader.ts:171` | `VersionDetail.programCode` | Identity from Program |
-| `programName` | string | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:71`; `source/backend/src/features/releases/version-history.reader.ts:172` | `VersionDetail.programName` | Version-owned |
-| `majorCode` | string | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:72`; `source/backend/src/features/releases/version-history.reader.ts:173` | `VersionDetail.majorCode` | Version-owned |
-| `majorName` | string | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:73`; `source/backend/src/features/releases/version-history.reader.ts:174` | `VersionDetail.majorName` | Version-owned |
-| `semesterCount` | number | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:74`; `source/backend/src/features/releases/version-history.reader.ts:175` | `VersionDetail.semesterCount` | Count, not calendar semester ID |
-| `totalCredits` | decimal string | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:75`; `source/backend/src/features/releases/version-history.reader.ts:176` | `VersionDetail.totalCredits` | No float comparison |
-| `compulsoryCredits` | decimal string | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:76`; `source/backend/src/features/releases/version-history.reader.ts:177` | `VersionDetail.compulsoryCredits` | Same |
-| `electiveCredits` | decimal string | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:77`; `source/backend/src/features/releases/version-history.reader.ts:178` | `VersionDetail.electiveCredits` | Same |
-| `publishedBy` | `UserRefDto` | yes | `source/backend/src/features/releases/dto/version-detail.dto.ts:78`; `source/backend/src/features/releases/version-history.reader.ts:179` | Existing header prop | No extra user API |
-| `previousVersion` | `VersionLinkDto` | yes | `source/backend/src/features/releases/dto/version-detail.dto.ts:80`; `source/backend/src/features/releases/version-history.reader.ts:180` | Existing header prop | Initial release has none |
-| `correctionOf` | `VersionLinkDto` | yes | `source/backend/src/features/releases/dto/version-detail.dto.ts:82`; `source/backend/src/features/releases/version-history.reader.ts:181` | Existing header prop | Ordinary releases have none |
-| `correctionReason` | string | yes | `source/backend/src/features/releases/dto/version-detail.dto.ts:84`; `source/backend/src/features/releases/version-history.reader.ts:182` | Existing header prop | Not a cohort-conversion document |
-| `isCorrectionDraft` | boolean | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:87`; `source/backend/src/features/releases/version-history.reader.ts:183` | Existing detail state | Never a comparison candidate |
-| `openCorrection` | `VersionLinkDto` | yes | `source/backend/src/features/releases/dto/version-detail.dto.ts:94`; `source/backend/src/features/releases/version-history.reader.ts:184` | Existing correction action | R1-only visibility |
-| `canCorrect` | boolean | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:98`; `source/backend/src/features/releases/version-history.reader.ts:192` | Existing correction action | Not permission to edit frozen content |
-| `rows` | `VersionRowDto[]` | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:99`; `source/backend/src/features/releases/version-history.reader.ts:193` | Existing `FrozenRowsTable` | Already sorted by semester/order/ID |
-| `UserRefDto.id` | string | no | `source/backend/src/shared/dtos/ref.dto.ts:11`; `source/backend/src/features/releases/version-history.reader.ts:179` | Existing header prop | No sensitive identity fields |
-| `UserRefDto.fullName` | string | no | `source/backend/src/shared/dtos/ref.dto.ts:12`; `source/backend/src/features/releases/version-history.reader.ts:179` | Existing header prop | Display only |
+| Field                 | Wire type         | Nullable | Source                                                                                                                                    | Modeled as                        | Note                                  |
+| --------------------- | ----------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | ------------------------------------- |
+| `programId`           | string            | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:69`; `source/backend/src/features/releases/version-history.reader.ts:170` | `VersionDetail.programId`         | Parent route                          |
+| `programCode`         | string            | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:70`; `source/backend/src/features/releases/version-history.reader.ts:171` | `VersionDetail.programCode`       | Identity from Program                 |
+| `programName`         | string            | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:71`; `source/backend/src/features/releases/version-history.reader.ts:172` | `VersionDetail.programName`       | Version-owned                         |
+| `majorCode`           | string            | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:72`; `source/backend/src/features/releases/version-history.reader.ts:173` | `VersionDetail.majorCode`         | Version-owned                         |
+| `majorName`           | string            | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:73`; `source/backend/src/features/releases/version-history.reader.ts:174` | `VersionDetail.majorName`         | Version-owned                         |
+| `semesterCount`       | number            | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:74`; `source/backend/src/features/releases/version-history.reader.ts:175` | `VersionDetail.semesterCount`     | Count, not calendar semester ID       |
+| `totalCredits`        | decimal string    | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:75`; `source/backend/src/features/releases/version-history.reader.ts:176` | `VersionDetail.totalCredits`      | No float comparison                   |
+| `compulsoryCredits`   | decimal string    | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:76`; `source/backend/src/features/releases/version-history.reader.ts:177` | `VersionDetail.compulsoryCredits` | Same                                  |
+| `electiveCredits`     | decimal string    | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:77`; `source/backend/src/features/releases/version-history.reader.ts:178` | `VersionDetail.electiveCredits`   | Same                                  |
+| `publishedBy`         | `UserRefDto`      | yes      | `source/backend/src/features/releases/dto/version-detail.dto.ts:78`; `source/backend/src/features/releases/version-history.reader.ts:179` | Existing header prop              | No extra user API                     |
+| `previousVersion`     | `VersionLinkDto`  | yes      | `source/backend/src/features/releases/dto/version-detail.dto.ts:80`; `source/backend/src/features/releases/version-history.reader.ts:180` | Existing header prop              | Initial release has none              |
+| `correctionOf`        | `VersionLinkDto`  | yes      | `source/backend/src/features/releases/dto/version-detail.dto.ts:82`; `source/backend/src/features/releases/version-history.reader.ts:181` | Existing header prop              | Ordinary releases have none           |
+| `correctionReason`    | string            | yes      | `source/backend/src/features/releases/dto/version-detail.dto.ts:84`; `source/backend/src/features/releases/version-history.reader.ts:182` | Existing header prop              | Not a cohort-conversion document      |
+| `isCorrectionDraft`   | boolean           | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:87`; `source/backend/src/features/releases/version-history.reader.ts:183` | Existing detail state             | Never a comparison candidate          |
+| `openCorrection`      | `VersionLinkDto`  | yes      | `source/backend/src/features/releases/dto/version-detail.dto.ts:94`; `source/backend/src/features/releases/version-history.reader.ts:184` | Existing correction action        | R1-only visibility                    |
+| `canCorrect`          | boolean           | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:98`; `source/backend/src/features/releases/version-history.reader.ts:192` | Existing correction action        | Not permission to edit frozen content |
+| `rows`                | `VersionRowDto[]` | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:99`; `source/backend/src/features/releases/version-history.reader.ts:193` | Existing `FrozenRowsTable`        | Already sorted by semester/order/ID   |
+| `UserRefDto.id`       | string            | no       | `source/backend/src/shared/dtos/ref.dto.ts:11`; `source/backend/src/features/releases/version-history.reader.ts:179`                      | Existing header prop              | No sensitive identity fields          |
+| `UserRefDto.fullName` | string            | no       | `source/backend/src/shared/dtos/ref.dto.ts:12`; `source/backend/src/features/releases/version-history.reader.ts:179`                      | Existing header prop              | Display only                          |
 
 **Rows, pins and calendar references** — `source/backend/src/features/releases/dto/version-detail.dto.ts:49`, serializer `source/backend/src/features/releases/version-history.reader.ts:140`; `source/backend/src/shared/releases/semester.dto.ts:5`, mappers `:22` and `:32`.
 
-| Field | Wire type | Nullable | Source | Modeled as | Note |
-|---|---|---|---|---|---|
-| `VersionRowDto.itemId` | string | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:58`; `source/backend/src/features/releases/version-history.reader.ts:144` | Existing row ID | Never diff identity across copies |
-| `plannedSemester` | number | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:59`; `source/backend/src/features/releases/version-history.reader.ts:145` | Existing row | Relative semester |
-| `courseId` | string | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:60`; `source/backend/src/features/releases/version-history.reader.ts:146` | Existing row/link | Stable catalog identity |
-| `courseCode` | string | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:61`; `source/backend/src/features/releases/version-history.reader.ts:147` | Existing row label | Code cannot be edited (`source/backend/src/features/courses/update-course.dto.ts:4`) |
-| `courseName` | string | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:62`; `source/backend/src/features/releases/version-history.reader.ts:148` | Existing row label | `rowCourse` prefers snapshot (`source/backend/src/shared/curriculum/row-course.ts:22`) |
-| `credits` | decimal string | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:63`; `source/backend/src/features/releases/version-history.reader.ts:149` | Existing row | Serializer, not schema, establishes string |
-| `syllabus` | `SyllabusPinDto` | yes | `source/backend/src/features/releases/dto/version-detail.dto.ts:64`; `source/backend/src/features/releases/version-history.reader.ts:150` | Existing row link | Old incomplete data may have none |
-| `SyllabusPinDto.id` | string | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:50`; `source/backend/src/features/releases/version-history.reader.ts:152` | Pin identity | No lookup of “latest” |
-| `revisionNumber` | number | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:51`; `source/backend/src/features/releases/version-history.reader.ts:153` | Pin label | Revision is not program version number |
-| `status` | `'DRAFT' \| 'PUBLISHED' \| 'HISTORICAL'` | no | `source/backend/src/features/releases/dto/version-detail.dto.ts:52`; `source/backend/src/features/releases/version-history.reader.ts:154`; `source/backend/prisma/schema.prisma:615` | Pin status label | Current lifecycle status; not semantic diff input |
-| `SemesterDto.id` | string | no | `source/backend/src/shared/releases/semester.dto.ts:6`, `source/backend/src/shared/releases/semester.dto.ts:24` | `Semester.id` | Query context |
-| `semesterCode` | string | no | `source/backend/src/shared/releases/semester.dto.ts:7`, `source/backend/src/shared/releases/semester.dto.ts:25` | `Semester.semesterCode` | Label only |
-| `academicYear` | string | no | `source/backend/src/shared/releases/semester.dto.ts:8`, `source/backend/src/shared/releases/semester.dto.ts:26` | `Semester.academicYear` | Not guaranteed sortable canonical syntax |
-| `termInYear` | number | no | `source/backend/src/shared/releases/semester.dto.ts:9`, `source/backend/src/shared/releases/semester.dto.ts:27` | `Semester.termInYear` | Not an absolute chronology |
-| `startDate` | ISO day string | yes | `source/backend/src/shared/releases/semester.dto.ts:10`, `source/backend/src/shared/releases/semester.dto.ts:28` | `Semester.startDate` | New resolver requires known dates |
-| `CohortDto.id` | string | no | `source/backend/src/shared/releases/semester.dto.ts:15`, `source/backend/src/shared/releases/semester.dto.ts:34` | `Cohort.id` | No student rows required |
-| `cohortCode` | string | no | `source/backend/src/shared/releases/semester.dto.ts:16`, `source/backend/src/shared/releases/semester.dto.ts:35` | `Cohort.cohortCode` | Never infer assignment from K2023 text |
-| `intakeYear` | number | no | `source/backend/src/shared/releases/semester.dto.ts:17`, `source/backend/src/shared/releases/semester.dto.ts:36` | `Cohort.intakeYear` | Display/sort only |
+| Field                  | Wire type                                | Nullable | Source                                                                                                                                                                               | Modeled as              | Note                                                                                   |
+| ---------------------- | ---------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------- | -------------------------------------------------------------------------------------- |
+| `VersionRowDto.itemId` | string                                   | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:58`; `source/backend/src/features/releases/version-history.reader.ts:144`                                            | Existing row ID         | Never diff identity across copies                                                      |
+| `plannedSemester`      | number                                   | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:59`; `source/backend/src/features/releases/version-history.reader.ts:145`                                            | Existing row            | Relative semester                                                                      |
+| `courseId`             | string                                   | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:60`; `source/backend/src/features/releases/version-history.reader.ts:146`                                            | Existing row/link       | Stable catalog identity                                                                |
+| `courseCode`           | string                                   | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:61`; `source/backend/src/features/releases/version-history.reader.ts:147`                                            | Existing row label      | Code cannot be edited (`source/backend/src/features/courses/update-course.dto.ts:4`)   |
+| `courseName`           | string                                   | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:62`; `source/backend/src/features/releases/version-history.reader.ts:148`                                            | Existing row label      | `rowCourse` prefers snapshot (`source/backend/src/shared/curriculum/row-course.ts:22`) |
+| `credits`              | decimal string                           | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:63`; `source/backend/src/features/releases/version-history.reader.ts:149`                                            | Existing row            | Serializer, not schema, establishes string                                             |
+| `syllabus`             | `SyllabusPinDto`                         | yes      | `source/backend/src/features/releases/dto/version-detail.dto.ts:64`; `source/backend/src/features/releases/version-history.reader.ts:150`                                            | Existing row link       | Old incomplete data may have none                                                      |
+| `SyllabusPinDto.id`    | string                                   | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:50`; `source/backend/src/features/releases/version-history.reader.ts:152`                                            | Pin identity            | No lookup of “latest”                                                                  |
+| `revisionNumber`       | number                                   | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:51`; `source/backend/src/features/releases/version-history.reader.ts:153`                                            | Pin label               | Revision is not program version number                                                 |
+| `status`               | `'DRAFT' \| 'PUBLISHED' \| 'HISTORICAL'` | no       | `source/backend/src/features/releases/dto/version-detail.dto.ts:52`; `source/backend/src/features/releases/version-history.reader.ts:154`; `source/backend/prisma/schema.prisma:615` | Pin status label        | Current lifecycle status; not semantic diff input                                      |
+| `SemesterDto.id`       | string                                   | no       | `source/backend/src/shared/releases/semester.dto.ts:6`, `source/backend/src/shared/releases/semester.dto.ts:24`                                                                      | `Semester.id`           | Query context                                                                          |
+| `semesterCode`         | string                                   | no       | `source/backend/src/shared/releases/semester.dto.ts:7`, `source/backend/src/shared/releases/semester.dto.ts:25`                                                                      | `Semester.semesterCode` | Label only                                                                             |
+| `academicYear`         | string                                   | no       | `source/backend/src/shared/releases/semester.dto.ts:8`, `source/backend/src/shared/releases/semester.dto.ts:26`                                                                      | `Semester.academicYear` | Not guaranteed sortable canonical syntax                                               |
+| `termInYear`           | number                                   | no       | `source/backend/src/shared/releases/semester.dto.ts:9`, `source/backend/src/shared/releases/semester.dto.ts:27`                                                                      | `Semester.termInYear`   | Not an absolute chronology                                                             |
+| `startDate`            | ISO day string                           | yes      | `source/backend/src/shared/releases/semester.dto.ts:10`, `source/backend/src/shared/releases/semester.dto.ts:28`                                                                     | `Semester.startDate`    | New resolver requires known dates                                                      |
+| `CohortDto.id`         | string                                   | no       | `source/backend/src/shared/releases/semester.dto.ts:15`, `source/backend/src/shared/releases/semester.dto.ts:34`                                                                     | `Cohort.id`             | No student rows required                                                               |
+| `cohortCode`           | string                                   | no       | `source/backend/src/shared/releases/semester.dto.ts:16`, `source/backend/src/shared/releases/semester.dto.ts:35`                                                                     | `Cohort.cohortCode`     | Never infer assignment from K2023 text                                                 |
+| `intakeYear`           | number                                   | no       | `source/backend/src/shared/releases/semester.dto.ts:17`, `source/backend/src/shared/releases/semester.dto.ts:36`                                                                     | `Cohort.intakeYear`     | Display/sort only                                                                      |
 
 **Program picker response** — no feature-to-feature frontend import is needed: alias generated schemas in releases API. These extra fields are explicitly not modeled where they are irrelevant to choosing program identity.
 
-| Field | Wire type | Nullable | Source | Modeled as | Note |
-|---|---|---|---|---|---|
-| `ProgramPageDto.items` | `ProgramSummaryDto[]` | no | `source/backend/src/features/programs/program.dto.ts:51`; `source/backend/src/shared/pagination/page.ts:22` | Picker table data | Preserve server page |
-| `total` | number | no | `source/backend/src/features/programs/program.dto.ts:52`; `source/backend/src/shared/pagination/page.ts:22` | DataTable total | No fetch-all assumption |
-| `page` | number | no | `source/backend/src/features/programs/program.dto.ts:53`; `source/backend/src/shared/pagination/page.ts:22` | Picker page | Existing default 1 |
-| `pageSize` | number | no | `source/backend/src/features/programs/program.dto.ts:54`; `source/backend/src/shared/pagination/page.ts:22` | Picker pageSize | Existing default 20/max 100 in `source/backend/src/shared/pagination/page-query.dto.ts:5` |
-| `ProgramSummaryDto.id` | string | no | `source/backend/src/features/programs/program.dto.ts:37`, `source/backend/src/features/programs/program.dto.ts:171` | Program route ID | Never select currentVersion instead |
-| `programCode` | string | no | `source/backend/src/features/programs/program.dto.ts:38`, `source/backend/src/features/programs/program.dto.ts:172` | Picker label | Display code |
-| `degreeLevel` | `'ENGINEER' \| 'BACHELOR'` | no | `source/backend/src/features/programs/program.dto.ts:39`, `source/backend/src/features/programs/program.dto.ts:173`; `source/backend/prisma/schema.prisma:53` | **not modeled** | Not required for selection |
-| `status` | `'ACTIVE' \| 'INACTIVE'` | no | `source/backend/src/features/programs/program.dto.ts:41`, `source/backend/src/features/programs/program.dto.ts:174`; `source/backend/prisma/schema.prisma:58` | **not modeled** | Do not hide historical programs by default |
-| `faculty` | `OrgUnitRefDto` | no | `source/backend/src/features/programs/program.dto.ts:43`, `source/backend/src/features/programs/program.dto.ts:175` | **not modeled** | Program ID supplies context |
-| `programName` | string | no | `source/backend/src/features/programs/program.dto.ts:44`, `source/backend/src/features/programs/program.dto.ts:176` | Picker label | Current display name, not a frozen cohort name |
-| `currentVersion` | `ProgramVersionRefDto` | no | `source/backend/src/features/programs/program.dto.ts:45`, `source/backend/src/features/programs/program.dto.ts:177` | **not modeled** | Chooses ACTIVE else newest (`source/backend/src/features/programs/program.dto.ts:130`), unsuitable for student lookup |
-| `directors` | `UserRefDto[]` | no | `source/backend/src/features/programs/program.dto.ts:47`, `source/backend/src/features/programs/program.dto.ts:178` | **not modeled** | No user display in picker |
-| `OrgUnitRefDto.id` | string | no | `source/backend/src/shared/dtos/ref.dto.ts:5`; `source/backend/src/features/programs/program.dto.ts:175` | **not modeled** | Nested faculty reference |
-| `unitCode` | string | no | `source/backend/src/shared/dtos/ref.dto.ts:6`; `source/backend/src/features/programs/program.dto.ts:175` | **not modeled** | Same |
-| `unitName` | string | no | `source/backend/src/shared/dtos/ref.dto.ts:7`; `source/backend/src/features/programs/program.dto.ts:175` | **not modeled** | Same |
-| `ProgramVersionRefDto.id` | string | no | `source/backend/src/features/programs/program.dto.ts:19`, `source/backend/src/features/programs/program.dto.ts:146` | **not modeled** | Never a cohort-version default |
-| `versionNumber` | string | yes | `source/backend/src/features/programs/program.dto.ts:20`, `source/backend/src/features/programs/program.dto.ts:147` | **not modeled** | Draft is nullable |
-| `status` | `'DRAFT' \| 'PENDING' \| 'ACTIVE' \| 'HISTORICAL'` | no | `source/backend/src/features/programs/program.dto.ts:22`, `source/backend/src/features/programs/program.dto.ts:148`; `source/backend/prisma/schema.prisma:63` | **not modeled** | Not an entitlement signal |
-| `directors[].id` | string | no | `source/backend/src/shared/dtos/ref.dto.ts:11`; `source/backend/src/features/programs/program.dto.ts:178` | **not modeled** | No student/user data fetched |
-| `directors[].fullName` | string | no | `source/backend/src/shared/dtos/ref.dto.ts:12`; `source/backend/src/features/programs/program.dto.ts:178` | **not modeled** | Same |
+| Field                     | Wire type                                          | Nullable | Source                                                                                                                                                        | Modeled as        | Note                                                                                                                  |
+| ------------------------- | -------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `ProgramPageDto.items`    | `ProgramSummaryDto[]`                              | no       | `source/backend/src/features/programs/program.dto.ts:51`; `source/backend/src/shared/pagination/page.ts:22`                                                   | Picker table data | Preserve server page                                                                                                  |
+| `total`                   | number                                             | no       | `source/backend/src/features/programs/program.dto.ts:52`; `source/backend/src/shared/pagination/page.ts:22`                                                   | DataTable total   | No fetch-all assumption                                                                                               |
+| `page`                    | number                                             | no       | `source/backend/src/features/programs/program.dto.ts:53`; `source/backend/src/shared/pagination/page.ts:22`                                                   | Picker page       | Existing default 1                                                                                                    |
+| `pageSize`                | number                                             | no       | `source/backend/src/features/programs/program.dto.ts:54`; `source/backend/src/shared/pagination/page.ts:22`                                                   | Picker pageSize   | Existing default 20/max 100 in `source/backend/src/shared/pagination/page-query.dto.ts:5`                             |
+| `ProgramSummaryDto.id`    | string                                             | no       | `source/backend/src/features/programs/program.dto.ts:37`, `source/backend/src/features/programs/program.dto.ts:171`                                           | Program route ID  | Never select currentVersion instead                                                                                   |
+| `programCode`             | string                                             | no       | `source/backend/src/features/programs/program.dto.ts:38`, `source/backend/src/features/programs/program.dto.ts:172`                                           | Picker label      | Display code                                                                                                          |
+| `degreeLevel`             | `'ENGINEER' \| 'BACHELOR'`                         | no       | `source/backend/src/features/programs/program.dto.ts:39`, `source/backend/src/features/programs/program.dto.ts:173`; `source/backend/prisma/schema.prisma:53` | **not modeled**   | Not required for selection                                                                                            |
+| `status`                  | `'ACTIVE' \| 'INACTIVE'`                           | no       | `source/backend/src/features/programs/program.dto.ts:41`, `source/backend/src/features/programs/program.dto.ts:174`; `source/backend/prisma/schema.prisma:58` | **not modeled**   | Do not hide historical programs by default                                                                            |
+| `faculty`                 | `OrgUnitRefDto`                                    | no       | `source/backend/src/features/programs/program.dto.ts:43`, `source/backend/src/features/programs/program.dto.ts:175`                                           | **not modeled**   | Program ID supplies context                                                                                           |
+| `programName`             | string                                             | no       | `source/backend/src/features/programs/program.dto.ts:44`, `source/backend/src/features/programs/program.dto.ts:176`                                           | Picker label      | Current display name, not a frozen cohort name                                                                        |
+| `currentVersion`          | `ProgramVersionRefDto`                             | no       | `source/backend/src/features/programs/program.dto.ts:45`, `source/backend/src/features/programs/program.dto.ts:177`                                           | **not modeled**   | Chooses ACTIVE else newest (`source/backend/src/features/programs/program.dto.ts:130`), unsuitable for student lookup |
+| `directors`               | `UserRefDto[]`                                     | no       | `source/backend/src/features/programs/program.dto.ts:47`, `source/backend/src/features/programs/program.dto.ts:178`                                           | **not modeled**   | No user display in picker                                                                                             |
+| `OrgUnitRefDto.id`        | string                                             | no       | `source/backend/src/shared/dtos/ref.dto.ts:5`; `source/backend/src/features/programs/program.dto.ts:175`                                                      | **not modeled**   | Nested faculty reference                                                                                              |
+| `unitCode`                | string                                             | no       | `source/backend/src/shared/dtos/ref.dto.ts:6`; `source/backend/src/features/programs/program.dto.ts:175`                                                      | **not modeled**   | Same                                                                                                                  |
+| `unitName`                | string                                             | no       | `source/backend/src/shared/dtos/ref.dto.ts:7`; `source/backend/src/features/programs/program.dto.ts:175`                                                      | **not modeled**   | Same                                                                                                                  |
+| `ProgramVersionRefDto.id` | string                                             | no       | `source/backend/src/features/programs/program.dto.ts:19`, `source/backend/src/features/programs/program.dto.ts:146`                                           | **not modeled**   | Never a cohort-version default                                                                                        |
+| `versionNumber`           | string                                             | yes      | `source/backend/src/features/programs/program.dto.ts:20`, `source/backend/src/features/programs/program.dto.ts:147`                                           | **not modeled**   | Draft is nullable                                                                                                     |
+| `status`                  | `'DRAFT' \| 'PENDING' \| 'ACTIVE' \| 'HISTORICAL'` | no       | `source/backend/src/features/programs/program.dto.ts:22`, `source/backend/src/features/programs/program.dto.ts:148`; `source/backend/prisma/schema.prisma:63` | **not modeled**   | Not an entitlement signal                                                                                             |
+| `directors[].id`          | string                                             | no       | `source/backend/src/shared/dtos/ref.dto.ts:11`; `source/backend/src/features/programs/program.dto.ts:178`                                                     | **not modeled**   | No student/user data fetched                                                                                          |
+| `directors[].fullName`    | string                                             | no       | `source/backend/src/shared/dtos/ref.dto.ts:12`; `source/backend/src/features/programs/program.dto.ts:178`                                                     | **not modeled**   | Same                                                                                                                  |
 
 ### 2c. Verified gaps and mismatch log
 
-| Deliverable | What an earlier plan/design suggests | What the source does | Found at |
-|---|---|---|---|
-| FE-02/05 | Program search might use a generic search parameter | The existing §2a contract and generated operation require q; the releases-owned picker aliases that operation and resets page on submit. No backend or response contract change | `source/frontend/src/shared/api/schema.d.ts:5239`; `source/frontend/src/features/releases/api/releases.ts:28` |
-| FE-03/04/06 | Earlier frontend file:line anchors still point to the same functions | Existing F-15/F-09 work shifted anchors. Preserve F-09 navigation; keep DiffView feature-local and build a releases-owned renderer as planned | `source/frontend/src/features/change-requests/components/DiffView.tsx:75`; `source/frontend/src/features/releases/hooks/useReleases.ts:185`; `source/frontend/src/router.tsx:386` |
-| FE-03 | F-15 history is issued-only | ALL-scope viewers can see a plain Draft; retain history but filter selectors | `source/backend/src/features/releases/version-history.reader.ts:79` |
-| BE-02 | Reuse the request diff as the full released-version diff | Request snapshot omits frozen course name/credits and syllabus pins, and its row label reads live course name | `source/backend/src/shared/change-requests/diff/program-snapshot.reader.ts:30`, `:79`, `:81` |
-| BE-02 | Pinned detail can be inferred from current syllabus status | Pin is per curriculum item; fallback exists only for unpinned rows | `source/backend/src/shared/syllabi/revision-for-items.ts:25`, `:53` |
-| BE-04/05 | CohortVersion has a program/semester unique constraint and mutable timestamp | Only `(cohortId, programVersionId)` is unique; only `createdAt` exists; F-09 shifted the old citation | `source/backend/prisma/schema.prisma:480`, `source/backend/prisma/schema.prisma:490` |
-| BE-04/07 | Correction preserves all before-semester assignment answers | Default `moveCohorts` rewrites existing mappings to the correction without adding an interval | `source/backend/src/features/releases/corrections.service.ts:143`; escalation E1 |
-| BE-04/05 | Semester codes/academic year sort chronologically and dates are immutable once used by an assignment | Arbitrary nonempty academicYear is accepted; only dates supporting ACTIVE/HISTORICAL release rows get the start-date guard | `source/backend/src/features/semesters/dto/semester.dto.ts:31`; `source/backend/src/features/semesters/semesters.service.ts:87`; E3 |
-| FE-02/04 | `DiffView` is a shared UI primitive | It belongs to change-requests and imports that feature's API/constants | `source/frontend/src/features/change-requests/components/DiffView.tsx:2` |
-| BE-05 | §12 sequence can count and move enrolled students at B4 | Current schema has CohortVersion, not Student/ProgramEnrollment models; B5 owns that integration | `source/backend/prisma/schema.prisma:470`; dependency U1 |
-| BE-01..07 | F-09 is not yet built | F-09 is built in features/imports and has moved shared course/curriculum code, schema citations, app wiring and permission-table lines. F-16 does not import or replace that work | `source/backend/src/app.module.ts:58`; `source/backend/src/shared/curriculum/curriculum-limits.ts:1`; `source/backend/test/permission-table.ts:70` |
-| BE-05 | Reuse toCohortDto directly for a picked domain cohort | Existing mapper requires the full Prisma Cohort including timestamps; the new domain intentionally carries only id/cohortCode/intakeYear. Map those three fields explicitly rather than widening a built exported contract | `source/backend/src/shared/releases/semester.dto.ts:30`; `source/backend/src/features/releases/cohort-versions.mapper.ts:22` |
-| BE-06 | The generic program write counter is a single Program count | The branch also handles director assignments. Insert the cohort counter before the whole existing branch and preserve both cases | `source/backend/test/permission-table.e2e-spec.ts:123` |
-| BE-07 | Fixture release calls can infer request types or allow past semesters implicitly | Use built CURRICULUM/SYLLABUS_CONTENT requests, real submit/final-approve routes, two R1 accounts and explicit allowPastSemester for the historical middle release. Initial release selects one cohort while another existing cohort stays unselected; later final releases select none, proving preservation instead of an empty-database tautology | `source/backend/test/fixtures/version-comparison.ts:1`; `source/backend/src/features/change-requests/final-approval.dto.ts:28` |
+| Deliverable | What an earlier plan/design suggests                                                                 | What the source does                                                                                                                                                                                                                                                                                                                                 | Found at                                                                                                                                                                          |
+| ----------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| FE-02/05    | Program search might use a generic search parameter                                                  | The existing §2a contract and generated operation require q; the releases-owned picker aliases that operation and resets page on submit. No backend or response contract change                                                                                                                                                                      | `source/frontend/src/shared/api/schema.d.ts:5239`; `source/frontend/src/features/releases/api/releases.ts:28`                                                                     |
+| FE-03/04/06 | Earlier frontend file:line anchors still point to the same functions                                 | Existing F-15/F-09 work shifted anchors. Preserve F-09 navigation; keep DiffView feature-local and build a releases-owned renderer as planned                                                                                                                                                                                                        | `source/frontend/src/features/change-requests/components/DiffView.tsx:75`; `source/frontend/src/features/releases/hooks/useReleases.ts:185`; `source/frontend/src/router.tsx:386` |
+| FE-03       | F-15 history is issued-only                                                                          | ALL-scope viewers can see a plain Draft; retain history but filter selectors                                                                                                                                                                                                                                                                         | `source/backend/src/features/releases/version-history.reader.ts:79`                                                                                                               |
+| BE-02       | Reuse the request diff as the full released-version diff                                             | Request snapshot omits frozen course name/credits and syllabus pins, and its row label reads live course name                                                                                                                                                                                                                                        | `source/backend/src/shared/change-requests/diff/program-snapshot.reader.ts:30`, `:79`, `:81`                                                                                      |
+| BE-02       | Pinned detail can be inferred from current syllabus status                                           | Pin is per curriculum item; fallback exists only for unpinned rows                                                                                                                                                                                                                                                                                   | `source/backend/src/shared/syllabi/revision-for-items.ts:25`, `:53`                                                                                                               |
+| BE-04/05    | CohortVersion has a program/semester unique constraint and mutable timestamp                         | Only `(cohortId, programVersionId)` is unique; only `createdAt` exists; F-09 shifted the old citation                                                                                                                                                                                                                                                | `source/backend/prisma/schema.prisma:480`, `source/backend/prisma/schema.prisma:490`                                                                                              |
+| BE-04/07    | Correction preserves all before-semester assignment answers                                          | Default `moveCohorts` rewrites existing mappings to the correction without adding an interval                                                                                                                                                                                                                                                        | `source/backend/src/features/releases/corrections.service.ts:143`; escalation E1                                                                                                  |
+| BE-04/05    | Semester codes/academic year sort chronologically and dates are immutable once used by an assignment | Arbitrary nonempty academicYear is accepted; only dates supporting ACTIVE/HISTORICAL release rows get the start-date guard                                                                                                                                                                                                                           | `source/backend/src/features/semesters/dto/semester.dto.ts:31`; `source/backend/src/features/semesters/semesters.service.ts:87`; E3                                               |
+| FE-02/04    | `DiffView` is a shared UI primitive                                                                  | It belongs to change-requests and imports that feature's API/constants                                                                                                                                                                                                                                                                               | `source/frontend/src/features/change-requests/components/DiffView.tsx:2`                                                                                                          |
+| BE-05       | §12 sequence can count and move enrolled students at B4                                              | Current schema has CohortVersion, not Student/ProgramEnrollment models; B5 owns that integration                                                                                                                                                                                                                                                     | `source/backend/prisma/schema.prisma:470`; dependency U1                                                                                                                          |
+| BE-01..07   | F-09 is not yet built                                                                                | F-09 is built in features/imports and has moved shared course/curriculum code, schema citations, app wiring and permission-table lines. F-16 does not import or replace that work                                                                                                                                                                    | `source/backend/src/app.module.ts:58`; `source/backend/src/shared/curriculum/curriculum-limits.ts:1`; `source/backend/test/permission-table.ts:70`                                |
+| BE-05       | Reuse toCohortDto directly for a picked domain cohort                                                | Existing mapper requires the full Prisma Cohort including timestamps; the new domain intentionally carries only id/cohortCode/intakeYear. Map those three fields explicitly rather than widening a built exported contract                                                                                                                           | `source/backend/src/shared/releases/semester.dto.ts:30`; `source/backend/src/features/releases/cohort-versions.mapper.ts:22`                                                      |
+| BE-06       | The generic program write counter is a single Program count                                          | The branch also handles director assignments. Insert the cohort counter before the whole existing branch and preserve both cases                                                                                                                                                                                                                     | `source/backend/test/permission-table.e2e-spec.ts:123`                                                                                                                            |
+| BE-07       | Fixture release calls can infer request types or allow past semesters implicitly                     | Use built CURRICULUM/SYLLABUS_CONTENT requests, real submit/final-approve routes, two R1 accounts and explicit allowPastSemester for the historical middle release. Initial release selects one cohort while another existing cohort stays unselected; later final releases select none, proving preservation instead of an empty-database tautology | `source/backend/test/fixtures/version-comparison.ts:1`; `source/backend/src/features/change-requests/final-approval.dto.ts:28`                                                    |
 
 No existing response field is silently upgraded to a different type. Source-verified DTO inventory: `source/backend/src/features/releases/dto/version-comparison.dto.ts:27` (queries/issued headers), `:42` (pin links/rows), `:51` (sections/comparison), `:67` (syllabus drill-down); `source/backend/src/features/releases/dto/cohort-version.dto.ts:26` (POST), `:41` (PATCH), `:47` (query), `:50` (assignment), `:57` (list), `:63` (diagnostic). The complete BE-01 inventory remains the wire contract; the presenter, strict snapshot reader and cohort mapper implement it. OpenAPI HTTP generation is not claimed verified here; §8 U1/U2 still names unavailable downstream contracts.
 
 ## 3. Decisions
 
-| ID | Decision | Why | Rejected alternative |
-|---|---|---|---|
-| D1 | Extend the existing `releases` feature; put only the cross-feature applied-version reader/types in `shared/releases` | Existing history lives there (`source/backend/src/features/releases/releases.module.ts:18`); B5 must not import a feature service | New parallel `versions` module or internal HTTP calls |
-| D2 | New released-content snapshot reader; reuse only the pure `diffSnapshots`, scalar and plain-text presentation primitives | Preserve F-13 working-copy semantics while covering frozen fields and pins | Changing the shared request reader and every caller |
-| D3 | Exactly six program comparison sections, all present even when empty; FE subgroups each section into Thêm / Bớt / Sửa | F16-03 A plus US-078's broader group coverage | Whole-program two-column JSON dump or omission of unchanged groups |
-| D4 | Direct comparison of endpoint snapshots by natural keys, not replay of intermediate ChangeItems | Non-adjacent versions and different copied row IDs must work | Adjacent-only diffs or row-ID identity |
-| D5 | Explicit required `semesterId`; chronological key is the referenced semester's non-null `startDate` | No canonical year syntax is enforced (`source/backend/src/features/semesters/dto/semester.dto.ts:31`); no wall-clock-dependent API default | ACTIVE version, highest version number, intake year, or lexical semester code |
-| D6 | Shared resolver returns ASSIGNED/UNASSIGNED; it may return PENDING for a future queried semester or HISTORICAL for an older cohort | Version lifecycle is not student entitlement; never auto-upgrade | Filtering assignments to ACTIVE only |
-| D7 | Same-date legacy ties resolve by assignment `createdAt desc`, then assignment ID in deterministic codepoint-descending order | F-15 can create more than one version in a semester; existing schema permits it | New uniqueness constraint or rejecting all legacy data |
-| D8 | New F-16 writes refuse another mapping for that cohort/program at the same start date; keep existing ties readable | Avoid creating new ambiguity without rewriting a built table or release writer | Deleting/replacing existing links or silently choosing a different target |
-| D9 | Batch POST creates links; PATCH only corrects `fromSemesterId`; no delete, pair-identity change or repeated-version interval | Match MH-50 while retaining existing pair uniqueness | Altering the F-15-owned schema to an interval/event model |
-| D10 | Program-row lock plus Serializable transaction and a hash revision of the schedule/calendar prevents stale overwrites | Existing release/correction writers also lock Program (`source/backend/src/features/releases/releases.service.ts:77`, `source/backend/src/features/releases/corrections.service.ts:97`) | `updatedAt` optimistic lock on a table that has no such column |
-| D11 | Assignment confirmation names target release decision, cohorts, start semester and retroactive effect; no invented student count or unpersisted free-text reason | Students are unbuilt; release decision is available; separate conversion evidence is E2, not an invented schema field | Reporting zero affected students, or collecting and discarding a “basis” |
-| D12 | No schema migration, new permission seed, queue, runtime library, branch or commit in this feature plan | Built foundation suffices; preserve behavior fences | Additive-looking migration that changes assignment semantics under F-15 |
-| D13 | Keep immutable content comparisons separate from mutable lifecycle/assignment metadata | A syllabus becoming HISTORICAL or another cohort being assigned is not curriculum change | Comparing timestamps/status/cohort lists as academic content |
+| ID  | Decision                                                                                                                                                         | Why                                                                                                                                                                                     | Rejected alternative                                                          |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| D1  | Extend the existing `releases` feature; put only the cross-feature applied-version reader/types in `shared/releases`                                             | Existing history lives there (`source/backend/src/features/releases/releases.module.ts:18`); B5 must not import a feature service                                                       | New parallel `versions` module or internal HTTP calls                         |
+| D2  | New released-content snapshot reader; reuse only the pure `diffSnapshots`, scalar and plain-text presentation primitives                                         | Preserve F-13 working-copy semantics while covering frozen fields and pins                                                                                                              | Changing the shared request reader and every caller                           |
+| D3  | Exactly six program comparison sections, all present even when empty; FE subgroups each section into Thêm / Bớt / Sửa                                            | F16-03 A plus US-078's broader group coverage                                                                                                                                           | Whole-program two-column JSON dump or omission of unchanged groups            |
+| D4  | Direct comparison of endpoint snapshots by natural keys, not replay of intermediate ChangeItems                                                                  | Non-adjacent versions and different copied row IDs must work                                                                                                                            | Adjacent-only diffs or row-ID identity                                        |
+| D5  | Explicit required `semesterId`; chronological key is the referenced semester's non-null `startDate`                                                              | No canonical year syntax is enforced (`source/backend/src/features/semesters/dto/semester.dto.ts:31`); no wall-clock-dependent API default                                              | ACTIVE version, highest version number, intake year, or lexical semester code |
+| D6  | Shared resolver returns ASSIGNED/UNASSIGNED; it may return PENDING for a future queried semester or HISTORICAL for an older cohort                               | Version lifecycle is not student entitlement; never auto-upgrade                                                                                                                        | Filtering assignments to ACTIVE only                                          |
+| D7  | Same-date legacy ties resolve by assignment `createdAt desc`, then assignment ID in deterministic codepoint-descending order                                     | F-15 can create more than one version in a semester; existing schema permits it                                                                                                         | New uniqueness constraint or rejecting all legacy data                        |
+| D8  | New F-16 writes refuse another mapping for that cohort/program at the same start date; keep existing ties readable                                               | Avoid creating new ambiguity without rewriting a built table or release writer                                                                                                          | Deleting/replacing existing links or silently choosing a different target     |
+| D9  | Batch POST creates links; PATCH only corrects `fromSemesterId`; no delete, pair-identity change or repeated-version interval                                     | Match MH-50 while retaining existing pair uniqueness                                                                                                                                    | Altering the F-15-owned schema to an interval/event model                     |
+| D10 | Program-row lock plus Serializable transaction and a hash revision of the schedule/calendar prevents stale overwrites                                            | Existing release/correction writers also lock Program (`source/backend/src/features/releases/releases.service.ts:77`, `source/backend/src/features/releases/corrections.service.ts:97`) | `updatedAt` optimistic lock on a table that has no such column                |
+| D11 | Assignment confirmation names target release decision, cohorts, start semester and retroactive effect; no invented student count or unpersisted free-text reason | Students are unbuilt; release decision is available; separate conversion evidence is E2, not an invented schema field                                                                   | Reporting zero affected students, or collecting and discarding a “basis”      |
+| D12 | No schema migration, new permission seed, queue, runtime library, branch or commit in this feature plan                                                          | Built foundation suffices; preserve behavior fences                                                                                                                                     | Additive-looking migration that changes assignment semantics under F-15       |
+| D13 | Keep immutable content comparisons separate from mutable lifecycle/assignment metadata                                                                           | A syllabus becoming HISTORICAL or another cohort being assigned is not curriculum change                                                                                                | Comparing timestamps/status/cohort lists as academic content                  |
 
 ## 4. Integration boundaries and deliberate divergences
 
 There is no shipped sibling implementation to diverge from. The existing web implementation is a dependency, not a spec for invented backend DTOs. These boundaries make differences from older documents explicit.
 
-| Boundary | Implementation instruction | Authority / consequence |
-|---|---|---|
-| F-15 history/detail already built | Modify only selection/navigation and explanatory text, retaining current response contracts and read-only links | `source/frontend/src/features/releases/pages/VersionHistoryPage.tsx:35`, `source/frontend/src/features/releases/pages/VersionDetailPage.tsx:88` |
-| F-13 request snapshots | Do not replace `readProgramSnapshot`, `readSyllabusSnapshot`, `diffSnapshots`, `toDiffSections` or `DiffView` | Existing reader deliberately represents request-editable data; no old call sites are removed or migrated |
-| §12 assignment sequence includes B5 work | B4 stores cohort links and offers explicit confirmation; student counts, enrollment transitions and exception records remain F-17 | F16-02 A; U1. Never stub “0 students transferred” |
-| Correction timeline differs from US-080's ideal as-of promise | Preserve F-15's current writer and characterize the limitation; do not certify correction-stable historical assignment results | E1 decided 2026-10-26; accepted limitation, no history/freeze work, not an approved product divergence |
-| Separate conversion evidence is not modeled | Default confirmation displays the existing release decision. If Faculty requires a distinct conversion decision/basis, stop that slice for E2 | No discarded input, audit-log revival or hidden new persistence |
-| Date-only chronology | Use existing date helpers and known semester starts, not a new academic-year grammar or changed Semester edit policy | E3 records the mutability limit; no historical date freezing is assumed |
+| Boundary                                                      | Implementation instruction                                                                                                                    | Authority / consequence                                                                                                                         |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| F-15 history/detail already built                             | Modify only selection/navigation and explanatory text, retaining current response contracts and read-only links                               | `source/frontend/src/features/releases/pages/VersionHistoryPage.tsx:35`, `source/frontend/src/features/releases/pages/VersionDetailPage.tsx:88` |
+| F-13 request snapshots                                        | Do not replace `readProgramSnapshot`, `readSyllabusSnapshot`, `diffSnapshots`, `toDiffSections` or `DiffView`                                 | Existing reader deliberately represents request-editable data; no old call sites are removed or migrated                                        |
+| §12 assignment sequence includes B5 work                      | B4 stores cohort links and offers explicit confirmation; student counts, enrollment transitions and exception records remain F-17             | F16-02 A; U1. Never stub “0 students transferred”                                                                                               |
+| Correction timeline differs from US-080's ideal as-of promise | Preserve F-15's current writer and characterize the limitation; do not certify correction-stable historical assignment results                | E1 decided 2026-10-26; accepted limitation, no history/freeze work, not an approved product divergence                                          |
+| Separate conversion evidence is not modeled                   | Default confirmation displays the existing release decision. If Faculty requires a distinct conversion decision/basis, stop that slice for E2 | No discarded input, audit-log revival or hidden new persistence                                                                                 |
+| Date-only chronology                                          | Use existing date helpers and known semester starts, not a new academic-year grammar or changed Semester edit policy                          | E3 records the mutability limit; no historical date freezing is assumed                                                                         |
 
 ## 5. Deliverables
 
@@ -293,14 +294,14 @@ Every NEW path below was checked against its existing parent directory; a new fi
 
 **Files**
 
-| Action | Path | Mirror / rationale |
-|---|---|---|
-| NEW | `source/backend/src/features/releases/dto/version-comparison.dto.ts` | `source/backend/src/features/releases/dto/version-detail.dto.ts:12`; concrete Swagger classes |
-| NEW | `source/backend/src/features/releases/dto/cohort-version.dto.ts` | `source/backend/src/features/releases/dto/release-version.dto.ts:23`; request validation and response classes |
-| NEW | `source/backend/src/features/releases/version-comparison.constants.ts` | `source/backend/src/shared/change-requests/diff/diff-labels.ts:22`; feature-owned section/field labels |
-| NEW | `source/backend/src/shared/releases/applied-version.errors.ts` | `source/backend/src/shared/releases/release.errors.ts:4`; typed Vietnamese errors usable by B5 |
-| NEW | `source/backend/src/features/releases/dto/version-comparison.dto.spec.ts` | `source/backend/src/features/releases/version-history.reader.spec.ts:1`; Vitest beside source |
-| NEW | `source/backend/src/features/releases/dto/cohort-version.dto.spec.ts` | Same test convention; exercise class-validator transformations |
+| Action | Path                                                                      | Mirror / rationale                                                                                            |
+| ------ | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| NEW    | `source/backend/src/features/releases/dto/version-comparison.dto.ts`      | `source/backend/src/features/releases/dto/version-detail.dto.ts:12`; concrete Swagger classes                 |
+| NEW    | `source/backend/src/features/releases/dto/cohort-version.dto.ts`          | `source/backend/src/features/releases/dto/release-version.dto.ts:23`; request validation and response classes |
+| NEW    | `source/backend/src/features/releases/version-comparison.constants.ts`    | `source/backend/src/shared/change-requests/diff/diff-labels.ts:22`; feature-owned section/field labels        |
+| NEW    | `source/backend/src/shared/releases/applied-version.errors.ts`            | `source/backend/src/shared/releases/release.errors.ts:4`; typed Vietnamese errors usable by B5                |
+| NEW    | `source/backend/src/features/releases/dto/version-comparison.dto.spec.ts` | `source/backend/src/features/releases/version-history.reader.spec.ts:1`; Vitest beside source                 |
+| NEW    | `source/backend/src/features/releases/dto/cohort-version.dto.spec.ts`     | Same test convention; exercise class-validator transformations                                                |
 
 **Shape — comparison types**
 
@@ -308,30 +309,41 @@ Use `ApiProperty`, class-validator `IsString`/`IsNotEmpty`, existing `SemesterDt
 
 ```ts
 export const VERSION_COMPARE_SECTIONS = {
-  INFO: 'INFO',
-  CURRICULUM: 'CURRICULUM',
-  ELECTIVE_GROUPS: 'ELECTIVE_GROUPS',
-  PLOS: 'PLOS',
-  MATRICES: 'MATRICES',
-  SYLLABI: 'SYLLABI',
+  INFO: "INFO",
+  CURRICULUM: "CURRICULUM",
+  ELECTIVE_GROUPS: "ELECTIVE_GROUPS",
+  PLOS: "PLOS",
+  MATRICES: "MATRICES",
+  SYLLABI: "SYLLABI",
 } as const;
 export type VersionCompareSection =
   (typeof VERSION_COMPARE_SECTIONS)[keyof typeof VERSION_COMPARE_SECTIONS];
 
-export const ISSUED_VERSION_STATUSES = ['PENDING', 'ACTIVE', 'HISTORICAL'] as const;
+export const ISSUED_VERSION_STATUSES = [
+  "PENDING",
+  "ACTIVE",
+  "HISTORICAL",
+] as const;
 export type IssuedVersionStatus = (typeof ISSUED_VERSION_STATUSES)[number];
 
 export class VersionComparisonQueryDto {
-  @ApiProperty() @IsString() @IsNotEmpty()
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   beforeVersionId!: string;
-  @ApiProperty() @IsString() @IsNotEmpty()
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   afterVersionId!: string;
 }
 
 export class IssuedVersionDto {
   @ApiProperty() id!: string;
   @ApiProperty() versionNumber!: string;
-  @ApiProperty({ enum: [...ISSUED_VERSION_STATUSES], enumName: 'IssuedVersionStatus' })
+  @ApiProperty({
+    enum: [...ISSUED_VERSION_STATUSES],
+    enumName: "IssuedVersionStatus",
+  })
   status!: IssuedVersionStatus;
   @ApiProperty() decisionNumber!: string;
   @ApiProperty({ type: SemesterDto }) effectiveSemester!: SemesterDto;
@@ -349,7 +361,10 @@ export class VersionCompareRowDto extends DiffRowDto {
 }
 
 export class VersionCompareSectionDto {
-  @ApiProperty({ enum: Object.values(VERSION_COMPARE_SECTIONS), enumName: 'VersionCompareSection' })
+  @ApiProperty({
+    enum: Object.values(VERSION_COMPARE_SECTIONS),
+    enumName: "VersionCompareSection",
+  })
   key!: VersionCompareSection;
   @ApiProperty() title!: string;
   @ApiProperty({ type: [VersionCompareRowDto] }) rows!: VersionCompareRowDto[];
@@ -359,7 +374,8 @@ export class VersionComparisonDto {
   @ApiProperty() programId!: string;
   @ApiProperty({ type: IssuedVersionDto }) before!: IssuedVersionDto;
   @ApiProperty({ type: IssuedVersionDto }) after!: IssuedVersionDto;
-  @ApiProperty({ type: [VersionCompareSectionDto] }) sections!: VersionCompareSectionDto[];
+  @ApiProperty({ type: [VersionCompareSectionDto] })
+  sections!: VersionCompareSectionDto[];
 }
 
 export class PinnedSyllabusComparisonDto {
@@ -386,30 +402,44 @@ export const COHORT_ASSIGNMENT_LIMITS = {
 export const ASSIGNMENT_REVISION_PATTERN = new RegExp(
   `^[a-f0-9]{${COHORT_ASSIGNMENT_LIMITS.REVISION_LENGTH}}$`,
 );
-export const APPLIED_VERSION_STATES = ['ASSIGNED', 'UNASSIGNED'] as const;
+export const APPLIED_VERSION_STATES = ["ASSIGNED", "UNASSIGNED"] as const;
 
 export class AssignCohortVersionsDto {
   @ApiProperty({ type: [String] })
-  @IsArray() @ArrayMinSize(1) @ArrayMaxSize(COHORT_ASSIGNMENT_LIMITS.COHORTS_MAX)
-  @ArrayUnique() @IsString({ each: true }) @IsNotEmpty({ each: true })
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(COHORT_ASSIGNMENT_LIMITS.COHORTS_MAX)
+  @ArrayUnique()
+  @IsString({ each: true })
+  @IsNotEmpty({ each: true })
   cohortIds!: string[];
-  @ApiProperty() @IsString() @IsNotEmpty()
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   programVersionId!: string;
-  @ApiProperty() @IsString() @IsNotEmpty()
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   fromSemesterId!: string;
-  @ApiProperty() @Matches(ASSIGNMENT_REVISION_PATTERN)
+  @ApiProperty()
+  @Matches(ASSIGNMENT_REVISION_PATTERN)
   expectedRevision!: string;
 }
 
 export class UpdateCohortVersionDto {
-  @ApiProperty() @IsString() @IsNotEmpty()
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   fromSemesterId!: string;
-  @ApiProperty() @Matches(ASSIGNMENT_REVISION_PATTERN)
+  @ApiProperty()
+  @Matches(ASSIGNMENT_REVISION_PATTERN)
   expectedRevision!: string;
 }
 
 export class AppliedVersionQueryDto {
-  @ApiProperty() @IsString() @IsNotEmpty()
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   semesterId!: string;
 }
 
@@ -432,8 +462,11 @@ export class AppliedCohortVersionDto {
   @ApiProperty() programId!: string;
   @ApiProperty({ type: CohortDto }) cohort!: CohortDto;
   @ApiProperty({ type: SemesterDto }) semester!: SemesterDto;
-  @ApiProperty({ enum: [...APPLIED_VERSION_STATES], enumName: 'AppliedVersionState' })
-  state!: 'ASSIGNED' | 'UNASSIGNED';
+  @ApiProperty({
+    enum: [...APPLIED_VERSION_STATES],
+    enumName: "AppliedVersionState",
+  })
+  state!: "ASSIGNED" | "UNASSIGNED";
   @ApiProperty({ type: CohortVersionAssignmentDto, nullable: true })
   assignment!: CohortVersionAssignmentDto | null;
 }
@@ -443,72 +476,72 @@ The cohort limit matches the current release DTO's bound (`source/backend/src/fe
 
 **Complete response field inventory / FE mapping** — NEW BE-01/02/03/04/05 provenance labels in this table now refer to implemented source, located in §2. Existing nested `SemesterDto`, `CohortDto`, `SyllabusPinDto` remain unchanged and are fully inventoried in §2b. HTTP execution and FE generation are pending.
 
-| DTO / field | Wire type | Nullable | Source | Modeled as / note |
-|---|---|---|---|---|
-| `IssuedVersionDto.id` | string | no | NEW BE-01, BE-03/05 mapper | Generated alias; ID |
-| `versionNumber` | string | no | NEW BE-01, BE-03/05 | Assert publication facts before mapping |
-| `status` | `'PENDING' \| 'ACTIVE' \| 'HISTORICAL'` | no | NEW BE-01, BE-03/05 | Presentation only, not entitlement filter |
-| `decisionNumber` | string | no | NEW BE-01, BE-03/05 | Confirmation's release basis |
-| `effectiveSemester` | `SemesterDto` | no | NEW BE-01, BE-03/05 | Must have known start for new mapping |
-| `VersionComparisonDto.programId` | string | no | NEW BE-01/03 | Route context |
-| `before` | `IssuedVersionDto` | no | NEW BE-01/03 | Exactly selected left version |
-| `after` | `IssuedVersionDto` | no | NEW BE-01/03 | Exactly selected right version |
-| `sections` | `VersionCompareSectionDto[]` | no | NEW BE-01/02 | Exactly six ordered groups |
-| `VersionCompareSectionDto.key` | `'INFO' \| 'CURRICULUM' \| 'ELECTIVE_GROUPS' \| 'PLOS' \| 'MATRICES' \| 'SYLLABI'` | no | NEW BE-01/02 | Stable collapse key |
-| `title` | string | no | NEW BE-01/02 | Vietnamese label |
-| `rows` | `VersionCompareRowDto[]` | no | NEW BE-01/02 | Empty means unchanged |
-| `VersionCompareRowDto.itemKey` | string | no | Existing base DTO `source/backend/src/shared/change-requests/diff/change-diff.dto.ts:18`; NEW BE-02 mapper | Opaque natural key, not parsed by UI |
-| `label` | string | no | `source/backend/src/shared/change-requests/diff/change-diff.dto.ts:19`; NEW BE-02 | Frozen display label |
-| `change` | `'ADDED' \| 'REMOVED' \| 'CHANGED'` | no | `source/backend/src/shared/change-requests/diff/change-diff.dto.ts:20`; NEW BE-02 | Three UI subgroups |
-| `fields` | `DiffFieldDto[]` | no | `source/backend/src/shared/change-requests/diff/change-diff.dto.ts:25`; NEW BE-02 | Only relevant before/after fields |
-| `syllabusComparison` | `SyllabusComparisonLinkDto` | yes | NEW BE-01/02 | Only a changed pin with both sides has a link |
-| `SyllabusComparisonLinkDto.courseId` | string | no | NEW BE-01/02 | Builds drill-down URL |
-| `beforeSyllabusId` | string | no | NEW BE-01/02 | Provenance/display; never trusted as request authorization |
-| `afterSyllabusId` | string | no | NEW BE-01/02 | Same |
-| `DiffFieldDto.name` | string | no | `source/backend/src/shared/change-requests/diff/change-diff.dto.ts:11`; NEW mapper BE-02 | Stable field key |
-| `label` | string | no | `source/backend/src/shared/change-requests/diff/change-diff.dto.ts:12`; NEW BE-02 | Vietnamese field name |
-| `before` | string | yes | `source/backend/src/shared/change-requests/diff/change-diff.dto.ts:13`; NEW BE-02 | Plain text, decimal strings preserved |
-| `after` | string | yes | `source/backend/src/shared/change-requests/diff/change-diff.dto.ts:14`; NEW BE-02 | Null is absence, not empty text |
-| `PinnedSyllabusComparisonDto.programId` | string | no | NEW BE-01/03 | Route context |
-| `courseId` | string | no | NEW BE-01/03 | Selected course |
-| `courseCode` | string | no | NEW BE-01/03 | Immutable course label |
-| `beforeVersionId` | string | no | NEW BE-01/03 | Back link and context |
-| `afterVersionId` | string | no | NEW BE-01/03 | Same |
-| `before` | `SyllabusPinDto` | no | NEW BE-01/03 | Actual pin derived by server |
-| `after` | `SyllabusPinDto` | no | NEW BE-01/03 | Actual pin derived by server |
-| `sections` | `DiffSectionDto[]` | no | NEW BE-01/03 | Three groups, empty groups retained |
-| `DiffSectionDto.entityType` | string | no | `source/backend/src/shared/change-requests/diff/change-diff.dto.ts:29`; NEW BE-03 mapper | `SYLLABUS_FIELD`, `WEEKLY_CONTENTS`, `CLO` |
-| `title` | string | no | `source/backend/src/shared/change-requests/diff/change-diff.dto.ts:30`; NEW BE-03 | Vietnamese section label |
-| `rows` | `DiffRowDto[]` | no | `source/backend/src/shared/change-requests/diff/change-diff.dto.ts:31`; NEW BE-03 | Same four base row fields above, no syllabusComparison field |
-| `CohortVersionAssignmentDto.id` | string | no | NEW BE-01/05 | Mapping ID |
-| `cohort` | `CohortDto` | no | NEW BE-01/05 | Selector/table label |
-| `version` | `IssuedVersionDto` | no | NEW BE-01/05 | Actual assigned version |
-| `fromSemester` | `SemesterDto` | no | NEW BE-01/05 | Starting semester, not version's effective semester |
-| `createdAt` | ISO instant string | no | NEW BE-01/05 | Tie provenance; not updated by PATCH |
-| `CohortVersionListDto.programId` | string | no | NEW BE-01/05 | Program context |
-| `revision` | lowercase hex string | no | NEW BE-01/04/05 | Opaque concurrency token, not authorization |
-| `assignments` | `CohortVersionAssignmentDto[]` | no | NEW BE-01/05 | Full table after POST/PATCH; not just changed rows |
-| `AppliedCohortVersionDto.programId` | string | no | NEW BE-01/05 | Program context |
-| `cohort` | `CohortDto` | no | NEW BE-01/05 | Exact requested cohort |
-| `semester` | `SemesterDto` | no | NEW BE-01/05 | Exact requested evaluation semester |
-| `state` | `'ASSIGNED' \| 'UNASSIGNED'` | no | NEW BE-01/05 | Never “latest active” fallback |
-| `assignment` | `CohortVersionAssignmentDto` | yes | NEW BE-01/05 | Non-null iff ASSIGNED |
+| DTO / field                             | Wire type                                                                          | Nullable | Source                                                                                                     | Modeled as / note                                            |
+| --------------------------------------- | ---------------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `IssuedVersionDto.id`                   | string                                                                             | no       | NEW BE-01, BE-03/05 mapper                                                                                 | Generated alias; ID                                          |
+| `versionNumber`                         | string                                                                             | no       | NEW BE-01, BE-03/05                                                                                        | Assert publication facts before mapping                      |
+| `status`                                | `'PENDING' \| 'ACTIVE' \| 'HISTORICAL'`                                            | no       | NEW BE-01, BE-03/05                                                                                        | Presentation only, not entitlement filter                    |
+| `decisionNumber`                        | string                                                                             | no       | NEW BE-01, BE-03/05                                                                                        | Confirmation's release basis                                 |
+| `effectiveSemester`                     | `SemesterDto`                                                                      | no       | NEW BE-01, BE-03/05                                                                                        | Must have known start for new mapping                        |
+| `VersionComparisonDto.programId`        | string                                                                             | no       | NEW BE-01/03                                                                                               | Route context                                                |
+| `before`                                | `IssuedVersionDto`                                                                 | no       | NEW BE-01/03                                                                                               | Exactly selected left version                                |
+| `after`                                 | `IssuedVersionDto`                                                                 | no       | NEW BE-01/03                                                                                               | Exactly selected right version                               |
+| `sections`                              | `VersionCompareSectionDto[]`                                                       | no       | NEW BE-01/02                                                                                               | Exactly six ordered groups                                   |
+| `VersionCompareSectionDto.key`          | `'INFO' \| 'CURRICULUM' \| 'ELECTIVE_GROUPS' \| 'PLOS' \| 'MATRICES' \| 'SYLLABI'` | no       | NEW BE-01/02                                                                                               | Stable collapse key                                          |
+| `title`                                 | string                                                                             | no       | NEW BE-01/02                                                                                               | Vietnamese label                                             |
+| `rows`                                  | `VersionCompareRowDto[]`                                                           | no       | NEW BE-01/02                                                                                               | Empty means unchanged                                        |
+| `VersionCompareRowDto.itemKey`          | string                                                                             | no       | Existing base DTO `source/backend/src/shared/change-requests/diff/change-diff.dto.ts:18`; NEW BE-02 mapper | Opaque natural key, not parsed by UI                         |
+| `label`                                 | string                                                                             | no       | `source/backend/src/shared/change-requests/diff/change-diff.dto.ts:19`; NEW BE-02                          | Frozen display label                                         |
+| `change`                                | `'ADDED' \| 'REMOVED' \| 'CHANGED'`                                                | no       | `source/backend/src/shared/change-requests/diff/change-diff.dto.ts:20`; NEW BE-02                          | Three UI subgroups                                           |
+| `fields`                                | `DiffFieldDto[]`                                                                   | no       | `source/backend/src/shared/change-requests/diff/change-diff.dto.ts:25`; NEW BE-02                          | Only relevant before/after fields                            |
+| `syllabusComparison`                    | `SyllabusComparisonLinkDto`                                                        | yes      | NEW BE-01/02                                                                                               | Only a changed pin with both sides has a link                |
+| `SyllabusComparisonLinkDto.courseId`    | string                                                                             | no       | NEW BE-01/02                                                                                               | Builds drill-down URL                                        |
+| `beforeSyllabusId`                      | string                                                                             | no       | NEW BE-01/02                                                                                               | Provenance/display; never trusted as request authorization   |
+| `afterSyllabusId`                       | string                                                                             | no       | NEW BE-01/02                                                                                               | Same                                                         |
+| `DiffFieldDto.name`                     | string                                                                             | no       | `source/backend/src/shared/change-requests/diff/change-diff.dto.ts:11`; NEW mapper BE-02                   | Stable field key                                             |
+| `label`                                 | string                                                                             | no       | `source/backend/src/shared/change-requests/diff/change-diff.dto.ts:12`; NEW BE-02                          | Vietnamese field name                                        |
+| `before`                                | string                                                                             | yes      | `source/backend/src/shared/change-requests/diff/change-diff.dto.ts:13`; NEW BE-02                          | Plain text, decimal strings preserved                        |
+| `after`                                 | string                                                                             | yes      | `source/backend/src/shared/change-requests/diff/change-diff.dto.ts:14`; NEW BE-02                          | Null is absence, not empty text                              |
+| `PinnedSyllabusComparisonDto.programId` | string                                                                             | no       | NEW BE-01/03                                                                                               | Route context                                                |
+| `courseId`                              | string                                                                             | no       | NEW BE-01/03                                                                                               | Selected course                                              |
+| `courseCode`                            | string                                                                             | no       | NEW BE-01/03                                                                                               | Immutable course label                                       |
+| `beforeVersionId`                       | string                                                                             | no       | NEW BE-01/03                                                                                               | Back link and context                                        |
+| `afterVersionId`                        | string                                                                             | no       | NEW BE-01/03                                                                                               | Same                                                         |
+| `before`                                | `SyllabusPinDto`                                                                   | no       | NEW BE-01/03                                                                                               | Actual pin derived by server                                 |
+| `after`                                 | `SyllabusPinDto`                                                                   | no       | NEW BE-01/03                                                                                               | Actual pin derived by server                                 |
+| `sections`                              | `DiffSectionDto[]`                                                                 | no       | NEW BE-01/03                                                                                               | Three groups, empty groups retained                          |
+| `DiffSectionDto.entityType`             | string                                                                             | no       | `source/backend/src/shared/change-requests/diff/change-diff.dto.ts:29`; NEW BE-03 mapper                   | `SYLLABUS_FIELD`, `WEEKLY_CONTENTS`, `CLO`                   |
+| `title`                                 | string                                                                             | no       | `source/backend/src/shared/change-requests/diff/change-diff.dto.ts:30`; NEW BE-03                          | Vietnamese section label                                     |
+| `rows`                                  | `DiffRowDto[]`                                                                     | no       | `source/backend/src/shared/change-requests/diff/change-diff.dto.ts:31`; NEW BE-03                          | Same four base row fields above, no syllabusComparison field |
+| `CohortVersionAssignmentDto.id`         | string                                                                             | no       | NEW BE-01/05                                                                                               | Mapping ID                                                   |
+| `cohort`                                | `CohortDto`                                                                        | no       | NEW BE-01/05                                                                                               | Selector/table label                                         |
+| `version`                               | `IssuedVersionDto`                                                                 | no       | NEW BE-01/05                                                                                               | Actual assigned version                                      |
+| `fromSemester`                          | `SemesterDto`                                                                      | no       | NEW BE-01/05                                                                                               | Starting semester, not version's effective semester          |
+| `createdAt`                             | ISO instant string                                                                 | no       | NEW BE-01/05                                                                                               | Tie provenance; not updated by PATCH                         |
+| `CohortVersionListDto.programId`        | string                                                                             | no       | NEW BE-01/05                                                                                               | Program context                                              |
+| `revision`                              | lowercase hex string                                                               | no       | NEW BE-01/04/05                                                                                            | Opaque concurrency token, not authorization                  |
+| `assignments`                           | `CohortVersionAssignmentDto[]`                                                     | no       | NEW BE-01/05                                                                                               | Full table after POST/PATCH; not just changed rows           |
+| `AppliedCohortVersionDto.programId`     | string                                                                             | no       | NEW BE-01/05                                                                                               | Program context                                              |
+| `cohort`                                | `CohortDto`                                                                        | no       | NEW BE-01/05                                                                                               | Exact requested cohort                                       |
+| `semester`                              | `SemesterDto`                                                                      | no       | NEW BE-01/05                                                                                               | Exact requested evaluation semester                          |
+| `state`                                 | `'ASSIGNED' \| 'UNASSIGNED'`                                                       | no       | NEW BE-01/05                                                                                               | Never “latest active” fallback                               |
+| `assignment`                            | `CohortVersionAssignmentDto`                                                       | yes      | NEW BE-01/05                                                                                               | Non-null iff ASSIGNED                                        |
 
 **Errors**
 
 Define `APPLIED_VERSION_ERRORS` with the same `satisfies Record<string, ErrorDefinition>` pattern as `source/backend/src/shared/releases/release.errors.ts:4`. Reuse existing PROGRAM_NOT_FOUND, VERSION_NOT_FOUND, COHORT_NOT_FOUND, SEMESTER_NOT_FOUND and SEMESTER_START_UNKNOWN definitions; do not mint competing names. New codes:
 
-| HTTP / code | Vietnamese message | Trigger |
-|---|---|---|
-| 409 `VERSION_NOT_ISSUED` | `Chỉ chọn phiên bản đã ban hành.` | Draft, working copy, missing release facts |
-| 409 `VERSION_SNAPSHOT_INCOMPLETE` | `Ảnh chụp phiên bản chưa đầy đủ; không thể so sánh an toàn.` | Missing frozen field or invalid pin |
-| 404 `PINNED_SYLLABUS_NOT_FOUND` | `Không tìm thấy hai bản đề cương được ghim trong các phiên bản đã chọn.` | Course/pin not present in both contexts |
-| 404 `COHORT_ASSIGNMENT_NOT_FOUND` | `Không tìm thấy dòng gán phiên bản cho khóa.` | PATCH ID outside selected program or missing |
-| 409 `COHORT_VERSION_EXISTS` | `Khóa đã có dòng áp dụng phiên bản này; hãy sửa học kỳ của dòng hiện có.` | Existing pair uniqueness |
-| 409 `ASSIGNMENT_START_CONFLICT` | `Khóa đã có phiên bản bắt đầu trong học kỳ này; hãy kiểm tra các dòng áp dụng.` | Another mapping at same chronological start |
-| 409 `ASSIGNMENT_BEFORE_VERSION` | `Học kỳ áp dụng không được sớm hơn học kỳ hiệu lực của phiên bản.` | New mapping before release eligibility |
-| 409 `ASSIGNMENT_STATE_CHANGED` | `Dữ liệu gán khóa hoặc lịch học kỳ đã thay đổi; tải lại và xác nhận lại.` | Hash mismatch or serialization failure |
-| 409 `INVALID_COHORT_ASSIGNMENT` | `Dữ liệu gán khóa chưa hợp lệ; cần kiểm tra trước khi xác định phiên bản áp dụng.` | Malformed existing timeline, never silently skip |
+| HTTP / code                       | Vietnamese message                                                                 | Trigger                                          |
+| --------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------ |
+| 409 `VERSION_NOT_ISSUED`          | `Chỉ chọn phiên bản đã ban hành.`                                                  | Draft, working copy, missing release facts       |
+| 409 `VERSION_SNAPSHOT_INCOMPLETE` | `Ảnh chụp phiên bản chưa đầy đủ; không thể so sánh an toàn.`                       | Missing frozen field or invalid pin              |
+| 404 `PINNED_SYLLABUS_NOT_FOUND`   | `Không tìm thấy hai bản đề cương được ghim trong các phiên bản đã chọn.`           | Course/pin not present in both contexts          |
+| 404 `COHORT_ASSIGNMENT_NOT_FOUND` | `Không tìm thấy dòng gán phiên bản cho khóa.`                                      | PATCH ID outside selected program or missing     |
+| 409 `COHORT_VERSION_EXISTS`       | `Khóa đã có dòng áp dụng phiên bản này; hãy sửa học kỳ của dòng hiện có.`          | Existing pair uniqueness                         |
+| 409 `ASSIGNMENT_START_CONFLICT`   | `Khóa đã có phiên bản bắt đầu trong học kỳ này; hãy kiểm tra các dòng áp dụng.`    | Another mapping at same chronological start      |
+| 409 `ASSIGNMENT_BEFORE_VERSION`   | `Học kỳ áp dụng không được sớm hơn học kỳ hiệu lực của phiên bản.`                 | New mapping before release eligibility           |
+| 409 `ASSIGNMENT_STATE_CHANGED`    | `Dữ liệu gán khóa hoặc lịch học kỳ đã thay đổi; tải lại và xác nhận lại.`          | Hash mismatch or serialization failure           |
+| 409 `INVALID_COHORT_ASSIGNMENT`   | `Dữ liệu gán khóa chưa hợp lệ; cần kiểm tra trước khi xác định phiên bản áp dụng.` | Malformed existing timeline, never silently skip |
 
 **Gotchas:** Swagger response classes must carry concrete decorators; union aliases alone are insufficient for generation. Spread readonly status tuples into mutable enum arrays in Swagger options. Do not expose Prisma Decimal/Date objects directly. Validation rejects empty/duplicate cohort lists, missing query IDs, malformed revisions and extra patch identity fields; the global whitelist rejects unknown properties (`source/backend/src/app.setup.ts:30`). All consumers retain the existing error envelope (`source/backend/src/shared/dtos/error-response.dto.ts:12`).
 
@@ -522,29 +555,32 @@ Define `APPLIED_VERSION_ERRORS` with the same `satisfies Record<string, ErrorDef
 
 **Files**
 
-| Action | Path | Mirror / rationale |
-|---|---|---|
-| NEW | `source/backend/src/features/releases/released-version-snapshot.reader.ts` | `source/backend/src/shared/change-requests/diff/program-snapshot.reader.ts:20`; one include-based read and natural keys |
-| NEW | `source/backend/src/features/releases/version-comparison.presenter.ts` | `source/backend/src/shared/change-requests/diff/diff-presenter.ts:62`; pure DTO presentation, feature-owned labels |
-| NEW | `source/backend/src/features/releases/released-version-snapshot.reader.spec.ts` | Existing `version-history.reader.spec.ts:1`; mock reads and assert frozen values |
-| NEW | `source/backend/src/features/releases/version-comparison.presenter.spec.ts` | `source/backend/src/shared/change-requests/diff/snapshot-differ.spec.ts:1`; pure equality and ordering cases |
-| MODIFY | `source/backend/src/features/releases/version-comparison.constants.ts` | Fill the section/field dictionaries declared in BE-01 |
+| Action | Path                                                                            | Mirror / rationale                                                                                                      |
+| ------ | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| NEW    | `source/backend/src/features/releases/released-version-snapshot.reader.ts`      | `source/backend/src/shared/change-requests/diff/program-snapshot.reader.ts:20`; one include-based read and natural keys |
+| NEW    | `source/backend/src/features/releases/version-comparison.presenter.ts`          | `source/backend/src/shared/change-requests/diff/diff-presenter.ts:62`; pure DTO presentation, feature-owned labels      |
+| NEW    | `source/backend/src/features/releases/released-version-snapshot.reader.spec.ts` | Existing `version-history.reader.spec.ts:1`; mock reads and assert frozen values                                        |
+| NEW    | `source/backend/src/features/releases/version-comparison.presenter.spec.ts`     | `source/backend/src/shared/change-requests/diff/snapshot-differ.spec.ts:1`; pure equality and ordering cases            |
+| MODIFY | `source/backend/src/features/releases/version-comparison.constants.ts`          | Fill the section/field dictionaries declared in BE-01                                                                   |
 
 **Shape**
 
 ```ts
 export const RELEASED_SNAPSHOT_ENTITY = {
-  PINNED_SYLLABUS: 'PINNED_SYLLABUS',
+  PINNED_SYLLABUS: "PINNED_SYLLABUS",
 } as const;
 
 export interface ReleasedProgramSnapshot {
   version: IssuedVersionDto;
   entries: SnapshotEntry[];
-  pinsByCourseCode: ReadonlyMap<string, {
-    courseId: string;
-    syllabusId: string;
-    revisionNumber: number;
-  }>;
+  pinsByCourseCode: ReadonlyMap<
+    string,
+    {
+      courseId: string;
+      syllabusId: string;
+      revisionNumber: number;
+    }
+  >;
 }
 
 export async function readReleasedVersionSnapshot(
@@ -564,16 +600,16 @@ Implement the signatures as exported functions. The reader loads the version usi
 
 For each row require frozen name, frozen credits and a real pinned syllabus of the same course with a non-null revision number and non-DRAFT status. Throw SNAPSHOT_INCOMPLETE if these are missing; do not use the live fallback used by ordinary legacy detail. This stricter new comparison behavior does not alter existing readers (`source/backend/src/shared/curriculum/row-course.ts:17`, `source/backend/src/shared/syllabi/revision-for-items.ts:53`).
 
-| Entry / natural key | Exact compared values | Section |
-|---|---|---|
-| VERSION_INFO / field name | `programName`, `majorCode`, `majorName`, `semesterCount`, `totalCredits`, `compulsoryCredits`, `electiveCredits`, `creditMismatchReason` | INFO |
-| CURRICULUM_ITEM / immutable `courseCode` | Frozen `courseName`, frozen `credits`, `plannedSemester`, `sortOrder`, `blockSymbol`, `isElective`, groupCode/null, `htDa`, `tqDa`, `minStudiedScore`, `minTransferScore`, `note` | CURRICULUM |
-| CURRICULUM_REQUISITE / `JSON.stringify([courseCode,sourceCourseCode,relationType])` | `minScore` | CURRICULUM |
-| ELECTIVE_GROUP / groupCode | `groupName`, `minCredits`, `minCourses` | ELECTIVE_GROUPS |
-| PLO / ploCode | `description`, `englishDescription`, `competencyGroup`, `sortOrder` | PLOS |
-| COURSE_PLO / `JSON.stringify([courseCode,ploCode])` | Exact decimal `weight` | MATRICES |
-| CLO_PLO / `JSON.stringify([courseCode,cloCode,ploCode])` | `linked: 'true'` | MATRICES |
-| PINNED_SYLLABUS / courseCode | `syllabusId`, `revisionNumber` | SYLLABI |
+| Entry / natural key                                                                 | Exact compared values                                                                                                                                                             | Section         |
+| ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| VERSION_INFO / field name                                                           | `programName`, `majorCode`, `majorName`, `semesterCount`, `totalCredits`, `compulsoryCredits`, `electiveCredits`, `creditMismatchReason`                                          | INFO            |
+| CURRICULUM_ITEM / immutable `courseCode`                                            | Frozen `courseName`, frozen `credits`, `plannedSemester`, `sortOrder`, `blockSymbol`, `isElective`, groupCode/null, `htDa`, `tqDa`, `minStudiedScore`, `minTransferScore`, `note` | CURRICULUM      |
+| CURRICULUM_REQUISITE / `JSON.stringify([courseCode,sourceCourseCode,relationType])` | `minScore`                                                                                                                                                                        | CURRICULUM      |
+| ELECTIVE_GROUP / groupCode                                                          | `groupName`, `minCredits`, `minCourses`                                                                                                                                           | ELECTIVE_GROUPS |
+| PLO / ploCode                                                                       | `description`, `englishDescription`, `competencyGroup`, `sortOrder`                                                                                                               | PLOS            |
+| COURSE_PLO / `JSON.stringify([courseCode,ploCode])`                                 | Exact decimal `weight`                                                                                                                                                            | MATRICES        |
+| CLO_PLO / `JSON.stringify([courseCode,cloCode,ploCode])`                            | `linked: 'true'`                                                                                                                                                                  | MATRICES        |
+| PINNED_SYLLABUS / courseCode                                                        | `syllabusId`, `revisionNumber`                                                                                                                                                    | SYLLABI         |
 
 Use existing `scalar` for decimal/boolean conversion (`source/backend/src/shared/change-requests/diff/snapshot-scalar.ts`), not binary floating-point comparisons. Row/group/PLO/mapping IDs, status, publisher, timestamps, decision numbers, cohort assignments and current syllabus status are **not content**. Keep release metadata in the two headers. Requisites belong to their owning version, not live `CourseRelation`; course equivalence remains global and is not part of the snapshot (ERD M-5/M-6).
 
@@ -599,18 +635,18 @@ Do not call `toDiffSections` on the new PINNED_SYLLABUS entity: its existing fix
 
 **Files**
 
-| Action | Path | Mirror / rationale |
-|---|---|---|
-| NEW | `source/backend/src/features/releases/version-comparison.controller.ts` | `source/backend/src/features/releases/version-history.controller.ts:10`; scoped path, cookie auth and Swagger |
-| NEW | `source/backend/src/features/releases/version-comparison.service.ts` | `source/backend/src/features/releases/version-history.reader.ts:117`; scope then content read |
-| NEW | `source/backend/src/features/releases/version-comparison.service.spec.ts` | `source/backend/src/features/releases/version-history.reader.spec.ts:19`; AccessContext fixtures |
+| Action | Path                                                                      | Mirror / rationale                                                                                            |
+| ------ | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| NEW    | `source/backend/src/features/releases/version-comparison.controller.ts`   | `source/backend/src/features/releases/version-history.controller.ts:10`; scoped path, cookie auth and Swagger |
+| NEW    | `source/backend/src/features/releases/version-comparison.service.ts`      | `source/backend/src/features/releases/version-history.reader.ts:117`; scope then content read                 |
+| NEW    | `source/backend/src/features/releases/version-comparison.service.spec.ts` | `source/backend/src/features/releases/version-history.reader.spec.ts:19`; AccessContext fixtures              |
 
 **Shape**
 
 ```ts
-@ApiTags('releases')
+@ApiTags("releases")
 @ApiCookieAuth()
-@Controller('programs/:programId/version-comparison')
+@Controller("programs/:programId/version-comparison")
 export class VersionComparisonController {
   constructor(private readonly comparison: VersionComparisonService) {}
 
@@ -618,19 +654,19 @@ export class VersionComparisonController {
   @RequirePermission(PERMISSIONS.VERSION_COMPARE)
   @ApiOkResponse({ type: VersionComparisonDto })
   compare(
-    @Param('programId') programId: string,
+    @Param("programId") programId: string,
     @Query() query: VersionComparisonQueryDto,
     @CurrentAccess() access: AccessContext,
   ): Promise<VersionComparisonDto> {
     return this.comparison.compare(programId, query, access);
   }
 
-  @Get('syllabi/:courseId')
+  @Get("syllabi/:courseId")
   @RequirePermission(PERMISSIONS.VERSION_COMPARE)
   @ApiOkResponse({ type: PinnedSyllabusComparisonDto })
   syllabi(
-    @Param('programId') programId: string,
-    @Param('courseId') courseId: string,
+    @Param("programId") programId: string,
+    @Param("courseId") courseId: string,
     @Query() query: VersionComparisonQueryDto,
     @CurrentAccess() access: AccessContext,
   ): Promise<PinnedSyllabusComparisonDto> {
@@ -639,10 +675,17 @@ export class VersionComparisonController {
 }
 
 export interface VersionComparisonOperations {
-  compare(programId: string, query: VersionComparisonQueryDto,
-    access: AccessContext): Promise<VersionComparisonDto>;
-  syllabi(programId: string, courseId: string, query: VersionComparisonQueryDto,
-    access: AccessContext): Promise<PinnedSyllabusComparisonDto>;
+  compare(
+    programId: string,
+    query: VersionComparisonQueryDto,
+    access: AccessContext,
+  ): Promise<VersionComparisonDto>;
+  syllabi(
+    programId: string,
+    courseId: string,
+    query: VersionComparisonQueryDto,
+    access: AccessContext,
+  ): Promise<PinnedSyllabusComparisonDto>;
 }
 ```
 
@@ -664,21 +707,24 @@ Use a private scoped-program helper in this service rather than importing the fe
 
 **Files**
 
-| Action | Path | Mirror / rationale |
-|---|---|---|
-| NEW | `source/backend/src/shared/releases/applied-version.types.ts` | `source/backend/src/shared/syllabi/revision-for-items.ts:4`; domain facts, not imports from a feature |
-| NEW | `source/backend/src/shared/releases/cohort-version-schedule.ts` | `source/backend/src/shared/releases/semester-start.ts:13`; DB-aware normalization plus pure chronological selection |
-| NEW | `source/backend/src/shared/releases/applied-program-version.reader.ts` | `source/backend/src/shared/outcomes/outcome-gaps.reader.ts`; injectable cross-feature reader |
-| NEW | `source/backend/src/shared/releases/cohort-version-schedule.spec.ts` | `source/backend/src/shared/releases/version-number.spec.ts`; pure selection/revision tests |
-| NEW | `source/backend/src/shared/releases/applied-program-version.reader.spec.ts` | `source/backend/src/shared/releases/version.activator.spec.ts`; injected Prisma and explicit transaction tests |
+| Action | Path                                                                        | Mirror / rationale                                                                                                  |
+| ------ | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| NEW    | `source/backend/src/shared/releases/applied-version.types.ts`               | `source/backend/src/shared/syllabi/revision-for-items.ts:4`; domain facts, not imports from a feature               |
+| NEW    | `source/backend/src/shared/releases/cohort-version-schedule.ts`             | `source/backend/src/shared/releases/semester-start.ts:13`; DB-aware normalization plus pure chronological selection |
+| NEW    | `source/backend/src/shared/releases/applied-program-version.reader.ts`      | `source/backend/src/shared/outcomes/outcome-gaps.reader.ts`; injectable cross-feature reader                        |
+| NEW    | `source/backend/src/shared/releases/cohort-version-schedule.spec.ts`        | `source/backend/src/shared/releases/version-number.spec.ts`; pure selection/revision tests                          |
+| NEW    | `source/backend/src/shared/releases/applied-program-version.reader.spec.ts` | `source/backend/src/shared/releases/version.activator.spec.ts`; injected Prisma and explicit transaction tests      |
 
 **Shape — domain contract, not a wire DTO**
 
 ```ts
-import type { Cohort, ProgramVersionStatus } from '../../generated/prisma/client.js';
-import type { StartedSemester } from './semester-start.js';
+import type {
+  Cohort,
+  ProgramVersionStatus,
+} from "../../generated/prisma/client.js";
+import type { StartedSemester } from "./semester-start.js";
 
-export type IssuedStatus = Exclude<ProgramVersionStatus, 'DRAFT'>;
+export type IssuedStatus = Exclude<ProgramVersionStatus, "DRAFT">;
 
 export interface IssuedVersionFact {
   id: string;
@@ -692,7 +738,7 @@ export interface IssuedVersionFact {
 
 export interface CohortAssignmentFact {
   id: string;
-  cohort: Pick<Cohort, 'id' | 'cohortCode' | 'intakeYear'>;
+  cohort: Pick<Cohort, "id" | "cohortCode" | "intakeYear">;
   version: IssuedVersionFact;
   fromSemester: StartedSemester;
   createdAt: Date;
@@ -700,7 +746,7 @@ export interface CohortAssignmentFact {
 
 export interface CohortVersionResolution {
   programId: string;
-  cohort: Pick<Cohort, 'id' | 'cohortCode' | 'intakeYear'>;
+  cohort: Pick<Cohort, "id" | "cohortCode" | "intakeYear">;
   semester: StartedSemester;
   assignment: CohortAssignmentFact | null;
 }
@@ -729,11 +775,14 @@ export class AppliedProgramVersionReader {
     input: CohortVersionLookup,
     tx?: Prisma.TransactionClient,
   ): Promise<CohortVersionResolution> {
-    const resolutions = await this.forCohorts({
-      programId: input.programId,
-      cohortIds: [input.cohortId],
-      semesterId: input.semesterId,
-    }, tx);
+    const resolutions = await this.forCohorts(
+      {
+        programId: input.programId,
+        cohortIds: [input.cohortId],
+        semesterId: input.semesterId,
+      },
+      tx,
+    );
     const resolution = resolutions[0];
     if (!resolution) throw new AppException(RELEASE_ERRORS.COHORT_NOT_FOUND);
     return resolution;
@@ -755,8 +804,10 @@ export function pickAppliedAssignment(
   rows: readonly CohortAssignmentFact[],
   semester: StartedSemester,
 ): CohortAssignmentFact | null {
-  const eligible = rows.filter((row) =>
-    row.fromSemester.startDate.getTime() <= semester.startDate.getTime());
+  const eligible = rows.filter(
+    (row) =>
+      row.fromSemester.startDate.getTime() <= semester.startDate.getTime(),
+  );
   return [...eligible].sort(compareAssignmentsNewestFirst)[0] ?? null;
 }
 
@@ -764,8 +815,9 @@ export function compareAssignmentsNewestFirst(
   left: CohortAssignmentFact,
   right: CohortAssignmentFact,
 ): number {
-  const bySemester = right.fromSemester.startDate.getTime()
-    - left.fromSemester.startDate.getTime();
+  const bySemester =
+    right.fromSemester.startDate.getTime() -
+    left.fromSemester.startDate.getTime();
   if (bySemester !== 0) return bySemester;
   const byCreatedAt = right.createdAt.getTime() - left.createdAt.getTime();
   if (byCreatedAt !== 0) return byCreatedAt;
@@ -795,16 +847,16 @@ The provider has no session/role policy: its callers are trusted server services
 
 **Stable lookup examples** — semester labels here are synthetic test contexts with known increasing starts; they are not inferred from cohort names.
 
-| Stored links for one program/cohort | Requested semester | Result |
-|---|---|---|
-| 1.0 from S1, 1.1 from S3 | S2 | 1.0, even if 1.1 is now ACTIVE |
-| Same | S3 or later | 1.1 |
-| 1.0 for K2023; 2.0 for K2025 | Any semester after both starts | Each cohort keeps its own mapped version |
-| Only a future link starting S3 | S1 | UNASSIGNED |
-| No link, but Program has an ACTIVE version | Any known semester | UNASSIGNED, never ACTIVE fallback |
-| PENDING 2.0 mapped from S3 | Future S3 | 2.0, irrespective of worker timing |
-| Two existing same-date links | That semester | Newest link.createdAt, then codepoint-descending link.id |
-| Null start date, malformed issued link or Draft link | Any affected lookup | Explicit error; no guessed answer |
+| Stored links for one program/cohort                  | Requested semester             | Result                                                   |
+| ---------------------------------------------------- | ------------------------------ | -------------------------------------------------------- |
+| 1.0 from S1, 1.1 from S3                             | S2                             | 1.0, even if 1.1 is now ACTIVE                           |
+| Same                                                 | S3 or later                    | 1.1                                                      |
+| 1.0 for K2023; 2.0 for K2025                         | Any semester after both starts | Each cohort keeps its own mapped version                 |
+| Only a future link starting S3                       | S1                             | UNASSIGNED                                               |
+| No link, but Program has an ACTIVE version           | Any known semester             | UNASSIGNED, never ACTIVE fallback                        |
+| PENDING 2.0 mapped from S3                           | Future S3                      | 2.0, irrespective of worker timing                       |
+| Two existing same-date links                         | That semester                  | Newest link.createdAt, then codepoint-descending link.id |
+| Null start date, malformed issued link or Draft link | Any affected lookup            | Explicit error; no guessed answer                        |
 
 **Schedule revision**
 
@@ -812,7 +864,7 @@ Add `readProgramCohortSchedule(tx, programId)` returning normalized assignments 
 
 ```ts
 export const ASSIGNMENT_REVISION_VERSION = 1;
-export const ASSIGNMENT_REVISION_ALGORITHM = 'sha256';
+export const ASSIGNMENT_REVISION_ALGORITHM = "sha256";
 
 export interface ScheduleRevisionInput {
   programId: string;
@@ -847,7 +899,7 @@ export interface StudentAppliedVersionResult {
   programId: string;
   semesterId: string;
   programVersionId: string;
-  source: 'COHORT' | 'EXCEPTION';
+  source: "COHORT" | "EXCEPTION";
   cohortAssignmentId: string | null;
 }
 ```
@@ -874,57 +926,65 @@ This is the contract every B5 feature reads, not a claim that those consumers al
 
 **Files**
 
-| Action | Path | Mirror / rationale |
-|---|---|---|
-| NEW | `source/backend/src/features/releases/cohort-versions.controller.ts` | `source/backend/src/features/releases/releases.controller.ts:17`; concrete response decorators |
-| NEW | `source/backend/src/features/releases/cohort-versions.service.ts` | `source/backend/src/features/releases/releases.service.ts:69`; authorization, transaction and program locking |
-| NEW | `source/backend/src/features/releases/cohort-versions.mapper.ts` | `source/backend/src/features/releases/version-history.reader.ts:198`; explicit Date/Decimal-free wire mapping |
-| NEW | `source/backend/src/features/releases/cohort-versions.service.spec.ts` | `source/backend/src/features/releases/corrections.service.spec.ts`; transaction/error behavior |
-| NEW | `source/backend/src/features/releases/cohort-versions.mapper.spec.ts` | `source/backend/src/features/releases/version-history.reader.spec.ts`; nullable assignment/state invariants |
+| Action | Path                                                                   | Mirror / rationale                                                                                            |
+| ------ | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| NEW    | `source/backend/src/features/releases/cohort-versions.controller.ts`   | `source/backend/src/features/releases/releases.controller.ts:17`; concrete response decorators                |
+| NEW    | `source/backend/src/features/releases/cohort-versions.service.ts`      | `source/backend/src/features/releases/releases.service.ts:69`; authorization, transaction and program locking |
+| NEW    | `source/backend/src/features/releases/cohort-versions.mapper.ts`       | `source/backend/src/features/releases/version-history.reader.ts:198`; explicit Date/Decimal-free wire mapping |
+| NEW    | `source/backend/src/features/releases/cohort-versions.service.spec.ts` | `source/backend/src/features/releases/corrections.service.spec.ts`; transaction/error behavior                |
+| NEW    | `source/backend/src/features/releases/cohort-versions.mapper.spec.ts`  | `source/backend/src/features/releases/version-history.reader.spec.ts`; nullable assignment/state invariants   |
 
 **Shape**
 
 ```ts
-@ApiTags('releases')
+@ApiTags("releases")
 @ApiCookieAuth()
-@Controller('programs/:programId')
+@Controller("programs/:programId")
 export class CohortVersionsController {
   constructor(private readonly cohorts: CohortVersionsService) {}
 
-  @Get('cohort-versions')
+  @Get("cohort-versions")
   @RequirePermission(PERMISSIONS.VERSION_ASSIGN_COHORT)
   @ApiOkResponse({ type: CohortVersionListDto })
-  list(@Param('programId') programId: string,
-    @CurrentAccess() access: AccessContext): Promise<CohortVersionListDto> {
+  list(
+    @Param("programId") programId: string,
+    @CurrentAccess() access: AccessContext,
+  ): Promise<CohortVersionListDto> {
     return this.cohorts.list(programId, access);
   }
 
-  @Post('cohort-versions')
+  @Post("cohort-versions")
   @RequirePermission(PERMISSIONS.VERSION_ASSIGN_COHORT)
   @ApiCreatedResponse({ type: CohortVersionListDto })
-  assign(@Param('programId') programId: string,
+  assign(
+    @Param("programId") programId: string,
     @Body() dto: AssignCohortVersionsDto,
-    @CurrentAccess() access: AccessContext): Promise<CohortVersionListDto> {
+    @CurrentAccess() access: AccessContext,
+  ): Promise<CohortVersionListDto> {
     return this.cohorts.assign(programId, dto, access);
   }
 
-  @Patch('cohort-versions/:assignmentId')
+  @Patch("cohort-versions/:assignmentId")
   @RequirePermission(PERMISSIONS.VERSION_ASSIGN_COHORT)
   @ApiOkResponse({ type: CohortVersionListDto })
-  update(@Param('programId') programId: string,
-    @Param('assignmentId') assignmentId: string,
+  update(
+    @Param("programId") programId: string,
+    @Param("assignmentId") assignmentId: string,
     @Body() dto: UpdateCohortVersionDto,
-    @CurrentAccess() access: AccessContext): Promise<CohortVersionListDto> {
+    @CurrentAccess() access: AccessContext,
+  ): Promise<CohortVersionListDto> {
     return this.cohorts.update(programId, assignmentId, dto, access);
   }
 
-  @Get('cohorts/:cohortId/applied-version')
+  @Get("cohorts/:cohortId/applied-version")
   @RequirePermission(PERMISSIONS.VERSION_ASSIGN_COHORT)
   @ApiOkResponse({ type: AppliedCohortVersionDto })
-  applied(@Param('programId') programId: string,
-    @Param('cohortId') cohortId: string,
+  applied(
+    @Param("programId") programId: string,
+    @Param("cohortId") cohortId: string,
     @Query() query: AppliedVersionQueryDto,
-    @CurrentAccess() access: AccessContext): Promise<AppliedCohortVersionDto> {
+    @CurrentAccess() access: AccessContext,
+  ): Promise<AppliedCohortVersionDto> {
     return this.cohorts.applied(programId, cohortId, query.semesterId, access);
   }
 }
@@ -944,13 +1004,16 @@ Implement an injectable `CohortVersionsService` with the four signatures called 
 6. Re-read and return the full schedule and new revision inside the transaction. Commit all or nothing. Map a Prisma P2002 on the existing pair key to COHORT_VERSION_EXISTS, and P2034 serialization/deadlock failure to ASSIGNMENT_STATE_CHANGED; propagate unrelated database errors. No background notification, enrollment update, audit record or version activation is performed.
 
 ```ts
-const rows = await this.prisma.$transaction(async (tx) => {
-  await lockPrograms(tx, [programId]);
-  return this.assignLocked(tx, programId, dto, access);
-}, {
-  ...RELEASE_TRANSACTION,
-  isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
-});
+const rows = await this.prisma.$transaction(
+  async (tx) => {
+    await lockPrograms(tx, [programId]);
+    return this.assignLocked(tx, programId, dto, access);
+  },
+  {
+    ...RELEASE_TRANSACTION,
+    isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+  },
+);
 ```
 
 `update` uses the same lock, isolation, revision comparison, target checks and conflict policy. Find the mapping using both assignmentId and `programVersion.programId`; reject cross-program IDs. Preserve cohortId, programVersionId and createdAt; update **only** `fromSemesterId`. Same-semester/no-change edit is a no-op returning the current list. Recompute the digest after a real edit. UI must clearly state that this corrects a schedule and can alter past as-of answers; creating a later switch means POST a different version, not moving the old 1.0 row forward.
@@ -983,22 +1046,30 @@ Map cohort/semester with existing `toCohortDto`/`toSemesterDto`, Date createdAt 
 
 **Files**
 
-| Action | Path | Mirror / rationale |
-|---|---|---|
-| MODIFY | `source/backend/src/features/releases/releases.module.ts` | Existing controllers/providers at `:18`; append comparison and cohort controllers/services |
-| MODIFY | `source/backend/src/shared/releases/releases-shared.module.ts` | Existing provider/export lists at `:9`; append AppliedProgramVersionReader |
-| MODIFY | `source/backend/test/permission-table.ts` | Existing history route entry at `:1030`; inventory every new route |
-| MODIFY | `source/backend/test/permission-table.e2e-spec.ts` | Existing authorization harness; add a cohortVersion counter branch before the general programs branch (`:92`, `:122`) |
+| Action | Path                                                           | Mirror / rationale                                                                                                    |
+| ------ | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| MODIFY | `source/backend/src/features/releases/releases.module.ts`      | Existing controllers/providers at `:18`; append comparison and cohort controllers/services                            |
+| MODIFY | `source/backend/src/shared/releases/releases-shared.module.ts` | Existing provider/export lists at `:9`; append AppliedProgramVersionReader                                            |
+| MODIFY | `source/backend/test/permission-table.ts`                      | Existing history route entry at `:1030`; inventory every new route                                                    |
+| MODIFY | `source/backend/test/permission-table.e2e-spec.ts`             | Existing authorization harness; add a cohortVersion counter branch before the general programs branch (`:92`, `:122`) |
 
 **Shape**
 
 ```ts
 @Module({
   imports: [ChangeRequestsSharedModule],
-  providers: [SyllabusPublisher, VersionPublisher, VersionActivator,
-    AppliedProgramVersionReader],
-  exports: [SyllabusPublisher, VersionPublisher, VersionActivator,
-    AppliedProgramVersionReader],
+  providers: [
+    SyllabusPublisher,
+    VersionPublisher,
+    VersionActivator,
+    AppliedProgramVersionReader,
+  ],
+  exports: [
+    SyllabusPublisher,
+    VersionPublisher,
+    VersionActivator,
+    AppliedProgramVersionReader,
+  ],
 })
 export class ReleasesSharedModule {}
 ```
@@ -1007,14 +1078,14 @@ Append `VersionComparisonController`, `CohortVersionsController` to ReleasesModu
 
 Permission-table additions, each as a concrete existing harness entry with a real program fixture:
 
-| Method / suffix | Permission | Additional service constraint |
-|---|---|---|
-| GET `programs/:programId/version-comparison` | VERSION_COMPARE | PROGRAM_VIEW scope; issued pair |
-| GET `programs/:programId/version-comparison/syllabi/:courseId` | VERSION_COMPARE | PROGRAM_VIEW scope plus SYLLABUS_VIEW course scope |
-| GET `programs/:programId/cohort-versions` | VERSION_ASSIGN_COHORT | School-wide DIRECT and PROGRAM_VIEW |
-| POST same | VERSION_ASSIGN_COHORT | Same; valid revision and selected cohorts |
-| PATCH `programs/:programId/cohort-versions/:assignmentId` | VERSION_ASSIGN_COHORT | Same; mapping ownership |
-| GET `programs/:programId/cohorts/:cohortId/applied-version` | VERSION_ASSIGN_COHORT | Same; explicit semester |
+| Method / suffix                                                | Permission            | Additional service constraint                      |
+| -------------------------------------------------------------- | --------------------- | -------------------------------------------------- |
+| GET `programs/:programId/version-comparison`                   | VERSION_COMPARE       | PROGRAM_VIEW scope; issued pair                    |
+| GET `programs/:programId/version-comparison/syllabi/:courseId` | VERSION_COMPARE       | PROGRAM_VIEW scope plus SYLLABUS_VIEW course scope |
+| GET `programs/:programId/cohort-versions`                      | VERSION_ASSIGN_COHORT | School-wide DIRECT and PROGRAM_VIEW                |
+| POST same                                                      | VERSION_ASSIGN_COHORT | Same; valid revision and selected cohorts          |
+| PATCH `programs/:programId/cohort-versions/:assignmentId`      | VERSION_ASSIGN_COHORT | Same; mapping ownership                            |
+| GET `programs/:programId/cohorts/:cohortId/applied-version`    | VERSION_ASSIGN_COHORT | Same; explicit semester                            |
 
 Staff R1..R5 have compare/history cells, R1 alone has the assignment cell in the default seed (`source/backend/prisma/seed-data/permission-catalog.ts:166`, `source/backend/prisma/seed-data/permission-catalog.ts:271`, `source/backend/prisma/seed-data/permission-catalog.ts:278`). Test actual AccessContext scopes as well as default roles; do not relax unrelated program or syllabus read policies to make a role fixture pass. Keep existing R6 program-detail behavior unchanged; direct F-16 staff-compare/management calls remain denied without the required permission.
 
@@ -1032,14 +1103,14 @@ Add `if (path.includes('/cohort-versions')) return prisma.cohortVersion.count();
 
 **Files**
 
-| Action | Path | Mirror / rationale |
-|---|---|---|
-| NEW | `source/backend/test/fixtures/version-comparison.ts` | `source/backend/test/fixtures/releases.ts:123`; synthetic programs released through real API |
-| NEW | `source/backend/test/fixtures/cohort-versions.ts` | `source/backend/test/fixtures/releases.ts:23`; synthetic semesters/cohorts and typed HTTP helpers |
-| NEW | `source/backend/test/version-comparison.e2e-spec.ts` | `source/backend/test/releases.e2e-spec.ts:29`; PostgreSQL ICU + Redis + app lifecycle |
-| NEW | `source/backend/test/cohort-versions.e2e-spec.ts` | Same harness; concurrency and rollback against real PostgreSQL |
-| MODIFY | `source/backend/test/releases.e2e-spec.ts` | Extend release/no-auto-reassignment regression, retaining current assertions |
-| MODIFY | `source/backend/test/corrections.e2e-spec.ts` | Characterize existing moveCohorts true/false semantics; no changed production behavior or assertion pretending E1 is solved |
+| Action | Path                                                 | Mirror / rationale                                                                                                          |
+| ------ | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| NEW    | `source/backend/test/fixtures/version-comparison.ts` | `source/backend/test/fixtures/releases.ts:123`; synthetic programs released through real API                                |
+| NEW    | `source/backend/test/fixtures/cohort-versions.ts`    | `source/backend/test/fixtures/releases.ts:23`; synthetic semesters/cohorts and typed HTTP helpers                           |
+| NEW    | `source/backend/test/version-comparison.e2e-spec.ts` | `source/backend/test/releases.e2e-spec.ts:29`; PostgreSQL ICU + Redis + app lifecycle                                       |
+| NEW    | `source/backend/test/cohort-versions.e2e-spec.ts`    | Same harness; concurrency and rollback against real PostgreSQL                                                              |
+| MODIFY | `source/backend/test/releases.e2e-spec.ts`           | Extend release/no-auto-reassignment regression, retaining current assertions                                                |
+| MODIFY | `source/backend/test/corrections.e2e-spec.ts`        | Characterize existing moveCohorts true/false semantics; no changed production behavior or assertion pretending E1 is solved |
 
 **Shape — fixture signatures**
 
@@ -1077,18 +1148,18 @@ Backend test code may import the feature DTO types; production shared providers 
 
 Create synthetic program code `1024034` in the isolated cohort spec to exercise CV-199's named example. Use a small invented curriculum and K2023/K2024/K2025 with three semesters of increasing known starts. This is a behavioral example, **not** validation against the Faculty's real curriculum; no real-data file is opened and no Excel feature is assumed. Keep fixture dates far enough from the test's app clock or use the existing test clock pattern so worker activation cannot randomly change setup.
 
-| Test group | Required assertions |
-|---|---|
-| Program comparison | Six groups always emitted; row addition/removal/semester move; group criteria; PLO and both matrix changes; frozen credits/name; null fields; numeric strings; different row IDs; direct 1.0→2.0 endpoint diff; identical pair |
-| Syllabus-only change | Same course/pinned ID difference appears; returned link carries actual two pins; drill-down text/weeks/CLO differences; both texts equal still shows a revision change |
-| Read-only history | Existing history metadata/cohorts/origin request retained; detail pin survives later publication; old content cannot be edited through existing writers; no new mutation endpoint for frozen snapshots |
-| Scope/security | R1..R5 default grants with valid program context; wrong-program IDs; out-of-scope custom grants; R6 denied compare; R2/R3/R4/R5 denied assignment; no CSRF header denied writes; stale/malformed query IDs |
-| BR-26 examples | Assign 1.0 K2023/K2024, 2.0 K2025; adding one cohort never changes another; schedule 1.1 for K2023/K2024 at S3; S2 still 1.0 and S3 1.1 |
-| Semester query | Required semester; date-order vs code-order disagreement; no mapping before earliest; no mapping despite global ACTIVE; PENDING future selection; HISTORICAL old-cohort selection; deterministic legacy ties |
-| Writer integrity | Batch invalid member creates no links; duplicate pair/start rejected; Draft rejected; before-effective rejected; wrong-program patch rejected; edit affects one link; no delete endpoint |
-| Concurrency | Two admins submit the same revision concurrently: at most one commits, the other reloads after 409; concurrent release/correction writes use Program locking; P2002/P2034 cannot produce partial batches |
-| Publication/activation | Initial/final publication with no selected cohorts and scheduler activation do not add/move cohort mappings; snapshot comparison remains unchanged after status transition |
-| Correction limitation | Existing `moveCohorts:false` keeps mappings; true moves old rows with old starting semester. Record this as E1, not proof of a new conversion interval |
+| Test group             | Required assertions                                                                                                                                                                                                            |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Program comparison     | Six groups always emitted; row addition/removal/semester move; group criteria; PLO and both matrix changes; frozen credits/name; null fields; numeric strings; different row IDs; direct 1.0→2.0 endpoint diff; identical pair |
+| Syllabus-only change   | Same course/pinned ID difference appears; returned link carries actual two pins; drill-down text/weeks/CLO differences; both texts equal still shows a revision change                                                         |
+| Read-only history      | Existing history metadata/cohorts/origin request retained; detail pin survives later publication; old content cannot be edited through existing writers; no new mutation endpoint for frozen snapshots                         |
+| Scope/security         | R1..R5 default grants with valid program context; wrong-program IDs; out-of-scope custom grants; R6 denied compare; R2/R3/R4/R5 denied assignment; no CSRF header denied writes; stale/malformed query IDs                     |
+| BR-26 examples         | Assign 1.0 K2023/K2024, 2.0 K2025; adding one cohort never changes another; schedule 1.1 for K2023/K2024 at S3; S2 still 1.0 and S3 1.1                                                                                        |
+| Semester query         | Required semester; date-order vs code-order disagreement; no mapping before earliest; no mapping despite global ACTIVE; PENDING future selection; HISTORICAL old-cohort selection; deterministic legacy ties                   |
+| Writer integrity       | Batch invalid member creates no links; duplicate pair/start rejected; Draft rejected; before-effective rejected; wrong-program patch rejected; edit affects one link; no delete endpoint                                       |
+| Concurrency            | Two admins submit the same revision concurrently: at most one commits, the other reloads after 409; concurrent release/correction writes use Program locking; P2002/P2034 cannot produce partial batches                       |
+| Publication/activation | Initial/final publication with no selected cohorts and scheduler activation do not add/move cohort mappings; snapshot comparison remains unchanged after status transition                                                     |
+| Correction limitation  | Existing `moveCohorts:false` keeps mappings; true moves old rows with old starting semester. Record this as E1, not proof of a new conversion interval                                                                         |
 
 Assert new endpoints' actual JSON types (decimal strings, ISO dates, no Prisma objects) and that read requests do not change row counts or timestamps. If a frontend would only use a subset of data, the HTTP test still checks the full DTO invariant `state === 'ASSIGNED'` iff assignment is non-null.
 
@@ -1104,8 +1175,8 @@ Assert new endpoints' actual JSON types (decimal strings, ISO dates, no Prisma o
 
 **Files**
 
-| Action | Path | Mirror / rationale |
-|---|---|---|
+| Action             | Path                                         | Mirror / rationale                                                                                                                                    |
+| ------------------ | -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | MODIFY (generated) | `source/frontend/src/shared/api/schema.d.ts` | Existing generation script `source/frontend/package.json:16`; generated schemas consumed by `source/frontend/src/features/releases/api/releases.ts:4` |
 
 **Shape / procedure**
@@ -1115,10 +1186,10 @@ Assert new endpoints' actual JSON types (decimal strings, ISO dates, no Prisma o
 3. Generated schemas must include the concrete new DTOs and literal enum schemas. Confirm both compare paths and all four cohort routes in the generated operations, and distinguish nullable from optional.
 
 ```ts
-type Schemas = components['schemas'];
-type Comparison = Schemas['VersionComparisonDto'];
-type Applied = Schemas['AppliedCohortVersionDto'];
-type AssignmentInput = Schemas['AssignCohortVersionsDto'];
+type Schemas = components["schemas"];
+type Comparison = Schemas["VersionComparisonDto"];
+type Applied = Schemas["AppliedCohortVersionDto"];
+type AssignmentInput = Schemas["AssignCohortVersionsDto"];
 ```
 
 The snippets show the generated contract's intended shape; no source types are manually copied into schema.d.ts. Reject a generation that accidentally changes unrelated response semantics; investigate actual backend metadata, not a generated-file patch.
@@ -1135,58 +1206,86 @@ The snippets show the generated contract's intended shape; no source types are m
 
 **Files**
 
-| Action | Path | Mirror / rationale |
-|---|---|---|
-| MODIFY | `source/frontend/src/features/releases/api/releases.ts` | Existing typed `getJson`/`sendJson` wrappers at `:30`, `:60` |
-| MODIFY | `source/frontend/src/features/releases/hooks/useReleases.ts` | Existing query keys `:27` and release invalidation `:69` |
-| NEW | `source/frontend/src/features/releases/api/releases.test.ts` | Existing `source/frontend/src/features/releases/utils/format.test.ts`; Vitest beside release code |
-| NEW | `source/frontend/src/features/releases/hooks/useCohortVersions.test.tsx` | Existing `source/frontend/src/features/releases/testRender.tsx`; QueryClient + mocked HTTP |
-| NEW | `source/frontend/src/features/releases/utils/versionComparison.ts` | `source/frontend/src/features/releases/utils/format.ts`; pure UI transforms, no server lookup logic |
-| NEW | `source/frontend/src/features/releases/utils/versionComparison.test.ts` | Adjacent pure test convention |
+| Action | Path                                                                     | Mirror / rationale                                                                                  |
+| ------ | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
+| MODIFY | `source/frontend/src/features/releases/api/releases.ts`                  | Existing typed `getJson`/`sendJson` wrappers at `:30`, `:60`                                        |
+| MODIFY | `source/frontend/src/features/releases/hooks/useReleases.ts`             | Existing query keys `:27` and release invalidation `:69`                                            |
+| NEW    | `source/frontend/src/features/releases/api/releases.test.ts`             | Existing `source/frontend/src/features/releases/utils/format.test.ts`; Vitest beside release code   |
+| NEW    | `source/frontend/src/features/releases/hooks/useCohortVersions.test.tsx` | Existing `source/frontend/src/features/releases/testRender.tsx`; QueryClient + mocked HTTP          |
+| NEW    | `source/frontend/src/features/releases/utils/versionComparison.ts`       | `source/frontend/src/features/releases/utils/format.ts`; pure UI transforms, no server lookup logic |
+| NEW    | `source/frontend/src/features/releases/utils/versionComparison.test.ts`  | Adjacent pure test convention                                                                       |
 
 **Shape**
 
 ```ts
-export type VersionComparison = Schemas['VersionComparisonDto'];
-export type PinnedSyllabusComparison = Schemas['PinnedSyllabusComparisonDto'];
-export type CohortVersionList = Schemas['CohortVersionListDto'];
-export type CohortVersionAssignment = Schemas['CohortVersionAssignmentDto'];
-export type AppliedCohortVersion = Schemas['AppliedCohortVersionDto'];
-export type AssignCohortVersionsInput = Schemas['AssignCohortVersionsDto'];
-export type UpdateCohortVersionInput = Schemas['UpdateCohortVersionDto'];
+export type VersionComparison = Schemas["VersionComparisonDto"];
+export type PinnedSyllabusComparison = Schemas["PinnedSyllabusComparisonDto"];
+export type CohortVersionList = Schemas["CohortVersionListDto"];
+export type CohortVersionAssignment = Schemas["CohortVersionAssignmentDto"];
+export type AppliedCohortVersion = Schemas["AppliedCohortVersionDto"];
+export type AssignCohortVersionsInput = Schemas["AssignCohortVersionsDto"];
+export type UpdateCohortVersionInput = Schemas["UpdateCohortVersionDto"];
 
 export const fetchVersionComparison = (
-  programId: string, beforeVersionId: string, afterVersionId: string,
-) => getJson<VersionComparison>(withQuery(
-  `${programPath(programId)}/version-comparison`,
-  { beforeVersionId, afterVersionId },
-));
+  programId: string,
+  beforeVersionId: string,
+  afterVersionId: string,
+) =>
+  getJson<VersionComparison>(
+    withQuery(`${programPath(programId)}/version-comparison`, {
+      beforeVersionId,
+      afterVersionId,
+    }),
+  );
 
 export const fetchPinnedSyllabusComparison = (
-  programId: string, courseId: string,
-  beforeVersionId: string, afterVersionId: string,
-) => getJson<PinnedSyllabusComparison>(withQuery(
-  `${programPath(programId)}/version-comparison/syllabi/${encodeURIComponent(courseId)}`,
-  { beforeVersionId, afterVersionId },
-));
+  programId: string,
+  courseId: string,
+  beforeVersionId: string,
+  afterVersionId: string,
+) =>
+  getJson<PinnedSyllabusComparison>(
+    withQuery(
+      `${programPath(programId)}/version-comparison/syllabi/${encodeURIComponent(courseId)}`,
+      { beforeVersionId, afterVersionId },
+    ),
+  );
 
 export const fetchCohortVersions = (programId: string) =>
   getJson<CohortVersionList>(`${programPath(programId)}/cohort-versions`);
 
-export const assignCohortVersions = (programId: string, body: AssignCohortVersionsInput) =>
-  sendJson<CohortVersionList>('POST', `${programPath(programId)}/cohort-versions`, body);
+export const assignCohortVersions = (
+  programId: string,
+  body: AssignCohortVersionsInput,
+) =>
+  sendJson<CohortVersionList>(
+    "POST",
+    `${programPath(programId)}/cohort-versions`,
+    body,
+  );
 
 export const updateCohortVersion = (
-  programId: string, assignmentId: string, body: UpdateCohortVersionInput,
-) => sendJson<CohortVersionList>('PATCH',
-  `${programPath(programId)}/cohort-versions/${encodeURIComponent(assignmentId)}`, body);
+  programId: string,
+  assignmentId: string,
+  body: UpdateCohortVersionInput,
+) =>
+  sendJson<CohortVersionList>(
+    "PATCH",
+    `${programPath(programId)}/cohort-versions/${encodeURIComponent(assignmentId)}`,
+    body,
+  );
 
 export const fetchAppliedCohortVersion = (
-  programId: string, cohortId: string, semesterId: string,
-) => getJson<AppliedCohortVersion>(withQuery(
-  `${programPath(programId)}/cohorts/${encodeURIComponent(cohortId)}/applied-version`,
-  { semesterId },
-));
+  programId: string,
+  cohortId: string,
+  semesterId: string,
+) =>
+  getJson<AppliedCohortVersion>(
+    withQuery(
+      `${programPath(programId)}/cohorts/${encodeURIComponent(cohortId)}/applied-version`,
+      { semesterId },
+    ),
+  );
 ```
 
 Import `withQuery` from the existing shared client (`source/frontend/src/shared/api/client.ts:9`). Do not duplicate `/api`, fetch logic, session handling or CSRF headers; the client supplies those (`client.ts:3`, `:28`, `:45`).
@@ -1221,12 +1320,12 @@ Pure utilities are restricted to `issuedComparisonCandidates(versions)` and `row
 For MH-10 entry, also add an independent releases-owned program picker adapter to the **same API/hook/test files** in this step. It mirrors `source/frontend/src/features/programs/api/programs.ts:40` without importing that feature. This existing endpoint's full consumed/ignored field contract is verified in §2b.
 
 ```ts
-export type AssignmentProgramPage = Schemas['ProgramPageDto'];
+export type AssignmentProgramPage = Schemas["ProgramPageDto"];
 export type AssignmentProgramQuery = NonNullable<
-  operations['ProgramsController_list']['parameters']['query']
+  operations["ProgramsController_list"]["parameters"]["query"]
 >;
 export const fetchAssignmentPrograms = (query: AssignmentProgramQuery) =>
-  getJson<AssignmentProgramPage>(withQuery('/programs', { ...query }));
+  getJson<AssignmentProgramPage>(withQuery("/programs", { ...query }));
 ```
 
 Import generated `operations` in addition to components. Add `useAssignmentPrograms(query)` and `assignmentPrograms: (query: AssignmentProgramQuery) => [...RELEASE_QUERY_ROOT, 'assignment-programs', query] as const` to RELEASE_QUERY_KEYS. Use existing `DEFAULT_PAGE_SIZE` and `PAGE_SIZE_OPTIONS` from `source/frontend/src/shared/api/pagination.ts:1`, not a second arbitrary bound; explicit search submit resets to the first page. Do not fetch only the first 20 rows and pretend the result is the full program catalog. This adapter lists program identities, never provides a cohort version.
@@ -1237,17 +1336,17 @@ Import generated `operations` in addition to components. Add `useAssignmentProgr
 
 **Files**
 
-| Action | Path | Mirror / rationale |
-|---|---|---|
-| MODIFY | `source/frontend/src/shared/auth/permissions.ts` | Existing backend-aligned constants at `:30`; expose existing compare/assign codes |
-| MODIFY | `source/frontend/src/routes.ts` | Existing `versionHistory`/`versionDetail` constants |
-| MODIFY | `source/frontend/src/router.tsx` | Existing release route wrappers; new guarded page imports |
-| MODIFY | `source/frontend/src/features/releases/pages/VersionHistoryPage.tsx` | Existing table at `:35`; add two-row selection and compare action |
-| MODIFY | `source/frontend/src/features/releases/pages/VersionDetailPage.tsx` | Existing read-only section links at `:88`; add explicit elective-group link |
-| MODIFY | `source/frontend/src/features/releases/pages/SemestersPage.tsx` | Existing MH-10 header at `:29`; management navigation only |
+| Action | Path                                                                          | Mirror / rationale                                                                        |
+| ------ | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| MODIFY | `source/frontend/src/shared/auth/permissions.ts`                              | Existing backend-aligned constants at `:30`; expose existing compare/assign codes         |
+| MODIFY | `source/frontend/src/routes.ts`                                               | Existing `versionHistory`/`versionDetail` constants                                       |
+| MODIFY | `source/frontend/src/router.tsx`                                              | Existing release route wrappers; new guarded page imports                                 |
+| MODIFY | `source/frontend/src/features/releases/pages/VersionHistoryPage.tsx`          | Existing table at `:35`; add two-row selection and compare action                         |
+| MODIFY | `source/frontend/src/features/releases/pages/VersionDetailPage.tsx`           | Existing read-only section links at `:88`; add explicit elective-group link               |
+| MODIFY | `source/frontend/src/features/releases/pages/SemestersPage.tsx`               | Existing MH-10 header at `:29`; management navigation only                                |
 | MODIFY | `source/frontend/src/features/programs/components/ProgramVersionsSection.tsx` | Existing history action at `:42`; route-only assignment link, no feature-component import |
-| MODIFY | `source/frontend/src/features/releases/constants/releaseLabels.ts` | Add comparison/assignment Vietnamese labels beside existing release strings |
-| MODIFY | `source/frontend/src/features/releases/pages/VersionHistoryPage.test.tsx` | Existing history behavior assertions at `:16`; preserve them and cover selection |
+| MODIFY | `source/frontend/src/features/releases/constants/releaseLabels.ts`            | Add comparison/assignment Vietnamese labels beside existing release strings               |
+| MODIFY | `source/frontend/src/features/releases/pages/VersionHistoryPage.test.tsx`     | Existing history behavior assertions at `:16`; preserve them and cover selection          |
 
 **Shape**
 
@@ -1283,16 +1382,16 @@ MH-22 `ProgramVersionsSection` adds an R1-permission-gated “Gán phiên bản 
 
 **Files**
 
-| Action | Path | Mirror / rationale |
-|---|---|---|
-| NEW | `source/frontend/src/features/releases/pages/VersionComparisonPage.tsx` | `source/frontend/src/features/releases/pages/VersionHistoryPage.tsx:13`; route state, loading/error composition |
-| NEW | `source/frontend/src/features/releases/pages/PinnedSyllabusComparisonPage.tsx` | Existing `VersionDetailPage.tsx:15`; version-scoped read-only detail |
-| NEW | `source/frontend/src/features/releases/components/VersionComparisonSelectors.tsx` | Existing `components/VersionHeader.tsx`; release labels and accessible selectors |
-| NEW | `source/frontend/src/features/releases/components/VersionComparisonSections.tsx` | `source/frontend/src/features/change-requests/components/DiffView.tsx:40`; local presentation mirror, not a cross-feature import |
-| NEW | `source/frontend/src/features/releases/components/ComparisonFieldsTable.tsx` | Existing DiffView's before/after table at `:50`; reusable within this feature |
-| NEW | `source/frontend/src/features/releases/pages/VersionComparisonPage.test.tsx` | `source/frontend/src/features/releases/pages/VersionHistoryPage.test.tsx`; renderReleasePage harness |
-| NEW | `source/frontend/src/features/releases/pages/PinnedSyllabusComparisonPage.test.tsx` | Same harness with pinned syllabus read response |
-| NEW | `source/frontend/src/features/releases/components/VersionComparisonSections.test.tsx` | Local RTL test using generated response fixtures |
+| Action | Path                                                                                  | Mirror / rationale                                                                                                               |
+| ------ | ------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| NEW    | `source/frontend/src/features/releases/pages/VersionComparisonPage.tsx`               | `source/frontend/src/features/releases/pages/VersionHistoryPage.tsx:13`; route state, loading/error composition                  |
+| NEW    | `source/frontend/src/features/releases/pages/PinnedSyllabusComparisonPage.tsx`        | Existing `VersionDetailPage.tsx:15`; version-scoped read-only detail                                                             |
+| NEW    | `source/frontend/src/features/releases/components/VersionComparisonSelectors.tsx`     | Existing `components/VersionHeader.tsx`; release labels and accessible selectors                                                 |
+| NEW    | `source/frontend/src/features/releases/components/VersionComparisonSections.tsx`      | `source/frontend/src/features/change-requests/components/DiffView.tsx:40`; local presentation mirror, not a cross-feature import |
+| NEW    | `source/frontend/src/features/releases/components/ComparisonFieldsTable.tsx`          | Existing DiffView's before/after table at `:50`; reusable within this feature                                                    |
+| NEW    | `source/frontend/src/features/releases/pages/VersionComparisonPage.test.tsx`          | `source/frontend/src/features/releases/pages/VersionHistoryPage.test.tsx`; renderReleasePage harness                             |
+| NEW    | `source/frontend/src/features/releases/pages/PinnedSyllabusComparisonPage.test.tsx`   | Same harness with pinned syllabus read response                                                                                  |
+| NEW    | `source/frontend/src/features/releases/components/VersionComparisonSections.test.tsx` | Local RTL test using generated response fixtures                                                                                 |
 
 **Shape**
 
@@ -1356,24 +1455,22 @@ All pages handle pending Skeleton, 403 Result, missing/version-not-found 404 Res
 
 **Files**
 
-| Action | Path | Mirror / rationale |
-|---|---|---|
-| NEW | `source/frontend/src/features/releases/pages/CohortVersionAssignmentsPage.tsx` | Existing `pages/SemestersPage.tsx:19`; catalog-like management plus program context |
-| NEW | `source/frontend/src/features/releases/components/CohortAssignmentProgramPicker.tsx` | `source/frontend/src/features/programs/pages/ProgramListPage.tsx`; paginated identity selection, no import from that feature |
-| NEW | `source/frontend/src/features/releases/components/CohortVersionAssignmentForm.tsx` | Existing `components/CorrectionIssueForm.tsx`; AntD Form, explicit confirmation, errors |
-| NEW | `source/frontend/src/features/releases/components/CohortVersionAssignmentsTable.tsx` | Existing `components/FrozenRowsTable.tsx:15`; typed no-pagination schedule table |
-| NEW | `source/frontend/src/features/releases/components/AppliedCohortVersionPanel.tsx` | Existing `components/VersionHeader.tsx:14`; labeled read-only result |
-| NEW | `source/frontend/src/features/releases/pages/CohortVersionAssignmentsPage.test.tsx` | Existing release page test harness |
-| NEW | `source/frontend/src/features/releases/components/CohortVersionAssignmentForm.test.tsx` | Existing `pages/CorrectionPage.test.tsx`; Form and confirm interactions |
-| MODIFY | `source/frontend/src/features/releases/constants/releaseLabels.ts` | Add exact management, confirmation and missing-assignment copy |
+| Action | Path                                                                                    | Mirror / rationale                                                                                                           |
+| ------ | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| NEW    | `source/frontend/src/features/releases/pages/CohortVersionAssignmentsPage.tsx`          | Existing `pages/SemestersPage.tsx:19`; catalog-like management plus program context                                          |
+| NEW    | `source/frontend/src/features/releases/components/CohortAssignmentProgramPicker.tsx`    | `source/frontend/src/features/programs/pages/ProgramListPage.tsx`; paginated identity selection, no import from that feature |
+| NEW    | `source/frontend/src/features/releases/components/CohortVersionAssignmentForm.tsx`      | Existing `components/CorrectionIssueForm.tsx`; AntD Form, explicit confirmation, errors                                      |
+| NEW    | `source/frontend/src/features/releases/components/CohortVersionAssignmentsTable.tsx`    | Existing `components/FrozenRowsTable.tsx:15`; typed no-pagination schedule table                                             |
+| NEW    | `source/frontend/src/features/releases/components/AppliedCohortVersionPanel.tsx`        | Existing `components/VersionHeader.tsx:14`; labeled read-only result                                                         |
+| NEW    | `source/frontend/src/features/releases/pages/CohortVersionAssignmentsPage.test.tsx`     | Existing release page test harness                                                                                           |
+| NEW    | `source/frontend/src/features/releases/components/CohortVersionAssignmentForm.test.tsx` | Existing `pages/CorrectionPage.test.tsx`; Form and confirm interactions                                                      |
+| MODIFY | `source/frontend/src/features/releases/constants/releaseLabels.ts`                      | Add exact management, confirmation and missing-assignment copy                                                               |
 
 **Shape**
 
 ```tsx
 type AssignmentDialog =
-  | { kind: 'create' }
-  | { kind: 'edit'; assignmentId: string }
-  | null;
+  { kind: "create" } | { kind: "edit"; assignmentId: string } | null;
 
 interface CohortVersionAssignmentFormProps {
   assignments: CohortVersionList;
@@ -1391,9 +1488,11 @@ interface AppliedCohortVersionPanelProps {
 
 export function CohortVersionAssignmentsPage() {
   const { programId } = useParams();
-  return programId
-    ? <ProgramCohortAssignments programId={programId} />
-    : <CohortAssignmentProgramPicker />;
+  return programId ? (
+    <ProgramCohortAssignments programId={programId} />
+  ) : (
+    <CohortAssignmentProgramPicker />
+  );
 }
 ```
 
@@ -1434,16 +1533,16 @@ For both modes, ASSIGNMENT_STATE_CHANGED triggers the explicit reload/reconfirm 
 
 **Files**
 
-| Action | Path | Mirror / rationale |
-|---|---|---|
-| MODIFY | `source/frontend/src/features/releases/testRender.tsx` | Existing generated-typed `versionRef` and fetch stub harness at `:43`; add reusable generated-typed comparison/assignment fixtures |
-| MODIFY | `source/frontend/src/features/releases/pages/VersionDetailPage.test.tsx` | Existing frozen detail test; add elective-group and version-context regression |
-| MODIFY | `source/frontend/src/features/releases/pages/SemestersPage.test.tsx` | Existing MH-10 test; assert R1 assignment entry |
-| MODIFY | `source/frontend/src/features/programs/pages/ProgramOverviewPage.test.tsx` | Existing MH-22 test harness at `:1`; route-only assignment action |
-| MODIFY | `source/frontend/src/features/releases/pages/VersionHistoryPage.test.tsx` | FE-03's test; retain origin/correction/Draft cases |
-| MODIFY | `source/frontend/src/features/releases/pages/VersionComparisonPage.test.tsx` | FE-04's test; full history-pair navigation and back journey |
-| MODIFY | `source/frontend/src/features/releases/pages/PinnedSyllabusComparisonPage.test.tsx` | FE-04's test; actual pin context and no latest-syllabus fetch |
-| MODIFY | `source/frontend/src/features/releases/pages/CohortVersionAssignmentsPage.test.tsx` | FE-05's test; invalidation, program selection and as-of changes |
+| Action | Path                                                                                | Mirror / rationale                                                                                                                 |
+| ------ | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| MODIFY | `source/frontend/src/features/releases/testRender.tsx`                              | Existing generated-typed `versionRef` and fetch stub harness at `:43`; add reusable generated-typed comparison/assignment fixtures |
+| MODIFY | `source/frontend/src/features/releases/pages/VersionDetailPage.test.tsx`            | Existing frozen detail test; add elective-group and version-context regression                                                     |
+| MODIFY | `source/frontend/src/features/releases/pages/SemestersPage.test.tsx`                | Existing MH-10 test; assert R1 assignment entry                                                                                    |
+| MODIFY | `source/frontend/src/features/programs/pages/ProgramOverviewPage.test.tsx`          | Existing MH-22 test harness at `:1`; route-only assignment action                                                                  |
+| MODIFY | `source/frontend/src/features/releases/pages/VersionHistoryPage.test.tsx`           | FE-03's test; retain origin/correction/Draft cases                                                                                 |
+| MODIFY | `source/frontend/src/features/releases/pages/VersionComparisonPage.test.tsx`        | FE-04's test; full history-pair navigation and back journey                                                                        |
+| MODIFY | `source/frontend/src/features/releases/pages/PinnedSyllabusComparisonPage.test.tsx` | FE-04's test; actual pin context and no latest-syllabus fetch                                                                      |
+| MODIFY | `source/frontend/src/features/releases/pages/CohortVersionAssignmentsPage.test.tsx` | FE-05's test; invalidation, program selection and as-of changes                                                                    |
 
 **Shape**
 
@@ -1481,22 +1580,22 @@ Test option/hash freshness: assignment mutation invalidates history and as-of ke
 
 **Files — future implementation deliverable only; this planning run creates none of these except this plan**
 
-| Action | Path | Mirror / rationale |
-|---|---|---|
-| NEW | `docs/implement-report/f-16-version-compare-cohort-assignment-implement-report.md` | `docs/implement-report/f-15-release-version-snapshots-implement-report.md`; deviations, actual checks and manual debt |
-| MODIFY | `docs/architecture/features_architecture.md` | Existing F-15 section at `:307`; add the actual F-16 routes/screens |
-| MODIFY | `docs/architecture/general_architecture.md` | Existing shared/releases layout; add exported reader and B5 consumer policy |
-| MODIFY | `docs/implementation/f-16-version-compare-cohort-assignment-implementation-plan.md` | Update Status and §2c as code lands, not an unverified retrospective |
+| Action | Path                                                                                | Mirror / rationale                                                                                                    |
+| ------ | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| NEW    | `docs/implement-report/f-16-version-compare-cohort-assignment-implement-report.md`  | `docs/implement-report/f-15-release-version-snapshots-implement-report.md`; deviations, actual checks and manual debt |
+| MODIFY | `docs/architecture/features_architecture.md`                                        | Existing F-15 section at `:307`; add the actual F-16 routes/screens                                                   |
+| MODIFY | `docs/architecture/general_architecture.md`                                         | Existing shared/releases layout; add exported reader and B5 consumer policy                                           |
+| MODIFY | `docs/implementation/f-16-version-compare-cohort-assignment-implementation-plan.md` | Update Status and §2c as code lands, not an unverified retrospective                                                  |
 
 **Shape**
 
-| Report heading | Required content |
-|---|---|
-| `## Status` | Delivered BE/FE steps and browser-walkthrough status |
-| `## Implemented` | Actual routes, exports and screens with source references |
-| `## Contract and deviations` | Built DTO/resolver contract and plan mismatches |
-| `## Verification` | Actual commands, results and environment blocks |
-| `## Remaining risks and user actions` | Open decision gates and outstanding acceptance |
+| Report heading                        | Required content                                          |
+| ------------------------------------- | --------------------------------------------------------- |
+| `## Status`                           | Delivered BE/FE steps and browser-walkthrough status      |
+| `## Implemented`                      | Actual routes, exports and screens with source references |
+| `## Contract and deviations`          | Built DTO/resolver contract and plan mismatches           |
+| `## Verification`                     | Actual commands, results and environment blocks           |
+| `## Remaining risks and user actions` | Open decision gates and outstanding acceptance            |
 
 The report must identify which BE/FE steps landed, actual commands/results, browser walkthrough status, any endpoint/DTO changes and their source lines, the cohort resolver/tie/error contract, and unresolved E1/E2/E3/U1/U2 items. The architecture documentation records only built exports/routes and says explicitly that the student adapter is still unbuilt until F-17 provides it. There is no schema migration to claim or database-reset instruction to copy forward.
 
@@ -1535,17 +1634,17 @@ flowchart TD
   F6 --> D1[DOC-01 evidence/handoff]
 ```
 
-| Order | Steps | Exit / pause point |
-|---|---|---|
-| 1 | BE-01 | Validation/Swagger vocabulary and all new wire fields fixed |
-| 2 | BE-02 → BE-03 | Frozen comparison and pin drill-down unit-tested; no change to F-13 |
-| 3 | BE-04 → BE-05 | Shared resolver and explicit schedule writes unit-tested; no student stub |
-| 4 | BE-06 → BE-07 | **Pause 1:** demo six-group HTTP comparison and K2023/S2 vs S3 resolver; test atomic writes and no implicit activation move |
-| 5 | FE-01 → FE-02 | OpenAPI generated from registered controllers; typed query keys include full context |
-| 6 | FE-03 + FE-04 | Land route imports with real page files. **Pause 2:** staff can browse old content and compare pin revisions without write controls |
-| 7 | FE-05 (with FE-03 assignment route imports) | **Pause 3:** R1 selects exact cohorts, confirms and sees authoritative as-of answers; unselected cohorts unchanged |
-| 8 | FE-06 | Regression/build gate and manual walkthrough evidence |
-| 9 | DOC-01 | Source-aligned hand-off; unresolved decisions are not marked complete |
+| Order | Steps                                       | Exit / pause point                                                                                                                  |
+| ----- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| 1     | BE-01                                       | Validation/Swagger vocabulary and all new wire fields fixed                                                                         |
+| 2     | BE-02 → BE-03                               | Frozen comparison and pin drill-down unit-tested; no change to F-13                                                                 |
+| 3     | BE-04 → BE-05                               | Shared resolver and explicit schedule writes unit-tested; no student stub                                                           |
+| 4     | BE-06 → BE-07                               | **Pause 1:** demo six-group HTTP comparison and K2023/S2 vs S3 resolver; test atomic writes and no implicit activation move         |
+| 5     | FE-01 → FE-02                               | OpenAPI generated from registered controllers; typed query keys include full context                                                |
+| 6     | FE-03 + FE-04                               | Land route imports with real page files. **Pause 2:** staff can browse old content and compare pin revisions without write controls |
+| 7     | FE-05 (with FE-03 assignment route imports) | **Pause 3:** R1 selects exact cohorts, confirms and sees authoritative as-of answers; unselected cohorts unchanged                  |
+| 8     | FE-06                                       | Regression/build gate and manual walkthrough evidence                                                                               |
+| 9     | DOC-01                                      | Source-aligned hand-off; unresolved decisions are not marked complete                                                               |
 
 At each pause, record the independently demoable result and invite user verification in an interactive implementation session. This non-interactive planning task does not wait for that verification. E1/E2/E3 were decided 2026-10-26; preserve the accepted history/calendar limitations and evidence boundary. Faculty inputs remain owed.
 
@@ -1553,16 +1652,16 @@ At each pause, record the independently demoable result and invite user verifica
 
 ### Automated coverage and contract gates
 
-| Layer | What proves it | Step |
-|---|---|---|
-| Validation | Required version/semester IDs, nonempty unique bounded cohort lists, hash syntax, immutable patch identity | BE-01 |
-| Pure snapshots/diff | All six groups, natural keys, copied IDs ignored, frozen names/credits, exact decimals, pins, unchanged/non-adjacent comparisons | BE-02 |
-| Authorization/read isolation | Program scope, correct permission combinations, pin ownership, no read-side writes, tx passed everywhere | BE-03/04 |
-| Temporal resolver | Correct pre/post-semester answers, PENDING/HISTORICAL validity, explicit null, null-date/malformed-state failures and deterministic legacy ties | BE-04 |
-| Atomic writer | Program lock, revision check, Serializable conflicts, all-or-none batch, same-pair/start rules, one-link edit, no automatic cohort selection | BE-05/07 |
-| Real HTTP | Decorators, JSON shape, permission table, wrong-program IDs, concurrency/rollback and unchanged release/activation behavior | BE-06/07 |
-| Typed FE boundary | Generated OpenAPI aliases, complete context query keys, existing mutation invalidation reaches new keys | FE-01/02 |
-| Screens/navigation | Two-version choice, Thêm/Bớt/Sửa, unchanged states, pin drill-down, history and assignment entries, confirmation/error/as-of behavior | FE-03..06 |
+| Layer                        | What proves it                                                                                                                                  | Step      |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| Validation                   | Required version/semester IDs, nonempty unique bounded cohort lists, hash syntax, immutable patch identity                                      | BE-01     |
+| Pure snapshots/diff          | All six groups, natural keys, copied IDs ignored, frozen names/credits, exact decimals, pins, unchanged/non-adjacent comparisons                | BE-02     |
+| Authorization/read isolation | Program scope, correct permission combinations, pin ownership, no read-side writes, tx passed everywhere                                        | BE-03/04  |
+| Temporal resolver            | Correct pre/post-semester answers, PENDING/HISTORICAL validity, explicit null, null-date/malformed-state failures and deterministic legacy ties | BE-04     |
+| Atomic writer                | Program lock, revision check, Serializable conflicts, all-or-none batch, same-pair/start rules, one-link edit, no automatic cohort selection    | BE-05/07  |
+| Real HTTP                    | Decorators, JSON shape, permission table, wrong-program IDs, concurrency/rollback and unchanged release/activation behavior                     | BE-06/07  |
+| Typed FE boundary            | Generated OpenAPI aliases, complete context query keys, existing mutation invalidation reaches new keys                                         | FE-01/02  |
+| Screens/navigation           | Two-version choice, Thêm/Bớt/Sửa, unchanged states, pin drill-down, history and assignment entries, confirmation/error/as-of behavior           | FE-03..06 |
 
 The test-case authority remains `docs/planning/test-plan.md` KB-059 and NT-B4-10/11/12 (`:333`..`:335`), with B5 NT-B5-02 as a future consumer contract. This plan maps those cases to concrete automated files rather than inventing a second numbered acceptance catalog.
 
@@ -1570,11 +1669,11 @@ The test-case authority remains `docs/planning/test-plan.md` KB-059 and NT-B4-10
 
 Run from each independent project directory, after its targeted step checks. These are **planned commands**, not results of this documentation task.
 
-| Directory | Commands |
-|---|---|
-| `source/backend` | `pnpm exec tsc --noEmit -p tsconfig.json`; `pnpm lint`; `pnpm test`; `pnpm test:e2e`; `pnpm build` |
+| Directory         | Commands                                                                                             |
+| ----------------- | ---------------------------------------------------------------------------------------------------- |
+| `source/backend`  | `pnpm exec tsc --noEmit -p tsconfig.json`; `pnpm lint`; `pnpm test`; `pnpm test:e2e`; `pnpm build`   |
 | `source/frontend` | `pnpm api:types` against running backend; `pnpm exec tsc -b`; `pnpm lint`; `pnpm test`; `pnpm build` |
-| Both | `pnpm exec prettier --check <explicit touched files>` using each project's installed formatter |
+| Both              | `pnpm exec prettier --check <explicit touched files>` using each project's installed formatter       |
 
 No package installation, environment-file dump, schema reset or new runtime dependency is required. Container/image unavailability, a blocked localhost backend or interrupted test run must be recorded as an environment block, not a code failure. Do not fix unrelated suite failures or concurrent documentation changes to make this feature appear green.
 
@@ -1592,52 +1691,52 @@ No implementation tests, codegen, application startup or browser acceptance are 
 
 ### Risks
 
-| Risk | Impact | Mitigation |
-|---|---|---|
-| **🏫 F16-01 / C07 / E-9:** conversion evidence | Evidence boundary is now decided, not an institutional stop line | Decided 2026-10-26 (user): target release decision plus explicit R1 cohort selection is sufficient; no separate conversion-evidence store, no automatic adoption |
-| F16-02 A: no student/enrollment integration at B4 | No true student-impact count, exception handling or materialized enrollment transitions yet | U1 is an explicit future contract; no fake zeros, writes, services or scheduled task |
-| F16-03 A plus US-078's broader six groups | A curriculum-only diff would miss PLO, matrices, electives or pinned syllabus changes | Six sections and operation subgroups are mandatory; pin drill-down covered by BE-03/FE-04 |
-| F-15 correction rewrites existing cohort links | Past cohort answers can change without a new fromSemester interval; explicit immutable history cannot be reconstructed from missing data | E1 decided 2026-10-26: preserve built retroactivity; no immutable pre-correction history or history/freeze work |
-| Semester starts are nullable and partly mutable | Unknown chronology or deliberate calendar edits can affect entitlement answers | Known-start validation, fail-closed query, revision includes calendar; E3 decided 2026-10-26: current calendar remains authoritative, with no additional freeze |
-| Existing pair uniqueness and no semester/program uniqueness | Cannot represent repeat application of the same version; legacy same-date ties can exist | D7 deterministic reads; D8 refuse new collisions; no schema alteration under this plan |
-| No updatedAt on CohortVersion | Naive optimistic locking would be fictitious | Digest exact schedule/calendar state; Program lock and Serializable writes; conflicts force reconfirmation |
-| Frozen data can be incomplete, and copied snapshot fields reflect what was actually stored | Comparing live fallback or intended changes would misrepresent history | Strict new reader errors; stored frozen facts win, no repair/re-freeze in this scope (`source/backend/src/shared/releases/version.publisher.ts:110`) |
-| Mutable syllabus status and signed attachments | Diff may falsely claim academic changes if all metadata/attachments are compared | Compare pin IDs/revision content; ignore lifecycle status and additive signed files |
-| Large curriculum/matrices and long text | N+1 reads or huge client-side recomputation | Include-based bounded reads, pure server diff, local text rendering; no queue or library added without measured need |
-| Concurrent planning/documentation runs | README/progress or another plan can be overwritten accidentally | Only this one plan file is written by this task; future DOC step leaves indexes/progress with caller |
-| Real 1024034 fixture/calendar unavailable in permitted inputs | Synthetic passing tests are not Faculty-data acceptance | Use invented fixtures only; record official-data acceptance as unverified, not silently read restricted trees |
+| Risk                                                                                       | Impact                                                                                                                                   | Mitigation                                                                                                                                                       |
+| ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **🏫 F16-01 / C07 / E-9:** conversion evidence                                             | Evidence boundary is now decided, not an institutional stop line                                                                         | Decided 2026-10-26 (user): target release decision plus explicit R1 cohort selection is sufficient; no separate conversion-evidence store, no automatic adoption |
+| F16-02 A: no student/enrollment integration at B4                                          | No true student-impact count, exception handling or materialized enrollment transitions yet                                              | U1 is an explicit future contract; no fake zeros, writes, services or scheduled task                                                                             |
+| F16-03 A plus US-078's broader six groups                                                  | A curriculum-only diff would miss PLO, matrices, electives or pinned syllabus changes                                                    | Six sections and operation subgroups are mandatory; pin drill-down covered by BE-03/FE-04                                                                        |
+| F-15 correction rewrites existing cohort links                                             | Past cohort answers can change without a new fromSemester interval; explicit immutable history cannot be reconstructed from missing data | E1 decided 2026-10-26: preserve built retroactivity; no immutable pre-correction history or history/freeze work                                                  |
+| Semester starts are nullable and partly mutable                                            | Unknown chronology or deliberate calendar edits can affect entitlement answers                                                           | Known-start validation, fail-closed query, revision includes calendar; E3 decided 2026-10-26: current calendar remains authoritative, with no additional freeze  |
+| Existing pair uniqueness and no semester/program uniqueness                                | Cannot represent repeat application of the same version; legacy same-date ties can exist                                                 | D7 deterministic reads; D8 refuse new collisions; no schema alteration under this plan                                                                           |
+| No updatedAt on CohortVersion                                                              | Naive optimistic locking would be fictitious                                                                                             | Digest exact schedule/calendar state; Program lock and Serializable writes; conflicts force reconfirmation                                                       |
+| Frozen data can be incomplete, and copied snapshot fields reflect what was actually stored | Comparing live fallback or intended changes would misrepresent history                                                                   | Strict new reader errors; stored frozen facts win, no repair/re-freeze in this scope (`source/backend/src/shared/releases/version.publisher.ts:110`)             |
+| Mutable syllabus status and signed attachments                                             | Diff may falsely claim academic changes if all metadata/attachments are compared                                                         | Compare pin IDs/revision content; ignore lifecycle status and additive signed files                                                                              |
+| Large curriculum/matrices and long text                                                    | N+1 reads or huge client-side recomputation                                                                                              | Include-based bounded reads, pure server diff, local text rendering; no queue or library added without measured need                                             |
+| Concurrent planning/documentation runs                                                     | README/progress or another plan can be overwritten accidentally                                                                          | Only this one plan file is written by this task; future DOC step leaves indexes/progress with caller                                                             |
+| Real 1024034 fixture/calendar unavailable in permitted inputs                              | Synthetic passing tests are not Faculty-data acceptance                                                                                  | Use invented fixtures only; record official-data acceptance as unverified, not silently read restricted trees                                                    |
 
 ### Decision register — accepted 2026-10-26; Faculty defaults remain provisional
 
 These are **not** permission for implementation to change a built feature. The plan uses the A-default/safe current behavior around them, records the limitation, and stops the affected slice at the indicated gate.
 
-| ID / what was hit | Options | Recommendation | Default / stop boundary |
-|---|---|---|---|
+| ID / what was hit                                                                                                                                                                                                                                                                                  | Options                                                                                                                                                                                                                                  | Recommendation                                                                          | Default / stop boundary                                                                                                                                                                                                                                        |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **E1 — Built correction behavior conflicts with interval-preserving history.** `source/backend/src/features/releases/corrections.service.ts:143` defaults to moving existing CohortVersion rows, retaining their original fromSemester; US-080 AC2 and §12 describe explicit semester-based change | Keep current correction as a retroactive administrative replacement and explicitly accept that exception; or approve a separate F-15 correction contract/write change that appends a conversion interval and records its chosen semester | Alternatives closed by the dated disposition; build with the recorded decision/default. | Decided 2026-10-26 (user): keep built administrative retroactivity and the current calendar; no immutable pre-correction history is promised and no history/freeze work is planned. F-19 audits snapshot their exact inputs so past decisions remain readable. |
-| **E2 — Faculty knowledge: conversion evidence.** §12 says confirm/input basis; current CohortVersion has only IDs/start/createdAt (`source/backend/prisma/schema.prisma:428`), while student `basisDecision` exists only in the future design | Existing target release decision + explicit R1 cohort selection is sufficient; or a separate conversion decision/basis must be durably recorded | Alternatives closed by the dated disposition; build with the recorded decision/default. | Decided 2026-10-26 (user): the target release decision plus explicit R1 cohort selection is sufficient evidence; no separate conversion-evidence store. |
-| **E3 — Built Semester edit policy is weaker than immutable assignment chronology.** `source/backend/src/features/semesters/semesters.service.ts:87` guards starts used by ACTIVE/HISTORICAL releases, not all assignment starts | Accept live authoritative calendar corrections; or approve a broader in-use date freeze/effective-date history policy owned by F-15 | Alternatives closed by the dated disposition; build with the recorded decision/default. | Decided 2026-10-26 (user): keep built administrative retroactivity and the current calendar; no immutable pre-correction history is promised and no history/freeze work is planned. F-19 audits snapshot their exact inputs so past decisions remain readable. |
-| **E4 — Faculty data/acceptance cannot be inferred.** CV-199/K-8 names 1024034; official curriculum/calendar and acceptance evidence are not available among permitted inputs | Validate the algorithm with synthetic records and obtain Faculty acceptance later; or wait for an approved sanitized fixture | Alternatives closed by the dated disposition; build with the recorded decision/default. | Default in effect 2026-10-26; Faculty input owed. Build with the stated default; institutional compatibility/production certification is not a Faculty answer. |
+| **E2 — Faculty knowledge: conversion evidence.** §12 says confirm/input basis; current CohortVersion has only IDs/start/createdAt (`source/backend/prisma/schema.prisma:428`), while student `basisDecision` exists only in the future design                                                      | Existing target release decision + explicit R1 cohort selection is sufficient; or a separate conversion decision/basis must be durably recorded                                                                                          | Alternatives closed by the dated disposition; build with the recorded decision/default. | Decided 2026-10-26 (user): the target release decision plus explicit R1 cohort selection is sufficient evidence; no separate conversion-evidence store.                                                                                                        |
+| **E3 — Built Semester edit policy is weaker than immutable assignment chronology.** `source/backend/src/features/semesters/semesters.service.ts:87` guards starts used by ACTIVE/HISTORICAL releases, not all assignment starts                                                                    | Accept live authoritative calendar corrections; or approve a broader in-use date freeze/effective-date history policy owned by F-15                                                                                                      | Alternatives closed by the dated disposition; build with the recorded decision/default. | Decided 2026-10-26 (user): keep built administrative retroactivity and the current calendar; no immutable pre-correction history is promised and no history/freeze work is planned. F-19 audits snapshot their exact inputs so past decisions remain readable. |
+| **E4 — Faculty data/acceptance cannot be inferred.** CV-199/K-8 names 1024034; official curriculum/calendar and acceptance evidence are not available among permitted inputs                                                                                                                       | Validate the algorithm with synthetic records and obtain Faculty acceptance later; or wait for an approved sanitized fixture                                                                                                             | Alternatives closed by the dated disposition; build with the recorded decision/default. | Default in effect 2026-10-26; Faculty input owed. Build with the stated default; institutional compatibility/production certification is not a Faculty answer.                                                                                                 |
 
 ### Unbuilt-feature dependencies and assumed contracts
 
-| ID / feature | Assumed contract, explicitly NEW / UNVERIFIED | Consequence / owner |
-|---|---|---|
-| **U1 — F-17 student records/enrollments** | F-17 owns student authorization, cohort membership, semester-appropriate enrollment selection, exception precedence, admission pinning and idempotent non-exception transitions. It will export `resolveForStudent(StudentAppliedVersionLookup, tx?)` returning the result contract in BE-04 and call F-16's exported `forCohort/forCohorts` for normal students | Not a prerequisite for F-16's cohort query. It is a hard dependency of student counts/transitions and B5 student endpoints. Historical enrollment reconstruction and null fromSemester policy must be settled in F-17; no stub is built here |
-| **U2 — F-12 grading formulas/assessments** | Assessment content is revision-addressed through the pinned Syllabus, copied and immutable on release. When built, F-12 must expose its revision content to comparison using the same SnapshotEntry/presentation semantics and supply release-valid fixtures; no unpublished DTO/table/signature is assumed | Current comparison covers only built syllabus text/weeks/CLOs. Extend the reader/presenter after actual F-12 source is available; exact formula B4 acceptance is blocked until then |
-| **U3 — F-18..F-21 B5 consumers** | Eligibility, graduation, portal and dDUT consumers request explicit student/program/semester context through F-17's adapter, propagate the selected programVersionId and never substitute Program.currentVersion or ACTIVE. F-21 additionally owns integration-client authorization | These are consumers of the F-16/F-17 boundary, not code required to finish F-16. No external API route or student security policy is implemented here |
-| F-09 | No dependency. Backend is now built in features/imports; synthetic fixture/API construction still replaces any need for Excel setup | Do not call an imports service, sendXlsx helper or worker for F-16 |
-| F-23 / F-25 | No implementation dependency or assumed parallel-plan content. Future reports may consume explicit issued version IDs; notifications/delegation must not alter resolution policy | Do not import or wait for those concurrent plans |
+| ID / feature                               | Assumed contract, explicitly NEW / UNVERIFIED                                                                                                                                                                                                                                                                                                                    | Consequence / owner                                                                                                                                                                                                                          |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **U1 — F-17 student records/enrollments**  | F-17 owns student authorization, cohort membership, semester-appropriate enrollment selection, exception precedence, admission pinning and idempotent non-exception transitions. It will export `resolveForStudent(StudentAppliedVersionLookup, tx?)` returning the result contract in BE-04 and call F-16's exported `forCohort/forCohorts` for normal students | Not a prerequisite for F-16's cohort query. It is a hard dependency of student counts/transitions and B5 student endpoints. Historical enrollment reconstruction and null fromSemester policy must be settled in F-17; no stub is built here |
+| **U2 — F-12 grading formulas/assessments** | Assessment content is revision-addressed through the pinned Syllabus, copied and immutable on release. When built, F-12 must expose its revision content to comparison using the same SnapshotEntry/presentation semantics and supply release-valid fixtures; no unpublished DTO/table/signature is assumed                                                      | Current comparison covers only built syllabus text/weeks/CLOs. Extend the reader/presenter after actual F-12 source is available; exact formula B4 acceptance is blocked until then                                                          |
+| **U3 — F-18..F-21 B5 consumers**           | Eligibility, graduation, portal and dDUT consumers request explicit student/program/semester context through F-17's adapter, propagate the selected programVersionId and never substitute Program.currentVersion or ACTIVE. F-21 additionally owns integration-client authorization                                                                              | These are consumers of the F-16/F-17 boundary, not code required to finish F-16. No external API route or student security policy is implemented here                                                                                        |
+| F-09                                       | No dependency. Backend is now built in features/imports; synthetic fixture/API construction still replaces any need for Excel setup                                                                                                                                                                                                                              | Do not call an imports service, sendXlsx helper or worker for F-16                                                                                                                                                                           |
+| F-23 / F-25                                | No implementation dependency or assumed parallel-plan content. Future reports may consume explicit issued version IDs; notifications/delegation must not alter resolution policy                                                                                                                                                                                 | Do not import or wait for those concurrent plans                                                                                                                                                                                             |
 
 ### Open questions and defaults
 
-| Question | Resolved when | Default if unanswered |
-|---|---|---|
-| Is the A-default permission for old cohorts to receive explicitly selected newer versions institutionally accepted? | Faculty acceptance of F16-01 | Default in effect 2026-10-26; Faculty input owed. A: yes only when R1 selects; never auto-migrate |
-| Is a separate conversion decision required beyond the target release decision? | E2 Faculty response and approved data contract if needed | Default in effect 2026-10-26; Faculty input owed. Display existing release decision; no claim of separate stored evidence |
-| Must pre-correction cohort answers remain unchanged? | E1 decided 2026-10-26 (user) | Accepted administrative retroactivity; no immutable pre-correction history or history/freeze work |
-| May an assignment-used semester's start date be edited? | E3 decided 2026-10-26 (user) | Current F-15 calendar edit policy stays; current known starts are authoritative |
-| Can the same version be re-applied to a cohort at a second interval? | A separately approved owned-schema change | No; existing pair uniqueness and explicit 409 |
-| What official calendar and sanitized 1024034 fixture prove institutional acceptance? | E4 input supplied through approved channels | Default in effect 2026-10-26; Faculty input owed. Synthetic fixtures, known dates, no real-data assertion |
-| How does F-17 select historical enrollment rows and materialize scheduled transitions? | U1 implemented/design approved by its owner | Do not implement or claim student-as-of support in F-16 |
+| Question                                                                                                            | Resolved when                                            | Default if unanswered                                                                                                     |
+| ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Is the A-default permission for old cohorts to receive explicitly selected newer versions institutionally accepted? | Faculty acceptance of F16-01                             | Default in effect 2026-10-26; Faculty input owed. A: yes only when R1 selects; never auto-migrate                         |
+| Is a separate conversion decision required beyond the target release decision?                                      | E2 Faculty response and approved data contract if needed | Default in effect 2026-10-26; Faculty input owed. Display existing release decision; no claim of separate stored evidence |
+| Must pre-correction cohort answers remain unchanged?                                                                | E1 decided 2026-10-26 (user)                             | Accepted administrative retroactivity; no immutable pre-correction history or history/freeze work                         |
+| May an assignment-used semester's start date be edited?                                                             | E3 decided 2026-10-26 (user)                             | Current F-15 calendar edit policy stays; current known starts are authoritative                                           |
+| Can the same version be re-applied to a cohort at a second interval?                                                | A separately approved owned-schema change                | No; existing pair uniqueness and explicit 409                                                                             |
+| What official calendar and sanitized 1024034 fixture prove institutional acceptance?                                | E4 input supplied through approved channels              | Default in effect 2026-10-26; Faculty input owed. Synthetic fixtures, known dates, no real-data assertion                 |
+| How does F-17 select historical enrollment rows and materialize scheduled transitions?                              | U1 implemented/design approved by its owner              | Do not implement or claim student-as-of support in F-16                                                                   |
 
 No new runtime dependency was identified. No schema change to a built table is proposed. No Faculty answer, full B4 sign-off or student integration is fabricated by this plan.

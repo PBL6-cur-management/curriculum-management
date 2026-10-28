@@ -24,6 +24,21 @@ describe('validateEnv', () => {
     );
   });
 
+  it('treats the credential key as optional and accepts only base64 of 32 bytes', () => {
+    expect(
+      validateEnv(REQUIRED).STUDENT_CREDENTIAL_ENCRYPTION_KEY,
+    ).toBeUndefined();
+    const key = Buffer.alloc(32, 1).toString('base64');
+    expect(
+      validateEnv({ ...REQUIRED, STUDENT_CREDENTIAL_ENCRYPTION_KEY: key })
+        .STUDENT_CREDENTIAL_ENCRYPTION_KEY,
+    ).toBe(key);
+    const short = Buffer.alloc(16, 1).toString('base64');
+    expect(() =>
+      validateEnv({ ...REQUIRED, STUDENT_CREDENTIAL_ENCRYPTION_KEY: short }),
+    ).toThrow(/STUDENT_CREDENTIAL_ENCRYPTION_KEY/);
+  });
+
   it('still converts numeric variables', () => {
     expect(validateEnv({ ...REQUIRED, REDIS_PORT: '6380' }).REDIS_PORT).toBe(
       6380,

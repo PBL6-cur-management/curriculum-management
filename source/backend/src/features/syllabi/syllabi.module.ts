@@ -6,6 +6,7 @@ import { CoursesSharedModule } from '../../shared/courses/courses-shared.module.
 import { BYTES_PER_MB } from '../../shared/files/attachment-types.js';
 import { FilesModule } from '../../shared/files/files.module.js';
 import { ClosService } from './clos.service.js';
+import { GradeFormulaService } from './grade-formula.service.js';
 import { SyllabiController } from './syllabi.controller.js';
 import { SyllabiService } from './syllabi.service.js';
 import { SyllabusAttachmentsService } from './syllabus-attachments.service.js';
@@ -32,6 +33,7 @@ import { WeeklyContentsService } from './weekly-contents.service.js';
     SyllabiService,
     WeeklyContentsService,
     ClosService,
+    GradeFormulaService,
     SyllabusAttachmentsService,
   ],
 })

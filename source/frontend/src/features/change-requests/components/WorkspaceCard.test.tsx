@@ -90,6 +90,14 @@ describe('WorkspaceCard', () => {
 });
 
 describe('workspaceLinks', () => {
+  it('sends a grading-formula request on a course to the formula tab and keeps the request id', () => {
+    const [link] = workspaceLinks('GRADING_FORMULA', detail().workspace!, 'r1');
+    expect(link).toEqual({
+      label: 'Sửa công thức điểm và ánh xạ CLO',
+      to: '/courses/c1/syllabus/edit?requestId=r1&tab=formula',
+    });
+  });
+
   it('sends an outcome request on a course to the CLO tab and one on a program to the three outcome screens', () => {
     const syllabus = detail().workspace!;
     expect(workspaceLinks('OUTCOME', syllabus, 'r1')[0].to).toBe(

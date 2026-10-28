@@ -16,10 +16,8 @@ export const CHANGE_REQUEST_LIMITS = {
 
 export const REQUEST_CODE = { PREFIX: 'DX', DIGITS: 4 } as const;
 
-// GRADING_FORMULA is in the enum (data dictionary) but refused until F-12 builds its workspace.
-export const CREATABLE_TYPES: readonly ChangeRequestType[] = Object.values(
-  ChangeRequestType,
-).filter((type) => type !== ChangeRequestType.GRADING_FORMULA);
+export const CREATABLE_TYPES: readonly ChangeRequestType[] =
+  Object.values(ChangeRequestType);
 
 export const DOCUMENT_DIR = 'change-requests';
 

@@ -39,14 +39,19 @@ import {
   ImportTargetDto,
   ImportTypeOptionDto,
 } from './dto/import-response.dto.js';
+import { StudentCredentialStatusDto } from './dto/student-credential.dto.js';
 import { IMPORT_LIMITS, XLSX_MIME } from './import.constants.js';
 import { sendXlsx } from './import-mapping.js';
 import { ImportsService } from './imports.service.js';
+import { StudentCredentialsService } from './student-credentials.service.js';
 
 @ApiTags('imports')
 @Controller('imports')
 export class ImportsController {
-  constructor(private readonly imports: ImportsService) {}
+  constructor(
+    private readonly imports: ImportsService,
+    private readonly credentials: StudentCredentialsService,
+  ) {}
 
   @Get('types')
   @RequirePermission(
@@ -154,6 +159,35 @@ export class ImportsController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const file = await this.imports.file(batchId, access);
+    return sendXlsx(res, file.content, file.fileName);
+  }
+
+  @Get(':batchId/student-credentials')
+  @RequirePermission(PERMISSIONS.DATA_IMPORT_EXCEL)
+  @ApiOkResponse({ type: StudentCredentialStatusDto })
+  credentialStatus(
+    @Param('batchId') batchId: string,
+    @CurrentAccess() access: AccessContext,
+  ) {
+    return this.credentials.status(batchId, access);
+  }
+
+  // POST because the download consumes the one copy; the CSRF guard then covers it and a prefetch cannot burn it.
+  @Post(':batchId/student-credentials/download')
+  @HttpCode(HttpStatus.OK)
+  @RequirePermission(PERMISSIONS.DATA_IMPORT_EXCEL)
+  @ApiProduces(XLSX_MIME)
+  @ApiOkResponse({
+    description: 'One-time workbook of initial passwords.',
+    content: { [XLSX_MIME]: { schema: { type: 'string', format: 'binary' } } },
+  })
+  async downloadCredentials(
+    @Param('batchId') batchId: string,
+    @CurrentAccess() access: AccessContext,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const file = await this.credentials.consume(batchId, access);
+    res.set('Cache-Control', 'no-store');
     return sendXlsx(res, file.content, file.fileName);
   }
 }

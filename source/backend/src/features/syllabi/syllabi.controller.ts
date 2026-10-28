@@ -38,6 +38,12 @@ import {
   UpdateCloDto,
 } from './clo.dto.js';
 import { ClosService } from './clos.service.js';
+import {
+  GradeFormulaDto,
+  ReplaceAssessmentMappingsDto,
+  ReplaceGradeFormulaDto,
+} from './grade-formula.dto.js';
+import { GradeFormulaService } from './grade-formula.service.js';
 import { SyllabusAttachmentsService } from './syllabus-attachments.service.js';
 import {
   SyllabusAttachmentDto,
@@ -67,6 +73,7 @@ export class SyllabiController {
     private readonly weeks: WeeklyContentsService,
     private readonly attachments: SyllabusAttachmentsService,
     private readonly clos: ClosService,
+    private readonly gradeFormula: GradeFormulaService,
   ) {}
 
   @Get('courses/:courseId/syllabus')
@@ -193,6 +200,28 @@ export class SyllabiController {
     @CurrentAccess() access: AccessContext,
   ) {
     return this.clos.remove(cloId, access);
+  }
+
+  @Put('syllabi/:syllabusId/grading-formula')
+  @RequirePermission(PERMISSIONS.GRADING_FORMULA_EDIT)
+  @ApiOkResponse({ type: GradeFormulaDto })
+  replaceGradingFormula(
+    @Param('syllabusId') syllabusId: string,
+    @Body() dto: ReplaceGradeFormulaDto,
+    @CurrentAccess() access: AccessContext,
+  ) {
+    return this.gradeFormula.replaceFormula(syllabusId, dto, access);
+  }
+
+  @Put('syllabi/:syllabusId/assessment-clo-mappings')
+  @RequirePermission(PERMISSIONS.GRADING_FORMULA_EDIT)
+  @ApiOkResponse({ type: GradeFormulaDto })
+  replaceAssessmentMappings(
+    @Param('syllabusId') syllabusId: string,
+    @Body() dto: ReplaceAssessmentMappingsDto,
+    @CurrentAccess() access: AccessContext,
+  ) {
+    return this.gradeFormula.replaceMappings(syllabusId, dto, access);
   }
 
   @Post('syllabi/:syllabusId/attachments')

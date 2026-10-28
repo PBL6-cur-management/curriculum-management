@@ -19,6 +19,7 @@ import { translated } from '../utils/syllabusLanguage';
 import { AttachmentList } from './AttachmentList';
 import { AttachmentUploader } from './AttachmentUploader';
 import { CloView } from './CloView';
+import { GradeFormulaView } from './GradeFormulaView';
 import { WeeklyContentView } from './WeeklyContentView';
 
 interface SyllabusSectionsProps {
@@ -87,6 +88,7 @@ export function SyllabusSections({
       </Section>
       {plain('teachingMethods')}
       {plain('assessmentMethods')}
+      <GradeFormulaView syllabus={syllabus} />
       {plain('references')}
       <Section title={ATTACHMENTS_SECTION_LABEL}>
         <Flex vertical gap="small">

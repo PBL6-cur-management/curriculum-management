@@ -6,7 +6,11 @@ import {
 } from '../../generated/prisma/client.js';
 import { AppException } from '../exception/app.exception.js';
 import { RELEASE_ERRORS } from './release.errors.js';
-import { syllabusPublishIssues } from './syllabus-release-issues.js';
+import { lockSyllabusAssessment } from '../syllabi/syllabus-assessment-lock.js';
+import {
+  PUBLISHABLE_SYLLABUS_SELECT,
+  syllabusPublishIssues,
+} from './syllabus-release-issues.js';
 
 export interface PublishedRevision {
   revision: Syllabus;
@@ -27,7 +31,10 @@ export class SyllabusPublisher {
       where: { courseId, status: SyllabusStatus.PUBLISHED },
       select: { id: true },
     });
-    if (published) return published.id;
+    if (published) {
+      await this.assertPublishable(tx, published.id);
+      return published.id;
+    }
     const draft = await tx.syllabus.findFirst({
       where: { courseId, status: SyllabusStatus.DRAFT, sourceRequestId: null },
     });
@@ -39,7 +46,7 @@ export class SyllabusPublisher {
         },
       ]);
     }
-    this.assertPublishable(draft);
+    await this.assertPublishable(tx, draft.id);
     await tx.syllabus.update({
       where: { id: draft.id },
       data: { status: SyllabusStatus.PUBLISHED, publishedAt: now },
@@ -64,7 +71,7 @@ export class SyllabusPublisher {
     if (previous.status !== SyllabusStatus.PUBLISHED) {
       throw new AppException(RELEASE_ERRORS.ITEM_APPLY_FAILED);
     }
-    this.assertPublishable(copy);
+    await this.assertPublishable(tx, copy.id);
     const highest = await tx.syllabus.aggregate({
       where: { courseId: copy.courseId },
       _max: { revisionNumber: true },
@@ -88,11 +95,16 @@ export class SyllabusPublisher {
     return { revision, previous };
   }
 
-  private assertPublishable(syllabus: {
-    courseId: string;
-    courseDescription: string | null;
-    objectives: string | null;
-  }): void {
+  // Locks the revision, then judges the text and the grade formula as they are now, not as an earlier read saw them.
+  private async assertPublishable(
+    tx: Prisma.TransactionClient,
+    syllabusId: string,
+  ): Promise<void> {
+    await lockSyllabusAssessment(tx, syllabusId);
+    const syllabus = await tx.syllabus.findUniqueOrThrow({
+      where: { id: syllabusId },
+      select: PUBLISHABLE_SYLLABUS_SELECT,
+    });
     const issues = syllabusPublishIssues(syllabus);
     if (issues.length > 0) {
       throw new AppException(

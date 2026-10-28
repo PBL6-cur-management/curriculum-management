@@ -15,7 +15,14 @@ describe('ImportsReader', () => {
     ).rejects.toMatchObject({ code: 'IMPORT_BATCH_NOT_FOUND' });
     expect(findFirst.mock.calls[0][0].where.AND).toEqual([
       { id: 'hidden' },
-      { OR: [{ performedById: 'user' }] },
+      {
+        OR: [
+          {
+            performedById: 'user',
+            importType: { notIn: ['STUDENT_LIST', 'ACADEMIC_RESULT'] },
+          },
+        ],
+      },
     ]);
   });
   it('paginates the same scoped filter for count and data, excluding blobs and reports from list selects', async () => {

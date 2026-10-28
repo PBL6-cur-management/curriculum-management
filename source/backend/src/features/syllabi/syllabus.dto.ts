@@ -22,6 +22,12 @@ import {
 } from './syllabus-attachment.dto.js';
 import { CLO_INCLUDE, CloDto, toCloDto } from './clo.dto.js';
 import {
+  ASSESSMENT_COMPONENT_ORDER,
+  ASSESSMENT_INCLUDE,
+  GradeFormulaDto,
+  toGradeFormulaDto,
+} from './grade-formula.dto.js';
+import {
   toWeeklyContentDto,
   WEEKLY_CONTENT_INCLUDE,
   WeeklyContentDto,
@@ -69,6 +75,11 @@ export class SyllabusDto {
   attachments!: SyllabusAttachmentDto[];
   @ApiProperty({ type: [CloDto] })
   clos!: CloDto[];
+  @ApiProperty({
+    type: GradeFormulaDto,
+    description: 'Empty aggregate when the revision has no formula',
+  })
+  gradingFormula!: GradeFormulaDto;
 }
 
 export class SyllabusVersionRefDto {
@@ -109,6 +120,18 @@ export class CourseSyllabusDto {
   canEditClos!: boolean;
   @ApiProperty({ enum: EDIT_PATHS, enumName: 'EditPath', nullable: true })
   editPath!: EditPath | null;
+  @ApiProperty({
+    enum: EDIT_PATHS,
+    enumName: 'EditPath',
+    nullable: true,
+    description:
+      'Path for the grade formula and assessment mappings (gradingFormula.edit); null when there is no such cell or in a pinned read',
+  })
+  gradingEditPath!: EditPath | null;
+  @ApiProperty({
+    description: 'A Draft exists and its grade formula is directly editable',
+  })
+  canEditGradingFormula!: boolean;
   @ApiProperty({ type: AttachmentRulesDto })
   attachmentRules!: AttachmentRulesDto;
   @ApiProperty({
@@ -137,6 +160,10 @@ export const SYLLABUS_INCLUDE = {
   clos: {
     include: CLO_INCLUDE,
     orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }],
+  },
+  assessmentComponents: {
+    include: ASSESSMENT_INCLUDE,
+    orderBy: [...ASSESSMENT_COMPONENT_ORDER],
   },
 } as const satisfies Prisma.SyllabusInclude;
 export type SyllabusRow = Prisma.SyllabusGetPayload<{
@@ -173,6 +200,7 @@ export function toSyllabusDto(
     updatedAt: row.updatedAt.toISOString(),
     weeklyContents: row.weeklyContents.map(toWeeklyContentDto),
     clos: row.clos.map(toCloDto),
+    gradingFormula: toGradeFormulaDto(row),
     attachments: row.attachments.map((attachment) =>
       toAttachmentDto(attachment, canDeleteFrom(attachment.uploadedBy.id)),
     ),

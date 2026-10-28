@@ -73,7 +73,12 @@ function accessRow(status: SyllabusStatus) {
   };
 }
 
-function cloRow(id: string, sortOrder: number, programs: string[] = []) {
+function cloRow(
+  id: string,
+  sortOrder: number,
+  programs: string[] = [],
+  assessmentLinks = 0,
+) {
   return {
     id,
     syllabusId: 's1',
@@ -82,6 +87,7 @@ function cloRow(id: string, sortOrder: number, programs: string[] = []) {
     englishDescription: null,
     cognitiveLevel: null,
     sortOrder,
+    _count: { assessmentLinks: assessmentLinks },
     ploLinks: programs.map((programCode) => ({
       coursePlo: {
         curriculumItem: { version: { program: { programCode } } },
@@ -102,6 +108,7 @@ describe('ClosService', () => {
       ReturnType<typeof vi.fn>
     >;
     $transaction: ReturnType<typeof vi.fn>;
+    $queryRaw: ReturnType<typeof vi.fn>;
   };
   let service: ClosService;
 
@@ -126,6 +133,7 @@ describe('ClosService', () => {
         delete: vi.fn().mockResolvedValue({}),
       },
       $transaction: vi.fn(),
+      $queryRaw: vi.fn().mockResolvedValue([]),
     };
     prisma.$transaction.mockImplementation((run: (tx: unknown) => unknown) =>
       run(prisma),
@@ -241,6 +249,18 @@ describe('ClosService', () => {
         service.reorder('s1', { ids: ['a', 'z'] }, R3),
       ).rejects.toMatchObject({ code: 'SYLLABUS_ORDER_MISMATCH' });
     });
+  });
+
+  it('reports how many assessment components assess the CLO', () => {
+    expect(toCloDto(cloRow('c1', 1, [], 2) as never).assessmentLinkCount).toBe(
+      2,
+    );
+  });
+
+  it('takes the revision lock before judging a CLO write', async () => {
+    await service.create('s1', input, R3);
+
+    expect(prisma.$queryRaw).toHaveBeenCalled();
   });
 
   it('lists each linked program once, sorted', () => {

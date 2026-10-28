@@ -111,6 +111,21 @@ export class SyllabiService {
           courseTarget(course),
           state,
         );
+    const gradingEditPath = copy
+      ? copyEditable(PERMISSIONS.GRADING_FORMULA_EDIT)
+        ? EDIT_PATH.DIRECT
+        : access.modeFor(
+              PERMISSIONS.GRADING_FORMULA_EDIT,
+              courseTarget(course),
+            ) !== null
+          ? EDIT_PATH.VIA_REQUEST
+          : null
+      : editPathFor(
+          access,
+          PERMISSIONS.GRADING_FORMULA_EDIT,
+          courseTarget(course),
+          state,
+        );
     const published =
       revisions.find((row) => row.status === SyllabusStatus.PUBLISHED) ?? null;
     const draft = copy
@@ -141,6 +156,9 @@ export class SyllabiService {
             state,
           ) === EDIT_PATH.DIRECT,
       editPath,
+      gradingEditPath,
+      canEditGradingFormula:
+        draft !== null && gradingEditPath === EDIT_PATH.DIRECT,
       attachmentRules: this.attachmentRules(),
       canAttachToPublished: published !== null && canAttachTo(access, course),
       version: null,
@@ -194,6 +212,8 @@ export class SyllabiService {
       canCreate: false,
       canEditClos: false,
       editPath: null,
+      gradingEditPath: null,
+      canEditGradingFormula: false,
       attachmentRules: this.attachmentRules(),
       canAttachToPublished: row !== null && canAttachTo(access, course),
       version: {

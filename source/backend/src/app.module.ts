@@ -29,6 +29,7 @@ import { NotificationsModule } from './features/notifications/notifications.modu
 import { ReleasesModule } from './features/releases/releases.module.js';
 import { SemestersModule } from './features/semesters/semesters.module.js';
 import { ImportsModule } from './features/imports/imports.module.js';
+import { StudentsModule } from './features/students/students.module.js';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { ImportsModule } from './features/imports/imports.module.js';
     SemestersModule,
     ReleasesModule,
     ImportsModule,
+    StudentsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: CsrfGuard },

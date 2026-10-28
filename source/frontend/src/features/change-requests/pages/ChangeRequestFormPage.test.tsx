@@ -110,15 +110,30 @@ describe('ChangeRequestFormPage', () => {
     });
   });
 
-  it('lists the grading formula type disabled with "Chưa hỗ trợ"', async () => {
-    renderForm('/change-requests/new');
+  it('offers the grading formula type to a holder of gradingFormula.edit and not to anyone else', async () => {
+    renderRequestPage({
+      path: '/change-requests/new',
+      entry: '/change-requests/new',
+      element: <ChangeRequestFormPage />,
+      me: {
+        ...ME,
+        permissions: [
+          'changeRequest.view',
+          'changeRequest.create',
+          'gradingFormula.edit',
+        ],
+      },
+    });
     fireEvent.mouseDown(
       await screen.findByRole('combobox', { name: 'Loại đề xuất' }),
     );
-    const option = await screen.findByText('Công thức tính điểm — Chưa hỗ trợ');
-    expect(option.closest('.ant-select-item')).toHaveClass(
+    const grading = await screen.findByText('Công thức tính điểm');
+    expect(grading.closest('.ant-select-item')).not.toHaveClass(
       'ant-select-item-option-disabled',
     );
+    expect(
+      screen.getByText('Nội dung đề cương').closest('.ant-select-item'),
+    ).toHaveClass('ant-select-item-option-disabled');
   });
 
   it('offers only the types the user may edit', async () => {

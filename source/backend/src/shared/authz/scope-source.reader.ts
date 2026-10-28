@@ -21,7 +21,7 @@ export class ScopeSourceReader {
       case ScopeSource.PROGRAM_DIRECTOR:
         return { programIds: await this.directedProgramIds(userId, today) };
       case ScopeSource.OWN_ENROLLMENT:
-        return {};
+        return this.ownStudent(userId);
       case ScopeSource.SUBJECT_GROUP_COORDINATOR:
         return {
           subjectGroupIds: await this.activeGroupIds(
@@ -33,6 +33,22 @@ export class ScopeSourceReader {
       case ScopeSource.SUBJECT_GROUP_MEMBER:
         return { subjectGroupIds: await this.activeGroupIds(userId, today) };
     }
+  }
+
+  // Past programs stay readable so a student can see their own history; an account with no student record derives nothing.
+  private async ownStudent(userId: string): Promise<ScopeTarget> {
+    const student = await this.prisma.student.findUnique({
+      where: { userId },
+      select: {
+        id: true,
+        enrollments: { select: { programId: true }, distinct: ['programId'] },
+      },
+    });
+    if (!student) return {};
+    return {
+      studentIds: [student.id],
+      programIds: student.enrollments.map((row) => row.programId),
+    };
   }
 
   private async directedProgramIds(

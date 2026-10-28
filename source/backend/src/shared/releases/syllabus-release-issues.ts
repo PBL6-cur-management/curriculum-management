@@ -1,6 +1,11 @@
 import { SyllabusStatus, type Prisma } from '../../generated/prisma/client.js';
 import { AppException } from '../exception/app.exception.js';
 import type { PrismaService } from '../prisma/prisma.service.js';
+import {
+  ASSESSMENT_RULES_SELECT,
+  assessmentIssues,
+  type AssessmentRuleInput,
+} from '../syllabi/grade-formula.rules.js';
 import { richTextToPlain } from '../rich-text/rich-text-to-plain.js';
 import { RELEASE_ERRORS } from './release.errors.js';
 import {
@@ -10,17 +15,29 @@ import {
 
 type Db = PrismaService | Prisma.TransactionClient;
 
-// DC-03 publish conditions that exist today. The assessment ones (weights 100%, a component per CLO, thresholds)
-// belong to F-12, which owns grading data; this list grows there rather than being faked here.
 export const SYLLABUS_PUBLISH_CONDITION = {
   DESCRIPTION: 'COURSE_DESCRIPTION_EMPTY',
   OBJECTIVES: 'OBJECTIVES_EMPTY',
 } as const;
 
-export function syllabusPublishIssues(syllabus: {
+// Everything a revision needs to be published; the assessment data is never optional, so no caller can skip it.
+export interface PublishableSyllabusInput extends AssessmentRuleInput {
   courseDescription: string | null;
   objectives: string | null;
-}): string[] {
+}
+
+export const PUBLISHABLE_SYLLABUS_SELECT = {
+  id: true,
+  courseId: true,
+  status: true,
+  courseDescription: true,
+  objectives: true,
+  ...ASSESSMENT_RULES_SELECT,
+} as const satisfies Prisma.SyllabusSelect;
+
+export function syllabusPublishIssues(
+  syllabus: PublishableSyllabusInput,
+): string[] {
   const issues: string[] = [];
   if (richTextToPlain(syllabus.courseDescription) === null) {
     issues.push(SYLLABUS_PUBLISH_CONDITION.DESCRIPTION);
@@ -28,44 +45,65 @@ export function syllabusPublishIssues(syllabus: {
   if (richTextToPlain(syllabus.objectives) === null) {
     issues.push(SYLLABUS_PUBLISH_CONDITION.OBJECTIVES);
   }
+  for (const issue of assessmentIssues(syllabus)) {
+    if (!issues.includes(issue.code)) issues.push(issue.code);
+  }
   return issues;
 }
 
-// A version's unpinned rows each need a revision to publish with: the course's Published one, else a complete Draft.
-// Pinned rows are already published. Read-only, so the preview and the release check one rule.
+// Each course row of a version needs a complete revision to publish with: its explicit pin, else the course's ordinary
+// Published revision, else its ordinary Draft. Pins that predate the grade formula are checked like any other; a legacy
+// incomplete revision stays readable but cannot enter a new release. Read-only, so the preview and the release check one rule.
 export async function collectSyllabusIssues(
   db: Db,
   versionId: string,
 ): Promise<SyllabusReleaseIssueDto[]> {
   const items = await db.curriculumItem.findMany({
-    where: { versionId, syllabusId: null },
-    select: { courseId: true, course: { select: { courseCode: true } } },
+    where: { versionId },
+    select: {
+      courseId: true,
+      syllabusId: true,
+      course: { select: { courseCode: true } },
+    },
     orderBy: [{ plannedSemester: 'asc' }, { sortOrder: 'asc' }, { id: 'asc' }],
   });
   if (items.length === 0) return [];
+  const pinIds = items.flatMap((item) =>
+    item.syllabusId === null ? [] : [item.syllabusId],
+  );
   const revisions = await db.syllabus.findMany({
     where: {
-      courseId: { in: items.map((item) => item.courseId) },
-      status: { in: [SyllabusStatus.PUBLISHED, SyllabusStatus.DRAFT] },
-      sourceRequestId: null,
+      OR: [
+        { id: { in: pinIds } },
+        {
+          courseId: {
+            in: items
+              .filter((item) => item.syllabusId === null)
+              .map((item) => item.courseId),
+          },
+          status: { in: [SyllabusStatus.PUBLISHED, SyllabusStatus.DRAFT] },
+          sourceRequestId: null,
+        },
+      ],
     },
-    select: {
-      courseId: true,
-      status: true,
-      courseDescription: true,
-      objectives: true,
-    },
+    select: PUBLISHABLE_SYLLABUS_SELECT,
   });
   const issues: SyllabusReleaseIssueDto[] = [];
+  const reported = new Set<string>();
   for (const item of items) {
-    const own = revisions.filter((row) => row.courseId === item.courseId);
+    if (reported.has(item.courseId)) continue;
     const where = {
       courseId: item.courseId,
       courseCode: item.course.courseCode,
     };
-    if (own.some((row) => row.status === SyllabusStatus.PUBLISHED)) continue;
-    const draft = own.find((row) => row.status === SyllabusStatus.DRAFT);
-    if (!draft) {
+    const own = revisions.filter((row) => row.courseId === item.courseId);
+    const candidate =
+      item.syllabusId === null
+        ? (own.find((row) => row.status === SyllabusStatus.PUBLISHED) ??
+          own.find((row) => row.status === SyllabusStatus.DRAFT))
+        : own.find((row) => row.id === item.syllabusId);
+    if (!candidate) {
+      reported.add(item.courseId);
       issues.push({
         ...where,
         code: SYLLABUS_ISSUE_CODE.MISSING_SYLLABUS,
@@ -73,8 +111,9 @@ export async function collectSyllabusIssues(
       });
       continue;
     }
-    const details = syllabusPublishIssues(draft);
+    const details = syllabusPublishIssues(candidate);
     if (details.length > 0) {
+      reported.add(item.courseId);
       issues.push({
         ...where,
         code: SYLLABUS_ISSUE_CODE.SYLLABUS_INCOMPLETE,

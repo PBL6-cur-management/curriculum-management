@@ -93,10 +93,36 @@ describe('ScopeSourceReader', () => {
     expect(findMany).not.toHaveBeenCalled();
   });
 
-  it('leaves OWN_ENROLLMENT empty', async () => {
+  it('derives OWN_ENROLLMENT from the linked student and their past programs', async () => {
+    const findUnique = vi.fn().mockResolvedValue({
+      id: 'student-1',
+      enrollments: [{ programId: 'p1' }, { programId: 'p2' }],
+    });
+    const studentReader = new ScopeSourceReader({
+      student: { findUnique },
+    } as unknown as PrismaService);
     expect(
-      await reader.activeTargets(ScopeSource.OWN_ENROLLMENT, 'student', TODAY),
+      await studentReader.activeTargets(
+        ScopeSource.OWN_ENROLLMENT,
+        'user-1',
+        TODAY,
+      ),
+    ).toEqual({ studentIds: ['student-1'], programIds: ['p1', 'p2'] });
+    expect(findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { userId: 'user-1' } }),
+    );
+  });
+
+  it('derives nothing for an account that is not linked to a student', async () => {
+    const studentReader = new ScopeSourceReader({
+      student: { findUnique: vi.fn().mockResolvedValue(null) },
+    } as unknown as PrismaService);
+    expect(
+      await studentReader.activeTargets(
+        ScopeSource.OWN_ENROLLMENT,
+        'staff',
+        TODAY,
+      ),
     ).toEqual({});
-    expect(findMany).not.toHaveBeenCalled();
   });
 });

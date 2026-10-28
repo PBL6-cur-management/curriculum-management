@@ -225,14 +225,15 @@ describe('change requests: authoring, routing and withdrawal', () => {
       ).toBe(0);
     });
 
-    it('refuses the formula type, a data type to R2 and the list to a user without a role (US-054 AC1, US-060 AC3)', async () => {
+    it('opens a grading-formula request on a syllabus copy, refuses a data type to R2 and the list to a user without a role (US-054 AC1, US-060 AC3)', async () => {
       const course = await publishedCourse(app, admin, code('CRS'), ga);
       const formula = await postRequest(memberA, {
         requestType: 'GRADING_FORMULA',
         targetType: 'COURSE',
         targetId: course.id,
-      }).expect(400);
-      expect(formula.body.code).toBe('VALIDATION_FAILED');
+      }).expect(201);
+      const opened = await readRequest(memberA, formula.body.id);
+      expect(opened.workspace?.kind).toBe('SYLLABUS');
       const r2 = await postRequest(viewer, syllabusBody(course.id)).expect(403);
       expect(r2.body.code).toBe('PERMISSION_DENIED');
       await outsider.get('/api/change-requests').expect(403);

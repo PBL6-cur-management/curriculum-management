@@ -1,5 +1,7 @@
 import type {
+  AssessmentComponent,
   CourseSyllabus,
+  GradeFormula,
   Syllabus,
   Clo,
   SyllabusAttachment,
@@ -45,6 +47,38 @@ export function clo(
     cognitiveLevel: null,
     sortOrder,
     linkedPrograms: [],
+    assessmentLinkCount: 0,
+    ...patch,
+  };
+}
+
+export function assessmentComponent(
+  id: string,
+  patch: Partial<AssessmentComponent> = {},
+): AssessmentComponent {
+  return {
+    id,
+    componentCode: id.toUpperCase(),
+    componentName: `Thành phần ${id}`,
+    weight: '100',
+    assessmentForm: null,
+    isConditional: false,
+    conditionThreshold: null,
+    failingScore: null,
+    mappings: [],
+    ...patch,
+  };
+}
+
+export function gradeFormula(
+  components: AssessmentComponent[],
+  patch: Partial<GradeFormula> = {},
+): GradeFormula {
+  return {
+    failingScore: null,
+    totalWeight: '100',
+    components,
+    warnings: [],
     ...patch,
   };
 }
@@ -81,6 +115,12 @@ export function syllabus(patch: Partial<Syllabus> = {}): Syllabus {
     weeklyContents: [],
     attachments: [],
     clos: [],
+    gradingFormula: {
+      failingScore: null,
+      totalWeight: '0',
+      components: [],
+      warnings: [],
+    },
     ...patch,
   };
 }
@@ -118,6 +158,8 @@ export function courseSyllabus(
     canCreate: false,
     canEditClos: true,
     editPath: 'DIRECT',
+    gradingEditPath: null,
+    canEditGradingFormula: false,
     attachmentRules: RULES,
     canAttachToPublished: false,
     version: null,

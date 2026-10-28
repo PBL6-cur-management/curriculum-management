@@ -30,6 +30,7 @@ Lý do chọn và bảng phiên bản: `docs/design/tech-stack.md` §2 và §6. 
 **Version**: Node.js ≥ 22.22 < 23 (`engines`, `.nvmrc`), pnpm 10.23.0 (`packageManager`)
 
 ### Usage Pattern
+
 - Chạy mọi lệnh bên trong `source/backend` hoặc `source/frontend`; không có lệnh ở gốc repo.
 - Volta trên máy phát triển đang gắn pnpm 10.23.0 với Node 20 nên in cảnh báo `engines`. Sửa bằng `volta install pnpm@10.23.0` (chưa chạy).
 
@@ -40,23 +41,25 @@ Lý do chọn và bảng phiên bản: `docs/design/tech-stack.md` §2 và §6. 
 **Library**: `@nestjs/config`, `class-validator`, `class-transformer`
 
 ### Configuration
+
 `src/shared/config/env.validation.ts` khai báo lớp `Env`; `ConfigModule.forRoot({ isGlobal: true, validate: validateEnv })`.
 
 ### Usage Pattern
+
 - Mỗi biến mới: thêm vào `Env` **kèm kiểu tường minh** (xem error log 2026-10-15), thêm dòng vào bảng biến trong `source/backend/README.md`.
 - Đọc bằng `config.get('NAME', { infer: true })` trên `ConfigService<Env, true>`.
 
-| Biến | Mặc định | Ràng buộc |
-|---|---|---|
-| `NODE_ENV` | `development` | `development` / `test` / `production` |
-| `PORT` | 3000 | 1..65535 |
-| `DATABASE_URL` | — | bắt buộc |
-| `REDIS_HOST`, `REDIS_PORT` | `localhost`, 6379 | |
-| `SESSION_SECRET` | — | bắt buộc, ≥ 32 ký tự (F-01) |
-| `SESSION_IDLE_MINUTES` | 60 | số nguyên ≥ 1 (F-01, NFR-08); `AuthenticatedGuard` cũng đo `lastActivityAt` trên phiên, tuyến `@PassiveRequest()` (đếm thông báo chưa đọc) không làm mới (F-14) |
-| `FILES_ROOT` | `files` | thư mục tệp đính kèm đề cương và văn bản đề xuất (F-10, F-13); đặt vào ổ bền, sao lưu cùng cơ sở dữ liệu; `/files/` nằm trong `.gitignore` |
-| `ATTACHMENT_MAX_MB` | 20 | giới hạn một tệp đính kèm (F-10) |
-| `BULLMQ_PREFIX` | không đặt (BullMQ dùng `bull`) | tiền tố khóa Redis của hàng đợi; chỉ đặt khi dùng chung Redis (F-15) |
+| Biến                       | Mặc định                       | Ràng buộc                                                                                                                                                       |
+| -------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NODE_ENV`                 | `development`                  | `development` / `test` / `production`                                                                                                                           |
+| `PORT`                     | 3000                           | 1..65535                                                                                                                                                        |
+| `DATABASE_URL`             | —                              | bắt buộc                                                                                                                                                        |
+| `REDIS_HOST`, `REDIS_PORT` | `localhost`, 6379              |                                                                                                                                                                 |
+| `SESSION_SECRET`           | —                              | bắt buộc, ≥ 32 ký tự (F-01)                                                                                                                                     |
+| `SESSION_IDLE_MINUTES`     | 60                             | số nguyên ≥ 1 (F-01, NFR-08); `AuthenticatedGuard` cũng đo `lastActivityAt` trên phiên, tuyến `@PassiveRequest()` (đếm thông báo chưa đọc) không làm mới (F-14) |
+| `FILES_ROOT`               | `files`                        | thư mục tệp đính kèm đề cương và văn bản đề xuất (F-10, F-13); đặt vào ổ bền, sao lưu cùng cơ sở dữ liệu; `/files/` nằm trong `.gitignore`                      |
+| `ATTACHMENT_MAX_MB`        | 20                             | giới hạn một tệp đính kèm (F-10)                                                                                                                                |
+| `BULLMQ_PREFIX`            | không đặt (BullMQ dùng `bull`) | tiền tố khóa Redis của hàng đợi; chỉ đặt khi dùng chung Redis (F-15)                                                                                            |
 
 `SEED_ADMIN_USERNAME`, `SEED_ADMIN_PASSWORD` chỉ dành cho `prisma/seed.ts`, đọc trực tiếp từ `process.env`, không có trong `Env`.
 
@@ -67,11 +70,13 @@ Lý do chọn và bảng phiên bản: `docs/design/tech-stack.md` §2 và §6. 
 **Library**: `prisma`, `@prisma/client`, `@prisma/adapter-pg` **Version**: 7.10.0 (ghim cứng)
 
 ### Configuration
+
 - Generator `prisma-client`, `moduleFormat = "esm"`, sinh vào `src/generated/prisma`; import từ `../generated/prisma/client.js`.
 - `prisma.config.ts` đọc `process.env.DATABASE_URL` trực tiếp, không qua `env()` (xem error log 2026-10-15).
 - `PrismaService extends PrismaClient`, nối qua `PrismaPg`; `onModuleInit` kiểm cơ sở dữ liệu dùng ICU `vi-VN`, sai thì dừng.
 
 ### Usage Pattern
+
 - Model `PascalCase` số ít, trường `camelCase`, tên theo `docs/design/naming-map.md`.
 - Thay đổi lược đồ: sửa `schema.prisma` → `pnpm prisma:migrate` → ghi vào `docs/architecture/database_and_models.md`.
 - Nhiều bảng trong một thao tác: `$transaction`.
@@ -82,10 +87,10 @@ Lý do chọn và bảng phiên bản: `docs/design/tech-stack.md` §2 và §6. 
 
 Chạy trong `source/backend`:
 
-| Script | Input / output | Điều kiện |
-|---|---|---|
-| `pnpm dut:extract` | Chạy `prisma/seed-data/dut/extract/extract.ts`, đọc sáu bảng curriculum/danh mục allow-listed trong legacy dump; ghi `catalog.json`, `programs.json`, `report.json` tại `prisma/seed-data/dut/data/` | Chỉ máy có legacy dump mới cần chạy; không chạm database |
-| `pnpm prisma:seed:dut` | Chỉ đọc `catalog.json`, `programs.json` đã sinh, nạp catalog và CTĐT; không đọc dump | Áp migrations và chạy `pnpm prisma:seed` trước; cần university/faculty và publisher R1 SYSTEM của base seed |
+| Script                 | Input / output                                                                                                                                                                                       | Điều kiện                                                                                                   |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `pnpm dut:extract`     | Chạy `prisma/seed-data/dut/extract/extract.ts`, đọc sáu bảng curriculum/danh mục allow-listed trong legacy dump; ghi `catalog.json`, `programs.json`, `report.json` tại `prisma/seed-data/dut/data/` | Chỉ máy có legacy dump mới cần chạy; không chạm database                                                    |
+| `pnpm prisma:seed:dut` | Chỉ đọc `catalog.json`, `programs.json` đã sinh, nạp catalog và CTĐT; không đọc dump                                                                                                                 | Áp migrations và chạy `pnpm prisma:seed` trước; cần university/faculty và publisher R1 SYSTEM của base seed |
 
 Ba JSON tại `source/backend/prisma/seed-data/dut/data/` là **artefact duy nhất từ legacy dump được mang ra ngoài**: chỉ dữ liệu CTĐT và danh mục hỗ trợ, không có dữ liệu cá nhân hoặc credentials. Không sao chép markdown dump hay các bảng hồ sơ sinh viên/giảng viên; `report.json` phục vụ rà soát counts/codes và các record bị bỏ. Máy chạy loader chỉ cần JSON, không cần giữ dump. Các module đọc/nạp JSON nằm tại `prisma/seed-data/dut/load/`; `dut-data.ts` và `legacy-mapping.ts` ở root `dut/` để dùng chung cho extract/load. `DEFAULT_LEGACY_ROOT` vẫn tương đối với working directory `source/backend`, không phải vị trí module.
 
@@ -104,9 +109,11 @@ Người dùng tự sao chép `.env.real.example` thành `.env.real`: `DATABASE_
 **Library**: `@nestjs/platform-express`, `@nestjs/swagger`, `class-validator`
 
 ### Configuration
+
 `configureApp` (`src/app.setup.ts`): tiền tố `api`, `ValidationPipe({ whitelist, forbidNonWhitelisted, transform })`, Swagger ở `/api/docs`, JSON ở `/api/docs-json`.
 
 ### Usage Pattern
+
 - `configureApp` dùng chung cho `main.ts` và kiểm thử đầu-cuối — thêm cấu hình toàn cục vào đó, không vào `main.ts`.
 - Mọi DTO trả về có `@ApiProperty`, kể cả `enum`, để `openapi-typescript` sinh đúng kiểu hợp.
 
@@ -117,10 +124,12 @@ Người dùng tự sao chép `.env.real.example` thành `.env.real`: `DATABASE_
 **Library**: `express-session` 1.19, `connect-pg-simple` 10, `pg` 8, `argon2` 0.45
 
 ### Configuration
+
 - `SessionStoreService` (`src/shared/session/`) dựng một handler `express-session` dùng chung: store `connect-pg-simple`, bảng `session` (`createTableIfMissing: false`), cookie `ctdt.sid` HttpOnly, `rolling: true`, `maxAge` = `SESSION_IDLE_MINUTES` phút; `configureApp` gắn handler và đặt `trust proxy` 1 bước.
 - `PasswordService` băm Argon2id; `argon2` là gói native.
 
 ### Usage Pattern
+
 - Đăng nhập dùng `regenerate`, đăng xuất dùng `destroy` qua `session-lifecycle.ts` — không gọi callback của `express-session` trực tiếp.
 - Route công khai đánh `@Public()`; route phải gọi được khi đang bị buộc đổi mật khẩu đánh `@AllowPendingPasswordChange()`.
 - Giao diện gửi `X-Requested-With: XMLHttpRequest` trên mọi yêu cầu (`src/shared/api/client.ts`); kiểm thử đầu-cuối gửi yêu cầu ghi phải tự thêm header này.
@@ -133,9 +142,11 @@ Người dùng tự sao chép `.env.real.example` thành `.env.real`: `DATABASE_
 **Library**: `@nestjs/bullmq`, `bullmq` 6.3, `ioredis`
 
 ### Configuration
+
 `QueueModule`: `BullModule.forRootAsync` lấy `REDIS_HOST`, `REDIS_PORT`. Redis chạy `noeviction` và AOF (`compose.yaml`).
 
 ### Usage Pattern
+
 - Redis chỉ chứa hàng đợi; mọi job phải chạy lại được mà không sinh kết quả kép.
 - Tên hàng đợi là hằng số; một processor cho một hàng đợi.
 - `release-activation` (F-15, `src/features/releases/`): `ReleaseActivationScheduler` đăng ký lịch lặp cron `RELEASE_ACTIVATION_CRON` (00:05) theo `APP_TIME_ZONE` (`Asia/Ho_Chi_Minh`) và một tác vụ lúc khởi động; `ReleaseActivationProcessor` gọi `VersionActivator` chuyển phiên bản `PENDING` đến học kỳ hiệu lực thành `ACTIVE` — idempotent, chạy lại không đổi gì. Khi tắt, worker chờ tác vụ đang chạy tối đa 10 giây rồi `close(true)` (đóng nhẹ treo vô hạn khi Redis chết).
@@ -147,6 +158,7 @@ Người dùng tự sao chép `.env.real.example` thành `.env.real`: `DATABASE_
 **Library**: React 19.3, Vite 8.3, `antd` 6.6, `@tanstack/react-query` 5, `react-router` 8.4, `openapi-typescript` 7.13; `@dnd-kit/core` 6.3.1, `@dnd-kit/sortable` 10.0.0, `@dnd-kit/utilities` 3.2.2 (cố định phiên bản; kéo thả dòng khung bằng chuột và bàn phím, AntD 6 `Table` không có sẵn — D15 của F-07)
 
 ### Usage Pattern
+
 - `getJson<T>(path, acceptedStatuses)` và `sendJson<T>` trong `src/shared/api/client.ts`; mã lỗi khác ném `ApiError` mang `ErrorResponseDto`. 401 `SESSION_REQUIRED` được `queryClient.ts` bắt chung và đặt `me` về `null`.
 - Sau khi máy chủ đổi DTO: chạy máy chủ, `pnpm api:types` (đọc `http://localhost:3000/api/docs-json`), đưa `src/shared/api/schema.d.ts` vào git.
 - Thông báo, hộp xác nhận: dùng `App.useApp()` của Ant Design (đã bọc `AntApp` ở `main.tsx`).
@@ -159,6 +171,7 @@ Người dùng tự sao chép `.env.real.example` thành `.env.real`: `DATABASE_
 **Library**: frontend `@tiptap/react`, `@tiptap/starter-kit`, `@tiptap/extension-table`, `@tiptap/pm` 3.31.4 (cố định); backend `sanitize-html` 2.18.0 (+ `@types/sanitize-html`), `@types/multer` 2.3.0 (khai trong `types` của `tsconfig.json`)
 
 ### Usage Pattern
+
 - Trình soạn thảo dùng chung ở `src/shared/components/rich-text/` (`RichTextEditor`, `RichTextToolbar`, `richTextExtensions`): đậm, nghiêng, danh sách, bảng, liên kết.
 - Máy chủ lọc **mọi** văn bản định dạng bằng `sanitizeRichText` (`src/shared/rich-text/`, chính sách `RICH_TEXT_POLICY`, cho phép `rel`, `target` trên `a`) trước khi ghi; `richTextToPlain` khi cần chữ thuần (so sánh, thông báo). Không ghi HTML chưa lọc.
 - Tải lên: `FileInterceptor` của Multer giữ tệp trong bộ nhớ (không truyền `storage`, vì pnpm không cho import `multer` trực tiếp); `FileStorageService` (`src/shared/files/`) ghi dưới `FILES_ROOT` với đường dẫn tương đối dùng `/`; `uploadedFileName` sửa tên tệp UTF-8; `sendFile` trả tệp kèm `Content-Disposition`. Quá `ATTACHMENT_MAX_MB` → 413 `PAYLOAD_TOO_LARGE`.
@@ -167,16 +180,17 @@ Người dùng tự sao chép `.env.real.example` thành `.env.real`: `DATABASE_
 
 ## 8. Kiểm thử
 
-| Dự án | Công cụ | Lệnh |
-|---|---|---|
-| backend, đơn vị | Vitest | `pnpm test` |
-| backend, đầu-cuối | Vitest + Supertest + Testcontainers (`postgres:18`, `redis:8`) | `pnpm test:e2e` — cần Docker |
-| frontend | Vitest + React Testing Library, jsdom | `pnpm test` |
+| Dự án                     | Công cụ                                                                               | Lệnh                                                                                                                |
+| ------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| backend, đơn vị           | Vitest                                                                                | `pnpm test`                                                                                                         |
+| backend, đầu-cuối         | Vitest + Supertest + Testcontainers (`postgres:18`, `redis:8`)                        | `pnpm test:e2e` — cần Docker                                                                                        |
+| frontend                  | Vitest + React Testing Library, jsdom                                                 | `pnpm test`                                                                                                         |
 | `source/e2e`, trình duyệt | Playwright; dự án pnpm độc lập thứ ba, `package.json`, lockfile, `node_modules` riêng | Tại `source/e2e`: `pnpm typecheck`; chạy một spec: `pnpm exec playwright test specs/<file>.spec.ts --reporter=list` |
 
 Playwright chạy trên app dev đang hoạt động, có demo seed: backend `http://localhost:3000/api`, frontend `http://localhost:5173`; không thay thế kiểm thử Testcontainers. Auth setup một lần cho mỗi vai R1..R6 (+R3b, R4b, R5b), lưu phiên qua `storageState`. Chỉ mục ca kiểm thử: `docs/testing/test-cases/README.md`; cài đặt và cách chạy: `docs/testing/playwright-guide.md`.
 
 ### Usage Pattern
+
 - Kiểm thử đầu-cuối tạo cơ sở dữ liệu ICU `vi-VN` qua `test/containers.ts`; kiểm thử mới dùng lại hàm ở đó.
 - Một PostgreSQL và một Redis cho cả lượt chạy (`test/global-setup.ts`, `globalSetup` của Vitest): migrate một lần vào cơ sở dữ liệu mẫu, mỗi tệp spec nhận cơ sở dữ liệu riêng chép từ mẫu; `test/test-env.ts` đặt biến môi trường (kể cả `FILES_ROOT` tạm cho từng tệp). Fixture dùng chung ở `test/fixtures/`; bảng quyền theo tuyến ở `test/permission-table.ts` — thêm dòng cho mỗi tuyến mới.
 - Kiểm thử giao diện giả `fetch` bằng `vi.stubGlobal` và bọc `QueryClientProvider` với `retry: false` (mẫu: `HealthPage.test.tsx`).
@@ -199,3 +213,9 @@ oxlint (`pnpm lint`; máy chủ bật `--type-aware`, lời hứa bị bỏ quê
 - Mẫu mặc định dùng nhãn SRS 4.3, chưa xác nhận tệp Excel thật của Khoa. Giữ tên cột ở SheetSpec; header sai tạo batch ABORTED/report và trả HTTP 201, không đổi thành HTTP 400. Content-Disposition giữ tên UTF-8 để tải lại không hỏng tiếng Việt.
 - Client dùng sendForm/downloadFile hiện có; không tự đặt multipart Content-Type để browser gắn boundary. Playwright tải mẫu/bản xuất từ app, không thêm thư viện sửa XLSX; round trip sang bản sao được backend e2e chuẩn bị metadata khớp đích.
 - Queue imports dùng chung BULLMQ_PREFIX; shutdown phải force-close cả worker và backend queue sau grace tối đa 10 giây, trước hook close của Nest, để Redis QUIT không treo khi Redis đã dừng.
+
+## 11. Số thập phân tỷ trọng (F-12)
+
+- API truyền tỷ trọng, ngưỡng và điểm liệt dạng chuỗi thập phân (`toWireDecimal`), không dùng số JSON.
+- Frontend (`features/syllabi/utils/gradeFormulaValues.ts`) cộng tỷ trọng theo phần trăm nguyên (hundredths) để tổng 100 chính xác, nhận dấu phẩy khi nhập và gửi chuỗi chuẩn hóa; không thêm thư viện.
+- Form tải lại từ máy chủ dùng khóa dựng lại gắn với `updatedAt` (`hooks/useEditorRemountKey.ts`): chỉ dựng lại khi trình sửa chưa có dữ liệu nhập.

@@ -11,6 +11,7 @@ import { PrismaService } from '../../shared/prisma/prisma.service.js';
 import { newestVersionsContainingCourse } from '../../shared/releases/fan-out-targets.js';
 import {
   collectSyllabusIssues,
+  PUBLISHABLE_SYLLABUS_SELECT,
   syllabusPublishIssues,
 } from '../../shared/releases/syllabus-release-issues.js';
 import { countDroppedLinks } from '../../shared/releases/version.publisher.js';
@@ -24,6 +25,7 @@ import type {
   FinalApprovalProgramDto,
   FinalApprovalPreviewDto,
 } from './final-approval.dto.js';
+import { hasGradingChanges } from './grading-changes.js';
 
 // What the academic office is shown before it decides. Advisory: the approval repeats every check in its transaction.
 @Injectable()
@@ -40,7 +42,9 @@ export class FinalApprovalPreviewReader {
       requestId: request.id,
       requestCode: request.requestCode,
       stale: await this.stale.isStale(this.prisma, request),
-      canAllowPastSemester: request.createdByAcademicOffice,
+      canAllowPastSemester:
+        request.createdByAcademicOffice &&
+        !(await hasGradingChanges(this.prisma, request.id)),
     };
     if (workspace === WORKSPACE_KIND.PROGRAM_VERSION) {
       const affected = await this.programCopy(request);
@@ -110,6 +114,7 @@ export class FinalApprovalPreviewReader {
     const courseId = request.courseId!;
     const copy = await this.prisma.syllabus.findUniqueOrThrow({
       where: { sourceRequestId: request.id },
+      select: PUBLISHABLE_SYLLABUS_SELECT,
     });
     const targets = await newestVersionsContainingCourse(this.prisma, courseId);
     const affected: FinalApprovalProgramDto[] = [];

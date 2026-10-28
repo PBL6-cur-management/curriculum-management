@@ -23,12 +23,16 @@ describe('readPrefill', () => {
     });
   });
 
-  it('ignores an unknown, unsupported or missing type', () => {
-    expect(
-      readPrefill(params('type=NOPE&targetType=COURSE&targetId=c1')),
-    ).toEqual({});
+  it('reads the grading formula type, and still rejects an unknown or missing one', () => {
     expect(
       readPrefill(params('type=GRADING_FORMULA&targetType=COURSE&targetId=c1')),
+    ).toEqual({
+      requestType: 'GRADING_FORMULA',
+      targetType: 'COURSE',
+      targetId: 'c1',
+    });
+    expect(
+      readPrefill(params('type=NOPE&targetType=COURSE&targetId=c1')),
     ).toEqual({});
     expect(readPrefill(params(''))).toEqual({});
     expect(

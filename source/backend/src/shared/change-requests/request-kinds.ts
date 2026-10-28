@@ -36,7 +36,10 @@ export function workspaceKindFor(
   ) {
     return WORKSPACE_KIND.PROGRAM_VERSION;
   }
-  if (type === ChangeRequestType.SYLLABUS_CONTENT) {
+  if (
+    type === ChangeRequestType.SYLLABUS_CONTENT ||
+    type === ChangeRequestType.GRADING_FORMULA
+  ) {
     return WORKSPACE_KIND.SYLLABUS;
   }
   if (type === ChangeRequestType.OUTCOME) {
@@ -70,7 +73,7 @@ export function editPermissionsFor(
     case ChangeRequestType.ORGANIZATION:
       return [PERMISSIONS.CHANGE_REQUEST_CREATE_ORGANIZATIONAL];
     case ChangeRequestType.GRADING_FORMULA:
-      return [];
+      return [PERMISSIONS.GRADING_FORMULA_EDIT];
   }
 }
 

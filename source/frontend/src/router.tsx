@@ -4,6 +4,7 @@ import { LoginPage } from './features/auth/pages/LoginPage';
 import { ROUTES } from './routes';
 import { RequireAuth } from './shared/auth/RequireAuth';
 import { AppLayout } from './shared/layout/AppLayout';
+import { RequireAnyPermission } from './shared/auth/RequireAnyPermission';
 import { RequirePermission } from './shared/auth/RequirePermission';
 import { PERMISSIONS } from './shared/auth/permissions';
 
@@ -369,9 +370,15 @@ export const router = createBrowserRouter([
           {
             path: ROUTES.syllabusEdit,
             element: (
-              <RequirePermission code={PERMISSIONS.syllabusEdit}>
+              <RequireAnyPermission
+                codes={[
+                  PERMISSIONS.syllabusEdit,
+                  PERMISSIONS.cloEdit,
+                  PERMISSIONS.gradingFormulaEdit,
+                ]}
+              >
                 <SyllabusEditorPage />
-              </RequirePermission>
+              </RequireAnyPermission>
             ),
           },
           {

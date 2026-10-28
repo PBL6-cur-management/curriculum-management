@@ -21,6 +21,7 @@ export const PERMISSIONS = {
   directorAssign: 'director.assign',
   syllabusView: 'syllabus.view',
   syllabusEdit: 'syllabus.edit',
+  gradingFormulaEdit: 'gradingFormula.edit',
   outcomeView: 'outcome.view',
   ploEdit: 'plo.edit',
   cloEdit: 'clo.edit',

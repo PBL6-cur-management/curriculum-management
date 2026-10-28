@@ -58,10 +58,25 @@ export async function selectComparisonOption(
 ) {
   await control.click();
   await control.fill(label);
-  const dropdown = page.locator(".ant-select-dropdown:visible");
+  await expect(control).toHaveAttribute("aria-expanded", "true");
+  const listId =
+    (await control.getAttribute("aria-controls")) ??
+    (await control.getAttribute("aria-owns"));
+  if (!listId) throw new Error(`Không tìm thấy listbox của Select: ${label}`);
+  const dropdown = page.locator(".ant-select-dropdown").filter({
+    has: page.locator(`[id=${JSON.stringify(listId)}]`),
+  });
   await expect(dropdown).toBeVisible();
   await dropdown.getByText(label, { exact: true }).click();
-  await control.press("Tab");
+  const select = control.locator(
+    `xpath=ancestor::div[contains(concat(' ', normalize-space(@class), ' '), ' ant-select ')][1]`,
+  );
+  if ((await select.getAttribute("class"))?.includes("ant-select-multiple")) {
+    await expect(select.getByTitle(label, { exact: true })).toBeVisible();
+  }
+  if ((await control.getAttribute("aria-expanded")) === "true") {
+    await control.press("Escape");
+  }
   await expect(control).toHaveAttribute("aria-expanded", "false");
 }
 export async function scheduleFor(page: Page, programId: string) {

@@ -12,6 +12,12 @@ interface FinalApprovalPreviewProps {
 const CONDITION_LABELS: Record<string, string> = {
   COURSE_DESCRIPTION_EMPTY: 'chưa có mô tả học phần',
   OBJECTIVES_EMPTY: 'chưa có mục tiêu học phần',
+  ASSESSMENT_FORMULA_EMPTY: 'chưa khai báo công thức điểm',
+  ASSESSMENT_WEIGHT_TOTAL_INVALID: 'tổng trọng số phải bằng 100%',
+  ASSESSMENT_COMPONENT_INVALID: 'có thành phần đánh giá chưa hợp lệ',
+  ASSESSMENT_CONDITION_THRESHOLD_REQUIRED:
+    'thành phần điều kiện chưa có ngưỡng',
+  ASSESSMENT_CLO_UNCOVERED: 'còn CLO chưa được đánh giá',
 };
 const SYLLABUS_ISSUE_LABELS: Record<
   FinalApprovalProgram['syllabusIssues'][number]['code'],
