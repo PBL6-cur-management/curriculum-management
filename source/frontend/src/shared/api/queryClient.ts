@@ -11,6 +11,8 @@ export const queryClient: QueryClient = new QueryClient({
   mutationCache: new MutationCache({ onError: handleSessionError }),
   defaultOptions: {
     queries: {
+      staleTime: 30_000,
+      refetchOnWindowFocus: false,
       retry: (failureCount, error) =>
         !(error instanceof ApiError && error.status < FIRST_SERVER_ERROR) &&
         failureCount < MAX_QUERY_RETRIES,

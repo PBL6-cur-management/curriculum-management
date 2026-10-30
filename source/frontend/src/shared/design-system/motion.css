@@ -1,94 +1,46 @@
-/* =============================================================================
-   Motion Rules — Emil Kowalski Design Engineering
-   Import này được thêm vào main.tsx và áp dụng toàn cục.
-   
-   Nguyên tắc:
-   - Tất cả animations ≤ 300ms
-   - Chỉ animate transform + opacity (GPU-accelerated)
-   - Entrance: ease-out (snappy) | Exit: ease-in (intentional)
-   - Scale entrances: không từ scale(0), dùng scale(0.93) trở lên
-   - prefers-reduced-motion luôn được tôn trọng
-   ============================================================================= */
+/* Global browser surfaces + motion.
+   Không gắn keyframe lên component AntD: AntD đã có motion riêng, chồng thêm sẽ chạy hai lần (lỗi "nháy 2 lần").
+   Motion của component cấu hình qua token motion* trong theme.ts. */
 
-/* ── Button: tactile press feedback ────────────────────────────────────────── */
-.ant-btn:active {
-  transform: scale(0.97);
-  transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 0.1s ease;
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* Icon buttons: more pronounced */
-.ant-btn-icon-only:active,
-.ant-btn-circle:active {
-  transform: scale(0.9);
+body {
+  margin: 0;
+  background: var(--ctdt-color-bg-layout);
+  color: var(--ctdt-color-text);
+  font-family: var(--ctdt-font-family);
 }
 
-/* ── Modal: spring entrance from scale(0.95) ─────────────────────────────── */
-.ant-modal-content {
-  animation: ctdt-modal-enter 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+::selection {
+  background: color-mix(in oklab, var(--ctdt-color-primary) 22%, transparent);
+  color: inherit;
 }
 
-@keyframes ctdt-modal-enter {
-  from {
-    transform: scale(0.95) translateY(-8px);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1) translateY(0);
-    opacity: 1;
-  }
+:focus-visible {
+  outline: 2px solid var(--ctdt-color-primary);
+  outline-offset: 2px;
 }
 
-/* ── Drawer: smooth slide ────────────────────────────────────────────────── */
-.ant-drawer-content-wrapper {
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+a {
+  text-underline-offset: 3px;
 }
 
-/* ── Dropdown / Select dropdown: scale entrance ─────────────────────────── */
-.ant-select-dropdown,
-.ant-dropdown-menu {
-  animation: ctdt-dropdown-enter 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-  transform-origin: top center;
+/* Số liệu trong bảng thẳng cột. */
+.ant-table,
+.ant-statistic,
+.ant-descriptions,
+.tabular {
+  font-variant-numeric: tabular-nums;
 }
 
-@keyframes ctdt-dropdown-enter {
-  from {
-    transform: scale(0.95) translateY(-4px);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1) translateY(0);
-    opacity: 1;
-  }
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ctdt-color-border) transparent;
 }
 
-/* ── Tooltip: fade in (small elements) ──────────────────────────────────── */
-.ant-tooltip {
-  animation: ctdt-tooltip-enter 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes ctdt-tooltip-enter {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* ── Card hover: subtle elevation ────────────────────────────────────────── */
-.ant-card-hoverable {
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.2s ease;
-}
-
-.ant-card-hoverable:hover {
-  transform: translateY(-2px);
-}
-
-/* ── Reduced motion: respect user preference ─────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

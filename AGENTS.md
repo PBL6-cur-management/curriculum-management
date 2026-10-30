@@ -85,8 +85,7 @@ Luồng chuẩn: `requirement → design → implementation plan → code → te
 
 ## Design System
 
-Trước khi build bất kỳ màn hình FE nào, đọc `source/frontend/src/shared/design-system/DESIGN_SYSTEM.md`.
-Component anatomy, token system và motion rules được định nghĩa tại đó.
+Mọi thay đổi UI đi qua plugin **impeccable** (`.claude/rules/ui-ux-skill.md`). Nguồn hình ảnh: `DESIGN.md`, `PRODUCT.md` ở gốc repo (ghim theo chuandaura.dut.udn.vn). Màn hình mới: `/impeccable shape`; trước PR: `/impeccable polish` + `audit`.
 
 ## Rules áp dụng
 

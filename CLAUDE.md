@@ -49,6 +49,7 @@ Answered in `docs/planning/feature-questions.md` §F-00; the code moves to this 
 | react-vite §4 `const` arrow components | `function Foo()` | F00-06 |
 | react-vite §4 no inline styles | AntD theme tokens + layout components; inline `style` allowed for one-off spacing | F00-07 |
 | — | Primary keys `String @id @default(cuid(2))` | F00-10 |
+| ui-ux / react-vite §4 styling | UI work goes through Impeccable; `DESIGN.md` is the visual source of truth (pinned to chuandaura.dut.udn.vn) | 2026-10-30 |
 
 ## Project knowledge — read before you guess
 
@@ -70,9 +71,10 @@ Answered in `docs/planning/feature-questions.md` §F-00; the code moves to this 
 
 ## Design system
 
-Before building any UI screen, read source/frontend/src/shared/design-system/DESIGN_SYSTEM.md.
-The component anatomy, token system, and motion rules are defined there.
-Use components from src/shared/design-system/ before creating new ones.
+Every UI change goes through the **impeccable** plugin (rule: `.claude/rules/ui-ux-skill.md`).
+Visual truth: `DESIGN.md` + `PRODUCT.md` at the repo root, pinned to the school's outcome system (chuandaura.dut.udn.vn).
+New screen → `/impeccable shape`; before a UI PR → `/impeccable polish` + `/impeccable audit`, detector clean.
+Tokens live in `source/frontend/src/shared/design-system/tokens.ts` → `theme.ts`; components catalog in `DESIGN_SYSTEM.md` there.
 
 ## Before building a feature
 
