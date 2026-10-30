@@ -16,7 +16,7 @@ side; otherwise check both.
 | Step | `source/backend` | `source/frontend` |
 |---|---|---|
 | 1. Type check | `pnpm exec tsc --noEmit -p tsconfig.json` | `pnpm exec tsc -b` |
-| 2. Lint | `pnpm lint` (oxlint, type-aware) | `pnpm lint` (oxlint) |
+| 2. Lint | `pnpm lint` (oxlint, type-aware) | `pnpm lint` (oxlint) + Impeccable detector: `~/.claude/plugins/cache/impeccable/impeccable/*/skills/impeccable/scripts/impeccable detect --json <changed UI files>` |
 | 3. Unit tests | `pnpm test` (Vitest) | `pnpm test` (Vitest + jsdom) |
 | 4. Build (only if asked) | `pnpm build` | `pnpm build` |
 
