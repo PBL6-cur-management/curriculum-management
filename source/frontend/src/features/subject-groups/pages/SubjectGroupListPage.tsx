@@ -19,6 +19,7 @@ import {
   GROUP_STATUS_COLORS,
   GROUP_STATUS_LABELS,
 } from '../constants/subjectGroupLabels';
+import { PageHeader } from '../../../shared/design-system';
 
 export function SubjectGroupListPage() {
   const canManage = useCan(PERMISSIONS.orgUnitManage);
@@ -106,9 +107,9 @@ export function SubjectGroupListPage() {
     return <Result status="error" title="Không tải được nhóm chuyên môn" />;
   return (
     <>
-      <Card
+      <PageHeader
         title="Nhóm chuyên môn"
-        extra={
+        actions={
           canManage && (
             <Button
               type="primary"
@@ -121,7 +122,8 @@ export function SubjectGroupListPage() {
             </Button>
           )
         }
-      >
+      />
+      <Card>
         <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
           <OrgUnitSelect
             types={['FACULTY']}

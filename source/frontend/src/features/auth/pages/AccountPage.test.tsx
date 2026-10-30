@@ -33,7 +33,7 @@ describe('AccountPage', () => {
       vi.fn().mockResolvedValue(new Response(JSON.stringify(account))),
     );
     expect(await screen.findByText('Quản trị')).toBeInTheDocument();
-    expect(screen.getByText('—')).toBeInTheDocument();
+    expect(screen.getByText('Chưa có')).toBeInTheDocument();
   });
   it('shows the forced password-change warning', async () => {
     renderAccount(

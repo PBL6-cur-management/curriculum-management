@@ -1,12 +1,13 @@
 import { ReloadOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { Alert, Button, Card, Descriptions, Spin, Tag } from 'antd';
+import { Alert, Button, Card, Descriptions, Spin, Tag, Flex } from 'antd';
 import {
   type DependencyStatus,
   fetchHealth,
   type Health,
   healthQueryKey,
 } from '../api/health';
+import { PageHeader } from '../../../shared/design-system';
 
 type Dependency = Exclude<keyof Health, 'status'>;
 
@@ -27,43 +28,46 @@ export function HealthPage() {
   });
 
   return (
-    <Card
-      title="Trạng thái hệ thống"
-      extra={
-        <Button
-          icon={<ReloadOutlined />}
-          loading={isFetching}
-          onClick={() => void refetch()}
-        >
-          Kiểm tra lại
-        </Button>
-      }
-    >
-      {isPending ? (
-        <Spin />
-      ) : isError ? (
-        <Alert
-          type="error"
-          showIcon
-          title="Không kết nối được máy chủ ứng dụng"
-        />
-      ) : (
-        <Descriptions
-          bordered
-          column={1}
-          items={(Object.keys(DEPENDENCY_LABELS) as Dependency[]).map(
-            (key) => ({
-              key,
-              label: DEPENDENCY_LABELS[key],
-              children: (
-                <Tag color={STATUS_TAGS[data[key]].color}>
-                  {STATUS_TAGS[data[key]].text}
-                </Tag>
-              ),
-            }),
-          )}
-        />
-      )}
-    </Card>
+    <Flex vertical gap="middle">
+      <PageHeader
+        title="Trạng thái hệ thống"
+        actions={
+          <Button
+            icon={<ReloadOutlined />}
+            loading={isFetching}
+            onClick={() => void refetch()}
+          >
+            Kiểm tra lại
+          </Button>
+        }
+      />
+      <Card>
+        {isPending ? (
+          <Spin />
+        ) : isError ? (
+          <Alert
+            type="error"
+            showIcon
+            title="Không kết nối được máy chủ ứng dụng"
+          />
+        ) : (
+          <Descriptions
+            bordered
+            column={1}
+            items={(Object.keys(DEPENDENCY_LABELS) as Dependency[]).map(
+              (key) => ({
+                key,
+                label: DEPENDENCY_LABELS[key],
+                children: (
+                  <Tag color={STATUS_TAGS[data[key]].color}>
+                    {STATUS_TAGS[data[key]].text}
+                  </Tag>
+                ),
+              }),
+            )}
+          />
+        )}
+      </Card>
+    </Flex>
   );
 }
