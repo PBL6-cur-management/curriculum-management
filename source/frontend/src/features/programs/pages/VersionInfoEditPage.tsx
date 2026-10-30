@@ -11,6 +11,8 @@ import {
   Skeleton,
   Space,
   Typography,
+  Col,
+  Row,
 } from 'antd';
 import { generatePath, Link, useNavigate, useParams } from 'react-router';
 import { ROUTES } from '../../../routes';
@@ -85,68 +87,91 @@ export function VersionInfoEditPage() {
           form={form}
           layout="vertical"
           onFinish={onFinish}
-          style={{ maxWidth: 640 }}
+          style={{ maxWidth: 800 }}
         >
-          <Form.Item
-            name="programName"
-            label="Tên chương trình"
-            rules={PROGRAM_RULES.programName}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="majorCode"
-            label="Mã ngành"
-            rules={PROGRAM_RULES.majorCode}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="majorName"
-            label="Tên ngành"
-            rules={PROGRAM_RULES.majorName}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="semesterCount"
-            label="Số học kỳ"
-            rules={PROGRAM_RULES.semesterCount}
-          >
-            <InputNumber
-              min={SEMESTERS_MIN}
-              max={SEMESTERS_MAX}
-              precision={0}
-            />
-          </Form.Item>
-          <Form.Item
-            name="totalCredits"
-            label="Tổng số tín chỉ"
-            rules={PROGRAM_RULES.totalCredits}
-          >
-            <Input inputMode="decimal" />
-          </Form.Item>
-          <Form.Item
-            name="compulsoryCredits"
-            label="Tín chỉ bắt buộc"
-            rules={PROGRAM_RULES.compulsoryCredits}
-          >
-            <Input inputMode="decimal" />
-          </Form.Item>
-          <Form.Item
-            name="electiveCredits"
-            label="Tín chỉ tự chọn"
-            rules={PROGRAM_RULES.electiveCredits}
-            extra={
-              <CreditsGapHint
-                total={total}
-                compulsory={compulsory}
-                elective={elective}
-              />
-            }
-          >
-            <Input inputMode="decimal" />
-          </Form.Item>
+          <Typography.Title level={5}>Định danh</Typography.Title>
+          <Row gutter={16}>
+            <Col xs={24} md={16}>
+              <Form.Item
+                name="programName"
+                label="Tên chương trình"
+                rules={PROGRAM_RULES.programName}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={8}>
+              <Form.Item
+                name="semesterCount"
+                label="Số học kỳ"
+                rules={PROGRAM_RULES.semesterCount}
+              >
+                <InputNumber
+                  min={SEMESTERS_MIN}
+                  max={SEMESTERS_MAX}
+                  precision={0}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Typography.Title level={5}>Ngành</Typography.Title>
+          <Row gutter={16}>
+            <Col xs={24} md={8}>
+              <Form.Item
+                name="majorCode"
+                label="Mã ngành"
+                rules={PROGRAM_RULES.majorCode}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={16}>
+              <Form.Item
+                name="majorName"
+                label="Tên ngành"
+                rules={PROGRAM_RULES.majorName}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Typography.Title level={5}>Tín chỉ</Typography.Title>
+          <Row gutter={16}>
+            <Col xs={24} md={8}>
+              <Form.Item
+                name="totalCredits"
+                label="Tổng số tín chỉ"
+                rules={PROGRAM_RULES.totalCredits}
+              >
+                <Input inputMode="decimal" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={8}>
+              <Form.Item
+                name="compulsoryCredits"
+                label="Tín chỉ bắt buộc"
+                rules={PROGRAM_RULES.compulsoryCredits}
+              >
+                <Input inputMode="decimal" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={8}>
+              <Form.Item
+                name="electiveCredits"
+                label="Tín chỉ tự chọn"
+                rules={PROGRAM_RULES.electiveCredits}
+                extra={
+                  <CreditsGapHint
+                    total={total}
+                    compulsory={compulsory}
+                    elective={elective}
+                  />
+                }
+              >
+                <Input inputMode="decimal" />
+              </Form.Item>
+            </Col>
+          </Row>
           <Space>
             <Button type="primary" htmlType="submit" loading={update.isPending}>
               Lưu
