@@ -45,7 +45,7 @@ describe('VersionHistoryPage (MH-46)', () => {
     expect(router.state.location.search).toBe(
       '?beforeVersionId=v1&afterVersionId=v2',
     );
-    fireEvent.click(screen.getByRole('link', { name: '← Lịch sử phiên bản' }));
+    fireEvent.click(screen.getByRole('link', { name: 'Lịch sử phiên bản' }));
     await screen.findByRole('heading', { name: 'Lịch sử phiên bản' });
     expect(router.state.location.pathname).toBe('/programs/p1/versions');
     expect(writes).toEqual([]);

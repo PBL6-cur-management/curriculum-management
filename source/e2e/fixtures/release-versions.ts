@@ -90,6 +90,7 @@ export async function openFinalApproval(page: Page, request: RequestRecord) {
 export async function attachPublishedFile(page: Page, program: ReleaseProgram, file: { name: string; mimeType: string; buffer: Buffer }) {
   await page.goto(`${program.course.path}/syllabus?versionId=${program.versionId}`);
   const section = syllabusSection(page, 'Tệp đính kèm');
+  await chooseOption(page, section.getByRole('combobox', { name: 'Loại tài liệu' }), 'Đề cương đã ký');
   await section.locator('input[type=file]').setInputFiles(file);
   await expect(attachmentRow(page, file.name)).toBeVisible();
 }

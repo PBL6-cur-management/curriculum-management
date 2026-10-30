@@ -1,4 +1,4 @@
-import { App, Alert, Flex, Result, Skeleton, Space, Typography } from 'antd';
+import { App, Alert, Flex, Result, Typography } from 'antd';
 import { generatePath, Link, useNavigate, useParams } from 'react-router';
 import { ROUTES } from '../../../routes';
 import { ApiError } from '../../../shared/api/client';
@@ -10,6 +10,11 @@ import {
   useIssueCorrection,
   useVersionDetail,
 } from '../hooks/useReleases';
+import {
+  BackLink,
+  PageHeader,
+  PageSkeleton,
+} from '../../../shared/design-system';
 
 // MH-49 (US-076): R1 edits a correction Draft through the ordinary screens (they take the Draft's own version id),
 // then issues it with a reason. Opening the page never creates a Draft: the button on the version does, once.
@@ -20,7 +25,7 @@ export function CorrectionPage() {
   const draft = useVersionDetail(programId, correctionId);
   const issue = useIssueCorrection(programId, versionId, correctionId);
   const discard = useDiscardCorrection(programId, versionId, correctionId);
-  if (draft.isPending) return <Skeleton active />;
+  if (draft.isPending) return <PageSkeleton />;
   if (!draft.data) {
     const refused =
       draft.error instanceof ApiError && draft.error.status === 403;
@@ -46,19 +51,24 @@ export function CorrectionPage() {
   const back = generatePath(ROUTES.versionDetail, { programId, versionId });
   return (
     <Flex vertical gap="middle">
-      <Link to={back}>
-        ← Phiên bản{' '}
+      <BackLink to={back}>
+        Phiên bản{' '}
         {versionLabel(draft.data.correctionOf ?? { versionNumber: null })}
-      </Link>
-      <Typography.Title level={2} style={{ margin: 0 }}>
-        Ban hành đính chính
-      </Typography.Title>
+      </BackLink>
+      <PageHeader title="Ban hành đính chính" />
       <Alert
         type="info"
         showIcon
         title="Sửa bản nháp đính chính ở các màn hình dưới đây, rồi ban hành. Phiên bản gốc không bị sửa tại chỗ."
       />
-      <Space wrap>
+      <Flex
+        component="nav"
+        aria-label="Sửa bản nháp"
+        wrap
+        gap="small"
+        align="center"
+      >
+        <Typography.Text type="secondary">Sửa:</Typography.Text>
         <Link to={generatePath(ROUTES.programVersionInfo, params)}>
           Thông tin chương trình
         </Link>
@@ -69,8 +79,7 @@ export function CorrectionPage() {
         <Link to={generatePath(ROUTES.consistency, params)}>
           Kiểm tra nhất quán
         </Link>
-      </Space>
-      <FrozenRowsTable rows={draft.data.rows} versionId={correctionId} />
+      </Flex>
       <CorrectionIssueForm
         issuing={issue.isPending}
         discarding={discard.isPending}
@@ -100,6 +109,7 @@ export function CorrectionPage() {
           )
         }
       />
+      <FrozenRowsTable rows={draft.data.rows} versionId={correctionId} />
     </Flex>
   );
 }

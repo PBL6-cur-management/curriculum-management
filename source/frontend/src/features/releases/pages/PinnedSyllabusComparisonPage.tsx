@@ -1,5 +1,5 @@
 import { Alert, Skeleton, Typography } from 'antd';
-import { Link, useParams, useSearchParams } from 'react-router';
+import { useParams, useSearchParams } from 'react-router';
 import { DetailPageLayout } from '../../../shared/design-system/DetailPageLayout';
 import { PageHeader } from '../../../shared/design-system/PageHeader';
 import {
@@ -8,6 +8,7 @@ import {
 } from '../components/VersionComparisonSections';
 import { usePinnedSyllabusComparison } from '../hooks/useReleases';
 import { comparisonPath } from '../utils/versionComparison';
+import { BackLink } from '../../../shared/design-system';
 
 export function PinnedSyllabusComparisonPage() {
   const { programId = '', courseId = '' } = useParams();
@@ -17,9 +18,9 @@ export function PinnedSyllabusComparisonPage() {
   const query = usePinnedSyllabusComparison(programId, courseId, before, after);
   return (
     <DetailPageLayout>
-      <Link to={comparisonPath(programId, before, after)}>
-        ← So sánh phiên bản
-      </Link>
+      <BackLink to={comparisonPath(programId, before, after)}>
+        So sánh phiên bản
+      </BackLink>
       <PageHeader title="Khác biệt đề cương đã ghim" />
       {!before || !after ? (
         <Alert type="info" title="Chọn hai phiên bản đã ban hành để so sánh." />

@@ -178,7 +178,7 @@ test.describe("F-16 So sánh và gán phiên bản", () => {
       "Bản sau: đề cương lần",
     );
     await main
-      .getByRole("link", { name: "← So sánh phiên bản", exact: true })
+      .getByRole("link", { name: "So sánh phiên bản", exact: true })
       .click();
     await expect(page).toHaveURL(
       new RegExp(`/version-comparison\\?${data.pair}$`),

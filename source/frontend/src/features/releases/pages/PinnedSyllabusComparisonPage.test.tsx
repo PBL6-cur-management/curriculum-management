@@ -24,7 +24,7 @@ describe('PinnedSyllabusComparisonPage', () => {
     ).toBeInTheDocument();
     expect(screen.getAllByText('Không thay đổi')).toHaveLength(3);
     expect(
-      screen.getByRole('link', { name: '← So sánh phiên bản' }),
+      screen.getByRole('link', { name: 'So sánh phiên bản' }),
     ).toHaveAttribute(
       'href',
       '/programs/p1/version-comparison?beforeVersionId=v1&afterVersionId=v2',

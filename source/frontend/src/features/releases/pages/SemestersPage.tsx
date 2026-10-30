@@ -1,5 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Card, Flex, Result, Table, Typography } from 'antd';
+import { Button, Card, Flex, Result, Table } from 'antd';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { ROUTES } from '../../../routes';
@@ -14,6 +14,7 @@ import {
 import { CohortForm } from '../components/CohortForm';
 import { SemesterForm } from '../components/SemesterForm';
 import { formatDay } from '../utils/format';
+import { PageHeader } from '../../../shared/design-system';
 
 type SemesterDialog = { semester?: Semester } | null;
 type CohortDialog = { cohort?: Cohort } | null;
@@ -30,14 +31,16 @@ export function SemestersPage() {
     return <Result status="403" title="Bạn không có quyền xem màn hình này" />;
   return (
     <Flex vertical gap="large">
-      <Typography.Title level={2} style={{ margin: 0 }}>
-        Học kỳ và khóa tuyển sinh
-      </Typography.Title>
-      {canAssign && (
-        <Link to={ROUTES.cohortVersionAssignmentStart}>
-          Gán phiên bản cho khóa
-        </Link>
-      )}
+      <PageHeader
+        title="Học kỳ và khóa tuyển sinh"
+        actions={
+          canAssign && (
+            <Link to={ROUTES.cohortVersionAssignmentStart}>
+              <Button type="primary">Gán phiên bản cho khóa</Button>
+            </Link>
+          )
+        }
+      />
       <Card
         title="Học kỳ"
         extra={
