@@ -97,6 +97,11 @@ export const APP_MENU: readonly AppMenuItem[] = [
     ],
   },
   {
+    path: ROUTES.schoolSync,
+    label: 'Đồng bộ CSDL Trường',
+    permission: PERMISSIONS.syncConfigure,
+  },
+  {
     path: ROUTES.subjectGroups,
     label: 'Nhóm chuyên môn',
     permission: PERMISSIONS.subjectGroupView,

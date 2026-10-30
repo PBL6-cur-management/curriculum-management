@@ -166,6 +166,7 @@ enum NotificationType {
   REQUEST_COMMENTED
   REQUEST_EFFECTIVE
   GRADUATION_CONCLUSION_CHANGED
+  SCHOOL_SYNC_FAILED
 }
 
 enum NotificationReadStatus {
@@ -202,8 +203,9 @@ model OrgUnit {
 }
 
 model User {
-  graduationAudits GraduationAudit[] @relation("GraduationReviewer")
-  graduationBatches GraduationBatch[] @relation("GraduationBatchRequester")
+  requestedSchoolSyncRuns   SyncLog[]                   @relation("SchoolSyncRequester")
+  graduationAudits          GraduationAudit[]           @relation("GraduationReviewer")
+  graduationBatches         GraduationBatch[]           @relation("GraduationBatchRequester")
   student                   Student?                    @relation("StudentAccount")
   createdEnrollments        ProgramEnrollment[]         @relation("EnrollmentCreator")
   importBatches             ImportBatch[]               @relation("ImportBatchPerformedBy")
@@ -260,6 +262,7 @@ model SubjectGroup {
 }
 
 model Course {
+  schoolClasses        SchoolClassMirror[]
   academicResults      AcademicResult[]
   id                   String                 @id @default(cuid(2))
   courseCode           String                 @unique
@@ -344,24 +347,24 @@ model SubjectGroupMember {
 }
 
 model Program {
-  graduationContexts GraduationAuditContext[]
+  graduationContexts   GraduationAuditContext[]
   graduationBatchItems GraduationBatchItem[]
-  enrollments    ProgramEnrollment[]
-  importBatches  ImportBatch[]               @relation("ImportBatchProgram")
-  id             String                      @id @default(cuid(2))
-  programCode    String                      @unique
-  facultyId      String
-  faculty        OrgUnit                     @relation("ProgramFaculty", fields: [facultyId], references: [id], onDelete: Restrict)
-  degreeLevel    DegreeLevel
-  status         ProgramStatus               @default(ACTIVE)
-  clonedFromId   String?
-  clonedFrom     ProgramVersion?             @relation("ProgramClonedFrom", fields: [clonedFromId], references: [id], onDelete: Restrict)
-  versions       ProgramVersion[]            @relation("ProgramVersions")
-  directors      ProgramDirectorAssignment[]
-  changeRequests ChangeRequest[]
-  approvalSteps  ApprovalStep[]
-  createdAt      DateTime                    @default(now())
-  updatedAt      DateTime                    @updatedAt
+  enrollments          ProgramEnrollment[]
+  importBatches        ImportBatch[]               @relation("ImportBatchProgram")
+  id                   String                      @id @default(cuid(2))
+  programCode          String                      @unique
+  facultyId            String
+  faculty              OrgUnit                     @relation("ProgramFaculty", fields: [facultyId], references: [id], onDelete: Restrict)
+  degreeLevel          DegreeLevel
+  status               ProgramStatus               @default(ACTIVE)
+  clonedFromId         String?
+  clonedFrom           ProgramVersion?             @relation("ProgramClonedFrom", fields: [clonedFromId], references: [id], onDelete: Restrict)
+  versions             ProgramVersion[]            @relation("ProgramVersions")
+  directors            ProgramDirectorAssignment[]
+  changeRequests       ChangeRequest[]
+  approvalSteps        ApprovalStep[]
+  createdAt            DateTime                    @default(now())
+  updatedAt            DateTime                    @updatedAt
 
   @@index([facultyId])
 }
@@ -370,7 +373,7 @@ model Program {
 // Two partial unique indexes are added by hand in the migration (not modelled by Prisma): see database_and_models.md.
 // A row with sourceRequestId is the working copy of a change request (F-13), not a version of the program.
 model ProgramVersion {
-  graduationAudits GraduationAudit[]
+  graduationAudits            GraduationAudit[]
   enrollmentsApplied          ProgramEnrollment[]  @relation("EnrollmentAppliedVersion")
   enrollmentsAdmitted         ProgramEnrollment[]  @relation("EnrollmentAdmissionVersion")
   importBatches               ImportBatch[]        @relation("ImportBatchVersion")
@@ -466,23 +469,24 @@ model ImportBatchFile {
 }
 
 model Semester {
-  graduationContexts GraduationAuditContext[]
-  graduationBatchItems GraduationBatchItem[]
-  admittedStudents       Student[]           @relation("StudentAdmissionSemester")
-  statusStudents         Student[]           @relation("StudentStatusSemester")
-  enrollmentsFrom        ProgramEnrollment[] @relation("EnrollmentFromSemester")
-  enrollmentsUntil       ProgramEnrollment[] @relation("EnrollmentUntilSemester")
+  schoolClasses          SchoolClassMirror[]
+  graduationContexts     GraduationAuditContext[]
+  graduationBatchItems   GraduationBatchItem[]
+  admittedStudents       Student[]                @relation("StudentAdmissionSemester")
+  statusStudents         Student[]                @relation("StudentStatusSemester")
+  enrollmentsFrom        ProgramEnrollment[]      @relation("EnrollmentFromSemester")
+  enrollmentsUntil       ProgramEnrollment[]      @relation("EnrollmentUntilSemester")
   academicResults        AcademicResult[]
-  id                     String              @id @default(cuid(2))
-  semesterCode           String              @unique
+  id                     String                   @id @default(cuid(2))
+  semesterCode           String                   @unique
   academicYear           String
   termInYear             Int
-  startDate              DateTime?           @db.Date
-  effectiveVersions      ProgramVersion[]    @relation("EffectiveSemester")
-  effectiveRequests      ChangeRequest[]     @relation("RequestEffectiveSemester")
-  startingCohortVersions CohortVersion[]     @relation("CohortStartSemester")
-  createdAt              DateTime            @default(now())
-  updatedAt              DateTime            @updatedAt
+  startDate              DateTime?                @db.Date
+  effectiveVersions      ProgramVersion[]         @relation("EffectiveSemester")
+  effectiveRequests      ChangeRequest[]          @relation("RequestEffectiveSemester")
+  startingCohortVersions CohortVersion[]          @relation("CohortStartSemester")
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
 
   @@unique([academicYear, termInYear])
 }
@@ -1071,62 +1075,62 @@ enum AcademicResultStatus {
 }
 
 model Student {
-  graduationContexts GraduationAuditContext[]
+  graduationContexts   GraduationAuditContext[]
   graduationBatchItems GraduationBatchItem[]
-  id                  String              @id @default(cuid(2))
-  studentCode         String              @unique
-  fullName            String
-  cohortId            String
-  cohort              Cohort              @relation(fields: [cohortId], references: [id], onDelete: Restrict)
-  admissionSemesterId String
-  admissionSemester   Semester            @relation("StudentAdmissionSemester", fields: [admissionSemesterId], references: [id], onDelete: Restrict)
-  statusSemesterId    String
-  statusSemester      Semester            @relation("StudentStatusSemester", fields: [statusSemesterId], references: [id], onDelete: Restrict)
-  major               String
-  status              StudentStatus       @default(STUDYING)
-  dataSource          StudentDataSource   @default(EXCEL)
-  userId              String?             @unique
-  user                User?               @relation("StudentAccount", fields: [userId], references: [id], onDelete: Restrict)
-  enrollments         ProgramEnrollment[]
-  academicResults     AcademicResult[]
-  createdAt           DateTime            @default(now())
-  updatedAt           DateTime            @updatedAt
+  id                   String                   @id @default(cuid(2))
+  studentCode          String                   @unique
+  fullName             String
+  cohortId             String
+  cohort               Cohort                   @relation(fields: [cohortId], references: [id], onDelete: Restrict)
+  admissionSemesterId  String
+  admissionSemester    Semester                 @relation("StudentAdmissionSemester", fields: [admissionSemesterId], references: [id], onDelete: Restrict)
+  statusSemesterId     String
+  statusSemester       Semester                 @relation("StudentStatusSemester", fields: [statusSemesterId], references: [id], onDelete: Restrict)
+  major                String
+  status               StudentStatus            @default(STUDYING)
+  dataSource           StudentDataSource        @default(EXCEL)
+  userId               String?                  @unique
+  user                 User?                    @relation("StudentAccount", fields: [userId], references: [id], onDelete: Restrict)
+  enrollments          ProgramEnrollment[]
+  academicResults      AcademicResult[]
+  createdAt            DateTime                 @default(now())
+  updatedAt            DateTime                 @updatedAt
 
   @@index([cohortId, status])
   @@index([fullName, id])
 }
 
 model ProgramEnrollment {
-  graduationAudits GraduationAudit[]
+  graduationAudits     GraduationAudit[]
   graduationBatchItems GraduationBatchItem[]
-  id                   String             @id @default(cuid(2))
+  id                   String                @id @default(cuid(2))
   studentId            String
-  student              Student            @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  student              Student               @relation(fields: [studentId], references: [id], onDelete: Restrict)
   programId            String
-  program              Program            @relation(fields: [programId], references: [id], onDelete: Restrict)
+  program              Program               @relation(fields: [programId], references: [id], onDelete: Restrict)
   cohortId             String
-  cohort               Cohort             @relation(fields: [cohortId], references: [id], onDelete: Restrict)
+  cohort               Cohort                @relation(fields: [cohortId], references: [id], onDelete: Restrict)
   appliedVersionId     String
-  appliedVersion       ProgramVersion     @relation("EnrollmentAppliedVersion", fields: [appliedVersionId], references: [id], onDelete: Restrict)
+  appliedVersion       ProgramVersion        @relation("EnrollmentAppliedVersion", fields: [appliedVersionId], references: [id], onDelete: Restrict)
   admissionVersionId   String
-  admissionVersion     ProgramVersion     @relation("EnrollmentAdmissionVersion", fields: [admissionVersionId], references: [id], onDelete: Restrict)
+  admissionVersion     ProgramVersion        @relation("EnrollmentAdmissionVersion", fields: [admissionVersionId], references: [id], onDelete: Restrict)
   cohortAssignmentId   String?
-  cohortAssignment     CohortVersion?     @relation(fields: [cohortAssignmentId], references: [id], onDelete: Restrict)
+  cohortAssignment     CohortVersion?        @relation(fields: [cohortAssignmentId], references: [id], onDelete: Restrict)
   fromSemesterId       String
-  fromSemester         Semester           @relation("EnrollmentFromSemester", fields: [fromSemesterId], references: [id], onDelete: Restrict)
+  fromSemester         Semester              @relation("EnrollmentFromSemester", fields: [fromSemesterId], references: [id], onDelete: Restrict)
   untilSemesterId      String?
-  untilSemester        Semester?          @relation("EnrollmentUntilSemester", fields: [untilSemesterId], references: [id], onDelete: Restrict)
-  previousEnrollmentId String?            @unique
-  previousEnrollment   ProgramEnrollment? @relation("EnrollmentHistory", fields: [previousEnrollmentId], references: [id], onDelete: Restrict)
-  nextEnrollment       ProgramEnrollment? @relation("EnrollmentHistory")
+  untilSemester        Semester?             @relation("EnrollmentUntilSemester", fields: [untilSemesterId], references: [id], onDelete: Restrict)
+  previousEnrollmentId String?               @unique
+  previousEnrollment   ProgramEnrollment?    @relation("EnrollmentHistory", fields: [previousEnrollmentId], references: [id], onDelete: Restrict)
+  nextEnrollment       ProgramEnrollment?    @relation("EnrollmentHistory")
   enrollmentType       EnrollmentType
-  isException          Boolean            @default(false)
+  isException          Boolean               @default(false)
   basisDecision        String?
-  status               EnrollmentStatus   @default(ACTIVE)
+  status               EnrollmentStatus      @default(ACTIVE)
   createdById          String?
-  createdBy            User?              @relation("EnrollmentCreator", fields: [createdById], references: [id], onDelete: Restrict)
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
+  createdBy            User?                 @relation("EnrollmentCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
 
   @@index([studentId, programId])
   @@index([programId, cohortId, status, isException])
@@ -1156,13 +1160,13 @@ model AcademicResult {
 
 model AcademicResultChange {
   graduationReceipt GraduationResultChangeReceipt?
-  id               String         @id @default(cuid(2))
-  academicResultId String
-  academicResult   AcademicResult @relation(fields: [academicResultId], references: [id], onDelete: Restrict)
-  revision         Int
-  before           Json?
-  after            Json
-  recordedAt       DateTime       @default(now())
+  id                String                         @id @default(cuid(2))
+  academicResultId  String
+  academicResult    AcademicResult                 @relation(fields: [academicResultId], references: [id], onDelete: Restrict)
+  revision          Int
+  before            Json?
+  after             Json
+  recordedAt        DateTime                       @default(now())
 
   @@unique([academicResultId, revision])
   @@index([recordedAt, id])
@@ -1187,11 +1191,13 @@ enum GraduationConclusion {
   ELIGIBLE
   NOT_ELIGIBLE
 }
+
 enum GraduationAuditTrigger {
   STAFF
   BATCH
   RESULT_CHANGE
 }
+
 enum GraduationBatchStatus {
   QUEUED
   RUNNING
@@ -1199,11 +1205,13 @@ enum GraduationBatchStatus {
   COMPLETED_WITH_ERRORS
   FAILED
 }
+
 enum GraduationBatchItemStatus {
   PENDING
   REVIEWED
   ERROR
 }
+
 enum GraduationReauditStatus {
   PENDING
   RUNNING
@@ -1213,38 +1221,38 @@ enum GraduationReauditStatus {
 }
 
 model GraduationAuditContext {
-  id            String   @id @default(cuid(2))
-  studentId     String
-  student       Student  @relation(fields: [studentId], references: [id], onDelete: Restrict)
-  programId     String
-  program       Program  @relation(fields: [programId], references: [id], onDelete: Restrict)
-  semesterId    String
-  semester      Semester @relation(fields: [semesterId], references: [id], onDelete: Restrict)
-  lastAuditId   String?  @unique
-  lastAudit     GraduationAudit? @relation("GraduationContextHead", fields: [lastAuditId], references: [id], onDelete: Restrict)
-  audits        GraduationAudit[] @relation("GraduationContextAudits")
-  reauditTasks  GraduationReauditTask[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String                  @id @default(cuid(2))
+  studentId    String
+  student      Student                 @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  programId    String
+  program      Program                 @relation(fields: [programId], references: [id], onDelete: Restrict)
+  semesterId   String
+  semester     Semester                @relation(fields: [semesterId], references: [id], onDelete: Restrict)
+  lastAuditId  String?                 @unique
+  lastAudit    GraduationAudit?        @relation("GraduationContextHead", fields: [lastAuditId], references: [id], onDelete: Restrict)
+  audits       GraduationAudit[]       @relation("GraduationContextAudits")
+  reauditTasks GraduationReauditTask[]
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
 
   @@unique([studentId, programId, semesterId])
   @@index([studentId])
 }
 
 model GraduationAudit {
-  id               String   @id @default(cuid(2))
+  id               String                  @id @default(cuid(2))
   contextId        String
-  context          GraduationAuditContext @relation("GraduationContextAudits", fields: [contextId], references: [id], onDelete: Restrict)
+  context          GraduationAuditContext  @relation("GraduationContextAudits", fields: [contextId], references: [id], onDelete: Restrict)
   currentFor       GraduationAuditContext? @relation("GraduationContextHead")
   enrollmentId     String
-  enrollment       ProgramEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+  enrollment       ProgramEnrollment       @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
   programVersionId String
-  programVersion   ProgramVersion @relation(fields: [programVersionId], references: [id], onDelete: Restrict)
-  auditedAt        DateTime @default(now())
+  programVersion   ProgramVersion          @relation(fields: [programVersionId], references: [id], onDelete: Restrict)
+  auditedAt        DateTime                @default(now())
   auditedById      String?
-  auditedBy        User? @relation("GraduationReviewer", fields: [auditedById], references: [id], onDelete: Restrict)
+  auditedBy        User?                   @relation("GraduationReviewer", fields: [auditedById], references: [id], onDelete: Restrict)
   trigger          GraduationAuditTrigger
-  operationKey     String @unique
+  operationKey     String                  @unique
   conclusion       GraduationConclusion
   schemaVersion    Int
   ruleVersion      String
@@ -1252,9 +1260,9 @@ model GraduationAudit {
   result           Json
   inputs           Json
   inputDigest      String
-  supersedesId     String? @unique
-  supersedes       GraduationAudit? @relation("GraduationAuditChain", fields: [supersedesId], references: [id], onDelete: Restrict)
-  supersededBy     GraduationAudit? @relation("GraduationAuditChain")
+  supersedesId     String?                 @unique
+  supersedes       GraduationAudit?        @relation("GraduationAuditChain", fields: [supersedesId], references: [id], onDelete: Restrict)
+  supersededBy     GraduationAudit?        @relation("GraduationAuditChain")
   batchItem        GraduationBatchItem?
   baselineTasks    GraduationReauditTask[] @relation("GraduationTaskBaseline")
   completedTasks   GraduationReauditTask[] @relation("GraduationTaskResult")
@@ -1264,9 +1272,9 @@ model GraduationAudit {
 }
 
 model GraduationBatch {
-  id              String @id @default(cuid(2))
+  id              String                @id @default(cuid(2))
   requestedById   String
-  requestedBy     User @relation("GraduationBatchRequester", fields: [requestedById], references: [id], onDelete: Restrict)
+  requestedBy     User                  @relation("GraduationBatchRequester", fields: [requestedById], references: [id], onDelete: Restrict)
   requestKey      String
   filters         Json
   previewRevision String
@@ -1277,7 +1285,7 @@ model GraduationBatch {
   failureCode     String?
   leaseToken      String?
   leaseUntil      DateTime?
-  createdAt       DateTime @default(now())
+  createdAt       DateTime              @default(now())
   startedAt       DateTime?
   finishedAt      DateTime?
   items           GraduationBatchItem[]
@@ -1287,56 +1295,212 @@ model GraduationBatch {
 }
 
 model GraduationBatchItem {
-  id              String @id @default(cuid(2))
-  batchId         String
-  batch           GraduationBatch @relation(fields: [batchId], references: [id], onDelete: Restrict)
-  studentId       String
-  student         Student @relation(fields: [studentId], references: [id], onDelete: Restrict)
-  programId       String
-  program         Program @relation(fields: [programId], references: [id], onDelete: Restrict)
-  semesterId      String
-  semester        Semester @relation(fields: [semesterId], references: [id], onDelete: Restrict)
+  id                 String                    @id @default(cuid(2))
+  batchId            String
+  batch              GraduationBatch           @relation(fields: [batchId], references: [id], onDelete: Restrict)
+  studentId          String
+  student            Student                   @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  programId          String
+  program            Program                   @relation(fields: [programId], references: [id], onDelete: Restrict)
+  semesterId         String
+  semester           Semester                  @relation(fields: [semesterId], references: [id], onDelete: Restrict)
   rosterEnrollmentId String?
-  rosterEnrollment ProgramEnrollment? @relation(fields: [rosterEnrollmentId], references: [id], onDelete: Restrict)
-  rosterIdentity  Json
-  status          GraduationBatchItemStatus @default(PENDING)
-  auditId         String? @unique
-  audit           GraduationAudit? @relation(fields: [auditId], references: [id], onDelete: Restrict)
-  errorCode       String?
-  errorMessage    String?
-  finishedAt      DateTime?
+  rosterEnrollment   ProgramEnrollment?        @relation(fields: [rosterEnrollmentId], references: [id], onDelete: Restrict)
+  rosterIdentity     Json
+  status             GraduationBatchItemStatus @default(PENDING)
+  auditId            String?                   @unique
+  audit              GraduationAudit?          @relation(fields: [auditId], references: [id], onDelete: Restrict)
+  errorCode          String?
+  errorMessage       String?
+  finishedAt         DateTime?
 
   @@unique([batchId, studentId, programId, semesterId])
   @@index([batchId, status, id])
 }
 
 model GraduationResultChangeReceipt {
-  changeId      String @id
-  change        AcademicResultChange @relation(fields: [changeId], references: [id], onDelete: Restrict)
-  targetCount   Int
-  reason        String?
-  recordedAt    DateTime @default(now())
-  tasks         GraduationReauditTask[]
+  changeId    String                  @id
+  change      AcademicResultChange    @relation(fields: [changeId], references: [id], onDelete: Restrict)
+  targetCount Int
+  reason      String?
+  recordedAt  DateTime                @default(now())
+  tasks       GraduationReauditTask[]
 }
 
 model GraduationReauditTask {
-  id               String @id @default(cuid(2))
+  id               String                        @id @default(cuid(2))
   changeId         String
   receipt          GraduationResultChangeReceipt @relation(fields: [changeId], references: [changeId], onDelete: Restrict)
   contextId        String
-  context          GraduationAuditContext @relation(fields: [contextId], references: [id], onDelete: Restrict)
+  context          GraduationAuditContext        @relation(fields: [contextId], references: [id], onDelete: Restrict)
   baselineAuditId  String
-  baselineAudit    GraduationAudit @relation("GraduationTaskBaseline", fields: [baselineAuditId], references: [id], onDelete: Restrict)
+  baselineAudit    GraduationAudit               @relation("GraduationTaskBaseline", fields: [baselineAuditId], references: [id], onDelete: Restrict)
   completedAuditId String?
-  completedAudit   GraduationAudit? @relation("GraduationTaskResult", fields: [completedAuditId], references: [id], onDelete: Restrict)
-  status           GraduationReauditStatus @default(PENDING)
-  attempts         Int @default(0)
+  completedAudit   GraduationAudit?              @relation("GraduationTaskResult", fields: [completedAuditId], references: [id], onDelete: Restrict)
+  status           GraduationReauditStatus       @default(PENDING)
+  attempts         Int                           @default(0)
   leaseToken       String?
   leaseUntil       DateTime?
   errorCode        String?
-  createdAt        DateTime @default(now())
+  createdAt        DateTime                      @default(now())
   finishedAt       DateTime?
 
   @@unique([changeId, contextId])
   @@index([status, leaseUntil, createdAt])
+}
+
+// F-22: optional read-only connector to the school's SQL Server. Excel stays the default source.
+enum SchoolSyncMode {
+  EXCEL_ONLY
+  SCHOOL_DB
+}
+
+enum SchoolSyncProfile {
+  SIMULATED_SQL_SERVER
+  EXTERNAL_SQL_SERVER
+}
+
+enum SchoolSyncCadence {
+  DAILY
+  WEEKLY
+}
+
+enum SchoolSyncStatus {
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+enum SchoolSyncTrigger {
+  SCHEDULED
+  MANUAL
+  RETRY
+}
+
+enum SchoolMappingKind {
+  COHORT
+  PROGRAM
+  SEMESTER
+  COURSE
+}
+
+enum SchoolConflictEntity {
+  STUDENT
+  ACADEMIC_RESULT
+}
+
+model SchoolSyncConfiguration {
+  id                         String                   @id @default(cuid(2))
+  singletonKey               String                   @unique @default("SCHOOL_DB")
+  revision                   Int                      @default(1)
+  mode                       SchoolSyncMode           @default(EXCEL_ONLY)
+  profile                    SchoolSyncProfile        @default(SIMULATED_SQL_SERVER)
+  enabled                    Boolean                  @default(false)
+  sourceIdentity             String                   @default("SYNTHETIC-SCHOOL-V1")
+  host                       String?
+  port                       Int?
+  database                   String?
+  username                   String?
+  passwordCiphertext         Bytes?
+  passwordIv                 Bytes?
+  passwordTag                Bytes?
+  passwordKeyId              String?
+  connectionRevision         Int                      @default(1)
+  verifiedConnectionRevision Int?
+  cadence                    SchoolSyncCadence        @default(DAILY)
+  localTime                  String                   @default("02:00")
+  weekday                    Int?
+  nextDueAt                  DateTime?
+  lastSuccessfulRunId        String?
+  lastSnapshotVersion        String?
+  mappings                   SchoolReferenceMapping[]
+  classes                    SchoolClassMirror[]
+  runs                       SyncLog[]
+  createdAt                  DateTime                 @default(now())
+  updatedAt                  DateTime                 @updatedAt
+}
+
+// Source code -> local code. The local target is checked on save and again inside every run.
+model SchoolReferenceMapping {
+  id              String                  @id @default(cuid(2))
+  configurationId String
+  configuration   SchoolSyncConfiguration @relation(fields: [configurationId], references: [id], onDelete: Restrict)
+  kind            SchoolMappingKind
+  sourceCode      String
+  targetCode      String
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
+  @@unique([configurationId, kind, sourceCode])
+}
+
+// A mirror of the school's classes only; it has no academic meaning in the CMS.
+model SchoolClassMirror {
+  id                  String                  @id @default(cuid(2))
+  configurationId     String
+  configuration       SchoolSyncConfiguration @relation(fields: [configurationId], references: [id], onDelete: Restrict)
+  sourceId            String
+  classCode           String
+  courseId            String
+  course              Course                  @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  semesterId          String
+  semester            Semester                @relation(fields: [semesterId], references: [id], onDelete: Restrict)
+  lastSnapshotVersion String
+  createdAt           DateTime                @default(now())
+  updatedAt           DateTime                @updatedAt
+
+  @@unique([configurationId, sourceId])
+  @@index([courseId, semesterId])
+}
+
+model SyncLog {
+  id                    String                  @id @default(cuid(2))
+  configurationId       String
+  configuration         SchoolSyncConfiguration @relation(fields: [configurationId], references: [id], onDelete: Restrict)
+  requestKey            String                  @unique
+  dataSource            String                  @default("SCHOOL_DB")
+  profile               SchoolSyncProfile
+  trigger               SchoolSyncTrigger
+  requestedById         String?
+  requestedBy           User?                   @relation("SchoolSyncRequester", fields: [requestedById], references: [id], onDelete: Restrict)
+  retryOfId             String?
+  retryOf               SyncLog?                @relation("SchoolSyncRetry", fields: [retryOfId], references: [id], onDelete: Restrict)
+  retries               SyncLog[]               @relation("SchoolSyncRetry")
+  configurationRevision Int
+  status                SchoolSyncStatus        @default(RUNNING)
+  workerToken           String?
+  startedAt             DateTime                @default(now())
+  expiresAt             DateTime
+  finishedAt            DateTime?
+  snapshotVersion       String?
+  recordCount           Int                     @default(0)
+  studentCount          Int                     @default(0)
+  resultCount           Int                     @default(0)
+  classCount            Int                     @default(0)
+  changedCount          Int                     @default(0)
+  conflictCount         Int                     @default(0)
+  errorCode             String?
+  errorMessage          String?
+  conflicts             SyncConflict[]
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+
+  @@index([startedAt, id])
+  @@index([status, startedAt, id])
+}
+
+model SyncConflict {
+  id             String               @id @default(cuid(2))
+  syncLogId      String
+  syncLog        SyncLog              @relation(fields: [syncLogId], references: [id], onDelete: Restrict)
+  entityType     SchoolConflictEntity
+  recordKey      String
+  previousSource StudentDataSource
+  selectedSource StudentDataSource
+  fields         String[]
+  before         Json
+  after          Json
+  createdAt      DateTime             @default(now())
+
+  @@unique([syncLogId, entityType, recordKey])
 }

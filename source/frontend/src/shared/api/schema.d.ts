@@ -2516,6 +2516,134 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/school-db-sync/configuration': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['SchoolSyncController_getConfiguration'];
+    put: operations['SchoolSyncController_saveConfiguration'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/school-db-sync/connection-test': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['SchoolSyncController_testConnection'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/school-db-sync/mappings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['SchoolSyncController_getMappings'];
+    put: operations['SchoolSyncController_saveMappings'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/school-db-sync/reference-options': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['SchoolSyncController_referenceOptions'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/school-db-sync/runs': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['SchoolSyncController_listRuns'];
+    put?: never;
+    post: operations['SchoolSyncController_startRun'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/school-db-sync/runs/{runId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['SchoolSyncController_getRun'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/school-db-sync/runs/{runId}/conflicts': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['SchoolSyncController_listConflicts'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/school-db-sync/runs/{runId}/retry': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['SchoolSyncController_retryRun'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -4268,7 +4396,8 @@ export interface components {
       | 'REQUEST_OVERRIDDEN'
       | 'REQUEST_COMMENTED'
       | 'REQUEST_EFFECTIVE'
-      | 'GRADUATION_CONCLUSION_CHANGED';
+      | 'GRADUATION_CONCLUSION_CHANGED'
+      | 'SCHOOL_SYNC_FAILED';
     /** @enum {string} */
     NotificationReadStatus: 'UNREAD' | 'READ';
     NotificationDto: {
@@ -5195,6 +5324,171 @@ export interface components {
     };
     GraduationBatchItemPageDto: {
       items: components['schemas']['GraduationBatchItemDto'][];
+      total: number;
+      page: number;
+      pageSize: number;
+    };
+    /** @enum {string} */
+    SchoolSyncMode: 'EXCEL_ONLY' | 'SCHOOL_DB';
+    /** @enum {string} */
+    SchoolSyncProfile: 'SIMULATED_SQL_SERVER' | 'EXTERNAL_SQL_SERVER';
+    /** @enum {string} */
+    SchoolSyncCadence: 'DAILY' | 'WEEKLY';
+    SyncConfigurationDto: {
+      id: string;
+      revision: number;
+      mode: components['schemas']['SchoolSyncMode'];
+      profile: components['schemas']['SchoolSyncProfile'];
+      enabled: boolean;
+      sourceIdentity: string;
+      host: string | null;
+      port: number | null;
+      database: string | null;
+      username: string | null;
+      passwordConfigured: boolean;
+      connectionRevision: number;
+      verifiedConnectionRevision: number | null;
+      cadence: components['schemas']['SchoolSyncCadence'];
+      localTime: string;
+      weekday: number | null;
+      /** @enum {string} */
+      timeZone: 'Asia/Ho_Chi_Minh';
+      /** Format: date-time */
+      nextRunAt: string | null;
+      lastSuccessfulRunId: string | null;
+      lastSnapshotVersion: string | null;
+      activeRunId: string | null;
+      externalAllowed: boolean;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    SaveSyncConfigurationDto: {
+      revision: number;
+      mode: components['schemas']['SchoolSyncMode'];
+      profile: components['schemas']['SchoolSyncProfile'];
+      enabled: boolean;
+      sourceIdentity: string;
+      host?: string | null;
+      port?: number | null;
+      database?: string | null;
+      username?: string | null;
+      password?: string;
+      cadence: components['schemas']['SchoolSyncCadence'];
+      /** @example 02:00 */
+      localTime: string;
+      weekday?: number | null;
+    };
+    TestSyncConnectionDto: {
+      configurationRevision: number;
+    };
+    /** @enum {string} */
+    SyncConnectionTestCode:
+      | 'CONNECTED'
+      | 'CONNECTION_FAILED'
+      | 'READ_ONLY_REQUIRED'
+      | 'SOURCE_CONTRACT_INVALID'
+      | 'CONNECTOR_UNAVAILABLE';
+    SyncConnectionTestDto: {
+      success: boolean;
+      code: components['schemas']['SyncConnectionTestCode'];
+      message: string;
+      /** Format: date-time */
+      testedAt: string;
+      configurationRevision: number;
+    };
+    /** @enum {string} */
+    SchoolMappingKind: 'COHORT' | 'PROGRAM' | 'SEMESTER' | 'COURSE';
+    SyncMappingDto: {
+      kind: components['schemas']['SchoolMappingKind'];
+      sourceCode: string;
+      targetCode: string;
+    };
+    SyncMappingSetDto: {
+      revision: number;
+      items: components['schemas']['SyncMappingDto'][];
+    };
+    SyncMappingInputDto: {
+      kind: components['schemas']['SchoolMappingKind'];
+      sourceCode: string;
+      targetCode: string;
+    };
+    SaveSyncMappingsDto: {
+      revision: number;
+      items: components['schemas']['SyncMappingInputDto'][];
+    };
+    SyncReferenceOptionDto: {
+      id: string;
+      code: string;
+      label: string;
+      /** Format: date */
+      startDate: string | null;
+    };
+    SyncReferencePageDto: {
+      items: components['schemas']['SyncReferenceOptionDto'][];
+      total: number;
+      page: number;
+      pageSize: number;
+    };
+    StartSyncRunDto: {
+      /** Format: uuid */
+      requestId: string;
+    };
+    /** @enum {string} */
+    SchoolSyncTrigger: 'SCHEDULED' | 'MANUAL' | 'RETRY';
+    /** @enum {string} */
+    SchoolSyncStatus: 'RUNNING' | 'SUCCEEDED' | 'FAILED';
+    SyncRunDto: {
+      id: string;
+      /** @enum {string} */
+      dataSource: 'SCHOOL_DB';
+      profile: components['schemas']['SchoolSyncProfile'];
+      trigger: components['schemas']['SchoolSyncTrigger'];
+      retryOfId: string | null;
+      status: components['schemas']['SchoolSyncStatus'];
+      /** Format: date-time */
+      startedAt: string;
+      /** Format: date-time */
+      finishedAt: string | null;
+      /** Format: date-time */
+      expiresAt: string;
+      configurationRevision: number;
+      snapshotVersion: string | null;
+      recordCount: number;
+      studentCount: number;
+      resultCount: number;
+      classCount: number;
+      changedCount: number;
+      conflictCount: number;
+      errorCode: string | null;
+      errorMessage: string | null;
+      canRetry: boolean;
+    };
+    SyncRunPageDto: {
+      items: components['schemas']['SyncRunDto'][];
+      total: number;
+      page: number;
+      pageSize: number;
+    };
+    /** @enum {string} */
+    SchoolConflictEntity: 'STUDENT' | 'ACADEMIC_RESULT';
+    SyncConflictValueDto: {
+      field: string;
+      value: string | null;
+    };
+    SyncConflictDto: {
+      id: string;
+      entityType: components['schemas']['SchoolConflictEntity'];
+      recordKey: string;
+      /** @enum {string} */
+      previousSource: 'EXCEL';
+      /** @enum {string} */
+      selectedSource: 'SCHOOL_DB';
+      fields: string[];
+      before: components['schemas']['SyncConflictValueDto'][];
+      after: components['schemas']['SyncConflictValueDto'][];
+    };
+    SyncConflictPageDto: {
+      items: components['schemas']['SyncConflictDto'][];
       total: number;
       page: number;
       pageSize: number;
@@ -9592,6 +9886,257 @@ export interface operations {
         };
         content: {
           'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': string;
+        };
+      };
+    };
+  };
+  SchoolSyncController_getConfiguration: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SyncConfigurationDto'];
+        };
+      };
+    };
+  };
+  SchoolSyncController_saveConfiguration: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SaveSyncConfigurationDto'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SyncConfigurationDto'];
+        };
+      };
+    };
+  };
+  SchoolSyncController_testConnection: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TestSyncConnectionDto'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SyncConnectionTestDto'];
+        };
+      };
+    };
+  };
+  SchoolSyncController_getMappings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SyncMappingSetDto'];
+        };
+      };
+    };
+  };
+  SchoolSyncController_saveMappings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SaveSyncMappingsDto'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SyncMappingSetDto'];
+        };
+      };
+    };
+  };
+  SchoolSyncController_referenceOptions: {
+    parameters: {
+      query: {
+        page?: number;
+        pageSize?: number;
+        kind: components['schemas']['SchoolMappingKind'];
+        q?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SyncReferencePageDto'];
+        };
+      };
+    };
+  };
+  SchoolSyncController_listRuns: {
+    parameters: {
+      query?: {
+        page?: number;
+        pageSize?: number;
+        status?: components['schemas']['SchoolSyncStatus'];
+        /** @description Inclusive */
+        startedFrom?: string;
+        /** @description Exclusive */
+        startedTo?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SyncRunPageDto'];
+        };
+      };
+    };
+  };
+  SchoolSyncController_startRun: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['StartSyncRunDto'];
+      };
+    };
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SyncRunDto'];
+        };
+      };
+    };
+  };
+  SchoolSyncController_getRun: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        runId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SyncRunDto'];
+        };
+      };
+    };
+  };
+  SchoolSyncController_listConflicts: {
+    parameters: {
+      query?: {
+        page?: number;
+        pageSize?: number;
+      };
+      header?: never;
+      path: {
+        runId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SyncConflictPageDto'];
+        };
+      };
+    };
+  };
+  SchoolSyncController_retryRun: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        runId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['StartSyncRunDto'];
+      };
+    };
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SyncRunDto'];
         };
       };
     };

@@ -40,6 +40,20 @@ services:
       timeout: 5s
       retries: 10
 
+  # F-22 only: a synthetic stand-in for the school's SQL Server. Opt-in (pnpm school-db:sim:start); never real data.
+  school-db-sim:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    profiles: ['school-db-sim']
+    environment:
+      ACCEPT_EULA: 'Y'
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: ${SCHOOL_DB_SIM_SA_PASSWORD:?set SCHOOL_DB_SIM_SA_PASSWORD in .env}
+      MSSQL_MEMORY_LIMIT_MB: '1536'
+    mem_limit: 2g
+    # Loopback only: the simulator is reachable from this machine and nowhere else.
+    ports:
+      - '127.0.0.1:${SCHOOL_DB_SIM_PORT:-14330}:1433'
+
 volumes:
   postgres-data:
   redis-data:
