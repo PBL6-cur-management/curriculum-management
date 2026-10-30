@@ -2890,6 +2890,118 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/reports/program-comparison': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['ReportsController_comparison'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reports/program-comparison/export': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['ReportsController_comparisonExport'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reports/credit-distribution': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['ReportsController_distribution'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reports/credit-distribution/export': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['ReportsController_distributionExport'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reports/versions/{versionId}/matrices/export': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['ReportsController_matrices'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reports/versions/{versionId}/accreditation/export': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['ReportsController_accreditation'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reports/change-request-statistics': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['ReportsController_changeRequestStatistics'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -5999,6 +6111,106 @@ export interface components {
       graduation:
         | components['schemas']['GraduationReviewedOutcomeDto']
         | components['schemas']['GraduationCannotAuditOutcomeDto'];
+    };
+    ReportVersionRefDto: {
+      id: string;
+      programCode: string;
+      programName: string;
+      versionNumber: string | null;
+      status: components['schemas']['ProgramVersionStatus'];
+      totalCredits: string;
+    };
+    ComparisonSummaryDto: {
+      sharedCount: number;
+      equivalentCount: number;
+      leftOnlyCount: number;
+      rightOnlyCount: number;
+      sharedCreditsLeft: string;
+      sharedCreditsRight: string;
+    };
+    ComparisonSideDto: {
+      plannedSemester: number;
+      credits: string;
+      isElective: boolean;
+      blockSymbol: string | null;
+    };
+    ComparisonCourseDto: {
+      courseCode: string;
+      courseName: string;
+      left: components['schemas']['ComparisonSideDto'] | null;
+      right: components['schemas']['ComparisonSideDto'] | null;
+      /** @description SEMESTER, CREDITS, ELECTIVE, BLOCK — chỉ với học phần chung */
+      differences: string[];
+    };
+    ComparisonEquivalentDto: {
+      left: components['schemas']['ComparisonCourseDto'];
+      right: components['schemas']['ComparisonCourseDto'];
+    };
+    ProgramComparisonDto: {
+      left: components['schemas']['ReportVersionRefDto'];
+      right: components['schemas']['ReportVersionRefDto'];
+      summary: components['schemas']['ComparisonSummaryDto'];
+      shared: components['schemas']['ComparisonCourseDto'][];
+      equivalent: components['schemas']['ComparisonEquivalentDto'][];
+      leftOnly: components['schemas']['ComparisonCourseDto'][];
+      rightOnly: components['schemas']['ComparisonCourseDto'][];
+    };
+    CreditTotalsDto: {
+      /** @description Tổng tín chỉ mọi dòng (cả học phần tự chọn được mở) */
+      allRows: string;
+      compulsory: string;
+      /** @description Tín chỉ tự chọn được mở, không phải yêu cầu */
+      electiveOffered: string;
+      /** @description Bắt buộc + tối thiểu các nhóm tự chọn */
+      required: string;
+      /** @description Tổng tín chỉ công bố của phiên bản */
+      declaredTotal: string;
+      declaredCompulsory: string;
+      declaredElective: string;
+      /** @description Có nhóm tự chọn chưa khai báo tối thiểu tín chỉ */
+      requiredIsPartial: boolean;
+    };
+    CreditBucketDto: {
+      key: string;
+      label: string;
+      compulsory: string;
+      elective: string;
+      total: string;
+      courseCount: number;
+    };
+    ElectiveRequirementDto: {
+      groupCode: string;
+      groupName: string;
+      minCredits: string | null;
+      minCourses: number | null;
+      offeredCredits: string;
+    };
+    CreditDistributionDto: {
+      version: components['schemas']['ReportVersionRefDto'];
+      totals: components['schemas']['CreditTotalsDto'];
+      byBlock: components['schemas']['CreditBucketDto'][];
+      bySemester: components['schemas']['CreditBucketDto'][];
+      byCourseType: components['schemas']['CreditBucketDto'][];
+      electiveGroups: components['schemas']['ElectiveRequirementDto'][];
+    };
+    CountDto: {
+      key: string;
+      count: number;
+    };
+    LevelTimingDto: {
+      approvalLevel: number;
+      visitCount: number;
+      /** @description Giờ */
+      averageHours: number | null;
+    };
+    ChangeRequestStatisticsDto: {
+      total: number;
+      byStatus: components['schemas']['CountDto'][];
+      byType: components['schemas']['CountDto'][];
+      byOrigin: components['schemas']['CountDto'][];
+      levels: components['schemas']['LevelTimingDto'][];
+      /** @description Toàn bộ, hoặc chỉ trong phạm vi được giao */
+      scoped: boolean;
     };
   };
   responses: never;
@@ -11017,6 +11229,159 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['DdutGraduationDto'];
+        };
+      };
+    };
+  };
+  ReportsController_comparison: {
+    parameters: {
+      query: {
+        leftVersionId: string;
+        rightVersionId: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProgramComparisonDto'];
+        };
+      };
+    };
+  };
+  ReportsController_comparisonExport: {
+    parameters: {
+      query: {
+        leftVersionId: string;
+        rightVersionId: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': string;
+        };
+      };
+    };
+  };
+  ReportsController_distribution: {
+    parameters: {
+      query: {
+        versionId: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CreditDistributionDto'];
+        };
+      };
+    };
+  };
+  ReportsController_distributionExport: {
+    parameters: {
+      query: {
+        versionId: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': string;
+        };
+      };
+    };
+  };
+  ReportsController_matrices: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        versionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': string;
+        };
+      };
+    };
+  };
+  ReportsController_accreditation: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        versionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': string;
+        };
+      };
+    };
+  };
+  ReportsController_changeRequestStatistics: {
+    parameters: {
+      query: {
+        /** @description Ngày tạo đề xuất, từ (bao gồm) */
+        from: string;
+        /** @description Ngày tạo đề xuất, đến (bao gồm) */
+        to: string;
+        programId?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ChangeRequestStatisticsDto'];
         };
       };
     };

@@ -39,6 +39,9 @@ export const PERMISSIONS = {
   dataImportExcel: 'data.importExcel',
   curriculumImportExportExcel: 'curriculum.importExportExcel',
   integrationClientManage: 'integrationClient.manage',
+  reportBenchmark: 'report.benchmark',
+  reportExportAccreditation: 'report.exportAccreditation',
+  changeRequestStatistics: 'changeRequest.statistics',
   syncConfigure: 'sync.configure',
 } as const satisfies Record<string, PermissionCode>;
 
