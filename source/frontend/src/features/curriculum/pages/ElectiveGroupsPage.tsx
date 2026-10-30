@@ -1,4 +1,5 @@
-import { Alert, Button, Flex, Result, Skeleton, Typography } from 'antd';
+import { Alert, Button, Flex, Result, Skeleton } from 'antd';
+import { PageHeader } from '../../../shared/design-system';
 import { useEffect, useState } from 'react';
 import { generatePath, Link, useParams, useSearchParams } from 'react-router';
 import { FOCUS_PARAM, ROUTES } from '../../../routes';
@@ -51,30 +52,35 @@ export function ElectiveGroupsPage() {
         ← Khung chương trình {version.programCode}
       </Link>
       <RequestDraftBanner request={version.sourceRequest} />
-      <Flex justify="space-between" align="center" wrap gap="small">
-        <Typography.Title level={2} style={{ margin: 0 }}>
-          Nhóm tự chọn — {version.programCode} ({versionLabel(version)})
-        </Typography.Title>
-        {curriculum.canEditStructure && (
-          <Button type="primary" onClick={() => setEditing('new')}>
-            Thêm nhóm
-          </Button>
-        )}
-        {curriculum.editPath === 'VIA_REQUEST' && (
-          <CreateRequestButton
-            prefill={{
-              type: 'CURRICULUM',
-              targetType: 'PROGRAM',
-              targetId: version.programId,
-            }}
-          />
-        )}
-      </Flex>
+      <PageHeader
+        title={`Nhóm tự chọn — ${version.programCode} (${versionLabel(version)})`}
+        actions={
+          <>
+            {curriculum.canEditStructure && (
+              <Button type="primary" onClick={() => setEditing('new')}>
+                Thêm nhóm
+              </Button>
+            )}
+            {curriculum.editPath === 'VIA_REQUEST' && (
+              <CreateRequestButton
+                prefill={{
+                  type: 'CURRICULUM',
+                  targetType: 'PROGRAM',
+                  targetId: version.programId,
+                }}
+              />
+            )}
+          </>
+        }
+      />
       {ungrouped.length > 0 && (
         <Alert
-          type="info"
+          type="warning"
           showIcon
-          message={`${ungrouped.length} học phần tự chọn chưa thuộc nhóm nào`}
+          title={`${ungrouped.length} học phần tự chọn chưa thuộc nhóm nào`}
+          description={ungrouped
+            .map((item) => item.course.courseCode)
+            .join(', ')}
         />
       )}
       <ElectiveGroupTable
