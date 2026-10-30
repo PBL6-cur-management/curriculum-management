@@ -1,7 +1,6 @@
 import { Alert, Card, Flex, Skeleton, Typography } from 'antd';
 import {
   generatePath,
-  Link,
   useNavigate,
   useParams,
   useSearchParams,
@@ -17,6 +16,7 @@ import {
 import { VersionStatusTag } from '../components/VersionStatusTag';
 import { useVersionComparison, useVersionHistory } from '../hooks/useReleases';
 import { comparisonPath } from '../utils/versionComparison';
+import { BackLink } from '../../../shared/design-system';
 
 export function VersionComparisonPage() {
   const { programId = '' } = useParams();
@@ -28,9 +28,9 @@ export function VersionComparisonPage() {
   const navigate = useNavigate();
   return (
     <DetailPageLayout>
-      <Link to={generatePath(ROUTES.versionHistory, { programId })}>
-        ← Lịch sử phiên bản
-      </Link>
+      <BackLink to={generatePath(ROUTES.versionHistory, { programId })}>
+        Lịch sử phiên bản
+      </BackLink>
       <PageHeader title="So sánh phiên bản" />
       {history.error ? (
         <ReleaseQueryError

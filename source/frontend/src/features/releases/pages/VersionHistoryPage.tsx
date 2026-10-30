@@ -1,4 +1,4 @@
-import { Button, Flex, Result, Skeleton, Table, Typography } from 'antd';
+import { Button, Flex, Result, Table, Typography } from 'antd';
 import { useState } from 'react';
 import { generatePath, Link, useNavigate, useParams } from 'react-router';
 import { PERMISSIONS } from '../../../shared/auth/permissions';
@@ -16,6 +16,12 @@ import { VersionStatusTag } from '../components/VersionStatusTag';
 import { NO_VERSIONS } from '../constants/releaseLabels';
 import { useVersionHistory } from '../hooks/useReleases';
 import { formatDay } from '../utils/format';
+import {
+  BackLink,
+  formatEmpty,
+  PageHeader,
+  PageSkeleton,
+} from '../../../shared/design-system';
 
 // MH-46: every version of a program, newest first, scoped like the program itself.
 export function VersionHistoryPage() {
@@ -24,7 +30,7 @@ export function VersionHistoryPage() {
   const navigate = useNavigate();
   const [selected, setSelected] = useState<string[]>([]);
   const { data, isPending, error } = useVersionHistory(programId);
-  if (isPending) return <Skeleton active />;
+  if (isPending) return <PageSkeleton />;
   if (!data) {
     if (error instanceof ApiError && error.status === 403)
       return (
@@ -37,12 +43,10 @@ export function VersionHistoryPage() {
   }
   return (
     <Flex vertical gap="middle">
-      <Link to={generatePath(ROUTES.programDetail, { programId })}>
-        ← Chương trình
-      </Link>
-      <Typography.Title level={2} style={{ margin: 0 }}>
-        Lịch sử phiên bản
-      </Typography.Title>
+      <BackLink to={generatePath(ROUTES.programDetail, { programId })}>
+        Chương trình
+      </BackLink>
+      <PageHeader title="Lịch sử phiên bản" />
       {canCompare && (
         <Button
           type="primary"
@@ -110,7 +114,7 @@ export function VersionHistoryPage() {
           {
             title: 'Số quyết định',
             dataIndex: 'decisionNumber',
-            render: (value: string | null) => value ?? '—',
+            render: (value: string | null) => formatEmpty(value),
           },
           {
             title: 'Ngày ký',
@@ -121,14 +125,16 @@ export function VersionHistoryPage() {
             title: 'Học kỳ hiệu lực',
             key: 'semester',
             render: (_: unknown, version) =>
-              version.effectiveSemester?.semesterCode ?? '—',
+              formatEmpty(version.effectiveSemester?.semesterCode),
           },
           {
             title: 'Khóa áp dụng',
             key: 'cohorts',
             render: (_: unknown, version) =>
-              version.cohorts.map((cohort) => cohort.cohortCode).join(', ') ||
-              '—',
+              formatEmpty(
+                version.cohorts.map((cohort) => cohort.cohortCode).join(', '),
+                'Chưa gán',
+              ),
           },
           {
             title: 'Đề xuất gốc',
@@ -143,7 +149,7 @@ export function VersionHistoryPage() {
                   {version.originRequest.requestCode}
                 </Link>
               ) : (
-                '—'
+                'Ban hành trực tiếp'
               ),
           },
           {
@@ -152,7 +158,7 @@ export function VersionHistoryPage() {
             render: (_: unknown, version) =>
               version.correctedBy
                 ? `Đã được đính chính bởi ${versionLabel(version.correctedBy)}`
-                : '—',
+                : formatEmpty(null, 'Không'),
           },
         ]}
       />

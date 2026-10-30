@@ -1,4 +1,4 @@
-import { App, Button, Flex, Result, Skeleton, Space, Typography } from 'antd';
+import { App, Button, Flex, Result, Typography } from 'antd';
 import { generatePath, Link, useNavigate, useParams } from 'react-router';
 import { ROUTES } from '../../../routes';
 import { ApiError } from '../../../shared/api/client';
@@ -10,6 +10,12 @@ import { FrozenRowsTable } from '../components/FrozenRowsTable';
 import { VersionHeader } from '../components/VersionHeader';
 import { VersionStatusTag } from '../components/VersionStatusTag';
 import { useOpenCorrection, useVersionDetail } from '../hooks/useReleases';
+import {
+  BackLink,
+  PageHeader,
+  PageSkeleton,
+  SummaryStrip,
+} from '../../../shared/design-system';
 
 // MH-47: an issued version, read-only for everyone (R1 included): the only way to change it is a request or a correction.
 export function VersionDetailPage() {
@@ -23,7 +29,7 @@ export function VersionDetailPage() {
   const { message } = App.useApp();
   const navigate = useNavigate();
   const openCorrection = useOpenCorrection(programId, versionId);
-  if (isPending) return <Skeleton active />;
+  if (isPending) return <PageSkeleton />;
   if (!version) {
     if (error instanceof ApiError && error.status === 403)
       return (
@@ -49,43 +55,62 @@ export function VersionDetailPage() {
     });
   return (
     <Flex vertical gap="middle">
-      <Link to={generatePath(ROUTES.versionHistory, { programId })}>
-        ← Lịch sử phiên bản {version.programCode}
-      </Link>
-      <Flex justify="space-between" align="center" wrap gap="small">
-        <Typography.Title level={2} style={{ margin: 0 }}>
-          {version.programCode} — {version.programName} · phiên bản{' '}
-          {versionLabel(version)} <VersionStatusTag status={version.status} />
-        </Typography.Title>
-        <Space wrap>
-          {version.openCorrection && (
-            <Link
-              to={generatePath(ROUTES.versionCorrection, {
-                programId,
-                versionId,
-                correctionId: version.openCorrection.id,
-              })}
-            >
-              Tiếp tục bản đính chính đang soạn
-            </Link>
-          )}
-          {version.canCorrect && !version.openCorrection && (
-            <Button
-              loading={openCorrection.isPending}
-              onClick={startCorrection}
-            >
-              Đính chính
-            </Button>
-          )}
-        </Space>
-      </Flex>
+      <BackLink to={generatePath(ROUTES.versionHistory, { programId })}>
+        Lịch sử phiên bản {version.programCode}
+      </BackLink>
+      <PageHeader
+        title={
+          <>
+            {version.programCode} — {version.programName} · phiên bản{' '}
+            {versionLabel(version)} <VersionStatusTag status={version.status} />
+          </>
+        }
+        actions={
+          <>
+            {version.openCorrection && (
+              <Link
+                to={generatePath(ROUTES.versionCorrection, {
+                  programId,
+                  versionId,
+                  correctionId: version.openCorrection.id,
+                })}
+              >
+                Tiếp tục bản đính chính đang soạn
+              </Link>
+            )}
+            {version.canCorrect && !version.openCorrection && (
+              <Button
+                loading={openCorrection.isPending}
+                onClick={startCorrection}
+              >
+                Đính chính
+              </Button>
+            )}
+          </>
+        }
+      />
       <VersionHeader version={version} />
-      <Typography.Text type="secondary">
-        {version.majorCode} — {version.majorName} · {version.semesterCount} học
-        kỳ · tổng {version.totalCredits} tín chỉ (bắt buộc{' '}
-        {version.compulsoryCredits}, tự chọn {version.electiveCredits})
-      </Typography.Text>
-      <Space wrap>
+      <SummaryStrip
+        label="Tóm tắt phiên bản"
+        items={[
+          {
+            label: 'Ngành',
+            value: `${version.majorCode} — ${version.majorName}`,
+          },
+          { label: 'Số học kỳ', value: version.semesterCount },
+          { label: 'Tổng tín chỉ', value: version.totalCredits },
+          { label: 'Bắt buộc', value: version.compulsoryCredits },
+          { label: 'Tự chọn', value: version.electiveCredits },
+        ]}
+      />
+      <Flex
+        component="nav"
+        aria-label="Xem trong phiên bản"
+        wrap
+        gap="small"
+        align="center"
+      >
+        <Typography.Text type="secondary">Xem:</Typography.Text>
         <Link to={generatePath(ROUTES.curriculum, params)}>
           Khung chương trình
         </Link>
@@ -106,7 +131,7 @@ export function VersionDetailPage() {
             </Link>
           </>
         )}
-      </Space>
+      </Flex>
       <FrozenRowsTable rows={version.rows} versionId={versionId} />
     </Flex>
   );

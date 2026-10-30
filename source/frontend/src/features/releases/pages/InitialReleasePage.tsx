@@ -7,7 +7,6 @@ import {
   Input,
   Modal,
   Result,
-  Skeleton,
   Typography,
 } from 'antd';
 import { useState } from 'react';
@@ -28,6 +27,11 @@ import {
 import { useReleaseCheck, useReleaseVersion } from '../hooks/useReleases';
 import { API_DATE_FORMAT } from '../utils/format';
 import type { Dayjs } from 'dayjs';
+import {
+  BackLink,
+  PageHeader,
+  PageSkeleton,
+} from '../../../shared/design-system';
 
 interface Values {
   versionNumber: string;
@@ -50,7 +54,7 @@ export function InitialReleasePage() {
   const check = useReleaseCheck(programId, versionId);
   const release = useReleaseVersion(programId, versionId);
 
-  if (check.isPending) return <Skeleton active />;
+  if (check.isPending) return <PageSkeleton />;
   if (check.error && !check.data) {
     const refused =
       check.error instanceof ApiError && check.error.status === 403;
@@ -98,12 +102,10 @@ export function InitialReleasePage() {
 
   return (
     <Flex vertical gap="middle">
-      <Link to={generatePath(ROUTES.programDetail, { programId })}>
-        ← Chương trình
-      </Link>
-      <Typography.Title level={2} style={{ margin: 0 }}>
-        Ban hành phiên bản đầu tiên
-      </Typography.Title>
+      <BackLink to={generatePath(ROUTES.programDetail, { programId })}>
+        Chương trình
+      </BackLink>
+      <PageHeader title="Ban hành phiên bản đầu tiên" />
       <ReleaseCheckPanel
         check={check.data}
         loading={check.isPending}
