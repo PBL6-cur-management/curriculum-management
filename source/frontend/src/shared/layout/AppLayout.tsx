@@ -1,6 +1,14 @@
 import { Suspense } from 'react';
 import { DownOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Flex, Layout, Menu, Skeleton, Typography } from 'antd';
+import {
+  Button,
+  Dropdown,
+  Flex,
+  Layout,
+  Menu,
+  Skeleton,
+  Typography,
+} from 'antd';
 import type { MenuProps } from 'antd';
 import { Link, Outlet, useLocation } from 'react-router';
 import { useMe } from '../auth/useMe';
@@ -62,13 +70,23 @@ export function AppLayout() {
                 flexShrink: 0,
               }}
             >
-              <img src="/logo-dut.webp" alt="Logo ĐHBK Đà Nẵng" width={36} height={36} />
+              <img
+                src="/logo-dut.webp"
+                alt="Logo ĐHBK Đà Nẵng"
+                width={36}
+                height={36}
+              />
             </Flex>
             <Flex vertical style={{ lineHeight: 1.25 }}>
-              <Typography.Text style={{ color: palette.white, fontSize: 12, opacity: 0.85 }}>
+              <Typography.Text
+                style={{ color: palette.white, fontSize: 12, opacity: 0.85 }}
+              >
                 Trường Đại học Bách khoa · Khoa Công nghệ Thông tin
               </Typography.Text>
-              <Typography.Text strong style={{ color: palette.white, fontSize: 16 }}>
+              <Typography.Text
+                strong
+                style={{ color: palette.white, fontSize: 16 }}
+              >
                 Quản lý Chương trình đào tạo
               </Typography.Text>
             </Flex>
