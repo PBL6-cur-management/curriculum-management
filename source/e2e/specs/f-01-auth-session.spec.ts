@@ -103,10 +103,11 @@ test.describe('F-01 Đăng nhập, phiên', () => {
         await expect(guest.getByText('Đã đổi mật khẩu', { exact: true })).toBeVisible();
         await expect(guest.getByText('Bạn cần đổi mật khẩu trước khi tiếp tục sử dụng hệ thống.', { exact: true })).not.toBeVisible();
         await expect(guest.getByText('Tài khoản của tôi', { exact: true })).toBeVisible();
-        await guest.getByRole('link', { name: 'Trang chính', exact: true }).click();
+        // The logo is also labelled "Trang chính"; click the menu entry that shows the words.
+        await guest.getByRole('link', { name: 'Trang chính', exact: true }).filter({ hasText: 'Trang chính' }).click();
         await expect(guest).toHaveURL(new URL('/', baseURL).href);
         await expect(guest.getByRole('heading', { name: `Xin chào, ${user.name}`, exact: true })).toBeVisible();
-        await guest.getByRole('button', { name: new RegExp(`${user.name}$`) }).click();
+        await guest.getByRole('button', { name: new RegExp(user.name) }).click();
         await guest.getByRole('menuitem', { name: 'Đăng xuất', exact: true }).click();
         await expect(guest).toHaveURL(/\/login$/);
         await guest.goBack();

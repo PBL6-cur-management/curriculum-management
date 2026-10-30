@@ -1,14 +1,5 @@
 import { useState } from 'react';
-import {
-  Alert,
-  Button,
-  Card,
-  Flex,
-  Result,
-  Skeleton,
-  Tag,
-  Typography,
-} from 'antd';
+import { Alert, Button, Card, Flex, Result, Tag, Typography } from 'antd';
 import { useParams } from 'react-router';
 import { ApiError } from '../../../shared/api/client';
 import { useCan } from '../../../shared/auth/useCan';
@@ -22,6 +13,7 @@ import {
   GROUP_STATUS_LABELS,
   NO_COORDINATOR_LABEL,
 } from '../constants/subjectGroupLabels';
+import { PageSkeleton } from '../../../shared/design-system';
 
 export function SubjectGroupDetailPage() {
   const { groupId = '' } = useParams();
@@ -31,7 +23,7 @@ export function SubjectGroupDetailPage() {
   const [memberRole, setMemberRole] = useState<
     SubjectGroupMember['memberRole'] | null
   >(null);
-  if (isPending) return <Skeleton active />;
+  if (isPending) return <PageSkeleton />;
   if (!group) {
     if (error instanceof ApiError && error.status === 403)
       return <Result status="403" title="Nhóm này nằm ngoài phạm vi của bạn" />;

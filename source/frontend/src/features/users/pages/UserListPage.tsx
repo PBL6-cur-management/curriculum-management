@@ -19,6 +19,7 @@ import { useUserList } from '../hooks/useUsers';
 import type { CreatedUser, UserListParams, UserSummary } from '../api/users';
 import { UserFormModal } from '../components/UserFormModal';
 import { TemporaryPasswordModal } from '../components/TemporaryPasswordModal';
+import { formatEmpty } from '../../../shared/design-system';
 
 export function UserListPage() {
   const [params, setParams] = useState<UserListParams>({
@@ -41,7 +42,10 @@ export function UserListPage() {
       ),
     },
     { title: 'Tên đăng nhập', dataIndex: 'username' },
-    { title: 'Đơn vị', render: (_, user) => user.orgUnit?.unitName ?? '—' },
+    {
+      title: 'Đơn vị',
+      render: (_, user) => formatEmpty(user.orgUnit?.unitName, 'Chưa gán'),
+    },
     {
       title: 'Vai trò',
       dataIndex: 'activeRoleCodes',

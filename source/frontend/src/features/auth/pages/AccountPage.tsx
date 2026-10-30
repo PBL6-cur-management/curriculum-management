@@ -12,11 +12,11 @@ import type { ChangePasswordRequest } from '../api/auth';
 import { useChangePassword } from '../hooks/useChangePassword';
 import { NEW_PASSWORD_RULES, REQUIRED_PASSWORD } from '../schema/authRules';
 import { useMe } from '../../../shared/auth/useMe';
+import { PageHeader, formatEmpty } from '../../../shared/design-system';
 
 interface ChangePasswordForm extends ChangePasswordRequest {
   confirmPassword: string;
 }
-const EMPTY = '—';
 
 export function AccountPage() {
   const { data: me } = useMe();
@@ -36,6 +36,7 @@ export function AccountPage() {
     );
   return (
     <Flex vertical gap="large">
+      <PageHeader title="Tài khoản của tôi" />
       {me.mustChangePassword && (
         <Alert
           type="warning"
@@ -43,7 +44,7 @@ export function AccountPage() {
           title="Bạn cần đổi mật khẩu trước khi tiếp tục sử dụng hệ thống."
         />
       )}
-      <Card title="Tài khoản của tôi">
+      <Card title="Thông tin tài khoản">
         <Descriptions
           bordered
           column={1}
@@ -55,7 +56,7 @@ export function AccountPage() {
               label: 'Mã cán bộ / sinh viên',
               children: me.userCode,
             },
-            { key: 'email', label: 'Email', children: me.email ?? EMPTY },
+            { key: 'email', label: 'Email', children: formatEmpty(me.email) },
           ]}
         />
       </Card>

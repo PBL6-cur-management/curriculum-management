@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Button, Card, Col, Result, Row, Skeleton, Tag, Tree } from 'antd';
+import { Button, Card, Col, Result, Row, Tag, Tree } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import { Link, generatePath } from 'react-router';
 import { ROUTES } from '../../../routes';
@@ -10,6 +10,7 @@ import { buildOrgTree, type OrgTreeNode } from '../utils/buildOrgTree';
 import { UNIT_TYPE_LABELS } from '../constants/orgUnitLabels';
 import { OrgUnitDetailPanel } from '../components/OrgUnitDetailPanel';
 import { OrgUnitFormModal } from '../components/OrgUnitFormModal';
+import { PageHeader, PageSkeleton } from '../../../shared/design-system';
 
 type Editor = { mode: 'create' | 'edit'; parent?: OrgUnit; unit?: OrgUnit };
 function toDataNode(
@@ -56,25 +57,26 @@ export function OrgUnitTreePage() {
   const expandedKeys = (units.data ?? [])
     .map((unit) => unit.id)
     .filter((key) => !collapsed.has(key));
-  if (units.isPending || groups.isPending) return <Skeleton active />;
+  if (units.isPending || groups.isPending) return <PageSkeleton />;
   if (units.isError)
     return <Result status="error" title="Không tải được cây đơn vị" />;
   const root = units.data?.find((unit) => unit.unitType === 'UNIVERSITY');
   return (
     <>
+      <PageHeader
+        title="Đơn vị"
+        actions={
+          <Button
+            type="primary"
+            onClick={() => setEditor({ mode: 'create', parent: root })}
+          >
+            Thêm đơn vị
+          </Button>
+        }
+      />
       <Row gutter={16}>
         <Col span={12}>
-          <Card
-            title="Cây đơn vị"
-            extra={
-              <Button
-                type="primary"
-                onClick={() => setEditor({ mode: 'create', parent: root })}
-              >
-                Thêm đơn vị
-              </Button>
-            }
-          >
+          <Card>
             <Tree
               expandedKeys={expandedKeys}
               onExpand={(_keys, info) =>

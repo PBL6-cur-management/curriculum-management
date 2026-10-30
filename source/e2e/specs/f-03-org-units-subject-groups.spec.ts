@@ -11,7 +11,8 @@ test.describe('F-03 Đơn vị và nhóm chuyên môn', () => {
     await page.goto('/org-units');
     const tree = page.getByRole('tree');
     for (const name of ['Trường Đại học Bách khoa – Đại học Đà Nẵng', 'Khoa Công nghệ Thông tin', 'Phòng Đào tạo', 'Khoa học máy tính', 'Công nghệ phần mềm', 'Hệ thống thông tin', 'Mạng và truyền thông']) {
-      await expect(tree.getByText(name)).toBeVisible();
+      // A tree node's text also carries its type tag ("Khoa", "Nhóm chuyên môn").
+      await expect(tree.getByRole('treeitem').filter({ hasText: name }).first()).toBeVisible();
     }
   });
 
