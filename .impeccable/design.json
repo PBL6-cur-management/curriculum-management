@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-30T00:00:00Z",
+  "title": "Design System: Quản lý Chương trình đào tạo",
+  "extensions": {
+    "colorMeta": {
+      "primary": { "role": "primary", "displayName": "Xanh Bách khoa", "canonical": "#0071a6", "tonalRamp": ["#002d42", "#004666", "#005b86", "#0071a6", "#3a93ba", "#7fb8d2", "#b8d7e6", "#e6f1f7"] },
+      "ink": { "role": "neutral", "displayName": "Mực slate", "canonical": "#1e293b", "tonalRamp": ["#0f172a", "#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e1", "#e2e8f0"] },
+      "canvas": { "role": "neutral", "displayName": "Nền trang", "canonical": "#f8fafc", "tonalRamp": ["#e2e8f0", "#f1f5f9", "#f8fafc", "#ffffff"] }
+    },
+    "typographyMeta": {
+      "page-title": { "displayName": "Page title", "purpose": "PageHeader, Title level 2, 20px/600." },
+      "body": { "displayName": "Body", "purpose": "14px Roboto Variable for tables, forms, prose." }
+    },
+    "shadows": [
+      { "name": "floating", "value": "0 4px 6px -1px rgba(15,23,42,0.08), 0 2px 4px -2px rgba(15,23,42,0.06)", "purpose": "Small floating surfaces." },
+      { "name": "overlay", "value": "0 10px 15px -3px rgba(15,23,42,0.10), 0 4px 6px -4px rgba(15,23,42,0.08)", "purpose": "Modals and popovers." },
+      { "name": "header", "value": "0 4px 6px -1px rgba(15,23,42,0.18)", "purpose": "Sticky app header only." }
+    ],
+    "motion": [
+      { "name": "ease", "value": "cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "Single easing for all transitions." },
+      { "name": "duration-fast", "value": "0.12s", "purpose": "motionDurationFast" },
+      { "name": "duration-mid", "value": "0.16s", "purpose": "motionDurationMid" },
+      { "name": "duration-slow", "value": "0.2s", "purpose": "motionDurationSlow" }
+    ],
+    "breakpoints": [{ "name": "lg", "value": "992px (AntD) - sider collapses below" }]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Single main action per region.",
+      "html": "<button class=\"ds-btn-primary\">Áp dụng thay đổi</button>",
+      "css": ".ds-btn-primary{background:#0071a6;color:#fff;border:0;border-radius:8px;height:36px;padding:0 16px;font:500 14px 'Roboto Variable',system-ui,sans-serif;cursor:pointer;transition:background .16s cubic-bezier(.4,0,.2,1)}.ds-btn-primary:hover{background:#005b86}.ds-btn-primary:focus-visible{outline:2px solid #0071a6;outline-offset:2px}"
+    },
+    {
+      "name": "Permission Matrix Cell",
+      "kind": "custom",
+      "description": "Circle = direct, diamond = via request; filled = all, hollow = scoped; short text always shown.",
+      "html": "<span class=\"ds-cell\"><i class=\"ds-dot\"></i>Toàn bộ</span> <span class=\"ds-cell\"><i class=\"ds-dot ds-diamond\"></i>Đề xuất · phạm vi</span>",
+      "css": ".ds-cell{display:inline-flex;align-items:center;gap:6px;font:400 12px 'Roboto Variable',system-ui,sans-serif;color:#1e293b;margin-right:16px}.ds-dot{width:10px;height:10px;border-radius:50%;background:#0071a6;border:2px solid #0071a6;display:inline-block}.ds-diamond{border-radius:2px;background:transparent;border-color:#d97706;transform:rotate(45deg) scale(.85)}"
+    },
+    {
+      "name": "Menu Item",
+      "kind": "nav",
+      "description": "Sider item, selected state uses soft brand fill.",
+      "html": "<div class=\"ds-nav ds-nav-sel\">Ma trận quyền</div>",
+      "css": ".ds-nav{height:38px;line-height:38px;padding:0 16px;margin:0 8px;border-radius:8px;color:#334155;font:400 14px 'Roboto Variable',system-ui,sans-serif}.ds-nav:hover{background:#f1f5f9}.ds-nav-sel{background:#e6f1f7;color:#005b86}"
+    },
+    {
+      "name": "App Header",
+      "kind": "custom",
+      "description": "Blue gradient bar with DUT logo in white square.",
+      "html": "<div class=\"ds-header\"><span class=\"ds-logo\"></span><span>Quản lý Chương trình đào tạo</span></div>",
+      "css": ".ds-header{display:flex;align-items:center;gap:12px;height:64px;padding:0 24px;color:#fff;font:600 16px 'Roboto Variable',system-ui,sans-serif;background:linear-gradient(to right,#1e40af,#2563eb);box-shadow:0 4px 6px -1px rgba(15,23,42,.18)}.ds-logo{width:44px;height:44px;background:#fff;display:inline-block}"
+    },
+    {
+      "name": "Default Tag",
+      "kind": "chip",
+      "refersTo": "tag-default",
+      "description": "Neutral status tag.",
+      "html": "<span class=\"ds-tag\">Nháp</span>",
+      "css": ".ds-tag{display:inline-block;background:#f1f5f9;color:#334155;border-radius:4px;padding:0 8px;font:400 12px/22px 'Roboto Variable',system-ui,sans-serif}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Hồ sơ của Trường",
+    "overview": "Operate-mode tool that continues the school's outcome system (chuandaura.dut.udn.vn): same blue, Roboto, blue gradient header with DUT logo in a white square. Dense, scannable, tables first, near-flat depth, light mode only, Vietnamese UI.",
+    "keyCharacteristics": ["One brand blue for action and selection", "Roboto Variable 14px base, weight 600 headings", "Radius 4/6/8/12, controls 36px", "State never by color alone", "Motion 120-200ms, one easing"],
+    "rules": [
+      { "name": "The Tokens-Only Rule", "body": "No hardcoded hex in components; use palette or AntD tokens.", "section": "colors" },
+      { "name": "The Never-Color-Alone Rule", "body": "Every state, scope and lock is readable without color.", "section": "colors" },
+      { "name": "The Meaning-Only Rule", "body": "Brand blue and semantic colors carry meaning, not decoration.", "section": "colors" },
+      { "name": "The Fourteen Floor Rule", "body": "Primary reading content is never below 14px.", "section": "typography" },
+      { "name": "The Tabular Rule", "body": "Numeric columns use tabular figures.", "section": "typography" },
+      { "name": "The Flat-Until-Floating Rule", "body": "Static surfaces have no shadow; shadows are for sticky bars and overlays.", "section": "elevation" }
+    ],
+    "dos": ["Do take every color from palette or AntD tokens.", "Do pair status color with shape, text or icon.", "Do use AntD components directly.", "Do write specific Vietnamese UI copy.", "Do keep lock reasons and scope visible without hover.", "Do stay light mode only."],
+    "donts": ["Don't add a display font or second family.", "Don't layer custom animation on AntD components.", "Don't add shadows to static cards or buttons.", "Don't use gradients outside the app header.", "Don't add dark mode or a second palette.", "Don't drop the DUT logo-in-white-square header convention."]
+  }
+}
