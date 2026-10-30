@@ -35,6 +35,7 @@ import {
   useEquivalenceGroupList,
   useRemoveEquivalenceMember,
 } from '../hooks/useEquivalenceGroups';
+import { formatEmpty } from '../../../shared/design-system';
 
 export const DISSOLVE_CONFIRM_TEXT =
   'Các học phần trong nhóm sẽ không còn tương đương với nhau. Thao tác này không hoàn tác được.';
@@ -118,7 +119,7 @@ export function EquivalenceGroupsPage() {
     {
       title: 'Ghi chú',
       dataIndex: 'note',
-      render: (note: string | null) => note ?? '—',
+      render: (note: string | null) => formatEmpty(note, 'Không có'),
     },
     ...(canEdit
       ? [
