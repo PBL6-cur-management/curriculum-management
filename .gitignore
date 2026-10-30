@@ -2,3 +2,7 @@
 **/tmDiemkyhoc*.md
 .playwright-mcp/
 .impeccable/config.local.json
+
+# School data dump (real personal data) — never commit
+source/current-data-dut/
+source/backend/prisma/seed-data/dut/data/private/
