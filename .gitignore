@@ -6,3 +6,6 @@
 # School data dump (real personal data) — never commit
 source/current-data-dut/
 source/backend/prisma/seed-data/dut/data/private/
+
+# Local-only helper scripts (viewer accounts and similar), never committed
+source/backend/scripts/local/

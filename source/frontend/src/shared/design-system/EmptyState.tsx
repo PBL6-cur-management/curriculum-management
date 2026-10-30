@@ -20,12 +20,13 @@ interface EmptyStateProps {
   onAction?: () => void;
 }
 
-export function EmptyState({ description, actionLabel, onAction }: EmptyStateProps) {
+export function EmptyState({
+  description,
+  actionLabel,
+  onAction,
+}: EmptyStateProps) {
   return (
-    <Empty
-      description={description}
-      image={Empty.PRESENTED_IMAGE_SIMPLE}
-    >
+    <Empty description={description} image={Empty.PRESENTED_IMAGE_SIMPLE}>
       {actionLabel && onAction && (
         <Button type="primary" onClick={onAction}>
           {actionLabel}

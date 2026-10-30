@@ -15,13 +15,12 @@
 
 import { Table } from 'antd';
 import type { TableColumnsType, TableProps } from 'antd';
-import {
-  DEFAULT_PAGE_SIZE,
-  PAGE_SIZE_OPTIONS,
-} from '../api/pagination.js';
+import { DEFAULT_PAGE_SIZE, PAGE_SIZE_OPTIONS } from '../api/pagination.js';
 
-interface DataTableProps<T>
-  extends Omit<TableProps<T>, 'pagination' | 'columns' | 'dataSource'> {
+interface DataTableProps<T> extends Omit<
+  TableProps<T>,
+  'pagination' | 'columns' | 'dataSource'
+> {
   /** Column definitions */
   columns: TableColumnsType<T>;
   /** Data rows */
