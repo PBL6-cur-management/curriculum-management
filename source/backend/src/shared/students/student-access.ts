@@ -8,6 +8,7 @@ import { AppException } from '../exception/app.exception.js';
 import { COMMON_ERRORS } from '../exception/error-codes.js';
 import type { StartedSemester } from '../releases/semester-start.js';
 import { enrollmentCoversWhere } from './enrollment-period.js';
+import { isIntegrationAssignment } from '../integration-access/integration-access.js';
 import { STUDENT_ROLES } from './student.constants.js';
 import { STUDENT_ERRORS } from './student.errors.js';
 import { GRADUATION_ERRORS } from '../graduation/graduation.errors.js';
@@ -104,6 +105,18 @@ export function holdsStudentImport(access: AccessContext): boolean {
   return officeHolds(access, PERMISSIONS.DATA_IMPORT_EXCEL);
 }
 
+// A partner call (F-21) reaches exactly the one student it was authorized for, nobody else.
+function integrationTargets(
+  assignment: ActiveAssignment,
+  studentId: string,
+): boolean {
+  return (
+    isIntegrationAssignment(assignment.roleCode) &&
+    !assignment.scope.all &&
+    assignment.scope.studentIds.has(studentId)
+  );
+}
+
 function holdsPurpose(
   assignment: ActiveAssignment,
   purpose: StudentReadPurpose,
@@ -123,6 +136,7 @@ export function readsWithoutEnrollment(
     (assignment) =>
       holdsPurpose(assignment, purpose) &&
       (assignment.roleCode === STUDENT_ROLES.OFFICE ||
+        integrationTargets(assignment, student.id) ||
         (assignment.roleCode === STUDENT_ROLES.SELF &&
           student.userId !== null &&
           student.userId === access.userId &&
@@ -163,6 +177,15 @@ export function studentReadWhere(
           assignment.scope.all ? undefined : [...assignment.scope.programIds],
         ),
       );
+    } else if (isIntegrationAssignment(assignment.roleCode)) {
+      const target: Prisma.StudentWhereInput = {
+        id: {
+          in: assignment.scope.all ? [] : [...assignment.scope.studentIds],
+        },
+      };
+      clauses.push(
+        programId || semester ? { AND: [target, enrolledIn()] } : target,
+      );
     } else if (assignment.roleCode === STUDENT_ROLES.SELF) {
       const own: Prisma.StudentWhereInput = { userId: access.userId };
       clauses.push(programId || semester ? { AND: [own, enrolledIn()] } : own);
@@ -192,6 +215,7 @@ export function assertStudentProgramRead(
       (assignment.scope.all || assignment.scope.studentIds.has(student.id))
     )
       return;
+    if (integrationTargets(assignment, student.id)) return;
   }
   // A personal object outside the caller's scope must not reveal that it exists.
   throw new AppException(STUDENT_ERRORS.STUDENT_NOT_FOUND);

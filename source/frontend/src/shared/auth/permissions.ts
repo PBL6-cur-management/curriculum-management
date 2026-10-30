@@ -38,6 +38,7 @@ export const PERMISSIONS = {
   semesterManage: 'semester.manage',
   dataImportExcel: 'data.importExcel',
   curriculumImportExportExcel: 'curriculum.importExportExcel',
+  integrationClientManage: 'integrationClient.manage',
   syncConfigure: 'sync.configure',
 } as const satisfies Record<string, PermissionCode>;
 

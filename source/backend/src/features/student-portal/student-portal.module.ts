@@ -13,5 +13,6 @@ import { StudentPortalService } from './student-portal.service.js';
   ],
   controllers: [StudentPortalController],
   providers: [StudentPortalService],
+  exports: [StudentPortalService],
 })
 export class StudentPortalModule {}

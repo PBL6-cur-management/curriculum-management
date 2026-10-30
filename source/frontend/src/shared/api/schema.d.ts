@@ -2724,6 +2724,172 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/integration-clients': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['IntegrationClientsController_list'];
+    put?: never;
+    post: operations['IntegrationClientsController_create'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/integration-clients/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch: operations['IntegrationClientsController_update'];
+    trace?: never;
+  };
+  '/api/integration-clients/{id}/lock': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['IntegrationClientsController_lock'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/integration-clients/{id}/unlock': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['IntegrationClientsController_unlock'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/sinh-vien/{mssv}/chuong-trinh': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Chương trình đào tạo áp dụng cho sinh viên */
+    get: operations['ddutV1GetApplicableProgram'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/chuong-trinh/{maCT}/phien-ban/{soPB}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Nội dung một phiên bản chương trình đã ban hành */
+    get: operations['ddutV1GetProgramVersion'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/hoc-phan/{maHP}/de-cuong': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Đề cương học phần đã ghim trong phiên bản của sinh viên hoặc phiên bản được chỉ rõ */
+    get: operations['ddutV1GetSyllabus'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/sinh-vien/{mssv}/tien-do': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Tiến độ học tập theo chương trình áp dụng */
+    get: operations['ddutV1GetProgress'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/sinh-vien/{mssv}/hoc-phan-du-dieu-kien': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Tư vấn học phần đủ điều kiện đăng ký */
+    get: operations['ddutV1GetEligibility'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/sinh-vien/{mssv}/xet-tot-nghiep': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Tự xét điều kiện tốt nghiệp (không lưu kết quả) */
+    get: operations['ddutV1GetGraduation'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -5670,6 +5836,169 @@ export interface components {
       weeks: components['schemas']['PortalWeekDto'][];
       assessments: components['schemas']['PortalAssessmentDto'][];
       attachments: components['schemas']['PortalAttachmentDto'][];
+    };
+    /** @enum {string} */
+    IntegrationClientStatus: 'ACTIVE' | 'LOCKED';
+    IntegrationClientDto: {
+      id: string;
+      clientName: string;
+      status: components['schemas']['IntegrationClientStatus'];
+      rateLimit: number;
+      createdByName: string;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      lastCalledAt: string | null;
+    };
+    IntegrationClientPageDto: {
+      items: components['schemas']['IntegrationClientDto'][];
+      total: number;
+      page: number;
+      pageSize: number;
+    };
+    CreateIntegrationClientDto: {
+      clientName: string;
+      /** @default 60 */
+      rateLimit: number;
+    };
+    IssuedIntegrationClientDto: {
+      client: components['schemas']['IntegrationClientDto'];
+      /** @description Hiển thị một lần duy nhất; hệ thống chỉ lưu bản băm. */
+      apiKey: string;
+    };
+    UpdateIntegrationClientDto: {
+      clientName?: string;
+      rateLimit?: number;
+    };
+    DdutMetaDto: {
+      /** @enum {string} */
+      apiVersion: 'v1';
+      /** Format: date-time */
+      evaluatedAt: string;
+    };
+    DdutStudentContextDto: {
+      studentCode: string;
+      enrollmentId: string;
+      programCode: string;
+      programName: string;
+      programVersionId: string;
+      versionNumber: string | null;
+      decisionNumber: string | null;
+      semesterCode: string;
+      /** Format: date */
+      semesterStartDate: string;
+      /** @enum {string} */
+      versionSource: 'COHORT' | 'EXCEPTION';
+    };
+    DdutApplicableProgramDto: {
+      meta: components['schemas']['DdutMetaDto'];
+      context: components['schemas']['DdutStudentContextDto'];
+    };
+    DdutCourseRefDto: {
+      courseCode: string;
+      courseName: string;
+    };
+    DdutRequisiteDto: {
+      sourceCourse: components['schemas']['DdutCourseRefDto'];
+      /** @enum {string} */
+      relationType: 'PRIOR' | 'PREREQUISITE' | 'COREQUISITE';
+      minScore: string | null;
+    };
+    DdutCurriculumItemDto: {
+      course: components['schemas']['DdutCourseRefDto'];
+      credits: string;
+      sortOrder: number;
+      blockSymbol: string | null;
+      isElective: boolean;
+      electiveGroupCode: string | null;
+      htDa: boolean;
+      tqDa: boolean;
+      minStudiedScore: string | null;
+      minTransferScore: string | null;
+      note: string | null;
+      hasSyllabus: boolean;
+      requisites: components['schemas']['DdutRequisiteDto'][];
+    };
+    DdutPlannedSemesterDto: {
+      plannedSemester: number;
+      items: components['schemas']['DdutCurriculumItemDto'][];
+    };
+    DdutElectiveGroupDto: {
+      groupCode: string;
+      groupName: string;
+      minCredits: string | null;
+      minCourses: number | null;
+    };
+    DdutPloDto: {
+      ploCode: string;
+      description: string;
+      competencyGroup: string | null;
+      sortOrder: number;
+    };
+    DdutProgramVersionDto: {
+      meta: components['schemas']['DdutMetaDto'];
+      programCode: string;
+      programName: string;
+      majorCode: string;
+      majorName: string;
+      versionNumber: string;
+      /** @enum {string} */
+      status: 'PENDING' | 'ACTIVE' | 'HISTORICAL';
+      decisionNumber: string | null;
+      semesterCount: number;
+      totalCredits: string;
+      compulsoryCredits: string;
+      electiveCredits: string;
+      /** Format: date-time */
+      publishedAt: string;
+      effectiveSemesterCode: string | null;
+      semesters: components['schemas']['DdutPlannedSemesterDto'][];
+      electiveGroups: components['schemas']['DdutElectiveGroupDto'][];
+      plos: components['schemas']['DdutPloDto'][];
+    };
+    DdutSyllabusContextDto: {
+      programCode: string;
+      versionNumber: string | null;
+      studentCode: string | null;
+    };
+    DdutSyllabusDto: {
+      meta: components['schemas']['DdutMetaDto'];
+      context: components['schemas']['DdutSyllabusContextDto'];
+      syllabus: components['schemas']['PortalSyllabusDto'];
+    };
+    DdutCreditsDto: {
+      requiredTotal: string;
+      recognizedTotal: string;
+      missingTotal: string;
+      compulsory: string;
+      elective: string;
+      free: string;
+    };
+    DdutDiagnosticDto: {
+      code: string;
+      message: string;
+    };
+    DdutProgressDto: {
+      meta: components['schemas']['DdutMetaDto'];
+      context: components['schemas']['DdutStudentContextDto'];
+      /** @enum {string} */
+      academicStatus: 'HAS_RESULTS' | 'NO_ACADEMIC_RESULTS';
+      /** @description Null khi không tính được; xem creditsUnavailable. */
+      credits: components['schemas']['DdutCreditsDto'] | null;
+      creditsUnavailable: components['schemas']['DdutDiagnosticDto'] | null;
+      terms: components['schemas']['PortalTermDto'][];
+    };
+    DdutEligibilityDto: {
+      meta: components['schemas']['DdutMetaDto'];
+      context: components['schemas']['DdutStudentContextDto'];
+      eligibility: components['schemas']['RegistrationEligibilityDto'];
+    };
+    DdutGraduationDto: {
+      meta: components['schemas']['DdutMetaDto'];
+      context: components['schemas']['DdutStudentContextDto'];
+      graduation:
+        | components['schemas']['GraduationReviewedOutcomeDto']
+        | components['schemas']['GraduationCannotAuditOutcomeDto'];
     };
   };
   responses: never;
@@ -10428,6 +10757,267 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  IntegrationClientsController_list: {
+    parameters: {
+      query?: {
+        page?: number;
+        pageSize?: number;
+        search?: string;
+        status?: components['schemas']['IntegrationClientStatus'];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['IntegrationClientPageDto'];
+        };
+      };
+    };
+  };
+  IntegrationClientsController_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateIntegrationClientDto'];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['IssuedIntegrationClientDto'];
+        };
+      };
+    };
+  };
+  IntegrationClientsController_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateIntegrationClientDto'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['IntegrationClientDto'];
+        };
+      };
+    };
+  };
+  IntegrationClientsController_lock: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['IntegrationClientDto'];
+        };
+      };
+    };
+  };
+  IntegrationClientsController_unlock: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['IntegrationClientDto'];
+        };
+      };
+    };
+  };
+  ddutV1GetApplicableProgram: {
+    parameters: {
+      query?: {
+        /** @description Mã học kỳ. Bỏ trống: học kỳ gần nhất đã bắt đầu tính đến hôm nay. */
+        semester?: string;
+      };
+      header?: never;
+      path: {
+        mssv: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['DdutApplicableProgramDto'];
+        };
+      };
+    };
+  };
+  ddutV1GetProgramVersion: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        maCT: string;
+        soPB: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['DdutProgramVersionDto'];
+        };
+      };
+    };
+  };
+  ddutV1GetSyllabus: {
+    parameters: {
+      query?: {
+        /** @description Mã học kỳ. Bỏ trống: học kỳ gần nhất đã bắt đầu tính đến hôm nay. */
+        semester?: string;
+        /** @description Mã sinh viên (chọn theo sinh viên). */
+        mssv?: string;
+        /** @description Mã chương trình (chọn theo phiên bản). */
+        program?: string;
+        programVersion?: string;
+      };
+      header?: never;
+      path: {
+        maHP: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['DdutSyllabusDto'];
+        };
+      };
+    };
+  };
+  ddutV1GetProgress: {
+    parameters: {
+      query?: {
+        /** @description Mã học kỳ. Bỏ trống: học kỳ gần nhất đã bắt đầu tính đến hôm nay. */
+        semester?: string;
+      };
+      header?: never;
+      path: {
+        mssv: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['DdutProgressDto'];
+        };
+      };
+    };
+  };
+  ddutV1GetEligibility: {
+    parameters: {
+      query?: {
+        /** @description Mã học kỳ. Bỏ trống: học kỳ gần nhất đã bắt đầu tính đến hôm nay. */
+        semester?: string;
+      };
+      header?: never;
+      path: {
+        mssv: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['DdutEligibilityDto'];
+        };
+      };
+    };
+  };
+  ddutV1GetGraduation: {
+    parameters: {
+      query?: {
+        /** @description Mã học kỳ. Bỏ trống: học kỳ gần nhất đã bắt đầu tính đến hôm nay. */
+        semester?: string;
+      };
+      header?: never;
+      path: {
+        mssv: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['DdutGraduationDto'];
+        };
       };
     };
   };

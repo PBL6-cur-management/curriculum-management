@@ -203,6 +203,7 @@ model OrgUnit {
 }
 
 model User {
+  integrationClientsCreated IntegrationClient[]         @relation("IntegrationClientCreator")
   requestedSchoolSyncRuns   SyncLog[]                   @relation("SchoolSyncRequester")
   graduationAudits          GraduationAudit[]           @relation("GraduationReviewer")
   graduationBatches         GraduationBatch[]           @relation("GraduationBatchRequester")
@@ -1503,4 +1504,52 @@ model SyncConflict {
   createdAt      DateTime             @default(now())
 
   @@unique([syncLogId, entityType, recordKey])
+}
+
+enum IntegrationClientStatus {
+  ACTIVE
+  LOCKED
+}
+
+// F-21: a partner server (dDUT) reading /api/v1 with its own key; only the SHA-256 of the key is stored.
+model IntegrationClient {
+  id          String                  @id @default(cuid(2))
+  clientName  String                  @unique
+  keyHash     String                  @unique @db.Char(64)
+  rateLimit   Int                     @default(60)
+  status      IntegrationClientStatus @default(ACTIVE)
+  createdById String
+  createdBy   User                    @relation("IntegrationClientCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+  windows     IntegrationRateWindow[]
+  calls       IntegrationCallLog[]
+}
+
+// One fixed-minute counter per client, shared by every backend process.
+model IntegrationRateWindow {
+  clientId    String
+  client      IntegrationClient @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  windowStart DateTime          @db.Timestamptz(3)
+  used        Int
+
+  @@id([clientId, windowStart])
+  @@index([windowStart])
+}
+
+// Append-only: a trigger refuses UPDATE and DELETE.
+model IntegrationCallLog {
+  id          String             @id @default(cuid(2))
+  requestId   String             @unique
+  clientId    String?
+  client      IntegrationClient? @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  resource    String
+  studentCode String?
+  occurredAt  DateTime           @default(now()) @db.Timestamptz(3)
+  httpStatus  Int
+  errorCode   String?
+  durationMs  Int
+
+  @@index([clientId, occurredAt])
+  @@index([studentCode, occurredAt])
 }

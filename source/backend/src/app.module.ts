@@ -33,6 +33,8 @@ import { StudentsModule } from './features/students/students.module.js';
 import { RegistrationEligibilityModule } from './features/registration-eligibility/registration-eligibility.module.js';
 import { GraduationModule } from './features/graduation/graduation.module.js';
 import { SchoolSyncModule } from './features/school-db-sync/school-sync.module.js';
+import { DdutApiModule } from './features/ddut-api/ddut-api.module.js';
+import { IntegrationClientsModule } from './features/integration-clients/integration-clients.module.js';
 import { StudentPortalModule } from './features/student-portal/student-portal.module.js';
 
 @Module({
@@ -67,6 +69,8 @@ import { StudentPortalModule } from './features/student-portal/student-portal.mo
     GraduationModule,
     SchoolSyncModule,
     StudentPortalModule,
+    IntegrationClientsModule,
+    DdutApiModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: CsrfGuard },

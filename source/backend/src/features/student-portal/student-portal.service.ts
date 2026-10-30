@@ -41,6 +41,36 @@ const MATERIAL_ORDER = [
   'OTHER',
 ];
 
+// A row's pin counts only once issued: a draft or an unnumbered revision is not something to publish.
+export function issuedPin(
+  pin: {
+    id: string;
+    status: SyllabusStatus;
+    revisionNumber: number | null;
+  } | null,
+): string | null {
+  return pin &&
+    pin.status !== SyllabusStatus.DRAFT &&
+    pin.revisionNumber !== null
+    ? pin.id
+    : null;
+}
+
+// The latest semester already started; before any start date is known, the earliest dated one.
+export async function defaultSemester(db: Prisma.TransactionClient) {
+  const today = new Date();
+  return (
+    (await db.semester.findFirst({
+      where: { startDate: { lte: today } },
+      orderBy: { startDate: 'desc' },
+    })) ??
+    (await db.semester.findFirst({
+      where: { startDate: { not: null } },
+      orderBy: { startDate: 'asc' },
+    }))
+  );
+}
+
 // Every read is addressed by the session, never by a student id in the URL: one student cannot name another.
 // Nothing here writes: no reconciliation, no saved audit, no missing context created.
 @Injectable()
@@ -73,21 +103,6 @@ export class StudentPortalService {
     return id;
   }
 
-  // The latest semester already started; before any start date is known, the earliest dated one.
-  private async defaultSemester(db: Prisma.TransactionClient) {
-    const today = new Date();
-    return (
-      (await db.semester.findFirst({
-        where: { startDate: { lte: today } },
-        orderBy: { startDate: 'desc' },
-      })) ??
-      (await db.semester.findFirst({
-        where: { startDate: { not: null } },
-        orderBy: { startDate: 'asc' },
-      }))
-    );
-  }
-
   async me(
     access: AccessContext,
     query: PortalSemesterQueryDto,
@@ -108,7 +123,7 @@ export class StudentPortalService {
       });
       const picked = query.semesterId
         ? await requireSemesterStart(tx, query.semesterId)
-        : await this.defaultSemester(tx);
+        : await defaultSemester(tx);
       const identity = {
         id: student.id,
         studentCode: student.studentCode,
@@ -184,7 +199,14 @@ export class StudentPortalService {
     query: PortalContextQueryDto,
   ): Promise<PortalCurriculumDto> {
     const studentId = await this.requireOwnStudentId(access);
-    const lookup = { studentId, ...query };
+    return this.curriculumFor(access, { studentId, ...query });
+  }
+
+  // Shared with the dDUT API (F-21): the caller's access decides who may be read; the answer is the same.
+  async curriculumFor(
+    access: AccessContext,
+    lookup: { studentId: string; programId: string; semesterId: string },
+  ): Promise<PortalCurriculumDto> {
     return this.prisma.$transaction(async (tx) => {
       // F-18 decides completion (equivalents included); F-17 supplies the attempts. Nothing is re-evaluated here.
       const answer = await this.eligibility
@@ -320,15 +342,9 @@ export class StudentPortalService {
       },
     });
     if (!item) throw new AppException(PORTAL_ERRORS.ITEM_NOT_FOUND);
-    const pin = item.syllabus;
-    if (
-      !pin ||
-      pin.status === SyllabusStatus.DRAFT ||
-      pin.revisionNumber === null
-    ) {
-      throw new AppException(PORTAL_ERRORS.SYLLABUS_NOT_ISSUED);
-    }
-    return pin.id;
+    const pin = issuedPin(item.syllabus);
+    if (!pin) throw new AppException(PORTAL_ERRORS.SYLLABUS_NOT_ISSUED);
+    return pin;
   }
 
   async syllabus(
@@ -336,7 +352,13 @@ export class StudentPortalService {
     itemId: string,
     query: PortalContextQueryDto,
   ): Promise<PortalSyllabusDto> {
-    const syllabusId = await this.pinnedSyllabusId(access, itemId, query);
+    return this.syllabusProjection(
+      await this.pinnedSyllabusId(access, itemId, query),
+    );
+  }
+
+  // The allowlisted, issued view of one syllabus revision; never request, reviewer or draft fields.
+  async syllabusProjection(syllabusId: string): Promise<PortalSyllabusDto> {
     const row = await this.prisma.syllabus.findUniqueOrThrow({
       where: { id: syllabusId },
       select: {
