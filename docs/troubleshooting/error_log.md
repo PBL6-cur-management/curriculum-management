@@ -85,3 +85,9 @@ Format:
 **Possible cause**: `onOk` của `modal.confirm` trong `GraduationBatchesPage.tsx` ném lại lỗi. ActionButton của AntD reject lại promise đó mà không ai await, nên lỗi rơi ra ngoài thành unhandled rejection.
 **Resolution**: `onOk` tự xử lý lỗi (đưa vào state của trang để hiển thị) và đóng dialog trong `finally`; không ném lại. Phát hiện và sửa trong lượt build F-19, kiểm bằng `GraduationBatchesPage.test.tsx` (Vitest 85/85).
 **How to avoid**: Không để `onOk` của AntD `modal.confirm` reject, trừ khi chủ ý dùng chế độ im lặng; hiển thị lỗi qua state. Rà các `modal.confirm` khác có `onOk` async ném lại lỗi.
+
+## 2026-10-30 — Dump dữ liệu Trường bị commit lên repo public
+
+- **Triệu chứng**: commit `dd78389` đưa 43 file `source/current-data-dut/` (hồ sơ SV/GV có CMND, SĐT, địa chỉ, cột `Matkhau`, học phí, điểm) lên `origin/main`; repo GitHub đang PUBLIC.
+- **Xử lý**: ngừng theo dõi thư mục, thêm vào `.gitignore` (nhánh `chore/remove-school-dump`). File trên đĩa giữ nguyên cho pipeline seed.
+- **Còn mở**: lịch sử git vẫn chứa dump. Xử lý dứt điểm cần chuyển repo sang Private và viết lại lịch sử (`git filter-repo`) — người dùng chọn chưa làm.
