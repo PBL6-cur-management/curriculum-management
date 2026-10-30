@@ -5,6 +5,7 @@ export type PermissionCode = components['schemas']['PermissionCode'];
 
 export const PERMISSIONS = {
   studentViewRegistrationEligibility: 'student.viewRegistrationEligibility',
+  studentViewProgress: 'student.viewProgress',
   versionCompare: 'version.compare',
   versionAssignCohort: 'version.assignCohort',
   userManage: 'user.manage',

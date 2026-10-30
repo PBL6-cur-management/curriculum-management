@@ -482,15 +482,13 @@ describe('outcomes: PLO, course-PLO and CLO-PLO matrices', () => {
     });
   });
 
-  it('lets a student read the PLOs of their faculty program and nothing of the matrices (F11-05)', async () => {
+  // F-20 BE-06: a student reads their own applied version's PLOs through the portal, never this staff-addressed list.
+  it('refuses a student the staff PLO list and every matrix (F11-05, F-20 BE-06)', async () => {
     const { versionId } = await newProgram();
     await createPlo(admin, versionId, 'PLO1');
 
-    const list = await student
-      .get(`/api/program-versions/${versionId}/plos`)
-      .expect(200);
-    expect(list.body).toMatchObject({ editPath: null, canEdit: false });
     for (const path of [
+      'plos',
       'course-plo-matrix',
       'clo-plo-matrix',
       'outcome-coverage',
@@ -498,7 +496,10 @@ describe('outcomes: PLO, course-PLO and CLO-PLO matrices', () => {
       const refused = await student
         .get(`/api/program-versions/${versionId}/${path}`)
         .expect(403);
-      expect(refused.body.code).toBe('PERMISSION_DENIED');
+      // R6 holds outcome.view scoped to nothing, so the refusal may say out of scope rather than not granted.
+      expect(['OUT_OF_SCOPE', 'PERMISSION_DENIED']).toContain(
+        refused.body.code,
+      );
     }
     const read = await viewer
       .get(`/api/program-versions/${versionId}/course-plo-matrix`)

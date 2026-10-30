@@ -93,11 +93,8 @@ describe('ScopeSourceReader', () => {
     expect(findMany).not.toHaveBeenCalled();
   });
 
-  it('derives OWN_ENROLLMENT from the linked student and their past programs', async () => {
-    const findUnique = vi.fn().mockResolvedValue({
-      id: 'student-1',
-      enrollments: [{ programId: 'p1' }, { programId: 'p2' }],
-    });
+  it('derives OWN_ENROLLMENT as the linked student only, never their programs (F-20 BE-06)', async () => {
+    const findUnique = vi.fn().mockResolvedValue({ id: 'student-1' });
     const studentReader = new ScopeSourceReader({
       student: { findUnique },
     } as unknown as PrismaService);
@@ -107,7 +104,7 @@ describe('ScopeSourceReader', () => {
         'user-1',
         TODAY,
       ),
-    ).toEqual({ studentIds: ['student-1'], programIds: ['p1', 'p2'] });
+    ).toEqual({ studentIds: ['student-1'] });
     expect(findUnique).toHaveBeenCalledWith(
       expect.objectContaining({ where: { userId: 'user-1' } }),
     );
