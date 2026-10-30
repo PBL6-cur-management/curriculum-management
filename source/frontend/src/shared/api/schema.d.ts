@@ -2644,6 +2644,86 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/portal/me': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['StudentPortalController_me'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/portal/curriculum': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['StudentPortalController_curriculum'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/portal/plos': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['StudentPortalController_plos'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/portal/curriculum-items/{itemId}/syllabus': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['StudentPortalController_syllabus'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/portal/curriculum-items/{itemId}/syllabus/attachments/{attachmentId}/file': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['StudentPortalController_attachment'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -5492,6 +5572,104 @@ export interface components {
       total: number;
       page: number;
       pageSize: number;
+    };
+    PortalStudentDto: {
+      id: string;
+      studentCode: string;
+      fullName: string;
+      cohortCode: string;
+      major: string;
+      status: components['schemas']['StudentStatus'];
+    };
+    PortalSemesterDto: {
+      id: string;
+      semesterCode: string;
+    };
+    PortalProgramDto: {
+      programId: string;
+      programCode: string;
+      programName: string;
+      enrollmentType: components['schemas']['EnrollmentType'];
+      versionId: string;
+      versionNumber: string | null;
+      decisionNumber: string | null;
+    };
+    PortalMeDto: {
+      student: components['schemas']['PortalStudentDto'] | null;
+      semester: components['schemas']['PortalSemesterDto'] | null;
+      programs: components['schemas']['PortalProgramDto'][];
+    };
+    /** @enum {string} */
+    PortalCourseState:
+      'PASSED' | 'PASSED_EQUIVALENT' | 'IN_PROGRESS' | 'FAILED' | 'NOT_TAKEN';
+    PortalCourseDto: {
+      itemId: string;
+      courseId: string;
+      courseCode: string;
+      courseName: string;
+      credits: string;
+      isElective: boolean;
+      groupName: string | null;
+      blockSymbol: string | null;
+      state: components['schemas']['PortalCourseState'];
+      attemptCount: number;
+      score10: string | null;
+      score4: string | null;
+      letterGrade: string | null;
+      hasSyllabus: boolean;
+    };
+    PortalTermDto: {
+      plannedSemester: number;
+      credits: string;
+      courses: components['schemas']['PortalCourseDto'][];
+    };
+    PortalCurriculumDto: {
+      programName: string;
+      versionNumber: string | null;
+      decisionNumber: string | null;
+      totalCredits: string;
+      terms: components['schemas']['PortalTermDto'][];
+    };
+    PortalPloDto: {
+      ploCode: string;
+      description: string;
+      competencyGroup: string | null;
+    };
+    PortalCloDto: {
+      cloCode: string;
+      description: string;
+    };
+    PortalWeekDto: {
+      weekLabel: string;
+      content: string;
+    };
+    PortalAssessmentDto: {
+      componentCode: string;
+      componentName: string;
+      weight: string;
+      assessmentForm: string | null;
+    };
+    PortalAttachmentDto: {
+      id: string;
+      fileName: string;
+      materialKind: components['schemas']['SyllabusMaterialKind'];
+      sizeBytes: number;
+    };
+    PortalSyllabusDto: {
+      courseCode: string;
+      courseName: string;
+      credits: string;
+      revisionNumber: number;
+      publishedAt: string | null;
+      courseDescription: string | null;
+      objectives: string | null;
+      teachingMethods: string | null;
+      assessmentMethods: string | null;
+      references: string | null;
+      clos: components['schemas']['PortalCloDto'][];
+      weeks: components['schemas']['PortalWeekDto'][];
+      assessments: components['schemas']['PortalAssessmentDto'][];
+      attachments: components['schemas']['PortalAttachmentDto'][];
     };
   };
   responses: never;
@@ -10138,6 +10316,118 @@ export interface operations {
         content: {
           'application/json': components['schemas']['SyncRunDto'];
         };
+      };
+    };
+  };
+  StudentPortalController_me: {
+    parameters: {
+      query?: {
+        semesterId?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PortalMeDto'];
+        };
+      };
+    };
+  };
+  StudentPortalController_curriculum: {
+    parameters: {
+      query: {
+        programId: string;
+        semesterId: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PortalCurriculumDto'];
+        };
+      };
+    };
+  };
+  StudentPortalController_plos: {
+    parameters: {
+      query: {
+        programId: string;
+        semesterId: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PortalPloDto'][];
+        };
+      };
+    };
+  };
+  StudentPortalController_syllabus: {
+    parameters: {
+      query: {
+        programId: string;
+        semesterId: string;
+      };
+      header?: never;
+      path: {
+        itemId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PortalSyllabusDto'];
+        };
+      };
+    };
+  };
+  StudentPortalController_attachment: {
+    parameters: {
+      query: {
+        programId: string;
+        semesterId: string;
+      };
+      header?: never;
+      path: {
+        itemId: string;
+        attachmentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

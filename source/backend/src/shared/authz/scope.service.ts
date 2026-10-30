@@ -77,14 +77,18 @@ export class ScopeService {
       scopeSource: row.role.scopeSource,
       scopeType: row.scopeType,
       scopeUnit: row.scopeUnit,
+      // A self-scoped role (R6) reaches its own record only through the derived assignment; an explicit
+      // assignment, whatever its scope type, must not widen SCOPED staff reads to everything (F-20 BE-06).
       scope:
-        row.scopeType === ScopeType.SYSTEM
-          ? { all: true }
-          : unitScope(
-              row.scopeUnit
-                ? descendantsAndSelf(row.scopeUnit.id, children)
-                : [],
-            ),
+        row.role.scopeSource === ScopeSource.OWN_ENROLLMENT
+          ? unitScope([])
+          : row.scopeType === ScopeType.SYSTEM
+            ? { all: true }
+            : unitScope(
+                row.scopeUnit
+                  ? descendantsAndSelf(row.scopeUnit.id, children)
+                  : [],
+              ),
       permissions: toGrantMap(row.role.rolePermissions),
     }));
   }

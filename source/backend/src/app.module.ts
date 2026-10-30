@@ -33,6 +33,7 @@ import { StudentsModule } from './features/students/students.module.js';
 import { RegistrationEligibilityModule } from './features/registration-eligibility/registration-eligibility.module.js';
 import { GraduationModule } from './features/graduation/graduation.module.js';
 import { SchoolSyncModule } from './features/school-db-sync/school-sync.module.js';
+import { StudentPortalModule } from './features/student-portal/student-portal.module.js';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { SchoolSyncModule } from './features/school-db-sync/school-sync.module.j
     RegistrationEligibilityModule,
     GraduationModule,
     SchoolSyncModule,
+    StudentPortalModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: CsrfGuard },

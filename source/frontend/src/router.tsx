@@ -6,6 +6,11 @@ import { LoginPage } from './features/auth/pages/LoginPage';
 import { ROUTES } from './routes';
 import { RequireAuth } from './shared/auth/RequireAuth';
 import { AppLayout } from './shared/layout/AppLayout';
+import { StudentLayout } from './features/student-portal/components/StudentLayout';
+import {
+  HomeGate,
+  RequireStudent,
+} from './features/student-portal/components/HomeGate';
 import { RequireAnyPermission } from './shared/auth/RequireAnyPermission';
 import { RequirePermission } from './shared/auth/RequirePermission';
 import { PERMISSIONS } from './shared/auth/permissions';
@@ -266,20 +271,66 @@ const ImportDetailPage = lazy(() =>
   })),
 );
 
-const SchoolSyncSettingsPage = lazy(() =>
-  import('./features/school-db-sync/pages/SchoolSyncSettingsPage').then((module) => ({
-    default: module.SchoolSyncSettingsPage,
+const PortalHomePage = lazy(() =>
+  import('./features/student-portal/pages/PortalHomePage').then((module) => ({
+    default: module.PortalHomePage,
   })),
+);
+const PortalCurriculumPage = lazy(() =>
+  import('./features/student-portal/pages/PortalCurriculumPage').then(
+    (module) => ({
+      default: module.PortalCurriculumPage,
+    }),
+  ),
+);
+const PortalSyllabusPage = lazy(() =>
+  import('./features/student-portal/pages/PortalSyllabusPage').then(
+    (module) => ({
+      default: module.PortalSyllabusPage,
+    }),
+  ),
+);
+const PortalProgressPage = lazy(() =>
+  import('./features/student-portal/pages/PortalProgressPage').then(
+    (module) => ({
+      default: module.PortalProgressPage,
+    }),
+  ),
+);
+const PortalRegistrationPage = lazy(() =>
+  import('./features/student-portal/pages/PortalRegistrationPage').then(
+    (module) => ({
+      default: module.PortalRegistrationPage,
+    }),
+  ),
+);
+const PortalGraduationPage = lazy(() =>
+  import('./features/student-portal/pages/PortalGraduationPage').then(
+    (module) => ({
+      default: module.PortalGraduationPage,
+    }),
+  ),
+);
+const SchoolSyncSettingsPage = lazy(() =>
+  import('./features/school-db-sync/pages/SchoolSyncSettingsPage').then(
+    (module) => ({
+      default: module.SchoolSyncSettingsPage,
+    }),
+  ),
 );
 const SchoolSyncRunsPage = lazy(() =>
-  import('./features/school-db-sync/pages/SchoolSyncRunsPage').then((module) => ({
-    default: module.SchoolSyncRunsPage,
-  })),
+  import('./features/school-db-sync/pages/SchoolSyncRunsPage').then(
+    (module) => ({
+      default: module.SchoolSyncRunsPage,
+    }),
+  ),
 );
 const SchoolSyncRunDetailPage = lazy(() =>
-  import('./features/school-db-sync/pages/SchoolSyncRunDetailPage').then((module) => ({
-    default: module.SchoolSyncRunDetailPage,
-  })),
+  import('./features/school-db-sync/pages/SchoolSyncRunDetailPage').then(
+    (module) => ({
+      default: module.SchoolSyncRunDetailPage,
+    }),
+  ),
 );
 
 const StudentListPage = lazy(() =>
@@ -299,10 +350,29 @@ export const router = createBrowserRouter([
     element: <RequireAuth />,
     children: [
       {
+        path: ROUTES.studentPortal,
+        element: (
+          <RequireStudent>
+            <StudentLayout />
+          </RequireStudent>
+        ),
+        children: [
+          { index: true, element: <PortalHomePage /> },
+          { path: ROUTES.studentCurriculum, element: <PortalCurriculumPage /> },
+          { path: ROUTES.studentSyllabus, element: <PortalSyllabusPage /> },
+          { path: ROUTES.studentProgress, element: <PortalProgressPage /> },
+          {
+            path: ROUTES.studentRegistration,
+            element: <PortalRegistrationPage />,
+          },
+          { path: ROUTES.studentGraduation, element: <PortalGraduationPage /> },
+        ],
+      },
+      {
         path: ROUTES.home,
         element: <AppLayout />,
         children: [
-          { index: true, element: <HomePage /> },
+          { index: true, element: <HomeGate staffHome={<HomePage />} /> },
           {
             path: ROUTES.graduation,
             element: (

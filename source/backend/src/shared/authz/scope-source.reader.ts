@@ -35,20 +35,16 @@ export class ScopeSourceReader {
     }
   }
 
-  // Past programs stay readable so a student can see their own history; an account with no student record derives nothing.
+  // Only the student's own record: a program the student is enrolled in does not open staff program, version or
+  // outcome reads (F-20 BE-06). The portal reads the applied version through the session instead.
+  // An account with no student record derives nothing.
   private async ownStudent(userId: string): Promise<ScopeTarget> {
     const student = await this.prisma.student.findUnique({
       where: { userId },
-      select: {
-        id: true,
-        enrollments: { select: { programId: true }, distinct: ['programId'] },
-      },
+      select: { id: true },
     });
     if (!student) return {};
-    return {
-      studentIds: [student.id],
-      programIds: student.enrollments.map((row) => row.programId),
-    };
+    return { studentIds: [student.id] };
   }
 
   private async directedProgramIds(
