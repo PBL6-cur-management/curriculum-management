@@ -13,24 +13,29 @@
 //     table={<DataTable ... />}
 //   />
 
-import { Space } from 'antd';
+import { Flex } from 'antd';
+import { FilterBar } from './FilterBar.js';
 import type { ReactNode } from 'react';
 
 interface ListPageLayoutProps {
   /** PageHeader component (title + action buttons) */
   header: ReactNode;
-  /** Filter controls — wrapped trong Space wrap tự động */
+  /** Filter controls — tự đặt trong FilterBar */
   filters: ReactNode;
   /** DataTable hoặc Table component */
   table: ReactNode;
 }
 
-export function ListPageLayout({ header, filters, table }: ListPageLayoutProps) {
+export function ListPageLayout({
+  header,
+  filters,
+  table,
+}: ListPageLayoutProps) {
   return (
-    <Space direction="vertical" size="middle" style={{ width: '100%', display: 'flex' }}>
+    <Flex vertical gap="middle">
       {header}
-      <Space wrap>{filters}</Space>
+      <FilterBar>{filters}</FilterBar>
       {table}
-    </Space>
+    </Flex>
   );
 }
