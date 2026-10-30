@@ -23,7 +23,8 @@ const SPRINT_DAYS = 14;
 const SIZE_POINTS = { S: 1, M: 2, L: 4 } as const; // task-breakdown.md K-3
 const TAIGA_POINT_STEPS = [1, 2, 3, 5, 8, 10, 13, 20, 40];
 const POINTS_ROLE = 'Back'; // the role whose estimate Taiga sums
-const REQUEST_GAP_MS = 120;
+const REQUEST_GAP_MS = 400;
+const THROTTLE_RETRIES = 20;
 
 // Features with code merged on main. Each still has manual test cases outstanding, so its stories are
 // "Ready for test" and all their tasks are closed.
@@ -289,8 +290,13 @@ async function taiga<T>(
       },
       body: body === undefined ? undefined : JSON.stringify(body),
     });
-    if (response.status === 429 && attempt < 5) {
-      await delay(2000 * (attempt + 1));
+    // Taiga throttles bursts and says how long to wait ("Expected available in N seconds").
+    if (response.status === 429 && attempt < THROTTLE_RETRIES) {
+      const seconds = Number(
+        /available in (\d+) second/.exec(await response.text())?.[1] ?? 30,
+      );
+      console.log(`Throttled by Taiga; waiting ${seconds}s`);
+      await delay((seconds + 5) * 1000);
       continue;
     }
     if (!response.ok)
