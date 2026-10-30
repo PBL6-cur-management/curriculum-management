@@ -39,6 +39,12 @@ async function expectNoStatus(page: Page) {
   await expect(page.getByRole('button', { name: 'Đổi trạng thái', exact: true })).toHaveCount(0);
 }
 
+async function searchCourses(page: Page, text: string) {
+  const search = page.getByPlaceholder('Tìm theo mã hoặc tên học phần');
+  await search.fill(text);
+  await search.press('Enter');
+}
+
 test.describe('F-04 Danh mục học phần', () => {
   test.use(asRole('R1'));
 
@@ -221,8 +227,13 @@ test.describe('F-04 Danh mục học phần', () => {
   test('F04-TC_037 Kiểm tra lọc theo khoa phụ trách', async ({ page }) => {
     await page.goto('/courses');
     // The unlabelled faculty combobox is the first filter; subsequent comboboxes filter group, type and status.
-    await chooseOption(page, page.getByRole('combobox').nth(0), courseData.foreignFaculty);
+    await chooseOption(page, page.getByRole('combobox').nth(0), courseData.foreignFaculty, {
+      search: courseData.foreignFaculty,
+    });
+    // Real data fills several pages; narrow to the two world courses being compared.
+    await searchCourses(page, 'MAT101');
     await expect(page.getByRole('link', { name: 'MAT101', exact: true })).toBeVisible();
+    await searchCourses(page, 'PRG101');
     await expect(page.getByRole('link', { name: 'PRG101', exact: true })).toHaveCount(0);
   });
 
@@ -231,7 +242,9 @@ test.describe('F-04 Danh mục học phần', () => {
     const origin = page.getByRole('radiogroup', { name: 'segmented control', exact: true });
     await origin.getByText('Khoa khác', { exact: true }).click();
     await expect(origin.getByRole('radio', { name: 'Khoa khác', exact: true })).toBeChecked();
+    await searchCourses(page, 'MAT101');
     await expect(page.getByRole('link', { name: 'MAT101', exact: true })).toBeVisible();
+    await searchCourses(page, 'PRG101');
     await expect(page.getByRole('link', { name: 'PRG101', exact: true })).toHaveCount(0);
   });
 

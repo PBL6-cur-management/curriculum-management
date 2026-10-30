@@ -36,6 +36,8 @@ export async function prepareCourse(page: Page, input: CourseInput = {}) {
     page,
     page.getByRole('combobox').nth(1),
     input.foreign ? courseData.foreignFaculty : courseData.homeFaculty,
+    // The real org tree lists many units; the virtual list only renders the first screen.
+    { search: input.foreign ? courseData.foreignFaculty : courseData.homeFaculty },
   );
   return { code: code.trim().toUpperCase(), name: name.trim() };
 }

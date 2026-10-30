@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Button, Flex, Result, Table, Tag, Typography } from 'antd';
+import { Button, Flex, Result, Table, Tag } from 'antd';
 import type { TableColumnsType, TableProps } from 'antd';
 import { Link, generatePath, useNavigate } from 'react-router';
 import { ROUTES } from '../../../routes';
@@ -22,6 +22,7 @@ import {
   FOREIGN_COURSE_LABEL,
 } from '../constants/courseLabels';
 import { useCourseList } from '../hooks/useCourses';
+import { formatEmpty, PageHeader } from '../../../shared/design-system';
 
 const INITIAL_QUERY: CourseQuery = {
   page: 1,
@@ -112,7 +113,7 @@ export function CourseListPage() {
     {
       title: 'Nhóm phụ trách',
       dataIndex: ['ownerGroup', 'groupName'],
-      render: (name?: string) => name ?? '—',
+      render: (name?: string) => formatEmpty(name, 'Chưa gán'),
     },
     {
       title: 'Trạng thái',
@@ -124,19 +125,21 @@ export function CourseListPage() {
     return <Result status="error" title="Không thể tải danh mục học phần" />;
   return (
     <Flex vertical gap="middle">
-      <Flex justify="space-between" align="center" wrap gap="small">
-        <Typography.Title level={2} style={{ margin: 0 }}>
-          Danh mục học phần
-        </Typography.Title>
-        {canEdit && (
-          <Button
-            type="primary"
-            onClick={() => void navigate(ROUTES.courseNew)}
-          >
-            Thêm học phần
-          </Button>
-        )}
-      </Flex>
+      <PageHeader
+        title="Danh mục học phần"
+        actions={
+          <>
+            {canEdit && (
+              <Button
+                type="primary"
+                onClick={() => void navigate(ROUTES.courseNew)}
+              >
+                Thêm học phần
+              </Button>
+            )}
+          </>
+        }
+      />
       <CourseFilters value={query} onChange={applyFilters} />
       <Table<CourseSummary>
         rowKey="id"
@@ -150,6 +153,7 @@ export function CourseListPage() {
           total: data?.total ?? 0,
           pageSizeOptions: PAGE_SIZE_OPTIONS,
           showSizeChanger: true,
+          showTotal: (total) => `${total} học phần`,
         }}
         onChange={(pagination, _filters, sorter) =>
           setQuery((current) => toCourseQuery(current, pagination, sorter))

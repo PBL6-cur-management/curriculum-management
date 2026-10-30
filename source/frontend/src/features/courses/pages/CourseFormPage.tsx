@@ -1,16 +1,5 @@
 import { useEffect } from 'react';
-import {
-  Alert,
-  App,
-  Button,
-  Flex,
-  Form,
-  Input,
-  Select,
-  Skeleton,
-  Space,
-  Typography,
-} from 'antd';
+import { Alert, App, Button, Flex, Form, Input, Select, Space } from 'antd';
 import { generatePath, useNavigate, useParams } from 'react-router';
 import { ROUTES } from '../../../routes';
 import { PERMISSIONS } from '../../../shared/auth/permissions';
@@ -34,6 +23,7 @@ import {
   useUpdateCourse,
 } from '../hooks/useCourses';
 import { COURSE_RULES } from '../schema/courseRules';
+import { PageHeader, PageSkeleton } from '../../../shared/design-system';
 
 interface CourseFormValues {
   courseCode: string;
@@ -129,12 +119,18 @@ export function CourseFormPage() {
     }
   };
 
-  if (editing && isPending) return <Skeleton active />;
+  if (editing && isPending) return <PageSkeleton />;
   return (
     <Flex vertical gap="middle">
-      <Typography.Title level={2} style={{ margin: 0 }}>
-        {editing ? `Sửa học phần ${course?.courseCode ?? ''}` : 'Thêm học phần'}
-      </Typography.Title>
+      <PageHeader
+        title={
+          <>
+            {editing
+              ? `Sửa học phần ${course?.courseCode ?? ''}`
+              : 'Thêm học phần'}
+          </>
+        }
+      />
       {course &&
         (course.programsUsing.length > 0 ? (
           <Alert
