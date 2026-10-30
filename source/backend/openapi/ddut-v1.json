@@ -1,0 +1,2303 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/v1/sinh-vien/{mssv}/chuong-trinh": {
+      "get": {
+        "operationId": "ddutV1GetApplicableProgram",
+        "parameters": [
+          {
+            "name": "mssv",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "semester",
+            "required": false,
+            "in": "query",
+            "description": "Mã học kỳ. Bỏ trống: học kỳ gần nhất đã bắt đầu tính đến hôm nay.",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DdutApplicableProgramDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Chương trình đào tạo áp dụng cho sinh viên",
+        "tags": [
+          "dDUT v1"
+        ]
+      }
+    },
+    "/api/v1/chuong-trinh/{maCT}/phien-ban/{soPB}": {
+      "get": {
+        "operationId": "ddutV1GetProgramVersion",
+        "parameters": [
+          {
+            "name": "maCT",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "soPB",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DdutProgramVersionDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Nội dung một phiên bản chương trình đã ban hành",
+        "tags": [
+          "dDUT v1"
+        ]
+      }
+    },
+    "/api/v1/hoc-phan/{maHP}/de-cuong": {
+      "get": {
+        "operationId": "ddutV1GetSyllabus",
+        "parameters": [
+          {
+            "name": "maHP",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "semester",
+            "required": false,
+            "in": "query",
+            "description": "Mã học kỳ. Bỏ trống: học kỳ gần nhất đã bắt đầu tính đến hôm nay.",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
+          },
+          {
+            "name": "mssv",
+            "required": false,
+            "in": "query",
+            "description": "Mã sinh viên (chọn theo sinh viên).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "program",
+            "required": false,
+            "in": "query",
+            "description": "Mã chương trình (chọn theo phiên bản).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "programVersion",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "1.0",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DdutSyllabusDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Đề cương học phần đã ghim trong phiên bản của sinh viên hoặc phiên bản được chỉ rõ",
+        "tags": [
+          "dDUT v1"
+        ]
+      }
+    },
+    "/api/v1/sinh-vien/{mssv}/tien-do": {
+      "get": {
+        "operationId": "ddutV1GetProgress",
+        "parameters": [
+          {
+            "name": "mssv",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "semester",
+            "required": false,
+            "in": "query",
+            "description": "Mã học kỳ. Bỏ trống: học kỳ gần nhất đã bắt đầu tính đến hôm nay.",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DdutProgressDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Tiến độ học tập theo chương trình áp dụng",
+        "tags": [
+          "dDUT v1"
+        ]
+      }
+    },
+    "/api/v1/sinh-vien/{mssv}/hoc-phan-du-dieu-kien": {
+      "get": {
+        "operationId": "ddutV1GetEligibility",
+        "parameters": [
+          {
+            "name": "mssv",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "semester",
+            "required": false,
+            "in": "query",
+            "description": "Mã học kỳ. Bỏ trống: học kỳ gần nhất đã bắt đầu tính đến hôm nay.",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DdutEligibilityDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Tư vấn học phần đủ điều kiện đăng ký",
+        "tags": [
+          "dDUT v1"
+        ]
+      }
+    },
+    "/api/v1/sinh-vien/{mssv}/xet-tot-nghiep": {
+      "get": {
+        "operationId": "ddutV1GetGraduation",
+        "parameters": [
+          {
+            "name": "mssv",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "semester",
+            "required": false,
+            "in": "query",
+            "description": "Mã học kỳ. Bỏ trống: học kỳ gần nhất đã bắt đầu tính đến hôm nay.",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DdutGraduationDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Tự xét điều kiện tốt nghiệp (không lưu kết quả)",
+        "tags": [
+          "dDUT v1"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "API dDUT — Chương trình đào tạo (chỉ đọc)",
+    "description": "Sáu tài nguyên chỉ đọc cho máy chủ tin cậy của dDUT. Gửi khóa trong header X-Api-Key; không dùng cookie. Giới hạn số lần gọi mỗi phút theo từng khóa (429 kèm Retry-After). Mọi lời gọi được ghi nhận.",
+    "version": "1.0.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "api-key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Api-Key"
+      }
+    },
+    "schemas": {
+      "GraduationCourseRefDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "courseCode": {
+            "type": "string"
+          },
+          "courseName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "courseCode",
+          "courseName"
+        ]
+      },
+      "GraduationMandatoryCourseShortfallDto": {
+        "type": "object",
+        "properties": {
+          "curriculumItemId": {
+            "type": "string"
+          },
+          "course": {
+            "$ref": "#/components/schemas/GraduationCourseRefDto"
+          },
+          "blockSymbol": {
+            "type": "string",
+            "nullable": true
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "NOT_TAKEN",
+              "FAILED",
+              "IN_PROGRESS"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "MANDATORY_COURSE_MISSING"
+            ]
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "MANDATORY_COURSE"
+            ]
+          }
+        },
+        "required": [
+          "curriculumItemId",
+          "course",
+          "blockSymbol",
+          "reason",
+          "message",
+          "code",
+          "category"
+        ]
+      },
+      "GraduationConditionalCourseShortfallDto": {
+        "type": "object",
+        "properties": {
+          "curriculumItemId": {
+            "type": "string"
+          },
+          "course": {
+            "$ref": "#/components/schemas/GraduationCourseRefDto"
+          },
+          "blockSymbol": {
+            "type": "string",
+            "nullable": true
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "NOT_TAKEN",
+              "FAILED",
+              "IN_PROGRESS"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "CONDITIONAL_COURSE_MISSING"
+            ]
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "CONDITIONAL_COURSE"
+            ]
+          }
+        },
+        "required": [
+          "curriculumItemId",
+          "course",
+          "blockSymbol",
+          "reason",
+          "message",
+          "code",
+          "category"
+        ]
+      },
+      "GraduationElectiveCreditShortfallDto": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "ELECTIVE_GROUP"
+            ]
+          },
+          "groupId": {
+            "type": "string"
+          },
+          "groupCode": {
+            "type": "string"
+          },
+          "groupName": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "ELECTIVE_CREDITS_MISSING"
+            ]
+          },
+          "requiredCredits": {
+            "type": "string"
+          },
+          "earnedCredits": {
+            "type": "string"
+          },
+          "missingCredits": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "category",
+          "groupId",
+          "groupCode",
+          "groupName",
+          "message",
+          "code",
+          "requiredCredits",
+          "earnedCredits",
+          "missingCredits"
+        ]
+      },
+      "GraduationElectiveCourseShortfallDto": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "ELECTIVE_GROUP"
+            ]
+          },
+          "groupId": {
+            "type": "string"
+          },
+          "groupCode": {
+            "type": "string"
+          },
+          "groupName": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "ELECTIVE_COURSES_MISSING"
+            ]
+          },
+          "requiredCourses": {
+            "type": "number"
+          },
+          "earnedCourses": {
+            "type": "number"
+          },
+          "missingCourses": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "category",
+          "groupId",
+          "groupCode",
+          "groupName",
+          "message",
+          "code",
+          "requiredCourses",
+          "earnedCourses",
+          "missingCourses"
+        ]
+      },
+      "GraduationTotalCreditShortfallDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "TOTAL_CREDITS_MISSING"
+            ]
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "TOTAL_CREDITS"
+            ]
+          },
+          "requiredCredits": {
+            "type": "string"
+          },
+          "earnedCredits": {
+            "type": "string"
+          },
+          "missingCredits": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "category",
+          "requiredCredits",
+          "earnedCredits",
+          "missingCredits",
+          "message"
+        ]
+      },
+      "GraduationContextDto": {
+        "type": "object",
+        "properties": {
+          "studentId": {
+            "type": "string"
+          },
+          "programId": {
+            "type": "string"
+          },
+          "semesterId": {
+            "type": "string"
+          },
+          "enrollmentId": {
+            "type": "string"
+          },
+          "studentCode": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "programCode": {
+            "type": "string"
+          },
+          "programName": {
+            "type": "string"
+          },
+          "cohortId": {
+            "type": "string"
+          },
+          "cohortCode": {
+            "type": "string"
+          },
+          "programVersionId": {
+            "type": "string"
+          },
+          "versionNumber": {
+            "type": "string"
+          },
+          "semesterCode": {
+            "type": "string"
+          },
+          "semesterStartDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "versionSource": {
+            "type": "string",
+            "enum": [
+              "COHORT",
+              "EXCEPTION"
+            ]
+          },
+          "cohortAssignmentId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "studentId",
+          "programId",
+          "semesterId",
+          "enrollmentId",
+          "studentCode",
+          "fullName",
+          "programCode",
+          "programName",
+          "cohortId",
+          "cohortCode",
+          "programVersionId",
+          "versionNumber",
+          "semesterCode",
+          "semesterStartDate",
+          "versionSource",
+          "cohortAssignmentId"
+        ]
+      },
+      "GraduationWarningDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "EQUIVALENT_CREDIT_GAP",
+              "CURRENT_CATALOG_CREDIT_BASIS",
+              "UNKNOWN_KNOWLEDGE_BLOCK"
+            ]
+          },
+          "curriculumItemId": {
+            "type": "string",
+            "nullable": true
+          },
+          "courseId": {
+            "type": "string",
+            "nullable": true
+          },
+          "creditGap": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "curriculumItemId",
+          "courseId",
+          "creditGap",
+          "message"
+        ]
+      },
+      "GraduationCreditsDto": {
+        "type": "object",
+        "properties": {
+          "requiredTotal": {
+            "type": "string"
+          },
+          "recognizedTotal": {
+            "type": "string"
+          },
+          "missingTotal": {
+            "type": "string"
+          },
+          "compulsory": {
+            "type": "string"
+          },
+          "elective": {
+            "type": "string"
+          },
+          "free": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "requiredTotal",
+          "recognizedTotal",
+          "missingTotal",
+          "compulsory",
+          "elective",
+          "free"
+        ]
+      },
+      "GraduationGroupProgressDto": {
+        "type": "object",
+        "properties": {
+          "groupId": {
+            "type": "string"
+          },
+          "groupCode": {
+            "type": "string"
+          },
+          "groupName": {
+            "type": "string"
+          },
+          "requiredCredits": {
+            "type": "string",
+            "nullable": true
+          },
+          "earnedCredits": {
+            "type": "string"
+          },
+          "missingCredits": {
+            "type": "string",
+            "nullable": true
+          },
+          "requiredCourses": {
+            "type": "number",
+            "nullable": true
+          },
+          "earnedCourses": {
+            "type": "number"
+          },
+          "missingCourses": {
+            "type": "number",
+            "nullable": true
+          }
+        },
+        "required": [
+          "groupId",
+          "groupCode",
+          "groupName",
+          "requiredCredits",
+          "earnedCredits",
+          "missingCredits",
+          "requiredCourses",
+          "earnedCourses",
+          "missingCourses"
+        ]
+      },
+      "GraduationBlockProgressDto": {
+        "type": "object",
+        "properties": {
+          "blockSymbol": {
+            "type": "string",
+            "nullable": true
+          },
+          "blockName": {
+            "type": "string",
+            "nullable": true
+          },
+          "earnedCredits": {
+            "type": "string"
+          },
+          "compulsoryCredits": {
+            "type": "string"
+          },
+          "electiveCredits": {
+            "type": "string"
+          },
+          "catalogRequiredCredits": {
+            "type": "string",
+            "nullable": true
+          },
+          "advisoryGap": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "blockSymbol",
+          "blockName",
+          "earnedCredits",
+          "compulsoryCredits",
+          "electiveCredits",
+          "catalogRequiredCredits",
+          "advisoryGap"
+        ]
+      },
+      "GraduationRecognitionDto": {
+        "type": "object",
+        "properties": {
+          "curriculumItemId": {
+            "type": "string"
+          },
+          "requiredCourse": {
+            "$ref": "#/components/schemas/GraduationCourseRefDto"
+          },
+          "studiedCourse": {
+            "$ref": "#/components/schemas/GraduationCourseRefDto"
+          },
+          "attemptId": {
+            "type": "string"
+          },
+          "attemptRevision": {
+            "type": "number"
+          },
+          "completionStatus": {
+            "type": "string",
+            "enum": [
+              "PASSED",
+              "EXEMPT"
+            ]
+          },
+          "viaEquivalence": {
+            "type": "boolean"
+          },
+          "equivalenceGroupId": {
+            "type": "string",
+            "nullable": true
+          },
+          "requiredCredits": {
+            "type": "string"
+          },
+          "recognizedCredits": {
+            "type": "string"
+          },
+          "creditBasis": {
+            "type": "string",
+            "enum": [
+              "APPLIED_VERSION_SNAPSHOT",
+              "CURRENT_CATALOG"
+            ]
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "MANDATORY_COURSE",
+              "ELECTIVE_GROUP",
+              "CONDITIONAL_COURSE"
+            ]
+          },
+          "electiveGroupId": {
+            "type": "string",
+            "nullable": true
+          },
+          "blockSymbol": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "curriculumItemId",
+          "requiredCourse",
+          "studiedCourse",
+          "attemptId",
+          "attemptRevision",
+          "completionStatus",
+          "viaEquivalence",
+          "equivalenceGroupId",
+          "requiredCredits",
+          "recognizedCredits",
+          "creditBasis",
+          "category",
+          "electiveGroupId",
+          "blockSymbol"
+        ]
+      },
+      "GraduationFreeCreditDto": {
+        "type": "object",
+        "properties": {
+          "course": {
+            "$ref": "#/components/schemas/GraduationCourseRefDto"
+          },
+          "attemptId": {
+            "type": "string"
+          },
+          "credits": {
+            "type": "string"
+          },
+          "creditBasis": {
+            "type": "string",
+            "enum": [
+              "APPLIED_VERSION_SNAPSHOT",
+              "CURRENT_CATALOG"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "SURPLUS_EQUIVALENT",
+              "OUTSIDE_FRAME"
+            ]
+          }
+        },
+        "required": [
+          "course",
+          "attemptId",
+          "credits",
+          "creditBasis",
+          "reason"
+        ]
+      },
+      "GraduationResultDto": {
+        "type": "object",
+        "properties": {
+          "schemaVersion": {
+            "type": "number",
+            "enum": [
+              1
+            ]
+          },
+          "ruleVersion": {
+            "type": "string",
+            "enum": [
+              "graduation-v1"
+            ]
+          },
+          "evaluatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "context": {
+            "$ref": "#/components/schemas/GraduationContextDto"
+          },
+          "conclusion": {
+            "type": "string",
+            "enum": [
+              "ELIGIBLE",
+              "NOT_ELIGIBLE"
+            ]
+          },
+          "shortfalls": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/GraduationMandatoryCourseShortfallDto"
+                },
+                {
+                  "$ref": "#/components/schemas/GraduationConditionalCourseShortfallDto"
+                },
+                {
+                  "$ref": "#/components/schemas/GraduationElectiveCreditShortfallDto"
+                },
+                {
+                  "$ref": "#/components/schemas/GraduationElectiveCourseShortfallDto"
+                },
+                {
+                  "$ref": "#/components/schemas/GraduationTotalCreditShortfallDto"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "code",
+                "mapping": {
+                  "MANDATORY_COURSE_MISSING": "#/components/schemas/GraduationMandatoryCourseShortfallDto",
+                  "CONDITIONAL_COURSE_MISSING": "#/components/schemas/GraduationConditionalCourseShortfallDto",
+                  "ELECTIVE_CREDITS_MISSING": "#/components/schemas/GraduationElectiveCreditShortfallDto",
+                  "ELECTIVE_COURSES_MISSING": "#/components/schemas/GraduationElectiveCourseShortfallDto",
+                  "TOTAL_CREDITS_MISSING": "#/components/schemas/GraduationTotalCreditShortfallDto"
+                }
+              }
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GraduationWarningDto"
+            }
+          },
+          "credits": {
+            "$ref": "#/components/schemas/GraduationCreditsDto"
+          },
+          "electiveGroups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GraduationGroupProgressDto"
+            }
+          },
+          "knowledgeBlocks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GraduationBlockProgressDto"
+            }
+          },
+          "recognitions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GraduationRecognitionDto"
+            }
+          },
+          "freeCredits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GraduationFreeCreditDto"
+            }
+          }
+        },
+        "required": [
+          "schemaVersion",
+          "ruleVersion",
+          "evaluatedAt",
+          "context",
+          "conclusion",
+          "shortfalls",
+          "warnings",
+          "credits",
+          "electiveGroups",
+          "knowledgeBlocks",
+          "recognitions",
+          "freeCredits"
+        ]
+      },
+      "GraduationReviewedOutcomeDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "REVIEWED"
+            ]
+          },
+          "result": {
+            "$ref": "#/components/schemas/GraduationResultDto"
+          },
+          "error": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              null
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "result",
+          "error"
+        ]
+      },
+      "GraduationDiagnosticDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "enrollmentId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "enrollmentId"
+        ]
+      },
+      "GraduationCannotAuditOutcomeDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "CANNOT_AUDIT"
+            ]
+          },
+          "result": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              null
+            ]
+          },
+          "error": {
+            "$ref": "#/components/schemas/GraduationDiagnosticDto"
+          }
+        },
+        "required": [
+          "status",
+          "result",
+          "error"
+        ]
+      },
+      "GraduationOutcomeDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "REVIEWED",
+              "CANNOT_AUDIT"
+            ]
+          },
+          "result": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GraduationResultDto"
+              }
+            ]
+          },
+          "error": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GraduationDiagnosticDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "result",
+          "error"
+        ]
+      },
+      "DdutMetaDto": {
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string",
+            "enum": [
+              "v1"
+            ]
+          },
+          "evaluatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "apiVersion",
+          "evaluatedAt"
+        ]
+      },
+      "DdutStudentContextDto": {
+        "type": "object",
+        "properties": {
+          "studentCode": {
+            "type": "string"
+          },
+          "enrollmentId": {
+            "type": "string"
+          },
+          "programCode": {
+            "type": "string"
+          },
+          "programName": {
+            "type": "string"
+          },
+          "programVersionId": {
+            "type": "string"
+          },
+          "versionNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "decisionNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "semesterCode": {
+            "type": "string"
+          },
+          "semesterStartDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "versionSource": {
+            "type": "string",
+            "enum": [
+              "COHORT",
+              "EXCEPTION"
+            ]
+          }
+        },
+        "required": [
+          "studentCode",
+          "enrollmentId",
+          "programCode",
+          "programName",
+          "programVersionId",
+          "versionNumber",
+          "decisionNumber",
+          "semesterCode",
+          "semesterStartDate",
+          "versionSource"
+        ]
+      },
+      "DdutApplicableProgramDto": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/DdutMetaDto"
+          },
+          "context": {
+            "$ref": "#/components/schemas/DdutStudentContextDto"
+          }
+        },
+        "required": [
+          "meta",
+          "context"
+        ]
+      },
+      "DdutCourseRefDto": {
+        "type": "object",
+        "properties": {
+          "courseCode": {
+            "type": "string"
+          },
+          "courseName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "courseCode",
+          "courseName"
+        ]
+      },
+      "DdutRequisiteDto": {
+        "type": "object",
+        "properties": {
+          "sourceCourse": {
+            "$ref": "#/components/schemas/DdutCourseRefDto"
+          },
+          "relationType": {
+            "type": "string",
+            "enum": [
+              "PRIOR",
+              "PREREQUISITE",
+              "COREQUISITE"
+            ]
+          },
+          "minScore": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "sourceCourse",
+          "relationType",
+          "minScore"
+        ]
+      },
+      "DdutCurriculumItemDto": {
+        "type": "object",
+        "properties": {
+          "course": {
+            "$ref": "#/components/schemas/DdutCourseRefDto"
+          },
+          "credits": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "type": "number"
+          },
+          "blockSymbol": {
+            "type": "string",
+            "nullable": true
+          },
+          "isElective": {
+            "type": "boolean"
+          },
+          "electiveGroupCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "htDa": {
+            "type": "boolean"
+          },
+          "tqDa": {
+            "type": "boolean"
+          },
+          "minStudiedScore": {
+            "type": "string",
+            "nullable": true
+          },
+          "minTransferScore": {
+            "type": "string",
+            "nullable": true
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "hasSyllabus": {
+            "type": "boolean"
+          },
+          "requisites": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DdutRequisiteDto"
+            }
+          }
+        },
+        "required": [
+          "course",
+          "credits",
+          "sortOrder",
+          "blockSymbol",
+          "isElective",
+          "electiveGroupCode",
+          "htDa",
+          "tqDa",
+          "minStudiedScore",
+          "minTransferScore",
+          "note",
+          "hasSyllabus",
+          "requisites"
+        ]
+      },
+      "DdutPlannedSemesterDto": {
+        "type": "object",
+        "properties": {
+          "plannedSemester": {
+            "type": "number"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DdutCurriculumItemDto"
+            }
+          }
+        },
+        "required": [
+          "plannedSemester",
+          "items"
+        ]
+      },
+      "DdutElectiveGroupDto": {
+        "type": "object",
+        "properties": {
+          "groupCode": {
+            "type": "string"
+          },
+          "groupName": {
+            "type": "string"
+          },
+          "minCredits": {
+            "type": "string",
+            "nullable": true
+          },
+          "minCourses": {
+            "type": "number",
+            "nullable": true
+          }
+        },
+        "required": [
+          "groupCode",
+          "groupName",
+          "minCredits",
+          "minCourses"
+        ]
+      },
+      "DdutPloDto": {
+        "type": "object",
+        "properties": {
+          "ploCode": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "competencyGroup": {
+            "type": "string",
+            "nullable": true
+          },
+          "sortOrder": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "ploCode",
+          "description",
+          "competencyGroup",
+          "sortOrder"
+        ]
+      },
+      "DdutProgramVersionDto": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/DdutMetaDto"
+          },
+          "programCode": {
+            "type": "string"
+          },
+          "programName": {
+            "type": "string"
+          },
+          "majorCode": {
+            "type": "string"
+          },
+          "majorName": {
+            "type": "string"
+          },
+          "versionNumber": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "ACTIVE",
+              "HISTORICAL"
+            ]
+          },
+          "decisionNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "semesterCount": {
+            "type": "number"
+          },
+          "totalCredits": {
+            "type": "string"
+          },
+          "compulsoryCredits": {
+            "type": "string"
+          },
+          "electiveCredits": {
+            "type": "string"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "effectiveSemesterCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "semesters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DdutPlannedSemesterDto"
+            }
+          },
+          "electiveGroups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DdutElectiveGroupDto"
+            }
+          },
+          "plos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DdutPloDto"
+            }
+          }
+        },
+        "required": [
+          "meta",
+          "programCode",
+          "programName",
+          "majorCode",
+          "majorName",
+          "versionNumber",
+          "status",
+          "decisionNumber",
+          "semesterCount",
+          "totalCredits",
+          "compulsoryCredits",
+          "electiveCredits",
+          "publishedAt",
+          "effectiveSemesterCode",
+          "semesters",
+          "electiveGroups",
+          "plos"
+        ]
+      },
+      "DdutSyllabusContextDto": {
+        "type": "object",
+        "properties": {
+          "programCode": {
+            "type": "string"
+          },
+          "versionNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "studentCode": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "programCode",
+          "versionNumber",
+          "studentCode"
+        ]
+      },
+      "PortalCloDto": {
+        "type": "object",
+        "properties": {
+          "cloCode": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "cloCode",
+          "description"
+        ]
+      },
+      "PortalWeekDto": {
+        "type": "object",
+        "properties": {
+          "weekLabel": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "weekLabel",
+          "content"
+        ]
+      },
+      "PortalAssessmentDto": {
+        "type": "object",
+        "properties": {
+          "componentCode": {
+            "type": "string"
+          },
+          "componentName": {
+            "type": "string"
+          },
+          "weight": {
+            "type": "string"
+          },
+          "assessmentForm": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "componentCode",
+          "componentName",
+          "weight",
+          "assessmentForm"
+        ]
+      },
+      "SyllabusMaterialKind": {
+        "type": "string",
+        "enum": [
+          "SIGNED_SYLLABUS",
+          "TEXTBOOK",
+          "LECTURE_SLIDES",
+          "OTHER"
+        ]
+      },
+      "PortalAttachmentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "materialKind": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SyllabusMaterialKind"
+              }
+            ]
+          },
+          "sizeBytes": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "fileName",
+          "materialKind",
+          "sizeBytes"
+        ]
+      },
+      "PortalSyllabusDto": {
+        "type": "object",
+        "properties": {
+          "courseCode": {
+            "type": "string"
+          },
+          "courseName": {
+            "type": "string"
+          },
+          "credits": {
+            "type": "string"
+          },
+          "revisionNumber": {
+            "type": "number"
+          },
+          "publishedAt": {
+            "type": "string",
+            "nullable": true
+          },
+          "courseDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "objectives": {
+            "type": "string",
+            "nullable": true
+          },
+          "teachingMethods": {
+            "type": "string",
+            "nullable": true
+          },
+          "assessmentMethods": {
+            "type": "string",
+            "nullable": true
+          },
+          "references": {
+            "type": "string",
+            "nullable": true
+          },
+          "clos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PortalCloDto"
+            }
+          },
+          "weeks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PortalWeekDto"
+            }
+          },
+          "assessments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PortalAssessmentDto"
+            }
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PortalAttachmentDto"
+            }
+          }
+        },
+        "required": [
+          "courseCode",
+          "courseName",
+          "credits",
+          "revisionNumber",
+          "publishedAt",
+          "courseDescription",
+          "objectives",
+          "teachingMethods",
+          "assessmentMethods",
+          "references",
+          "clos",
+          "weeks",
+          "assessments",
+          "attachments"
+        ]
+      },
+      "DdutSyllabusDto": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/DdutMetaDto"
+          },
+          "context": {
+            "$ref": "#/components/schemas/DdutSyllabusContextDto"
+          },
+          "syllabus": {
+            "$ref": "#/components/schemas/PortalSyllabusDto"
+          }
+        },
+        "required": [
+          "meta",
+          "context",
+          "syllabus"
+        ]
+      },
+      "DdutCreditsDto": {
+        "type": "object",
+        "properties": {
+          "requiredTotal": {
+            "type": "string"
+          },
+          "recognizedTotal": {
+            "type": "string"
+          },
+          "missingTotal": {
+            "type": "string"
+          },
+          "compulsory": {
+            "type": "string"
+          },
+          "elective": {
+            "type": "string"
+          },
+          "free": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "requiredTotal",
+          "recognizedTotal",
+          "missingTotal",
+          "compulsory",
+          "elective",
+          "free"
+        ]
+      },
+      "DdutDiagnosticDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ]
+      },
+      "PortalCourseState": {
+        "type": "string",
+        "enum": [
+          "PASSED",
+          "PASSED_EQUIVALENT",
+          "IN_PROGRESS",
+          "FAILED",
+          "NOT_TAKEN"
+        ]
+      },
+      "PortalCourseDto": {
+        "type": "object",
+        "properties": {
+          "itemId": {
+            "type": "string"
+          },
+          "courseId": {
+            "type": "string"
+          },
+          "courseCode": {
+            "type": "string"
+          },
+          "courseName": {
+            "type": "string"
+          },
+          "credits": {
+            "type": "string"
+          },
+          "isElective": {
+            "type": "boolean"
+          },
+          "groupName": {
+            "type": "string",
+            "nullable": true
+          },
+          "blockSymbol": {
+            "type": "string",
+            "nullable": true
+          },
+          "state": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PortalCourseState"
+              }
+            ]
+          },
+          "attemptCount": {
+            "type": "number"
+          },
+          "score10": {
+            "type": "string",
+            "nullable": true
+          },
+          "score4": {
+            "type": "string",
+            "nullable": true
+          },
+          "letterGrade": {
+            "type": "string",
+            "nullable": true
+          },
+          "hasSyllabus": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "itemId",
+          "courseId",
+          "courseCode",
+          "courseName",
+          "credits",
+          "isElective",
+          "groupName",
+          "blockSymbol",
+          "state",
+          "attemptCount",
+          "score10",
+          "score4",
+          "letterGrade",
+          "hasSyllabus"
+        ]
+      },
+      "PortalTermDto": {
+        "type": "object",
+        "properties": {
+          "plannedSemester": {
+            "type": "number"
+          },
+          "credits": {
+            "type": "string"
+          },
+          "courses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PortalCourseDto"
+            }
+          }
+        },
+        "required": [
+          "plannedSemester",
+          "credits",
+          "courses"
+        ]
+      },
+      "DdutProgressDto": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/DdutMetaDto"
+          },
+          "context": {
+            "$ref": "#/components/schemas/DdutStudentContextDto"
+          },
+          "academicStatus": {
+            "type": "string",
+            "enum": [
+              "HAS_RESULTS",
+              "NO_ACADEMIC_RESULTS"
+            ]
+          },
+          "credits": {
+            "nullable": true,
+            "description": "Null khi không tính được; xem creditsUnavailable.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DdutCreditsDto"
+              }
+            ]
+          },
+          "creditsUnavailable": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DdutDiagnosticDto"
+              }
+            ]
+          },
+          "terms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PortalTermDto"
+            }
+          }
+        },
+        "required": [
+          "meta",
+          "context",
+          "academicStatus",
+          "credits",
+          "creditsUnavailable",
+          "terms"
+        ]
+      },
+      "EligibilityVersionSource": {
+        "type": "string",
+        "enum": [
+          "COHORT",
+          "EXCEPTION"
+        ]
+      },
+      "EligibilityContextDto": {
+        "type": "object",
+        "properties": {
+          "studentId": {
+            "type": "string"
+          },
+          "enrollmentId": {
+            "type": "string"
+          },
+          "programId": {
+            "type": "string"
+          },
+          "semesterId": {
+            "type": "string"
+          },
+          "programVersionId": {
+            "type": "string"
+          },
+          "source": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EligibilityVersionSource"
+              }
+            ]
+          },
+          "cohortAssignmentId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "studentId",
+          "enrollmentId",
+          "programId",
+          "semesterId",
+          "programVersionId",
+          "source",
+          "cohortAssignmentId"
+        ]
+      },
+      "EligibilityNameSource": {
+        "type": "string",
+        "enum": [
+          "SNAPSHOT",
+          "CATALOG"
+        ]
+      },
+      "EligibilityCourseRefDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "courseCode": {
+            "type": "string"
+          },
+          "courseName": {
+            "type": "string"
+          },
+          "nameSource": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EligibilityNameSource"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "courseCode",
+          "courseName",
+          "nameSource"
+        ]
+      },
+      "CourseStatus": {
+        "type": "string",
+        "enum": [
+          "ACTIVE",
+          "DISCONTINUED",
+          "CANCELLED"
+        ]
+      },
+      "EligibilityReasonCode": {
+        "type": "string",
+        "enum": [
+          "COURSE_COMPLETED",
+          "EQUIVALENT_COMPLETED",
+          "PREREQUISITE_NOT_PASSED",
+          "PREREQUISITE_SCORE_MISSING",
+          "PREREQUISITE_SCORE_TOO_LOW",
+          "PRIOR_RESULT_MISSING",
+          "COREQUISITE_REQUIRED",
+          "COREQUISITE_INELIGIBLE",
+          "COREQUISITE_RULES_UNAVAILABLE",
+          "COREQUISITE_DEPTH_LIMIT"
+        ]
+      },
+      "AcademicResultStatus": {
+        "type": "string",
+        "enum": [
+          "PASSED",
+          "FAILED",
+          "IN_PROGRESS",
+          "EXEMPT"
+        ]
+      },
+      "EligibilityReasonDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EligibilityReasonCode"
+              }
+            ]
+          },
+          "causeCode": {
+            "type": "string",
+            "enum": [
+              "COURSE_COMPLETED",
+              "EQUIVALENT_COMPLETED",
+              "PREREQUISITE_NOT_PASSED",
+              "PREREQUISITE_SCORE_MISSING",
+              "PREREQUISITE_SCORE_TOO_LOW",
+              "PRIOR_RESULT_MISSING",
+              "COREQUISITE_REQUIRED",
+              "COREQUISITE_INELIGIBLE",
+              "COREQUISITE_RULES_UNAVAILABLE",
+              "COREQUISITE_DEPTH_LIMIT"
+            ],
+            "nullable": true
+          },
+          "message": {
+            "type": "string"
+          },
+          "relationType": {
+            "type": "string",
+            "enum": [
+              "PRIOR",
+              "PREREQUISITE",
+              "COREQUISITE"
+            ],
+            "nullable": true
+          },
+          "requiredCourse": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EligibilityCourseRefDto"
+              }
+            ]
+          },
+          "viaCourse": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EligibilityCourseRefDto"
+              }
+            ]
+          },
+          "evidenceCourse": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EligibilityCourseRefDto"
+              }
+            ]
+          },
+          "evidenceResultId": {
+            "type": "string",
+            "nullable": true
+          },
+          "requiredScore4": {
+            "type": "string",
+            "nullable": true
+          },
+          "actualScore4": {
+            "type": "string",
+            "nullable": true
+          },
+          "actualStatus": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AcademicResultStatus"
+              }
+            ]
+          },
+          "path": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EligibilityCourseRefDto"
+            }
+          }
+        },
+        "required": [
+          "code",
+          "causeCode",
+          "message",
+          "relationType",
+          "requiredCourse",
+          "viaCourse",
+          "evidenceCourse",
+          "evidenceResultId",
+          "requiredScore4",
+          "actualScore4",
+          "actualStatus",
+          "path"
+        ]
+      },
+      "EligibilityItemDto": {
+        "type": "object",
+        "properties": {
+          "itemId": {
+            "type": "string"
+          },
+          "course": {
+            "$ref": "#/components/schemas/EligibilityCourseRefDto"
+          },
+          "credits": {
+            "type": "string"
+          },
+          "catalogStatus": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CourseStatus"
+              }
+            ]
+          },
+          "plannedSemester": {
+            "type": "number"
+          },
+          "completed": {
+            "type": "boolean"
+          },
+          "eligibility": {
+            "type": "string",
+            "enum": [
+              "ELIGIBLE",
+              "CONDITIONAL",
+              "INELIGIBLE"
+            ],
+            "nullable": true
+          },
+          "statusText": {
+            "type": "string"
+          },
+          "reasons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EligibilityReasonDto"
+            }
+          },
+          "requiredConcurrentCourses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EligibilityCourseRefDto"
+            }
+          }
+        },
+        "required": [
+          "itemId",
+          "course",
+          "credits",
+          "catalogStatus",
+          "plannedSemester",
+          "completed",
+          "eligibility",
+          "statusText",
+          "reasons",
+          "requiredConcurrentCourses"
+        ]
+      },
+      "EligibilityWarningCode": {
+        "type": "string",
+        "enum": [
+          "REPLACEMENT_UNAVAILABLE",
+          "EXTERNAL_REQUISITE",
+          "EXTERNAL_COREQUISITE_RULES_UNAVAILABLE",
+          "COURSE_NOT_ACTIVE"
+        ]
+      },
+      "EligibilityWarningDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EligibilityWarningCode"
+              }
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "course": {
+            "$ref": "#/components/schemas/EligibilityCourseRefDto"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "course"
+        ]
+      },
+      "RegistrationEligibilityDto": {
+        "type": "object",
+        "properties": {
+          "contractVersion": {
+            "type": "number",
+            "enum": [
+              1
+            ]
+          },
+          "context": {
+            "$ref": "#/components/schemas/EligibilityContextDto"
+          },
+          "evaluatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EligibilityItemDto"
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EligibilityWarningDto"
+            }
+          }
+        },
+        "required": [
+          "contractVersion",
+          "context",
+          "evaluatedAt",
+          "items",
+          "warnings"
+        ]
+      },
+      "DdutEligibilityDto": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/DdutMetaDto"
+          },
+          "context": {
+            "$ref": "#/components/schemas/DdutStudentContextDto"
+          },
+          "eligibility": {
+            "$ref": "#/components/schemas/RegistrationEligibilityDto"
+          }
+        },
+        "required": [
+          "meta",
+          "context",
+          "eligibility"
+        ]
+      },
+      "DdutGraduationDto": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/DdutMetaDto"
+          },
+          "context": {
+            "$ref": "#/components/schemas/DdutStudentContextDto"
+          },
+          "graduation": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GraduationReviewedOutcomeDto"
+              },
+              {
+                "$ref": "#/components/schemas/GraduationCannotAuditOutcomeDto"
+              }
+            ],
+            "discriminator": {
+              "propertyName": "status",
+              "mapping": {
+                "REVIEWED": "#/components/schemas/GraduationReviewedOutcomeDto",
+                "CANNOT_AUDIT": "#/components/schemas/GraduationCannotAuditOutcomeDto"
+              }
+            }
+          }
+        },
+        "required": [
+          "meta",
+          "context",
+          "graduation"
+        ]
+      }
+    }
+  }
+}

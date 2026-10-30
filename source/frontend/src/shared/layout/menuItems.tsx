@@ -97,6 +97,11 @@ export const APP_MENU: readonly AppMenuItem[] = [
     ],
   },
   {
+    path: ROUTES.integrationClients,
+    label: 'Bên tích hợp dDUT',
+    permission: PERMISSIONS.integrationClientManage,
+  },
+  {
     path: ROUTES.schoolSync,
     label: 'Đồng bộ CSDL Trường',
     permission: PERMISSIONS.syncConfigure,

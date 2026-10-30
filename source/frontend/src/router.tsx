@@ -311,6 +311,11 @@ const PortalGraduationPage = lazy(() =>
     }),
   ),
 );
+const IntegrationClientsPage = lazy(() =>
+  import('./features/integration-clients/pages/IntegrationClientsPage').then(
+    (module) => ({ default: module.IntegrationClientsPage }),
+  ),
+);
 const SchoolSyncSettingsPage = lazy(() =>
   import('./features/school-db-sync/pages/SchoolSyncSettingsPage').then(
     (module) => ({
@@ -432,6 +437,14 @@ export const router = createBrowserRouter([
               >
                 <ImportPage />
               </RequireAnyPermission>
+            ),
+          },
+          {
+            path: ROUTES.integrationClients,
+            element: (
+              <RequirePermission code={PERMISSIONS.integrationClientManage}>
+                <IntegrationClientsPage />
+              </RequirePermission>
             ),
           },
           {

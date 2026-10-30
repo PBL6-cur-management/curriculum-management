@@ -63,6 +63,7 @@ export const ROUTES = {
   studentProgress: '/student/progress',
   studentRegistration: '/student/registration',
   studentGraduation: '/student/graduation',
+  integrationClients: '/integration-clients',
   schoolSync: '/school-db-sync',
   schoolSyncRuns: '/school-db-sync/runs',
   schoolSyncRunDetail: '/school-db-sync/runs/:runId',

@@ -74,6 +74,10 @@ async function roots(withId: Set<string>): Promise<Map<string, Set<string>>> {
       ...Object.values(DEMO_PROGRAM_CODES),
     ],
   );
+  await add(
+    '"IntegrationClient"',
+    `SELECT id FROM "IntegrationClient" WHERE "clientName" LIKE '%E2E%'`,
+  );
   const codeColumns = await q(`
     SELECT a.attrelid::regclass::text AS table, a.attname AS column FROM pg_attribute a
     JOIN pg_class k ON k.oid = a.attrelid
@@ -125,6 +129,18 @@ try {
   const [keys, withId] = await Promise.all([foreignKeys(), tablesWithId()]);
   const marked = await roots(withId);
   await closure(marked, keys, withId);
+  // Call records are append-only at runtime; the purge is the one owner-level maintenance path (F-21).
+  const clients = [...(marked.get('"IntegrationClient"') ?? [])];
+  if (clients.length)
+    await prisma.$transaction([
+      prisma.$executeRawUnsafe(
+        `SET LOCAL ctdt.integration_log_maintenance = 'on'`,
+      ),
+      prisma.$executeRawUnsafe(
+        `DELETE FROM "IntegrationCallLog" WHERE "clientId" = ANY($1)`,
+        clients,
+      ),
+    ]);
   for (const key of keys) {
     const parents = marked.get(key.parent);
     if (!parents?.size) continue;

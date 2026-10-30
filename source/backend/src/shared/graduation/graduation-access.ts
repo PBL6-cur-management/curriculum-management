@@ -3,6 +3,7 @@ import { PERMISSIONS } from '../authz/permission-codes.js';
 import { AppException } from '../exception/app.exception.js';
 import { COMMON_ERRORS } from '../exception/error-codes.js';
 import { GRADUATION_ERRORS } from './graduation.errors.js';
+import { isIntegrationAssignment } from '../integration-access/integration-access.js';
 import { STUDENT_ROLES } from '../students/student.constants.js';
 
 export function assertGraduationRead(
@@ -76,6 +77,14 @@ function assertGrant(
         target.programIds?.some(
           (id) => !assignment.scope.all && assignment.scope.programIds.has(id),
         ))
+    )
+      return;
+    if (
+      !write &&
+      isIntegrationAssignment(assignment.roleCode) &&
+      target.studentIds?.some(
+        (id) => !assignment.scope.all && assignment.scope.studentIds.has(id),
+      )
     )
       return;
     if (

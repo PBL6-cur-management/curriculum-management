@@ -58,5 +58,6 @@ import {
         }) satisfies GraduationJobHandlers,
     },
   ],
+  exports: [GraduationService],
 })
 export class GraduationModule {}
