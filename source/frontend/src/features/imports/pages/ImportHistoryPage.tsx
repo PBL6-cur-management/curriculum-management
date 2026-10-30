@@ -47,7 +47,7 @@ const columns: TableColumnsType<ImportSummary> = [
     render: (_, batch) =>
       batch.program
         ? `${batch.program.programCode} — ${batch.program.programName}`
-        : '—',
+        : 'Không gắn chương trình',
   },
   { title: 'Người nhập', render: (_, batch) => batch.performedBy.fullName },
   {

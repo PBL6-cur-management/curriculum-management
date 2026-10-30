@@ -1,8 +1,12 @@
 import { Alert, Button, Descriptions, Skeleton, Tooltip } from 'antd';
 import dayjs from 'dayjs';
-import { Link, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import { ROUTES } from '../../../routes';
-import { DetailPageLayout, PageHeader } from '../../../shared/design-system';
+import {
+  BackLink,
+  DetailPageLayout,
+  PageHeader,
+} from '../../../shared/design-system';
 import { errorMessage } from '../../../shared/forms/applyFieldErrors';
 import { CommitImportButton } from '../components/CommitImportButton';
 import { ImportReport } from '../components/ImportReport';
@@ -16,10 +20,8 @@ export function ImportDetailPage() {
   const file = useDownloadImportFile();
   return (
     <DetailPageLayout>
-      <PageHeader
-        title="Chi tiết lần nhập"
-        actions={<Link to={ROUTES.importHistory}>← Lịch sử nhập liệu</Link>}
-      />
+      <BackLink to={ROUTES.importHistory}>Lịch sử nhập liệu</BackLink>
+      <PageHeader title="Chi tiết lần nhập" />
       {batch.isPending && <Skeleton active />}
       {batch.error && (
         <Alert
@@ -47,7 +49,7 @@ export function ImportDetailPage() {
                 label: 'Chương trình',
                 children: batch.data.program
                   ? `${batch.data.program.programCode} — ${batch.data.program.programName}`
-                  : '—',
+                  : 'Không gắn chương trình',
               },
               {
                 key: 'user',

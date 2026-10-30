@@ -18,6 +18,9 @@ import {
   ListPageLayout,
   PageHeader,
   StatusTag,
+  SummaryStrip,
+  BackLink,
+  formatEmpty,
 } from '../../../shared/design-system';
 import type {
   GraduationBatchItem,
@@ -65,10 +68,10 @@ export function GraduationBatchPage() {
     batch.data?.status === 'COMPLETED' ||
     batch.data?.status === 'COMPLETED_WITH_ERRORS';
   const header = (
-    <PageHeader
-      title="Chi tiết đợt xét tốt nghiệp"
-      actions={<Link to={ROUTES.graduationBatches}>Danh sách đợt xét</Link>}
-    />
+    <>
+      <BackLink to={ROUTES.graduationBatches}>Danh sách đợt xét</BackLink>
+      <PageHeader title="Chi tiết đợt xét tốt nghiệp" />
+    </>
   );
   if (batch.isPending)
     return (
@@ -100,6 +103,24 @@ export function GraduationBatchPage() {
   return (
     <DetailPageLayout>
       {header}
+      <SummaryStrip
+        label="Kết quả đợt xét"
+        items={[
+          { label: 'Sinh viên', value: data.studentCount },
+          { label: 'Lượt chương trình', value: data.enrollmentCount },
+          { label: 'Đủ điều kiện', value: data.eligibleCount, tone: 'success' },
+          {
+            label: 'Chưa đủ',
+            value: data.notEligibleCount,
+            tone: data.notEligibleCount ? 'warning' : 'default',
+          },
+          {
+            label: 'Lỗi dữ liệu',
+            value: data.errorCount,
+            tone: data.errorCount ? 'danger' : 'default',
+          },
+        ]}
+      />
       <Card
         title={
           <StatusTag
@@ -135,19 +156,9 @@ export function GraduationBatchPage() {
                 : 'Tất cả khóa',
             },
             {
-              key: 'counts',
-              label: 'Sinh viên / lượt chương trình',
-              children: `${data.studentCount} / ${data.enrollmentCount}`,
-            },
-            {
               key: 'processed',
               label: 'Đã xử lý',
               children: `${data.processedCount} / ${data.enrollmentCount}`,
-            },
-            {
-              key: 'conclusions',
-              label: 'Đủ / chưa đủ / lỗi dữ liệu',
-              children: `${data.eligibleCount} / ${data.notEligibleCount} / ${data.errorCount}`,
             },
             {
               key: 'created',
@@ -325,14 +336,15 @@ export function GraduationBatchPage() {
                 },
                 {
                   title: 'Hạng mục còn thiếu',
-                  render: (_, item) => item.shortfallCount ?? '—',
+                  render: (_, item) =>
+                    formatEmpty(item.shortfallCount, 'Chưa xét'),
                 },
                 {
                   title: 'Lỗi dữ liệu',
                   render: (_, item) =>
                     item.error
                       ? `${item.error.code} — ${item.error.message}`
-                      : '—',
+                      : 'Không lỗi',
                 },
                 {
                   title: 'Lần xét đã lưu',
@@ -346,7 +358,7 @@ export function GraduationBatchPage() {
                         Xem lần xét
                       </Link>
                     ) : (
-                      '—'
+                      'Chưa có lần xét'
                     ),
                 },
               ]}
