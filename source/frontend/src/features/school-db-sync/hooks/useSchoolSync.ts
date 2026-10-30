@@ -27,7 +27,8 @@ export const SYNC_QUERY_KEYS = {
   configuration: ['school-db-sync', 'configuration'] as const,
   mappings: ['school-db-sync', 'mappings'] as const,
   runs: ['school-db-sync', 'runs'] as const,
-  runList: (query: SyncRunQuery) => ['school-db-sync', 'runs', 'list', query] as const,
+  runList: (query: SyncRunQuery) =>
+    ['school-db-sync', 'runs', 'list', query] as const,
   run: (id: string) => ['school-db-sync', 'runs', 'detail', id] as const,
   conflicts: (id: string, page: number, pageSize: number) =>
     ['school-db-sync', 'runs', 'conflicts', id, page, pageSize] as const,
@@ -44,7 +45,10 @@ export function useSyncConfiguration() {
 }
 
 export function useSyncMappings() {
-  return useQuery({ queryKey: SYNC_QUERY_KEYS.mappings, queryFn: fetchSyncMappings });
+  return useQuery({
+    queryKey: SYNC_QUERY_KEYS.mappings,
+    queryFn: fetchSyncMappings,
+  });
 }
 
 export function useSaveSyncConfiguration() {
@@ -70,11 +74,18 @@ export function useTestSyncConnection() {
 export function useSaveSyncMappings() {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: ({ revision, items }: { revision: number; items: SyncMapping[] }) =>
-      saveSyncMappings(revision, items),
+    mutationFn: ({
+      revision,
+      items,
+    }: {
+      revision: number;
+      items: SyncMapping[];
+    }) => saveSyncMappings(revision, items),
     onSuccess: (saved) => {
       client.setQueryData(SYNC_QUERY_KEYS.mappings, saved);
-      void client.invalidateQueries({ queryKey: SYNC_QUERY_KEYS.configuration });
+      void client.invalidateQueries({
+        queryKey: SYNC_QUERY_KEYS.configuration,
+      });
     },
   });
 }
@@ -82,9 +93,15 @@ export function useSaveSyncMappings() {
 export function useStartSyncRun() {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: ({ runId, requestId }: { runId?: string; requestId: string }) =>
-      runId ? retrySyncRun(runId, requestId) : startSyncRun(requestId),
-    onSuccess: () => client.invalidateQueries({ queryKey: SYNC_QUERY_KEYS.all }),
+    mutationFn: ({
+      runId,
+      requestId,
+    }: {
+      runId?: string;
+      requestId: string;
+    }) => (runId ? retrySyncRun(runId, requestId) : startSyncRun(requestId)),
+    onSuccess: () =>
+      client.invalidateQueries({ queryKey: SYNC_QUERY_KEYS.all }),
   });
 }
 
@@ -117,7 +134,12 @@ export function useSyncRun(runId: string) {
   });
 }
 
-export function useSyncConflicts(runId: string, page: number, pageSize: number, enabled: boolean) {
+export function useSyncConflicts(
+  runId: string,
+  page: number,
+  pageSize: number,
+  enabled: boolean,
+) {
   return useQuery({
     queryKey: SYNC_QUERY_KEYS.conflicts(runId, page, pageSize),
     queryFn: () => fetchSyncConflicts(runId, page, pageSize),

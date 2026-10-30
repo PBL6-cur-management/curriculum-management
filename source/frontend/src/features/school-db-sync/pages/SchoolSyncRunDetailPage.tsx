@@ -42,7 +42,8 @@ function ValueList({ values }: { values: SyncConflict['before'] }) {
     <Flex vertical>
       {values.map((entry) => (
         <span key={entry.field}>
-          {CONFLICT_FIELD_LABELS[entry.field] ?? entry.field}: {formatEmpty(entry.value, 'Trống')}
+          {CONFLICT_FIELD_LABELS[entry.field] ?? entry.field}:{' '}
+          {formatEmpty(entry.value, 'Trống')}
         </span>
       ))}
     </Flex>
@@ -54,13 +55,23 @@ const conflictColumns: TableColumnsType<SyncConflict> = [
     title: 'Bản ghi',
     render: (_, row) => (
       <Flex vertical>
-        <span>{row.entityType === 'STUDENT' ? 'Hồ sơ sinh viên' : 'Kết quả học tập'}</span>
-        <Typography.Text type="secondary">{row.recordKey.replaceAll('|', ' · ')}</Typography.Text>
+        <span>
+          {row.entityType === 'STUDENT' ? 'Hồ sơ sinh viên' : 'Kết quả học tập'}
+        </span>
+        <Typography.Text type="secondary">
+          {row.recordKey.replaceAll('|', ' · ')}
+        </Typography.Text>
       </Flex>
     ),
   },
-  { title: 'Trước (Excel)', render: (_, row) => <ValueList values={row.before} /> },
-  { title: 'Sau (CSDL Trường)', render: (_, row) => <ValueList values={row.after} /> },
+  {
+    title: 'Trước (Excel)',
+    render: (_, row) => <ValueList values={row.before} />,
+  },
+  {
+    title: 'Sau (CSDL Trường)',
+    render: (_, row) => <ValueList values={row.after} />,
+  },
 ];
 
 export function SchoolSyncRunDetailPage() {
@@ -83,7 +94,11 @@ export function SchoolSyncRunDetailPage() {
     return (
       <Flex vertical gap="middle">
         <BackLink to={ROUTES.schoolSyncRuns}>Lịch sử đồng bộ</BackLink>
-        <Alert type="error" showIcon title={errorMessage(run.error, 'Không tải được lần đồng bộ.')} />
+        <Alert
+          type="error"
+          showIcon
+          title={errorMessage(run.error, 'Không tải được lần đồng bộ.')}
+        />
       </Flex>
     );
   }
@@ -91,8 +106,13 @@ export function SchoolSyncRunDetailPage() {
 
   async function onRetry() {
     try {
-      const started = await retry.mutateAsync({ runId: data.id, requestId: crypto.randomUUID() });
-      void navigate(generatePath(ROUTES.schoolSyncRunDetail, { runId: started.id }));
+      const started = await retry.mutateAsync({
+        runId: data.id,
+        requestId: crypto.randomUUID(),
+      });
+      void navigate(
+        generatePath(ROUTES.schoolSyncRunDetail, { runId: started.id }),
+      );
     } catch (error) {
       void message.error(errorMessage(error, 'Không chạy lại được.'));
     }
@@ -105,28 +125,52 @@ export function SchoolSyncRunDetailPage() {
         title={
           <Flex gap="small" align="center" wrap>
             Lần đồng bộ {formatTime(data.startedAt)}
-            <StatusTag status={data.status} colorMap={RUN_STATUS_COLORS} labelMap={RUN_STATUS_LABELS} />
+            <StatusTag
+              status={data.status}
+              colorMap={RUN_STATUS_COLORS}
+              labelMap={RUN_STATUS_LABELS}
+            />
           </Flex>
         }
         subtitle={`${TRIGGER_LABELS[data.trigger]} · ${data.profile === 'SIMULATED_SQL_SERVER' ? 'Bản mô phỏng' : 'Máy chủ của Trường'}${data.snapshotVersion ? ` · Ảnh dữ liệu ${data.snapshotVersion}` : ''}`}
         actions={
           data.canRetry && (
-            <Button type="primary" loading={retry.isPending} onClick={() => void onRetry()}>
+            <Button
+              type="primary"
+              loading={retry.isPending}
+              onClick={() => void onRetry()}
+            >
               Chạy lại
             </Button>
           )
         }
       />
       {data.status === 'RUNNING' && (
-        <Alert type="info" showIcon title={`Đang đồng bộ. Hạn chót ${formatTime(data.expiresAt)}; quá hạn thì lần này thất bại và không ghi gì.`} />
+        <Alert
+          type="info"
+          showIcon
+          title={`Đang đồng bộ. Hạn chót ${formatTime(data.expiresAt)}; quá hạn thì lần này thất bại và không ghi gì.`}
+        />
       )}
       {data.status === 'FAILED' && (
-        <Alert type="error" showIcon title={formatEmpty(data.errorMessage, 'Thất bại, không rõ lý do.')} description="Không có thay đổi nào được ghi. Lịch tiếp theo hoặc nút Chạy lại sẽ thử lại." />
+        <Alert
+          type="error"
+          showIcon
+          title={formatEmpty(data.errorMessage, 'Thất bại, không rõ lý do.')}
+          description="Không có thay đổi nào được ghi. Lịch tiếp theo hoặc nút Chạy lại sẽ thử lại."
+        />
       )}
       {data.retryOfId && (
         <Typography.Text>
           Chạy lại của{' '}
-          <Link to={generatePath(ROUTES.schoolSyncRunDetail, { runId: data.retryOfId })}>lần thất bại trước</Link>.
+          <Link
+            to={generatePath(ROUTES.schoolSyncRunDetail, {
+              runId: data.retryOfId,
+            })}
+          >
+            lần thất bại trước
+          </Link>
+          .
         </Typography.Text>
       )}
       <SummaryStrip
@@ -136,11 +180,22 @@ export function SchoolSyncRunDetailPage() {
           { label: 'Kết quả học tập', value: data.resultCount },
           { label: 'Lớp học phần', value: data.classCount },
           { label: 'Có thay đổi', value: data.changedCount },
-          { label: 'Xung đột với Excel', value: data.conflictCount, tone: data.conflictCount > 0 ? 'warning' : 'default' },
+          {
+            label: 'Xung đột với Excel',
+            value: data.conflictCount,
+            tone: data.conflictCount > 0 ? 'warning' : 'default',
+          },
         ]}
       />
       {data.conflictCount > 0 && (
-        <Card title="Xung đột với dữ liệu Excel" extra={<Typography.Text type="secondary">Dữ liệu Trường đã được chọn</Typography.Text>}>
+        <Card
+          title="Xung đột với dữ liệu Excel"
+          extra={
+            <Typography.Text type="secondary">
+              Dữ liệu Trường đã được chọn
+            </Typography.Text>
+          }
+        >
           <Table<SyncConflict>
             rowKey="id"
             columns={conflictColumns}

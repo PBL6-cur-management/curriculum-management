@@ -2,7 +2,8 @@ import { getJson, sendJson, withQuery } from '../../../shared/api/client';
 import type { components, operations } from '../../../shared/api/schema';
 
 export type SyncConfiguration = components['schemas']['SyncConfigurationDto'];
-export type SaveSyncConfiguration = components['schemas']['SaveSyncConfigurationDto'];
+export type SaveSyncConfiguration =
+  components['schemas']['SaveSyncConfigurationDto'];
 export type SyncConnectionTest = components['schemas']['SyncConnectionTestDto'];
 export type SyncMappingSet = components['schemas']['SyncMappingSetDto'];
 export type SyncMapping = components['schemas']['SyncMappingDto'];
@@ -39,7 +40,11 @@ export const retrySyncRun = (runId: string, requestId: string) =>
 export const fetchSyncRuns = (query: SyncRunQuery) =>
   getJson<SyncRunPage>(withQuery(`${BASE}/runs`, query));
 export const fetchSyncRun = (runId: string) => getJson<SyncRun>(runPath(runId));
-export const fetchSyncConflicts = (runId: string, page: number, pageSize: number) =>
+export const fetchSyncConflicts = (
+  runId: string,
+  page: number,
+  pageSize: number,
+) =>
   getJson<SyncConflictPage>(
     withQuery(`${runPath(runId)}/conflicts`, { page, pageSize }),
   );

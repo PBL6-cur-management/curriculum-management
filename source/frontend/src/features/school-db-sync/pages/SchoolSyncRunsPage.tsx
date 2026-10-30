@@ -2,7 +2,10 @@ import { Alert, Button, Select, type TableColumnsType } from 'antd';
 import dayjs from 'dayjs';
 import { generatePath, Link, useSearchParams } from 'react-router';
 import { ROUTES } from '../../../routes';
-import { DEFAULT_PAGE_SIZE, PAGE_SIZE_OPTIONS } from '../../../shared/api/pagination';
+import {
+  DEFAULT_PAGE_SIZE,
+  PAGE_SIZE_OPTIONS,
+} from '../../../shared/api/pagination';
 import {
   DataTable,
   ListPageLayout,
@@ -40,7 +43,11 @@ const columns: TableColumnsType<SyncRun> = [
     title: 'Trạng thái',
     dataIndex: 'status',
     render: (status: SyncRunStatus) => (
-      <StatusTag status={status} colorMap={RUN_STATUS_COLORS} labelMap={RUN_STATUS_LABELS} />
+      <StatusTag
+        status={status}
+        colorMap={RUN_STATUS_COLORS}
+        labelMap={RUN_STATUS_LABELS}
+      />
     ),
   },
   { title: 'Bản ghi', dataIndex: 'recordCount', align: 'right' },
@@ -69,7 +76,10 @@ export function SchoolSyncRunsPage() {
   };
   const runs = useSyncRuns(query);
 
-  function change(values: Record<string, string | undefined>, resetPage = true) {
+  function change(
+    values: Record<string, string | undefined>,
+    resetPage = true,
+  ) {
     const next = new URLSearchParams(search);
     if (resetPage) next.delete('page');
     for (const [key, value] of Object.entries(values)) {
@@ -95,7 +105,10 @@ export function SchoolSyncRunsPage() {
           allowClear
           value={status}
           style={{ minWidth: 180 }}
-          options={Object.entries(RUN_STATUS_LABELS).map(([value, label]) => ({ value, label }))}
+          options={Object.entries(RUN_STATUS_LABELS).map(([value, label]) => ({
+            value,
+            label,
+          }))}
           onChange={(value) => change({ status: value })}
         />
       }
@@ -105,8 +118,13 @@ export function SchoolSyncRunsPage() {
             <Alert
               type="error"
               showIcon
-              title={errorMessage(runs.error, 'Không tải được lịch sử đồng bộ.')}
-              action={<Button onClick={() => void runs.refetch()}>Thử lại</Button>}
+              title={errorMessage(
+                runs.error,
+                'Không tải được lịch sử đồng bộ.',
+              )}
+              action={
+                <Button onClick={() => void runs.refetch()}>Thử lại</Button>
+              }
             />
           )}
           <DataTable

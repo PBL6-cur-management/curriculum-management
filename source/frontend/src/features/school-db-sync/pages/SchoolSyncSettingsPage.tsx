@@ -123,9 +123,13 @@ export function SchoolSyncSettingsPage() {
   async function onRun() {
     try {
       const started = await run.mutateAsync({ requestId: crypto.randomUUID() });
-      void navigate(generatePath(ROUTES.schoolSyncRunDetail, { runId: started.id }));
+      void navigate(
+        generatePath(ROUTES.schoolSyncRunDetail, { runId: started.id }),
+      );
     } catch (error) {
-      void message.error(errorMessage(error, 'Không bắt đầu được lần đồng bộ.'));
+      void message.error(
+        errorMessage(error, 'Không bắt đầu được lần đồng bộ.'),
+      );
     }
   }
 
@@ -137,7 +141,12 @@ export function SchoolSyncSettingsPage() {
         actions={
           <>
             <Link to={ROUTES.schoolSyncRuns}>Lịch sử đồng bộ</Link>
-            <Button type="primary" disabled={!canRun} loading={run.isPending} onClick={() => void onRun()}>
+            <Button
+              type="primary"
+              disabled={!canRun}
+              loading={run.isPending}
+              onClick={() => void onRun()}
+            >
               Đồng bộ ngay
             </Button>
           </>
@@ -149,7 +158,11 @@ export function SchoolSyncSettingsPage() {
           showIcon
           title="Đang có một lần đồng bộ chạy. Cấu hình và ánh xạ được khóa đến khi lần đó kết thúc."
           action={
-            <Link to={generatePath(ROUTES.schoolSyncRunDetail, { runId: data.activeRunId })}>
+            <Link
+              to={generatePath(ROUTES.schoolSyncRunDetail, {
+                runId: data.activeRunId,
+              })}
+            >
               Xem lần đang chạy
             </Link>
           }
@@ -175,17 +188,27 @@ export function SchoolSyncSettingsPage() {
               <Radio.Group
                 options={[
                   { value: 'EXCEL_ONLY', label: 'Chỉ nhập Excel' },
-                  { value: 'SCHOOL_DB', label: 'CSDL Trường (SQL Server) và Excel' },
+                  {
+                    value: 'SCHOOL_DB',
+                    label: 'CSDL Trường (SQL Server) và Excel',
+                  },
                 ]}
               />
             </Form.Item>
             {mode === 'SCHOOL_DB' && (
               <>
                 <Flex gap="middle" wrap>
-                  <Form.Item name="profile" label="Loại kết nối" style={{ minWidth: 260 }}>
+                  <Form.Item
+                    name="profile"
+                    label="Loại kết nối"
+                    style={{ minWidth: 260 }}
+                  >
                     <Select
                       options={[
-                        { value: 'SIMULATED_SQL_SERVER', label: 'Bản mô phỏng (máy này)' },
+                        {
+                          value: 'SIMULATED_SQL_SERVER',
+                          label: 'Bản mô phỏng (máy này)',
+                        },
                         {
                           value: 'EXTERNAL_SQL_SERVER',
                           label: 'Máy chủ của Trường',
@@ -194,43 +217,85 @@ export function SchoolSyncSettingsPage() {
                       ]}
                     />
                   </Form.Item>
-                  <Form.Item name="host" label="Máy chủ" rules={[{ required: true, message: 'Nhập tên máy chủ' }]} style={{ minWidth: 240 }}>
+                  <Form.Item
+                    name="host"
+                    label="Máy chủ"
+                    rules={[{ required: true, message: 'Nhập tên máy chủ' }]}
+                    style={{ minWidth: 240 }}
+                  >
                     <Input placeholder="localhost" />
                   </Form.Item>
-                  <Form.Item name="port" label="Cổng" rules={[{ required: true, message: 'Nhập cổng' }]}>
+                  <Form.Item
+                    name="port"
+                    label="Cổng"
+                    rules={[{ required: true, message: 'Nhập cổng' }]}
+                  >
                     <InputNumber min={1} max={65535} style={{ width: 120 }} />
                   </Form.Item>
-                  <Form.Item name="database" label="Tên CSDL" rules={[{ required: true, message: 'Nhập tên CSDL' }]} style={{ minWidth: 220 }}>
+                  <Form.Item
+                    name="database"
+                    label="Tên CSDL"
+                    rules={[{ required: true, message: 'Nhập tên CSDL' }]}
+                    style={{ minWidth: 220 }}
+                  >
                     <Input />
                   </Form.Item>
                 </Flex>
                 <Flex gap="middle" wrap>
-                  <Form.Item name="username" label="Tài khoản chỉ đọc" rules={[{ required: true, message: 'Nhập tài khoản' }]} style={{ minWidth: 240 }}>
+                  <Form.Item
+                    name="username"
+                    label="Tài khoản chỉ đọc"
+                    rules={[{ required: true, message: 'Nhập tài khoản' }]}
+                    style={{ minWidth: 240 }}
+                  >
                     <Input autoComplete="off" />
                   </Form.Item>
                   <Form.Item
                     name="password"
                     label="Mật khẩu"
-                    extra={data.passwordConfigured ? 'Đã lưu; để trống để giữ nguyên. Mật khẩu không bao giờ hiển thị lại.' : undefined}
-                    rules={[{ required: !data.passwordConfigured, message: 'Nhập mật khẩu' }]}
+                    extra={
+                      data.passwordConfigured
+                        ? 'Đã lưu; để trống để giữ nguyên. Mật khẩu không bao giờ hiển thị lại.'
+                        : undefined
+                    }
+                    rules={[
+                      {
+                        required: !data.passwordConfigured,
+                        message: 'Nhập mật khẩu',
+                      },
+                    ]}
                     style={{ minWidth: 240 }}
                   >
                     <Input.Password autoComplete="new-password" />
                   </Form.Item>
-                  <Form.Item name="sourceIdentity" label="Mã nguồn dữ liệu" style={{ minWidth: 220 }}>
+                  <Form.Item
+                    name="sourceIdentity"
+                    label="Mã nguồn dữ liệu"
+                    style={{ minWidth: 220 }}
+                  >
                     <Input disabled={Boolean(data.lastSuccessfulRunId)} />
                   </Form.Item>
                 </Flex>
                 <Flex gap="small" align="center" wrap>
-                  <Button onClick={() => void onTest()} loading={test.isPending}>
+                  <Button
+                    onClick={() => void onTest()}
+                    loading={test.isPending}
+                  >
                     Kiểm tra kết nối đã lưu
                   </Button>
                   <Typography.Text type={verified ? 'success' : 'secondary'}>
-                    {verified ? 'Kết nối đã lưu đã kiểm tra thành công.' : 'Kết nối đã lưu chưa được kiểm tra.'}
+                    {verified
+                      ? 'Kết nối đã lưu đã kiểm tra thành công.'
+                      : 'Kết nối đã lưu chưa được kiểm tra.'}
                   </Typography.Text>
                 </Flex>
                 {probe && (
-                  <Alert style={{ marginTop: 12 }} type={CONNECTION_TEST_TONE[probe.code]} showIcon title={probe.message} />
+                  <Alert
+                    style={{ marginTop: 12 }}
+                    type={CONNECTION_TEST_TONE[probe.code]}
+                    showIcon
+                    title={probe.message}
+                  />
                 )}
               </>
             )}
@@ -238,7 +303,11 @@ export function SchoolSyncSettingsPage() {
 
           <Card title="Lịch đồng bộ">
             <Flex gap="middle" wrap align="end">
-              <Form.Item name="enabled" label="Tự động đồng bộ" valuePropName="checked">
+              <Form.Item
+                name="enabled"
+                label="Tự động đồng bộ"
+                valuePropName="checked"
+              >
                 <Switch disabled={mode !== 'SCHOOL_DB'} />
               </Form.Item>
               <Form.Item name="cadence" label="Tần suất">
@@ -250,17 +319,39 @@ export function SchoolSyncSettingsPage() {
                 />
               </Form.Item>
               {cadence === 'WEEKLY' && (
-                <Form.Item name="weekday" label="Ngày trong tuần" style={{ minWidth: 160 }}>
-                  <Select options={WEEKDAY_LABELS.map((label, index) => ({ value: index + 1, label }))} />
+                <Form.Item
+                  name="weekday"
+                  label="Ngày trong tuần"
+                  style={{ minWidth: 160 }}
+                >
+                  <Select
+                    options={WEEKDAY_LABELS.map((label, index) => ({
+                      value: index + 1,
+                      label,
+                    }))}
+                  />
                 </Form.Item>
               )}
-              <Form.Item name="localTime" label="Giờ (giờ Việt Nam)" rules={[{ required: true, pattern: /^([01]\d|2[0-3]):[0-5]\d$/, message: 'Giờ dạng HH:mm' }]}>
+              <Form.Item
+                name="localTime"
+                label="Giờ (giờ Việt Nam)"
+                rules={[
+                  {
+                    required: true,
+                    pattern: /^([01]\d|2[0-3]):[0-5]\d$/,
+                    message: 'Giờ dạng HH:mm',
+                  },
+                ]}
+              >
                 <Input type="time" style={{ width: 140 }} />
               </Form.Item>
             </Flex>
             <Typography.Text type="secondary">
-              {data.nextRunAt ? `Lần chạy tiếp theo: ${formatTime(data.nextRunAt)}.` : 'Chưa có lịch: tự động đồng bộ đang tắt.'}{' '}
-              Dữ liệu Trường luôn được ưu tiên hơn dữ liệu Excel; giá trị cũ được giữ trong lịch sử xung đột.
+              {data.nextRunAt
+                ? `Lần chạy tiếp theo: ${formatTime(data.nextRunAt)}.`
+                : 'Chưa có lịch: tự động đồng bộ đang tắt.'}{' '}
+              Dữ liệu Trường luôn được ưu tiên hơn dữ liệu Excel; giá trị cũ
+              được giữ trong lịch sử xung đột.
             </Typography.Text>
           </Card>
 
@@ -312,35 +403,83 @@ function MappingCard({ revision, items, locked, loading }: MappingCardProps) {
     <Card
       title="Ánh xạ mã"
       loading={loading}
-      extra={<Typography.Text type="secondary">Mã không có trong bảng được dùng nguyên văn</Typography.Text>}
+      extra={
+        <Typography.Text type="secondary">
+          Mã không có trong bảng được dùng nguyên văn
+        </Typography.Text>
+      }
     >
-      <Form form={form} disabled={locked} onFinish={(values) => void onSave(values)}>
+      <Form
+        form={form}
+        disabled={locked}
+        onFinish={(values) => void onSave(values)}
+      >
         <Form.List name="items">
           {(fields, { add, remove }) => (
             <Flex vertical gap="small">
               {fields.length === 0 && (
-                <Typography.Text type="secondary">Chưa có ánh xạ: mã của Trường trùng mã trong hệ thống.</Typography.Text>
+                <Typography.Text type="secondary">
+                  Chưa có ánh xạ: mã của Trường trùng mã trong hệ thống.
+                </Typography.Text>
               )}
               {fields.map((field, index) => (
                 <Flex key={field.key} gap="small" wrap align="start">
-                  <Form.Item name={[field.name, 'kind']} rules={[{ required: true, message: 'Chọn loại' }]} style={{ minWidth: 180, marginBottom: 0 }}>
+                  <Form.Item
+                    name={[field.name, 'kind']}
+                    rules={[{ required: true, message: 'Chọn loại' }]}
+                    style={{ minWidth: 180, marginBottom: 0 }}
+                  >
                     <Select
                       aria-label={`Loại mã dòng ${index + 1}`}
                       placeholder="Loại"
-                      options={Object.entries(MAPPING_KIND_LABELS).map(([value, label]) => ({ value, label }))}
+                      options={Object.entries(MAPPING_KIND_LABELS).map(
+                        ([value, label]) => ({ value, label }),
+                      )}
                     />
                   </Form.Item>
-                  <Form.Item name={[field.name, 'sourceCode']} rules={[{ required: true, whitespace: true, message: 'Nhập mã Trường' }]} style={{ marginBottom: 0 }}>
-                    <Input aria-label={`Mã của Trường dòng ${index + 1}`} placeholder="Mã của Trường" />
+                  <Form.Item
+                    name={[field.name, 'sourceCode']}
+                    rules={[
+                      {
+                        required: true,
+                        whitespace: true,
+                        message: 'Nhập mã Trường',
+                      },
+                    ]}
+                    style={{ marginBottom: 0 }}
+                  >
+                    <Input
+                      aria-label={`Mã của Trường dòng ${index + 1}`}
+                      placeholder="Mã của Trường"
+                    />
                   </Form.Item>
-                  <Form.Item name={[field.name, 'targetCode']} rules={[{ required: true, whitespace: true, message: 'Nhập mã hệ thống' }]} style={{ marginBottom: 0 }}>
-                    <Input aria-label={`Mã trong hệ thống dòng ${index + 1}`} placeholder="Mã trong hệ thống" />
+                  <Form.Item
+                    name={[field.name, 'targetCode']}
+                    rules={[
+                      {
+                        required: true,
+                        whitespace: true,
+                        message: 'Nhập mã hệ thống',
+                      },
+                    ]}
+                    style={{ marginBottom: 0 }}
+                  >
+                    <Input
+                      aria-label={`Mã trong hệ thống dòng ${index + 1}`}
+                      placeholder="Mã trong hệ thống"
+                    />
                   </Form.Item>
                   <Button onClick={() => remove(field.name)}>Xóa</Button>
                 </Flex>
               ))}
               <Flex gap="small" justify="space-between">
-                <Button onClick={() => add({ kind: 'COURSE', sourceCode: '', targetCode: '' })}>Thêm ánh xạ</Button>
+                <Button
+                  onClick={() =>
+                    add({ kind: 'COURSE', sourceCode: '', targetCode: '' })
+                  }
+                >
+                  Thêm ánh xạ
+                </Button>
                 <Button htmlType="submit" loading={save.isPending}>
                   Lưu ánh xạ
                 </Button>

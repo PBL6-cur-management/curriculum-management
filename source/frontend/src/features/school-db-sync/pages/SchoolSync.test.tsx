@@ -17,7 +17,9 @@ import { SchoolSyncSettingsPage } from './SchoolSyncSettingsPage';
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status });
 
-function configuration(patch: Partial<SyncConfiguration> = {}): SyncConfiguration {
+function configuration(
+  patch: Partial<SyncConfiguration> = {},
+): SyncConfiguration {
   return {
     id: 'c1',
     revision: 3,
@@ -95,12 +97,18 @@ function stub(reads: Record<string, unknown>) {
       const url = String(input).replace(/^.*\/api/, '/api');
       const method = init?.method ?? 'GET';
       if (method !== 'GET') {
-        writes.push({ method, url, body: init?.body ? JSON.parse(String(init.body)) : undefined });
+        writes.push({
+          method,
+          url,
+          body: init?.body ? JSON.parse(String(init.body)) : undefined,
+        });
         const answer = reads[`${method} ${url}`];
         return answer instanceof Response ? answer : json(answer ?? {});
       }
       const path = url.split('?')[0]!;
-      return path in reads ? json(reads[path]) : json({ message: 'Not found' }, 404);
+      return path in reads
+        ? json(reads[path])
+        : json({ message: 'Not found' }, 404);
     }),
   );
   return writes;
@@ -113,7 +121,10 @@ function renderAt(element: ReactNode, route: string, entry: string) {
   const router = createMemoryRouter(
     [
       { path: route, element },
-      { path: '/school-db-sync/runs/:runId', element: <SchoolSyncRunDetailPage /> },
+      {
+        path: '/school-db-sync/runs/:runId',
+        element: <SchoolSyncRunDetailPage />,
+      },
     ],
     { initialEntries: [entry] },
   );
@@ -136,7 +147,9 @@ describe('SchoolSyncSettingsPage', () => {
       '/api/school-db-sync/mappings': { revision: 3, items: [] },
     });
     renderAt(<SchoolSyncSettingsPage />, '/school-db-sync', '/school-db-sync');
-    expect(await screen.findByRole('heading', { name: 'Đồng bộ CSDL Trường' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Đồng bộ CSDL Trường' }),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText('Chỉ nhập Excel')).toBeChecked();
     expect(screen.getByRole('button', { name: 'Đồng bộ ngay' })).toBeDisabled();
     expect(screen.queryByLabelText('Máy chủ')).not.toBeInTheDocument();
@@ -146,7 +159,10 @@ describe('SchoolSyncSettingsPage', () => {
     const writes = stub({
       '/api/school-db-sync/configuration': configuration({ ...SCHOOL_DB }),
       '/api/school-db-sync/mappings': { revision: 3, items: [] },
-      'PUT /api/school-db-sync/configuration': configuration({ ...SCHOOL_DB, revision: 4 }),
+      'PUT /api/school-db-sync/configuration': configuration({
+        ...SCHOOL_DB,
+        revision: 4,
+      }),
     });
     renderAt(<SchoolSyncSettingsPage />, '/school-db-sync', '/school-db-sync');
     const password = await screen.findByLabelText('Mật khẩu');
@@ -155,8 +171,15 @@ describe('SchoolSyncSettingsPage', () => {
     expect(screen.getByText(/bản mô phỏng SQL Server/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Lưu cấu hình' }));
     await waitFor(() => expect(writes).toHaveLength(1));
-    expect(writes[0]).toMatchObject({ method: 'PUT', url: '/api/school-db-sync/configuration' });
-    expect(writes[0]!.body).toMatchObject({ revision: 3, mode: 'SCHOOL_DB', host: 'localhost' });
+    expect(writes[0]).toMatchObject({
+      method: 'PUT',
+      url: '/api/school-db-sync/configuration',
+    });
+    expect(writes[0]!.body).toMatchObject({
+      revision: 3,
+      mode: 'SCHOOL_DB',
+      host: 'localhost',
+    });
     expect(writes[0]!.body).not.toHaveProperty('password');
   });
 
@@ -173,9 +196,14 @@ describe('SchoolSyncSettingsPage', () => {
       },
     });
     renderAt(<SchoolSyncSettingsPage />, '/school-db-sync', '/school-db-sync');
-    fireEvent.click(await screen.findByRole('button', { name: 'Kiểm tra kết nối đã lưu' }));
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Kiểm tra kết nối đã lưu' }),
+    );
     expect(await screen.findByText(/tài khoản chỉ đọc/)).toBeInTheDocument();
-    expect(writes[0]).toMatchObject({ url: '/api/school-db-sync/connection-test', body: { configurationRevision: 3 } });
+    expect(writes[0]).toMatchObject({
+      url: '/api/school-db-sync/connection-test',
+      body: { configurationRevision: 3 },
+    });
   });
 
   it('starts a run once the saved connection is verified and opens it (US-103 AC1)', async () => {
@@ -187,23 +215,39 @@ describe('SchoolSyncSettingsPage', () => {
         nextRunAt: '2026-10-31T19:00:00.000Z',
       }),
       '/api/school-db-sync/mappings': { revision: 3, items: [] },
-      'POST /api/school-db-sync/runs': run({ id: 'r9', status: 'RUNNING', finishedAt: null }),
+      'POST /api/school-db-sync/runs': run({
+        id: 'r9',
+        status: 'RUNNING',
+        finishedAt: null,
+      }),
       '/api/school-db-sync/runs/r9': run({ id: 'r9' }),
     });
     renderAt(<SchoolSyncSettingsPage />, '/school-db-sync', '/school-db-sync');
-    expect(await screen.findByText(/Lần chạy tiếp theo: 02:00, 01\/11\/2026/)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Lần chạy tiếp theo: 02:00, 01\/11\/2026/),
+    ).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Đồng bộ ngay' }));
-    expect(await screen.findByRole('heading', { name: /Lần đồng bộ/ })).toBeInTheDocument();
-    expect((writes[0]!.body as { requestId: string }).requestId).toMatch(/^[0-9a-f-]{36}$/);
+    expect(
+      await screen.findByRole('heading', { name: /Lần đồng bộ/ }),
+    ).toBeInTheDocument();
+    expect((writes[0]!.body as { requestId: string }).requestId).toMatch(
+      /^[0-9a-f-]{36}$/,
+    );
   });
 
   it('locks the configuration while a run is in progress (US-103 AC3)', async () => {
     stub({
-      '/api/school-db-sync/configuration': configuration({ ...SCHOOL_DB, verifiedConnectionRevision: 1, activeRunId: 'r2' }),
+      '/api/school-db-sync/configuration': configuration({
+        ...SCHOOL_DB,
+        verifiedConnectionRevision: 1,
+        activeRunId: 'r2',
+      }),
       '/api/school-db-sync/mappings': { revision: 3, items: [] },
     });
     renderAt(<SchoolSyncSettingsPage />, '/school-db-sync', '/school-db-sync');
-    expect(await screen.findByText(/Cấu hình và ánh xạ được khóa/)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Cấu hình và ánh xạ được khóa/),
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Lưu cấu hình' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Đồng bộ ngay' })).toBeDisabled();
   });
@@ -215,19 +259,35 @@ describe('SchoolSyncRunsPage', () => {
       '/api/school-db-sync/runs': {
         items: [
           run(),
-          run({ id: 'r2', status: 'FAILED', recordCount: 0, studentCount: 0, resultCount: 0, classCount: 0, changedCount: 0, errorCode: 'CONNECTION_FAILED', errorMessage: 'x' }),
+          run({
+            id: 'r2',
+            status: 'FAILED',
+            recordCount: 0,
+            studentCount: 0,
+            resultCount: 0,
+            classCount: 0,
+            changedCount: 0,
+            errorCode: 'CONNECTION_FAILED',
+            errorMessage: 'x',
+          }),
         ],
         total: 2,
         page: 1,
         pageSize: 20,
       },
     });
-    const router = renderAt(<SchoolSyncRunsPage />, '/school-db-sync/runs', '/school-db-sync/runs');
+    const router = renderAt(
+      <SchoolSyncRunsPage />,
+      '/school-db-sync/runs',
+      '/school-db-sync/runs',
+    );
     expect(await screen.findByText('Thành công')).toBeInTheDocument();
     expect(screen.getByText('Thất bại')).toBeInTheDocument();
     fireEvent.mouseDown(screen.getByLabelText('Lọc trạng thái'));
     fireEvent.click(await screen.findByTitle('Thất bại'));
-    await waitFor(() => expect(router.state.location.search).toBe('?status=FAILED'));
+    await waitFor(() =>
+      expect(router.state.location.search).toBe('?status=FAILED'),
+    );
   });
 });
 
@@ -243,15 +303,34 @@ describe('SchoolSyncRunDetailPage', () => {
         classCount: 0,
         changedCount: 0,
         errorCode: 'CONNECTION_FAILED',
-        errorMessage: 'Không kết nối được CSDL Trường (máy chủ, cổng hoặc tài khoản).',
+        errorMessage:
+          'Không kết nối được CSDL Trường (máy chủ, cổng hoặc tài khoản).',
         canRetry: true,
       }),
-      'POST /api/school-db-sync/runs/r2/retry': run({ id: 'r3', trigger: 'RETRY', retryOfId: 'r2', status: 'RUNNING', finishedAt: null }),
-      '/api/school-db-sync/runs/r3': run({ id: 'r3', trigger: 'RETRY', retryOfId: 'r2' }),
+      'POST /api/school-db-sync/runs/r2/retry': run({
+        id: 'r3',
+        trigger: 'RETRY',
+        retryOfId: 'r2',
+        status: 'RUNNING',
+        finishedAt: null,
+      }),
+      '/api/school-db-sync/runs/r3': run({
+        id: 'r3',
+        trigger: 'RETRY',
+        retryOfId: 'r2',
+      }),
     });
-    renderAt(<SchoolSyncRunDetailPage />, '/school-db-sync/runs/:runId', '/school-db-sync/runs/r2');
-    expect(await screen.findByText(/Không kết nối được CSDL Trường/)).toBeInTheDocument();
-    expect(screen.getByText(/Không có thay đổi nào được ghi/)).toBeInTheDocument();
+    renderAt(
+      <SchoolSyncRunDetailPage />,
+      '/school-db-sync/runs/:runId',
+      '/school-db-sync/runs/r2',
+    );
+    expect(
+      await screen.findByText(/Không kết nối được CSDL Trường/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Không có thay đổi nào được ghi/),
+    ).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Chạy lại' }));
     expect(await screen.findByText('lần thất bại trước')).toBeInTheDocument();
     expect(writes[0]!.url).toBe('/api/school-db-sync/runs/r2/retry');
@@ -270,12 +349,23 @@ describe('SchoolSyncRunDetailPage', () => {
     };
     stub({
       '/api/school-db-sync/runs/r1': run({ conflictCount: 1 }),
-      '/api/school-db-sync/runs/r1/conflicts': { items: [conflict], total: 1, page: 1, pageSize: 20 },
+      '/api/school-db-sync/runs/r1/conflicts': {
+        items: [conflict],
+        total: 1,
+        page: 1,
+        pageSize: 20,
+      },
     });
-    renderAt(<SchoolSyncRunDetailPage />, '/school-db-sync/runs/:runId', '/school-db-sync/runs/r1');
+    renderAt(
+      <SchoolSyncRunDetailPage />,
+      '/school-db-sync/runs/:runId',
+      '/school-db-sync/runs/r1',
+    );
     expect(await screen.findByText('Xung đột với Excel')).toBeInTheDocument();
     expect(await screen.findByText('Điểm thang 10: 7.00')).toBeInTheDocument();
     expect(screen.getByText('Điểm thang 10: 8.50')).toBeInTheDocument();
-    expect(screen.getByText('SYN00003 · 1020010 · 2026-2027-1')).toBeInTheDocument();
+    expect(
+      screen.getByText('SYN00003 · 1020010 · 2026-2027-1'),
+    ).toBeInTheDocument();
   });
 });
