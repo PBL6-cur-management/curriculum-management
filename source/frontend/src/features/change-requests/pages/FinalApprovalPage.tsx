@@ -29,7 +29,11 @@ import {
   useFinalApprovalPreview,
   useFinalApprove,
 } from '../hooks/useApprovals';
-import { PageHeader, PageSkeleton } from '../../../shared/design-system';
+import {
+  BackLink,
+  PageHeader,
+  PageSkeleton,
+} from '../../../shared/design-system';
 
 interface Values {
   decisionNumber: string;
@@ -109,7 +113,7 @@ export function FinalApprovalPage() {
 
   return (
     <Flex vertical gap="middle">
-      <Link to={back}>← Đề xuất {data.requestCode}</Link>
+      <BackLink to={back}>Đề xuất {data.requestCode}</BackLink>
       <PageHeader title={FINAL_APPROVAL_TITLE} />
       <FinalApprovalPreview preview={data} />
       <Form<Values>

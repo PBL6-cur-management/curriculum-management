@@ -28,7 +28,11 @@ export function NotificationsPage() {
     <Flex vertical gap="middle">
       <PageHeader
         title="Thông báo"
-        subtitle={data ? `${data.total} thông báo${query.unread ? ' chưa đọc' : ''}` : undefined}
+        subtitle={
+          data
+            ? `${data.total} thông báo${query.unread ? ' chưa đọc' : ''}`
+            : undefined
+        }
         actions={
           <>
             <Button
