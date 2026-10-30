@@ -24,6 +24,8 @@ const LOADERS: Record<string, () => Promise<unknown>> = {
   [ROUTES.imports]: () => import('../../features/imports/pages/ImportPage'),
   [ROUTES.importHistory]: () =>
     import('../../features/imports/pages/ImportHistoryPage'),
+  [ROUTES.schoolSync]: () =>
+    import('../../features/school-db-sync/pages/SchoolSyncSettingsPage'),
   [ROUTES.subjectGroups]: () =>
     import('../../features/subject-groups/pages/SubjectGroupListPage'),
   [ROUTES.orgUnits]: () =>

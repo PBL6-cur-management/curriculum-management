@@ -80,6 +80,18 @@ export class Env {
   })
   STUDENT_CREDENTIAL_ENCRYPTION_KEY?: string;
 
+  // AES-256 key (base64 of 32 bytes) that seals the school database password (F-22). Absent: the connection cannot be saved.
+  @IsOptional()
+  @Matches(CREDENTIAL_KEY_PATTERN, {
+    message: 'SCHOOL_SYNC_ENCRYPTION_KEY must be the base64 of exactly 32 bytes',
+  })
+  SCHOOL_SYNC_ENCRYPTION_KEY?: string;
+
+  // Comma-separated school SQL Server host names the operator allows. Empty: only the local simulator.
+  @IsOptional()
+  @IsString()
+  SCHOOL_SYNC_EXTERNAL_HOSTS?: string;
+
   @IsInt()
   @Min(ELIGIBILITY_LIMITS.MIN_DEPTH)
   @Max(ELIGIBILITY_LIMITS.MAX_DEPTH)

@@ -57,6 +57,9 @@ export const ROUTES = {
   imports: '/imports',
   importHistory: '/imports/history',
   importDetail: '/imports/history/:batchId',
+  schoolSync: '/school-db-sync',
+  schoolSyncRuns: '/school-db-sync/runs',
+  schoolSyncRunDetail: '/school-db-sync/runs/:runId',
 } as const;
 
 // Row or group to scroll to and highlight on arrival; set by the consistency result list.

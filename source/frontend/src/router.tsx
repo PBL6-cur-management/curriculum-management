@@ -266,6 +266,22 @@ const ImportDetailPage = lazy(() =>
   })),
 );
 
+const SchoolSyncSettingsPage = lazy(() =>
+  import('./features/school-db-sync/pages/SchoolSyncSettingsPage').then((module) => ({
+    default: module.SchoolSyncSettingsPage,
+  })),
+);
+const SchoolSyncRunsPage = lazy(() =>
+  import('./features/school-db-sync/pages/SchoolSyncRunsPage').then((module) => ({
+    default: module.SchoolSyncRunsPage,
+  })),
+);
+const SchoolSyncRunDetailPage = lazy(() =>
+  import('./features/school-db-sync/pages/SchoolSyncRunDetailPage').then((module) => ({
+    default: module.SchoolSyncRunDetailPage,
+  })),
+);
+
 const StudentListPage = lazy(() =>
   import('./features/students/pages/StudentListPage').then((module) => ({
     default: module.StudentListPage,
@@ -346,6 +362,30 @@ export const router = createBrowserRouter([
               >
                 <ImportPage />
               </RequireAnyPermission>
+            ),
+          },
+          {
+            path: ROUTES.schoolSync,
+            element: (
+              <RequirePermission code={PERMISSIONS.syncConfigure}>
+                <SchoolSyncSettingsPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: ROUTES.schoolSyncRuns,
+            element: (
+              <RequirePermission code={PERMISSIONS.syncConfigure}>
+                <SchoolSyncRunsPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: ROUTES.schoolSyncRunDetail,
+            element: (
+              <RequirePermission code={PERMISSIONS.syncConfigure}>
+                <SchoolSyncRunDetailPage />
+              </RequirePermission>
             ),
           },
           {

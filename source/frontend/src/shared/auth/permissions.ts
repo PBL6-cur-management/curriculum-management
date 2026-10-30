@@ -37,6 +37,7 @@ export const PERMISSIONS = {
   semesterManage: 'semester.manage',
   dataImportExcel: 'data.importExcel',
   curriculumImportExportExcel: 'curriculum.importExportExcel',
+  syncConfigure: 'sync.configure',
 } as const satisfies Record<string, PermissionCode>;
 
 export function hasPermission(
