@@ -66,6 +66,12 @@ export class Env {
   @Min(1)
   ATTACHMENT_MAX_MB: number = DEFAULT_ATTACHMENT_MAX_MB;
 
+  // Chrome/Edge executable for curriculum PDFs (F-24). Unset: the browser Puppeteer installed (`puppeteer browsers install chrome`).
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  PDF_BROWSER_PATH?: string;
+
   // Redis key prefix of every queue. Unset means BullMQ's own default ("bull"); the e2e specs share one Redis and set a unique one each.
   @IsOptional()
   @IsString()
@@ -83,7 +89,8 @@ export class Env {
   // AES-256 key (base64 of 32 bytes) that seals the school database password (F-22). Absent: the connection cannot be saved.
   @IsOptional()
   @Matches(CREDENTIAL_KEY_PATTERN, {
-    message: 'SCHOOL_SYNC_ENCRYPTION_KEY must be the base64 of exactly 32 bytes',
+    message:
+      'SCHOOL_SYNC_ENCRYPTION_KEY must be the base64 of exactly 32 bytes',
   })
   SCHOOL_SYNC_ENCRYPTION_KEY?: string;
 

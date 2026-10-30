@@ -15,6 +15,7 @@ interface ProgramSectionLinksProps {
 export function ProgramSectionLinks({ program }: ProgramSectionLinksProps) {
   const canViewOutcomes = useCan('outcome.view');
   const seesMatrices = useSeesMatrices();
+  const canViewHistory = useCan('version.viewHistory');
   const workingVersion = program.draftVersion ?? program.currentVersion;
   const params = { programId: program.id, versionId: workingVersion.id };
   const sections = [
@@ -46,6 +47,24 @@ export function ProgramSectionLinks({ program }: ProgramSectionLinksProps) {
           {
             title: 'Kiểm tra phủ chuẩn đầu ra',
             to: generatePath(ROUTES.outcomeCoverage, params),
+          },
+          {
+            title: 'Đồ thị học phần',
+            to: generatePath(ROUTES.courseGraph, params),
+          },
+          {
+            title: 'Sức khỏe chương trình',
+            to: generatePath(ROUTES.programHealth, params),
+          },
+        ]
+      : []),
+    ...(canViewHistory && seesMatrices
+      ? [
+          {
+            title: 'Dòng thời gian phiên bản',
+            to: generatePath(ROUTES.versionTimeline, {
+              programId: program.id,
+            }),
           },
         ]
       : []),

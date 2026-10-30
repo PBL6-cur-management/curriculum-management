@@ -36,6 +36,9 @@ export const ROUTES = {
   outcomeCoverage: '/programs/:programId/versions/:versionId/outcome-coverage',
   programVersionInfo: '/programs/:programId/versions/:versionId/info',
   versionHistory: '/programs/:programId/versions',
+  versionTimeline: '/programs/:programId/version-timeline',
+  courseGraph: '/programs/:programId/versions/:versionId/course-graph',
+  programHealth: '/programs/:programId/versions/:versionId/health',
   versionCompare: '/programs/:programId/version-comparison',
   pinnedSyllabusCompare:
     '/programs/:programId/version-comparison/syllabi/:courseId',
