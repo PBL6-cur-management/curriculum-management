@@ -2,14 +2,14 @@ import { fileURLToPath } from 'node:url';
 
 export const accounts = {
   R1: process.env.E2E_ADMIN_USERNAME || 'admin',
-  R2: 'r2.lanhdao',
-  R3: 'r3.giamdoc',
-  R3b: 'r3.giamdoc2',
-  R4: 'r4.dieuphoi',
-  R4b: 'r4.dieuphoi2',
-  R5: 'r5.giangvien',
-  R5b: 'r5.giangvien2',
-  R6: 'r6.sinhvien',
+  R2: 'e2e.r2.lanhdao',
+  R3: 'e2e.r3.giamdoc',
+  R3b: 'e2e.r3.giamdoc2',
+  R4: 'e2e.r4.dieuphoi',
+  R4b: 'e2e.r4.dieuphoi2',
+  R5: 'e2e.r5.giangvien',
+  R5b: 'e2e.r5.giangvien2',
+  R6: 'e2e.r6.sinhvien',
 } as const;
 
 export type AccountRole = keyof typeof accounts;

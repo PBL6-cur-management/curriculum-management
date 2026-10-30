@@ -383,7 +383,7 @@ test.describe('F-11 PLO, CLO, ma trận', () => {
       const owned = await createAdminOutcome(browser);
       try {
         const admin = await owned.context.newPage();
-        const other = await createGroupedCourse(admin, 'CNPM — Công nghệ phần mềm');
+        const other = await createGroupedCourse(admin, 'E2E-CNPM — Công nghệ phần mềm');
         await addCurriculumItem(admin, owned.program.curriculumPath, other);
         await page.goto(outcomePath(owned.program, 'outcome-coverage'));
         const section = coverageSection(page, 'Học phần chưa gắn PLO');

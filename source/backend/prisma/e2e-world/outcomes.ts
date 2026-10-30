@@ -1,4 +1,4 @@
-import type { PrismaClient } from '../../../src/generated/prisma/client.js';
+import type { PrismaClient } from '../../src/generated/prisma/client.js';
 
 export const DEMO_PLOS: readonly {
   ploCode: string;

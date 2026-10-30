@@ -2,15 +2,15 @@ import {
   ScopeType,
   SubjectGroupMemberRole,
   type PrismaClient,
-} from '../../../src/generated/prisma/client.js';
-import { PasswordService } from '../../../src/shared/password/password.service.js';
-import { todayDate } from '../../../src/shared/time/today.js';
-import { ORG_UNIT_CODES } from '../org-units.js';
-import { ROLE_CODES, type RoleCode } from '../roles.js';
+} from '../../src/generated/prisma/client.js';
+import { PasswordService } from '../../src/shared/password/password.service.js';
+import { todayDate } from '../../src/shared/time/today.js';
+import { ORG_UNIT_CODES } from '../seed-data/org-units.js';
+import { ROLE_CODES, type RoleCode } from '../seed-data/roles.js';
 import { DEMO_GROUP_CODES } from './catalog.js';
 import { DEMO_PROGRAM_CODES } from './programs.js';
 
-// One password for every demo account (SEED_DEMO_PASSWORD). R3, R4 and R5 are derived roles: they exist only through
+// One password for every demo account (E2E_PASSWORD). R3, R4 and R5 are derived roles: they exist only through
 // the director or membership rows below. R2 and R6 are manual assignments. R6 is derived from enrolment in the final
 // design (F-17) so the UI refuses to assign it; the seed writes the row directly, as the e2e tests do, with a UNIT scope
 // on Phòng Đào tạo: a unit scope that covers the program's own faculty would still read its Drafts (F-06 D2).
@@ -21,44 +21,44 @@ export const DEMO_ACCOUNTS: readonly {
   manualRole?: RoleCode;
 }[] = [
   {
-    username: 'r2.lanhdao',
-    userCode: 'GV001',
+    username: 'e2e.r2.lanhdao',
+    userCode: 'E2EGV001',
     fullName: 'TS. Lê Văn Minh',
     manualRole: ROLE_CODES.R2,
   },
   {
-    username: 'r3.giamdoc',
-    userCode: 'GV002',
+    username: 'e2e.r3.giamdoc',
+    userCode: 'E2EGV002',
     fullName: 'TS. Trần Thị Hương',
   },
   {
-    username: 'r3.giamdoc2',
-    userCode: 'GV003',
+    username: 'e2e.r3.giamdoc2',
+    userCode: 'E2EGV003',
     fullName: 'TS. Phạm Quốc Bảo',
   },
   {
-    username: 'r4.dieuphoi',
-    userCode: 'GV004',
+    username: 'e2e.r4.dieuphoi',
+    userCode: 'E2EGV004',
     fullName: 'ThS. Nguyễn Hoàng Anh',
   },
   {
-    username: 'r4.dieuphoi2',
-    userCode: 'GV005',
+    username: 'e2e.r4.dieuphoi2',
+    userCode: 'E2EGV005',
     fullName: 'ThS. Võ Thanh Tùng',
   },
   {
-    username: 'r5.giangvien',
-    userCode: 'GV006',
+    username: 'e2e.r5.giangvien',
+    userCode: 'E2EGV006',
     fullName: 'ThS. Đặng Thị Lan',
   },
   {
-    username: 'r5.giangvien2',
-    userCode: 'GV007',
+    username: 'e2e.r5.giangvien2',
+    userCode: 'E2EGV007',
     fullName: 'ThS. Hồ Minh Khôi',
   },
   {
-    username: 'r6.sinhvien',
-    userCode: '102240001',
+    username: 'e2e.r6.sinhvien',
+    userCode: '999240001',
     fullName: 'Nguyễn Minh Quân',
     manualRole: ROLE_CODES.R6,
   },
@@ -70,30 +70,30 @@ const MEMBERSHIPS: readonly {
   memberRole: SubjectGroupMemberRole;
 }[] = [
   {
-    username: 'r4.dieuphoi',
+    username: 'e2e.r4.dieuphoi',
     groupCode: DEMO_GROUP_CODES.KHMT,
     memberRole: SubjectGroupMemberRole.COORDINATOR,
   },
   {
-    username: 'r4.dieuphoi2',
+    username: 'e2e.r4.dieuphoi2',
     groupCode: DEMO_GROUP_CODES.CNPM,
     memberRole: SubjectGroupMemberRole.COORDINATOR,
   },
   {
-    username: 'r5.giangvien',
+    username: 'e2e.r5.giangvien',
     groupCode: DEMO_GROUP_CODES.KHMT,
     memberRole: SubjectGroupMemberRole.MEMBER,
   },
   {
-    username: 'r5.giangvien2',
+    username: 'e2e.r5.giangvien2',
     groupCode: DEMO_GROUP_CODES.CNPM,
     memberRole: SubjectGroupMemberRole.MEMBER,
   },
 ];
 
 const DIRECTORS: readonly { username: string; programCode: string }[] = [
-  { username: 'r3.giamdoc', programCode: DEMO_PROGRAM_CODES.MAIN },
-  { username: 'r3.giamdoc2', programCode: DEMO_PROGRAM_CODES.SECOND },
+  { username: 'e2e.r3.giamdoc', programCode: DEMO_PROGRAM_CODES.MAIN },
+  { username: 'e2e.r3.giamdoc2', programCode: DEMO_PROGRAM_CODES.SECOND },
 ];
 
 // Users and manual role rows. Existing accounts are left as they are (password included).

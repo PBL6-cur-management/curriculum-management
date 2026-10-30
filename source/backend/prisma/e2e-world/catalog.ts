@@ -3,20 +3,20 @@ import {
   CourseType,
   OrgUnitType,
   type PrismaClient,
-} from '../../../src/generated/prisma/client.js';
-import { ORG_UNIT_CODES } from '../org-units.js';
+} from '../../src/generated/prisma/client.js';
+import { ORG_UNIT_CODES } from '../seed-data/org-units.js';
 
 export const DEMO_GROUP_CODES = {
-  KHMT: 'KHMT',
-  CNPM: 'CNPM',
-  HTTT: 'HTTT',
-  MMT: 'MMT',
+  KHMT: 'E2E-KHMT',
+  CNPM: 'E2E-CNPM',
+  HTTT: 'E2E-HTTT',
+  MMT: 'E2E-MMT',
 } as const;
 type GroupCode = (typeof DEMO_GROUP_CODES)[keyof typeof DEMO_GROUP_CODES];
 
 // A second faculty, only so one course can be "của khoa khác".
 const OTHER_FACULTY = {
-  unitCode: 'KHOA_KHCB',
+  unitCode: 'E2E-KHOA_KHCB',
   unitName: 'Khoa Khoa học cơ bản',
 } as const;
 
@@ -218,7 +218,7 @@ export const DEMO_RELATIONS: readonly {
 ];
 
 const EQUIVALENCE = {
-  groupCode: 'TD-CSDL',
+  groupCode: 'E2E-TD-CSDL',
   note: 'Cơ sở dữ liệu tương đương bản của chương trình cũ',
   courseCodes: ['DBS201', 'DBS200'],
 } as const;

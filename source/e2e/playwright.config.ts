@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: fileURLToPath(new URL('.env', import.meta.url)) });
 
-for (const variable of ['E2E_ADMIN_PASSWORD', 'E2E_DEMO_PASSWORD']) {
+for (const variable of ['E2E_ADMIN_PASSWORD', 'E2E_PASSWORD']) {
   if (!process.env[variable]?.trim()) {
     throw new Error(`Thiếu ${variable}: điền mật khẩu trong source/e2e/.env trước khi chạy.`);
   }
@@ -13,6 +13,8 @@ for (const variable of ['E2E_ADMIN_PASSWORD', 'E2E_DEMO_PASSWORD']) {
 export default defineConfig({
   testDir: '.',
   testMatch: 'specs/**/*.spec.ts',
+  globalSetup: './global-setup.ts',
+  globalTeardown: './global-teardown.ts',
   fullyParallel: false,
   workers: 1,
   retries: 0,

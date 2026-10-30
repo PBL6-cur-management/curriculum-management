@@ -5,7 +5,7 @@ import { accounts, authStatePath, type AccountRole } from './fixtures/accounts.j
 
 for (const role of Object.keys(accounts) as AccountRole[]) {
   setup(`Đăng nhập ${role}`, async ({ page }) => {
-    const password = process.env[role === 'R1' ? 'E2E_ADMIN_PASSWORD' : 'E2E_DEMO_PASSWORD'];
+    const password = process.env[role === 'R1' ? 'E2E_ADMIN_PASSWORD' : 'E2E_PASSWORD'];
     if (!password) throw new Error(`Thiếu mật khẩu E2E cho ${role}.`);
     await page.goto('/login');
     await page.getByLabel('Tên đăng nhập', { exact: true }).fill(accounts[role]);
