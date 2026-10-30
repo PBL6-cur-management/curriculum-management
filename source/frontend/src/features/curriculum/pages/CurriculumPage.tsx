@@ -25,7 +25,10 @@ import { CurriculumAddButton } from '../components/CurriculumAddButton';
 import { CurriculumFiltersBar } from '../components/CurriculumFiltersBar';
 import { CurriculumItemModal } from '../components/CurriculumItemModal';
 import { CurriculumTable } from '../components/CurriculumTable';
-import { CurriculumTotals } from '../components/CurriculumTotals';
+import {
+  CurriculumTotals,
+  ProgramCreditsLine,
+} from '../components/CurriculumTotals';
 import { CurriculumWarningsPanel } from '../components/CurriculumWarningsPanel';
 import { RequisitesModal } from '../components/RequisitesModal';
 import { SemesterBoard } from '../components/SemesterBoard';
@@ -364,7 +367,7 @@ export function CurriculumPage() {
                 versionId,
               })}
             >
-              Nhóm tự chọn
+              <Button>Nhóm tự chọn</Button>
             </Link>
             <Link
               to={generatePath(ROUTES.consistency, { programId, versionId })}
@@ -390,6 +393,7 @@ export function CurriculumPage() {
           )}
         />
       )}
+      <ProgramCreditsLine credits={curriculum.programCredits} />
       <CurriculumWarningsPanel warnings={curriculum.warnings} />
       {contextBar}
       {studentMode && answer && (

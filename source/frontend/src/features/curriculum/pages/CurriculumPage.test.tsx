@@ -255,7 +255,7 @@ describe('CurriculumPage', () => {
         name: /Khung chương trình — 1024034 \(Nháp\)/,
       }),
     ).toBeInTheDocument();
-    const table = screen.getAllByRole('table')[0];
+    const table = screen.getAllByRole('table')[1];
     const rows = within(table).getAllByRole('row').slice(1);
     expect(rows).toHaveLength(3);
     expect(rows[0]).toHaveTextContent('MAT101');

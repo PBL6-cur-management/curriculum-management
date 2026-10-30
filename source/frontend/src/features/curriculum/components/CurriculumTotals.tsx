@@ -17,7 +17,7 @@ const SEMESTER_COLUMNS: TableColumnsType<SemesterTotal> = [
   { title: 'Tổng TC', dataIndex: 'totalCredits', align: 'right' },
 ];
 
-function ProgramCreditsLine({
+export function ProgramCreditsLine({
   credits,
 }: {
   credits: Curriculum['programCredits'];
@@ -69,9 +69,6 @@ export function CurriculumTotals({
   ];
   return (
     <Row gutter={[16, 16]}>
-      <Col xs={24}>
-        <ProgramCreditsLine credits={curriculum.programCredits} />
-      </Col>
       <Col xs={24} lg={14}>
         <Card size="small" title="Tín chỉ theo học kỳ">
           <Table<SemesterTotal>
