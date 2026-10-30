@@ -17,23 +17,51 @@ export interface AppMenuItem {
 export const STUDENT_ROLE_CODE = 'R6';
 
 export const APP_MENU: readonly AppMenuItem[] = [
-  {
-    path: ROUTES.imports,
-    label: 'Nhập liệu',
-    anyPermissions: [
-      PERMISSIONS.curriculumImportExportExcel,
-      PERMISSIONS.dataImportExcel,
-    ],
-  },
-  {
-    path: ROUTES.importHistory,
-    label: 'Lịch sử nhập liệu',
-    anyPermissions: [
-      PERMISSIONS.curriculumImportExportExcel,
-      PERMISSIONS.dataImportExcel,
-    ],
-  },
+  // Việc hằng ngày trước, danh mục ở giữa, quản trị cuối.
   { path: ROUTES.home, label: 'Trang chính' },
+  { path: ROUTES.notifications, label: 'Thông báo' },
+  {
+    path: ROUTES.approvalQueue,
+    label: 'Chờ tôi duyệt',
+    permission: PERMISSIONS.changeRequestView,
+  },
+  {
+    path: ROUTES.changeRequests,
+    label: 'Đề xuất thay đổi',
+    permission: PERMISSIONS.changeRequestView,
+  },
+  {
+    path: ROUTES.programs,
+    label: 'Chương trình đào tạo',
+    permission: PERMISSIONS.programView,
+    hideForRoles: [STUDENT_ROLE_CODE],
+  },
+  {
+    label: 'Học phần',
+    children: [
+      {
+        path: ROUTES.courses,
+        label: 'Danh mục học phần',
+        permission: PERMISSIONS.courseView,
+      },
+      {
+        path: ROUTES.equivalenceGroups,
+        label: 'Nhóm tương đương',
+        permission: PERMISSIONS.courseView,
+      },
+    ],
+  },
+  {
+    path: ROUTES.semesters,
+    label: 'Học kỳ và khóa tuyển sinh',
+    permission: PERMISSIONS.semesterManage,
+  },
+  {
+    path: ROUTES.students,
+    label: 'Sinh viên',
+    permission: 'student.viewProgress',
+    hideForRoles: ['R2', 'R4', 'R5', 'R6'],
+  },
   {
     label: 'Xét tốt nghiệp',
     children: [
@@ -52,20 +80,20 @@ export const APP_MENU: readonly AppMenuItem[] = [
     ],
   },
   {
-    path: ROUTES.students,
-    label: 'Sinh viên',
-    permission: 'student.viewProgress',
-    hideForRoles: ['R2', 'R4', 'R5', 'R6'],
+    path: ROUTES.imports,
+    label: 'Nhập liệu',
+    anyPermissions: [
+      PERMISSIONS.curriculumImportExportExcel,
+      PERMISSIONS.dataImportExcel,
+    ],
   },
   {
-    path: ROUTES.users,
-    label: 'Tài khoản',
-    permission: PERMISSIONS.userManage,
-  },
-  {
-    path: ROUTES.orgUnits,
-    label: 'Đơn vị',
-    permission: PERMISSIONS.orgUnitManage,
+    path: ROUTES.importHistory,
+    label: 'Lịch sử nhập liệu',
+    anyPermissions: [
+      PERMISSIONS.curriculumImportExportExcel,
+      PERMISSIONS.dataImportExcel,
+    ],
   },
   {
     path: ROUTES.subjectGroups,
@@ -73,42 +101,15 @@ export const APP_MENU: readonly AppMenuItem[] = [
     permission: PERMISSIONS.subjectGroupView,
   },
   {
-    label: 'Học phần',
-    children: [
-      {
-        path: ROUTES.courses,
-        label: 'Danh mục học phần',
-        permission: PERMISSIONS.courseView,
-      },
-      {
-        path: ROUTES.equivalenceGroups,
-        label: 'Nhóm tương đương',
-        permission: PERMISSIONS.courseView,
-      },
-    ],
+    path: ROUTES.orgUnits,
+    label: 'Đơn vị',
+    permission: PERMISSIONS.orgUnitManage,
   },
   {
-    path: ROUTES.programs,
-    label: 'Chương trình đào tạo',
-    permission: PERMISSIONS.programView,
-    hideForRoles: [STUDENT_ROLE_CODE],
+    path: ROUTES.users,
+    label: 'Tài khoản',
+    permission: PERMISSIONS.userManage,
   },
-  {
-    path: ROUTES.semesters,
-    label: 'Học kỳ và khóa tuyển sinh',
-    permission: PERMISSIONS.semesterManage,
-  },
-  {
-    path: ROUTES.changeRequests,
-    label: 'Đề xuất thay đổi',
-    permission: PERMISSIONS.changeRequestView,
-  },
-  {
-    path: ROUTES.approvalQueue,
-    label: 'Chờ tôi duyệt',
-    permission: PERMISSIONS.changeRequestView,
-  },
-  { path: ROUTES.notifications, label: 'Thông báo' },
   {
     path: ROUTES.permissionMatrix,
     label: 'Ma trận quyền',
@@ -204,4 +205,19 @@ export function openMenuGroups(
         : false,
     )
     .map(groupKey);
+}
+
+// Các trang người dùng mở được, phẳng hóa (dùng cho lối tắt ở trang chính).
+export function visibleLeaves(
+  items: readonly AppMenuItem[],
+  permissions: readonly PermissionCode[],
+  roleCodes: readonly string[] = [],
+): AppMenuItem[] {
+  return items
+    .filter((item) => isVisible(item, permissions, roleCodes))
+    .flatMap((item) =>
+      item.children
+        ? visibleLeaves(item.children, permissions, roleCodes)
+        : [item],
+    );
 }
