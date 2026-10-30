@@ -1,3 +1,4 @@
+import type request from 'supertest';
 import ExcelJS from 'exceljs';
 import { createAccount, loginAgent } from './fixtures/accounts.js';
 import {
@@ -9,13 +10,14 @@ import {
 const XLSX =
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
-function binary(
-  res: NodeJS.ReadableStream,
-  callback: (error: Error | null, body: Buffer) => void,
-) {
-  const chunks: Buffer[] = [];
-  res.on('data', (chunk: Buffer) => chunks.push(chunk));
-  res.on('end', () => callback(null, Buffer.concat(chunks)));
+// Collects an xlsx body as bytes (supertest would otherwise try to read it as text).
+function bytes(call: request.Test) {
+  return call.buffer(true).parse((stream, callback) => {
+    const chunks: Buffer[] = [];
+    stream.on('data', (chunk: Buffer) => chunks.push(chunk));
+    stream.on('error', callback);
+    stream.on('end', () => callback(null, Buffer.concat(chunks)));
+  });
 }
 
 async function sheetNames(body: Buffer) {
@@ -53,11 +55,9 @@ describe('Accreditation reports (F-23)', () => {
       .query({ leftVersionId: left.versionId, rightVersionId: left.versionId })
       .expect(400)
       .expect((r) => expect(r.body.code).toBe('REPORT_SAME_PROGRAM'));
-    const file = await harness.office
-      .get('/api/reports/program-comparison/export')
-      .query(query)
-      .buffer(true)
-      .parse(binary)
+    const file = await bytes(
+      harness.office.get('/api/reports/program-comparison/export').query(query),
+    )
       .expect(200)
       .expect('Content-Type', XLSX);
     expect(await sheetNames(file.body as Buffer)).toEqual([
@@ -95,20 +95,20 @@ describe('Accreditation reports (F-23)', () => {
   });
 
   it('exports matrices, and builds the accreditation dossier (US-107, US-108)', async () => {
-    const matrices = await harness.office
-      .get(`/api/reports/versions/${left.versionId}/matrices/export`)
-      .buffer(true)
-      .parse(binary)
-      .expect(200);
+    const matrices = await bytes(
+      harness.office.get(
+        `/api/reports/versions/${left.versionId}/matrices/export`,
+      ),
+    ).expect(200);
     expect(await sheetNames(matrices.body as Buffer)).toEqual([
       'HocPhan_PLO',
       'CLO_PLO',
     ]);
-    const dossier = await harness.office
-      .get(`/api/reports/versions/${left.versionId}/accreditation/export`)
-      .buffer(true)
-      .parse(binary)
-      .expect(200);
+    const dossier = await bytes(
+      harness.office.get(
+        `/api/reports/versions/${left.versionId}/accreditation/export`,
+      ),
+    ).expect(200);
     expect(await sheetNames(dossier.body as Buffer)).toEqual([
       'ThongTin',
       'KhungCTDT',
