@@ -311,6 +311,15 @@ const PortalGraduationPage = lazy(() =>
     }),
   ),
 );
+const CourseGraphPage = lazy(
+  () => import('./features/publication/pages/CourseGraphPage'),
+);
+const ProgramHealthPage = lazy(
+  () => import('./features/publication/pages/ProgramHealthPage'),
+);
+const VersionTimelinePage = lazy(
+  () => import('./features/publication/pages/VersionTimelinePage'),
+);
 const ProgramComparisonPage = lazy(
   () => import('./features/reports/pages/ProgramComparisonPage'),
 );
@@ -837,6 +846,30 @@ export const router = createBrowserRouter([
             element: (
               <RequirePermission code={PERMISSIONS.programView}>
                 <ElectiveGroupsPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: ROUTES.courseGraph,
+            element: (
+              <RequirePermission code={PERMISSIONS.programView}>
+                <CourseGraphPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: ROUTES.programHealth,
+            element: (
+              <RequirePermission code={PERMISSIONS.programView}>
+                <ProgramHealthPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: ROUTES.versionTimeline,
+            element: (
+              <RequirePermission code={PERMISSIONS.versionViewHistory}>
+                <VersionTimelinePage />
               </RequirePermission>
             ),
           },

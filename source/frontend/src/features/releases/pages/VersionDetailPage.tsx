@@ -6,6 +6,7 @@ import { PERMISSIONS } from '../../../shared/auth/permissions';
 import { useCan } from '../../../shared/auth/useCan';
 import { versionLabel } from '../../../shared/constants/versionLabels';
 import { errorMessage } from '../../../shared/forms/applyFieldErrors';
+import { PdfExportButton } from '../../publication/components/PdfExportButton';
 import { FrozenRowsTable } from '../components/FrozenRowsTable';
 import { VersionHeader } from '../components/VersionHeader';
 import { VersionStatusTag } from '../components/VersionStatusTag';
@@ -67,6 +68,7 @@ export function VersionDetailPage() {
         }
         actions={
           <>
+            <PdfExportButton programId={programId} versionId={versionId} />
             {version.openCorrection && (
               <Link
                 to={generatePath(ROUTES.versionCorrection, {
@@ -128,6 +130,12 @@ export function VersionDetailPage() {
             </Link>
             <Link to={generatePath(ROUTES.cloPloMatrix, params)}>
               Ma trận CLO–PLO
+            </Link>
+            <Link to={generatePath(ROUTES.courseGraph, params)}>
+              Đồ thị học phần
+            </Link>
+            <Link to={generatePath(ROUTES.programHealth, params)}>
+              Sức khỏe chương trình
             </Link>
           </>
         )}

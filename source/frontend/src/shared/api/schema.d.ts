@@ -3002,6 +3002,102 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/programs/{programId}/versions/{versionId}/course-graph': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['PublicationController_graph'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/programs/{programId}/version-timeline': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['PublicationController_versionTimeline'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/programs/{programId}/versions/{versionId}/health': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['PublicationController_programHealth'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/programs/{programId}/versions/{versionId}/pdf-exports': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['PublicationController_createPdf'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/program-pdf-exports/{exportId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['PublicationController_pdfStatus'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/program-pdf-exports/{exportId}/file': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['PublicationController_pdfFile'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -6211,6 +6307,139 @@ export interface components {
       levels: components['schemas']['LevelTimingDto'][];
       /** @description Toàn bộ, hoặc chỉ trong phạm vi được giao */
       scoped: boolean;
+    };
+    PublicationVersionDto: {
+      id: string;
+      programId: string;
+      programCode: string;
+      programName: string;
+      versionNumber: string | null;
+      status: components['schemas']['ProgramVersionStatus'];
+      semesterCount: number;
+    };
+    GraphNodeDto: {
+      id: string;
+      itemId: string | null;
+      courseId: string;
+      courseCode: string;
+      courseName: string;
+      credits: string | null;
+      semester: number | null;
+      sortOrder: number | null;
+      /** @description Học phần điều kiện nằm ngoài khung */
+      external: boolean;
+    };
+    /** @enum {string} */
+    GraphRelationType: 'PRIOR' | 'PREREQUISITE' | 'COREQUISITE';
+    GraphEdgeDto: {
+      id: string;
+      source: string;
+      target: string;
+      relationType: components['schemas']['GraphRelationType'];
+      minScore: string | null;
+    };
+    CourseGraphDto: {
+      version: components['schemas']['PublicationVersionDto'];
+      nodes: components['schemas']['GraphNodeDto'][];
+      edges: components['schemas']['GraphEdgeDto'][];
+    };
+    TimelineSemesterDto: {
+      id: string;
+      semesterCode: string;
+      /** Format: date */
+      startDate: string | null;
+    };
+    TimelineVersionRefDto: {
+      id: string;
+      versionNumber: string | null;
+    };
+    TimelineAssignmentDto: {
+      id: string;
+      cohortCode: string;
+      intakeYear: number;
+      fromSemester: components['schemas']['TimelineSemesterDto'];
+    };
+    TimelineEventDto: {
+      versionId: string;
+      versionNumber: string | null;
+      status: components['schemas']['ProgramVersionStatus'];
+      decisionNumber: string | null;
+      /** Format: date-time */
+      publishedAt: string | null;
+      effectiveSemester: components['schemas']['TimelineSemesterDto'] | null;
+      previousVersion: components['schemas']['TimelineVersionRefDto'] | null;
+      correctionOf: components['schemas']['TimelineVersionRefDto'] | null;
+      assignments: components['schemas']['TimelineAssignmentDto'][];
+    };
+    ProgramTimelineDto: {
+      programId: string;
+      programCode: string;
+      programName: string;
+      events: components['schemas']['TimelineEventDto'][];
+    };
+    /** @enum {string} */
+    HealthCategory:
+      | 'CREDIT'
+      | 'REQUISITE_ORDER'
+      | 'REQUISITE_OUTSIDE'
+      | 'EMPTY_SEMESTER'
+      | 'PLO_COVERAGE'
+      | 'ASSESSMENT_CLO'
+      | 'SYLLABUS'
+      | 'REPLACEMENT'
+      | 'OTHER';
+    HealthCategoryCountDto: {
+      category: components['schemas']['HealthCategory'];
+      count: number;
+      /** @description Nhóm kiểm tra này đã chạy được */
+      checked: boolean;
+    };
+    /** @enum {string} */
+    HealthSeverity: 'ERROR' | 'HIGH' | 'INFO';
+    /** @enum {string} */
+    HealthTarget:
+      | 'CURRICULUM'
+      | 'ELECTIVE_GROUPS'
+      | 'VERSION_INFO'
+      | 'COURSE_PLO_MATRIX'
+      | 'ITEM_CLO_PLO'
+      | 'SYLLABUS'
+      | 'COURSE';
+    HealthIssueDto: {
+      category: components['schemas']['HealthCategory'];
+      code: string;
+      severity: components['schemas']['HealthSeverity'];
+      message: string;
+      semester: number | null;
+      courseCode: string | null;
+      itemId: string | null;
+      courseId: string | null;
+      target: components['schemas']['HealthTarget'];
+    };
+    ProgramHealthDto: {
+      version: components['schemas']['PublicationVersionDto'];
+      checkedAt: string;
+      /** @description false: còn nhóm kiểm tra chưa chạy được — không phải "không có cảnh báo" */
+      complete: boolean;
+      categories: components['schemas']['HealthCategoryCountDto'][];
+      issues: components['schemas']['HealthIssueDto'][];
+      errorCount: number;
+      warningCount: number;
+    };
+    /** @enum {string} */
+    PdfExportState: 'QUEUED' | 'RUNNING' | 'READY' | 'FAILED' | 'EXPIRED';
+    ProgramPdfExportDto: {
+      id: string;
+      state: components['schemas']['PdfExportState'];
+      programId: string;
+      versionId: string;
+      fileName: string;
+      draft: boolean;
+      /** Format: date-time */
+      requestedAt: string;
+      /** Format: date-time */
+      expiresAt: string | null;
+      failure: string | null;
     };
   };
   responses: never;
@@ -11382,6 +11611,135 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['ChangeRequestStatisticsDto'];
+        };
+      };
+    };
+  };
+  PublicationController_graph: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        programId: string;
+        versionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CourseGraphDto'];
+        };
+      };
+    };
+  };
+  PublicationController_versionTimeline: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        programId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProgramTimelineDto'];
+        };
+      };
+    };
+  };
+  PublicationController_programHealth: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        programId: string;
+        versionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProgramHealthDto'];
+        };
+      };
+    };
+  };
+  PublicationController_createPdf: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        programId: string;
+        versionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProgramPdfExportDto'];
+        };
+      };
+    };
+  };
+  PublicationController_pdfStatus: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        exportId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProgramPdfExportDto'];
+        };
+      };
+    };
+  };
+  PublicationController_pdfFile: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        exportId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/pdf': string;
         };
       };
     };
