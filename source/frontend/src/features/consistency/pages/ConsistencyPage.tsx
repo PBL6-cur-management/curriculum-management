@@ -1,5 +1,6 @@
 import { ReloadOutlined } from '@ant-design/icons';
 import { Alert, Button, Flex, Result, Skeleton, Typography } from 'antd';
+import { PageHeader } from '../../../shared/design-system';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { generatePath, Link, useParams } from 'react-router';
@@ -42,30 +43,29 @@ export function ConsistencyPage() {
       <Link to={generatePath(ROUTES.curriculum, { programId, versionId })}>
         ← Khung chương trình {version.programCode}
       </Link>
-      <Flex justify="space-between" align="center" wrap gap="small">
-        <Typography.Title level={2} style={{ margin: 0 }}>
-          Kiểm tra nhất quán — {version.programCode} ({versionLabel(version)})
-        </Typography.Title>
-        <Button
-          icon={<ReloadOutlined />}
-          loading={isFetching}
-          onClick={() => void refetch()}
-        >
-          {RERUN_LABEL}
-        </Button>
-      </Flex>
+      <PageHeader
+        title={`Kiểm tra nhất quán — ${version.programCode} (${versionLabel(version)})`}
+        actions={
+          <Button
+            icon={<ReloadOutlined />}
+            loading={isFetching}
+            onClick={() => void refetch()}
+          >
+            {RERUN_LABEL}
+          </Button>
+        }
+      />
       <Typography.Text type="secondary">
         Kiểm tra lúc {dayjs(report.checkedAt).format('DD/MM/YYYY HH:mm:ss')}
       </Typography.Text>
       {!report.passes && (
-        <Alert type="error" showIcon message={BLOCKING_NOTE} />
+        <Alert
+          type="error"
+          showIcon
+          title={BLOCKING_NOTE}
+          description={`${report.issues.length} vấn đề cần xử lý, liệt kê ngay dưới đây.`}
+        />
       )}
-      <CreditSummaryCard
-        credits={report.credits}
-        groups={report.groups}
-        canAccept={report.canAcceptMismatch}
-        onAccept={() => setAccepting(true)}
-      />
       {report.issues.length === 0 ? (
         <Result status="success" title={CLEAN_RESULT_MESSAGE} />
       ) : (
@@ -75,6 +75,12 @@ export function ConsistencyPage() {
           versionId={versionId}
         />
       )}
+      <CreditSummaryCard
+        credits={report.credits}
+        groups={report.groups}
+        canAccept={report.canAcceptMismatch}
+        onAccept={() => setAccepting(true)}
+      />
       {accepting && (
         <AcceptMismatchModal
           versionId={versionId}
