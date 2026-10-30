@@ -1,5 +1,6 @@
 import { Link } from 'react-router';
 import { ROUTES } from '../../routes';
+import { prefetchRoute } from './prefetchRoute';
 import { PERMISSIONS, type PermissionCode } from '../auth/permissions';
 
 // A leaf has a `path`; a group has `children` and no path of its own.
@@ -167,7 +168,15 @@ export function toMenuItems(
           }
         : {
             key: item.path ?? item.label,
-            label: <Link to={item.path ?? ROUTES.home}>{item.label}</Link>,
+            label: (
+              <Link
+                to={item.path ?? ROUTES.home}
+                onMouseEnter={() => item.path && prefetchRoute(item.path)}
+                onFocus={() => item.path && prefetchRoute(item.path)}
+              >
+                {item.label}
+              </Link>
+            ),
           },
     );
 }

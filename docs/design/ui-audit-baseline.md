@@ -34,3 +34,8 @@ Chunk lớn nhất: `SyllabusEditorPage` 481 kB (151 kB gzip, chứa tiptap, ch�
 | Shell, trang chính, menu | Đã làm lại (PR #3, #5) |
 | Ma trận quyền | Đã làm lại (PR #4) |
 | B–H (quản trị, danh mục, CTĐT, CĐR/đề cương, đề xuất/duyệt, phiên bản, sinh viên) | Đã nhận theme mới qua token; bố cục, mật độ và copy chưa rà. Cần kế hoạch chi tiết từng cụm. |
+
+## Quyết định hiệu năng bổ sung
+
+- **Prefetch:** hover hoặc focus mục menu thì tải trước chunk của trang (`shared/layout/prefetchRoute.ts`).
+- **Bảng ảo hóa:** ma trận quyền không cần. Mỗi nhóm tối đa 10 dòng, các nhóm thu gọn được. Khung CTĐT bật `virtual` khi có hơn 100 dòng; việc này làm ở cụm D.
