@@ -424,3 +424,11 @@ Format:
 - Còn nợ: 16 ca Manual trong `docs/testing/feature__f-19-graduation-review.md`; chưa có file test case F-19 trong chỉ mục `docs/testing/test-cases/`; đồng bộ `features_architecture.md`/`database_and_models.md`; tách view kết quả sang shared cho F-20; đầu vào Khoa C4.
 - Start here: **F-22**, rồi F-20 → F-21.
 - Đồng bộ docs (2026-10-30): features/database/general architecture, error_log (onOk xác nhận đợt xét), test case `f-19-graduation-review-test-cases.md` 35 ca = 19 Passed + 16 Manual; chỉ mục 925 = 512 Passed + 413 Manual.
+
+## 2026-10-30 — Cải tổ UI theo Impeccable, ma trận quyền, dữ liệu thật DUT
+
+- PR #2–#5 (đã merge): theme chuandaura (`tokens.ts`, `theme.ts`, tiền tố `--ctdt-*`), PRODUCT.md/DESIGN.md, menu theo tác vụ + prefetch khi hover, Suspense từng route, ma trận quyền thiết kế lại (ô có hình + chữ, nhóm thu gọn, lọc khác biệt, Drawer sửa vai trò). F-02 Playwright 30/31 (TC_031 chập chờn, chạy lại 4/4).
+- PR #6 (đã merge): chỉ một DB `ctdt_real`; bỏ seed demo. Nạp thật 69 giảng viên, 1.731 sinh viên, 1.731 ghi danh, 51.896 kết quả; seed lần 2 tạo 0. E2E Playwright dựng `e2e:world` trước và `e2e:purge` sau. Báo cáo: [dut-real-seed](../implement-report/dut-real-seed-implement-report.md).
+- Chưa chạy: bộ test đầy đủ BE/FE/Playwright sau PR #6 (người dùng yêu cầu tắt chạy test).
+- Chờ người dùng: Taiga (biến môi trường `TAIGA_USERNAME`/`TAIGA_PASSWORD`, slug dự án, duyệt bảng phân công).
+- Start here: Phase 4 thiết kế lại màn hình, cụm D (CTĐT) → E → F → G → C → H → B; sau đó F-22 → F-20 → F-21.

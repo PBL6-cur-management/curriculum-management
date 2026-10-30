@@ -1,6 +1,12 @@
-# Current Work — F-19 có mã và xanh; tiếp theo F-22
+# Current Work — Dữ liệu thật DUT đã nạp; tiếp theo Phase 4 (thiết kế lại màn hình)
 
-**Start here**: **F-22** (đồng bộ DB Trường) theo mặc định kế hoạch; kiểm lại source/hợp đồng dependency khi bắt đầu. Sau đó **F-20 → F-21**. F-19 đã build, kiểm chứng và đồng bộ docs 2026-10-30 (còn 16 ca thủ công, C4). F-23/F-24/F-25 hoãn (2026-10-29). Full suites chưa chạy lại.
+**Start here**: Phase 4 cụm **D (CTĐT)** theo kế hoạch `l-n-k-ho-ch-cho-buzzing-naur.md`: brief `docs/design/briefs/d-programs.md` → dựng lại → polish/detector/audit. Sau Phase 4: **F-22 → F-20 → F-21**. Taiga (Phase 6) chờ người dùng đặt `TAIGA_USERNAME`/`TAIGA_PASSWORD` và gửi slug.
+
+## Dữ liệu thật DUT và cải tổ UI — 2026-10-30
+
+- DB duy nhất `ctdt_real`: `prisma:migrate` → `prisma:seed` → `dut:extract` → `prisma:seed:dut`. Dữ liệu cá nhân ở `prisma/seed-data/dut/data/private/` (gitignore). Mật khẩu tạm giảng viên: `lecturer-credentials.csv` trong thư mục đó.
+- E2E: điền `E2E_PASSWORD` trong `source/e2e/.env`; setup/teardown tự dựng và dọn thế giới `e2e.*`.
+- Chưa chạy lại bộ test đầy đủ sau PR #6.
 
 ## F-19 có mã hoàn tất — 2026-10-30
 
