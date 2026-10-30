@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-ctdt}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ctdt}
-      POSTGRES_DB: ${POSTGRES_DB:-ctdt}
+      POSTGRES_DB: ${POSTGRES_DB:-ctdt_real}
       # Vietnamese ordering comes from ICU; the backend refuses to start without it.
       POSTGRES_INITDB_ARGS: --locale-provider=icu --icu-locale=vi-VN --locale=C.UTF-8
     ports:

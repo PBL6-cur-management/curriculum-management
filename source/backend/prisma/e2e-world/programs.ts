@@ -4,9 +4,9 @@ import {
   Prisma,
   ProgramVersionStatus,
   type PrismaClient,
-} from '../../../src/generated/prisma/client.js';
-import { ORG_UNIT_CODES } from '../org-units.js';
-import { SEED_PROGRAM_CODES } from '../programs.js';
+} from '../../src/generated/prisma/client.js';
+import { ORG_UNIT_CODES } from '../seed-data/org-units.js';
+import { SEED_PROGRAM_CODES } from '../seed-data/programs.js';
 import { DEMO_COURSES, DEMO_RELATIONS } from './catalog.js';
 
 export const DEMO_PROGRAM_CODES = {

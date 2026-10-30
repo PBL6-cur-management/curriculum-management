@@ -1,5 +1,5 @@
-import type { PrismaClient } from '../../../src/generated/prisma/client.js';
-import { sanitizeRichText } from '../../../src/shared/rich-text/sanitize-rich-text.js';
+import type { PrismaClient } from '../../src/generated/prisma/client.js';
+import { sanitizeRichText } from '../../src/shared/rich-text/sanitize-rich-text.js';
 import { DEMO_COURSES } from './catalog.js';
 
 interface DemoClo {

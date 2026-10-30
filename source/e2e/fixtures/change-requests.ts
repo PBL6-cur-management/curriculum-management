@@ -173,7 +173,7 @@ export async function buildReleaseProgram(
   );
   const director = users.items.find((user) => user.username === accounts.R3);
   if (!director)
-    throw new Error("Thiếu Giám đốc CTĐT demo; không đổi tài khoản seed.");
+    throw new Error("Thiếu Giám đốc CTĐT e2e: chạy `pnpm --dir ../backend e2e:world`.");
   await fixtureApi(page, "POST", `/programs/${program.id}/directors`, {
     directorId: director.id,
     validFrom: "2020-01-01",
@@ -185,7 +185,7 @@ export async function buildReleaseProgram(
     (entry) =>
       `${entry.groupCode} — ${entry.groupName}` === courseData.homeGroup,
   );
-  if (!group) throw new Error("Thiếu nhóm KHMT demo; không sửa nhóm seed.");
+  if (!group) throw new Error("Thiếu nhóm E2E-KHMT: chạy `pnpm --dir ../backend e2e:world`.");
   const courseCode = `E2E${uniqueSuffix()}`;
   const courseName = `Học phần thử ${courseCode}`;
   const course = await fixtureApi<{ id: string }>(page, "POST", "/courses", {

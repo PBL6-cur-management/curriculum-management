@@ -1,0 +1,46 @@
+{
+  "malformedLines": {
+    "DHBK_CDS/tmHosoGV": 0,
+    "Data_SV1/tmHosoGV": 0,
+    "DHBK_CDS/tmHoSoSV": 0,
+    "Data_SV1/tmHoSoSV": 0,
+    "DHBK_CDS/tmHocvu": 0,
+    "DHBK_CDS/tmDiemkyhoc": 0
+  },
+  "lecturers": 69,
+  "lecturersByUnit": {
+    "102": 27,
+    "120": 1,
+    "130": 1,
+    "501": 2,
+    "502": 1,
+    "901": 2,
+    "990": 9,
+    "998": 1,
+    "999": 25
+  },
+  "lecturersWithEmail": 32,
+  "students": 1731,
+  "studentsOnLeave": 1,
+  "resultRowsRead": 57531,
+  "resultsKept": 57526,
+  "resultsWithoutScore": 15725,
+  "resultTerms": [
+    "2110",
+    "2120",
+    "2121",
+    "2210",
+    "2220",
+    "2221",
+    "2310",
+    "2320",
+    "2321",
+    "2410",
+    "2420",
+    "2421",
+    "2510",
+    "2520",
+    "2521",
+    "2610"
+  ]
+}

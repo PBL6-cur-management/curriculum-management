@@ -63,7 +63,7 @@ test.describe("MVP CTĐT → khung → nhất quán → đề xuất → duyệt
     }>(page, "GET", `/users?q=${encodeURIComponent(accounts.R3)}`);
     const director = users.items.find((user) => user.username === accounts.R3);
     if (!director)
-      throw new Error("Thiếu Giám đốc CTĐT demo; không đổi tài khoản seed.");
+      throw new Error("Thiếu Giám đốc CTĐT e2e: chạy `pnpm --dir ../backend e2e:world`.");
     await fixtureApi(page, "POST", `${created.path}/directors`, {
       directorId: director.id,
       validFrom: "2020-01-01",

@@ -6,6 +6,9 @@ import { ROLE_CODES } from './seed-data/roles.js';
 import { readDutData } from './seed-data/dut/load/read-dut-data.js';
 import { seedDutCatalog } from './seed-data/dut/load/seed-catalog.js';
 import { seedDutPrograms } from './seed-data/dut/load/seed-programs.js';
+import { seedDutPeople } from './seed-data/dut/load/seed-people.js';
+import { readDutPeople } from './seed-data/dut/people-data.js';
+import peopleReport from './seed-data/dut/data/people-report.json' with { type: 'json' };
 
 const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
@@ -69,6 +72,31 @@ try {
     console.log(
       `${difference.semesterCode}: ${difference.existing ?? 'null'} → ${difference.legacy}`,
     );
+  }
+  const people = readDutPeople();
+  if (!people)
+    console.log(
+      'people: skipped (run `pnpm dut:extract` with the school dump first)',
+    );
+  else {
+    const seeded = await seedDutPeople(prisma, {
+      people,
+      programs: data.programs,
+      // The latest term with results is the open one (tmKehoach.Hientai is set on several terms).
+      openTermCode: peopleReport.resultTerms.at(-1)!,
+      facultyId: faculty.id,
+    });
+    console.log(
+      `lecturers: created ${seeded.lecturers.created}; skipped ${seeded.lecturers.skipped}`,
+    );
+    console.log(
+      `students: created ${seeded.students.created}; skipped ${seeded.students.skipped}`,
+    );
+    console.log(
+      `results: created ${seeded.results.created}; past term without score ${seeded.results.skippedPastWithoutScore}; unknown course ${seeded.results.skippedUnknownCourse}`,
+    );
+    if (seeded.credentialsFile)
+      console.log(`lecturer temporary passwords: ${seeded.credentialsFile}`);
   }
   console.log('DUT seed done.');
 } finally {

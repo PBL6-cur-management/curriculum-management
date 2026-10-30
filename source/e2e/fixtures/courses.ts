@@ -5,7 +5,7 @@ import { uniqueSuffix } from './unique.js';
 export const courseData = {
   homeFaculty: 'Khoa Công nghệ Thông tin',
   foreignFaculty: 'Khoa Khoa học cơ bản',
-  homeGroup: 'KHMT — Khoa học máy tính',
+  homeGroup: 'E2E-KHMT — Khoa học máy tính',
   creditError: 'Số tín chỉ phải là số từ 0 đến 999.99, tối đa 2 chữ số thập phân (ví dụ 3, 2.5 hoặc 0).',
   cancelWarning: 'Học phần đã hủy không mở lại được và không sửa được. Chỉ hủy học phần chưa từng dùng trong phiên bản đã ban hành và chưa có kết quả học tập.',
 } as const;
