@@ -35,10 +35,10 @@ export function ProgramOverviewPage() {
           {program.canManage && <ProgramStatusActions program={program} />}
         </Space>
       </Flex>
-      <ProgramInfoCard program={program} />
-      <ProgramDirectorsSection program={program} />
-      <ProgramVersionsSection program={program} />
       <ProgramSectionLinks program={program} />
+      <ProgramInfoCard program={program} />
+      <ProgramVersionsSection program={program} />
+      <ProgramDirectorsSection program={program} />
     </Flex>
   );
 }

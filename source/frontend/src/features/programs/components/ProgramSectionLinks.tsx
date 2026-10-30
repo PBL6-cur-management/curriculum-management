@@ -1,9 +1,10 @@
-import { Card, Col, Row, Typography } from 'antd';
+import { Button, Flex, Typography } from 'antd';
 import { generatePath, Link } from 'react-router';
 import { ROUTES } from '../../../routes';
 import { useCan } from '../../../shared/auth/useCan';
 import { useSeesMatrices } from '../../../shared/outcomes/useSeesMatrices';
 import type { ProgramDetail } from '../api/programs';
+import { versionLabel } from '../constants/programLabels';
 
 interface ProgramSectionLinksProps {
   program: ProgramDetail;
@@ -50,16 +51,28 @@ export function ProgramSectionLinks({ program }: ProgramSectionLinksProps) {
       : []),
   ];
   return (
-    <Row gutter={[16, 16]} data-program-id={program.id}>
-      {sections.map(({ title, to }) => (
-        <Col key={title} xs={24} md={8}>
-          <Link to={to} aria-label={title}>
-            <Card size="small" title={title} hoverable>
-              <Typography.Text>Mở</Typography.Text>
-            </Card>
+    <Flex
+      vertical
+      gap={8}
+      data-program-id={program.id}
+      style={{
+        padding: 16,
+        borderRadius: 12,
+        background: 'var(--ctdt-color-fill-quaternary)',
+      }}
+    >
+      <Typography.Text type="secondary">
+        Làm việc trên phiên bản {versionLabel(workingVersion)}
+      </Typography.Text>
+      <Flex wrap gap={8}>
+        {sections.map(({ title, to }, index) => (
+          <Link key={title} to={to} aria-label={title}>
+            <Button type={index === 0 ? 'primary' : 'default'} tabIndex={-1}>
+              {title}
+            </Button>
           </Link>
-        </Col>
-      ))}
-    </Row>
+        ))}
+      </Flex>
+    </Flex>
   );
 }
