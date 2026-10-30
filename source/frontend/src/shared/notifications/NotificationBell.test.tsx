@@ -30,6 +30,38 @@ function renderBell() {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('NotificationBell', () => {
+  it('renders graduation conclusion changes as content-only notices without a fake request link', async () => {
+    const note = {
+      ...NOTE,
+      notificationType: 'GRADUATION_CONCLUSION_CHANGED',
+      content:
+        'Kết luận tốt nghiệp SYN001 — chương trình tổng hợp đã thay đổi.',
+      changeRequestId: null,
+    };
+    const { calls, router } = renderWithNotifications({
+      element: <NotificationBell />,
+      reads: {
+        '/api/notifications/unread-count': { count: 1 },
+        '/api/notifications?page=1&pageSize=5': { ...PAGE, items: [note] },
+      },
+      writes: { '/api/notifications/n1/read': { ...note, readStatus: 'READ' } },
+    });
+    await screen.findByText('1');
+    fireEvent.click(screen.getByRole('button', { name: 'Thông báo' }));
+    fireEvent.click(await screen.findByText(note.content));
+    await waitFor(() =>
+      expect(
+        calls.some(
+          (call) =>
+            call.method === 'POST' && call.url === '/api/notifications/n1/read',
+        ),
+      ).toBe(true),
+    );
+    expect(router.state.location.pathname).toBe('/');
+    expect(
+      screen.queryByRole('link', { name: /SYN001/ }),
+    ).not.toBeInTheDocument();
+  });
   it('shows the unread count as a badge', async () => {
     renderBell();
     expect(await screen.findByText('3')).toBeInTheDocument();

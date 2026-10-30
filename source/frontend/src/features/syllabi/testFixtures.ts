@@ -9,7 +9,7 @@ import type {
 } from './api/syllabi';
 
 export const RULES = {
-  maxBytes: 20 * 1024 * 1024,
+  maxBytes: 50 * 1024 * 1024,
   fileTypes: [
     'PDF',
     'DOCX',
@@ -89,6 +89,7 @@ export function attachment(
   return {
     id: 'a1',
     fileName: 'Đề cương ký.pdf',
+    materialKind: 'SIGNED_SYLLABUS',
     fileType: 'PDF',
     sizeBytes: 2_500_000,
     uploadedBy: { id: 'u1', fullName: 'Giảng viên A' },

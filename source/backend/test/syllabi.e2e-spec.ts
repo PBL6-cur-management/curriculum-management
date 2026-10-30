@@ -25,7 +25,7 @@ import { setAppEnv } from './test-env.js';
 
 const CSRF = { 'X-Requested-With': 'XMLHttpRequest' };
 const MB = 1024 * 1024;
-const OVER_LIMIT_BYTES = 21 * MB;
+const OVER_LIMIT_BYTES = 51 * MB;
 
 type Agent = ReturnType<typeof request.agent>;
 
@@ -124,6 +124,7 @@ describe('syllabi', () => {
     return agent
       .post(`/api/syllabi/${syllabusId}/attachments`)
       .set(CSRF)
+      .field('materialKind', 'SIGNED_SYLLABUS')
       .attach('file', body, { filename: name });
   }
 
@@ -136,7 +137,7 @@ describe('syllabi', () => {
       canCreate: true,
       editPath: 'DIRECT',
     });
-    expect(before.body.attachmentRules.maxBytes).toBe(20 * MB);
+    expect(before.body.attachmentRules.maxBytes).toBe(50 * MB);
 
     const created = await director
       .post(`/api/courses/${course.id}/syllabus`)
@@ -346,6 +347,29 @@ describe('syllabi', () => {
   });
 
   describe('attachments', () => {
+    it.each([undefined, 'INVALID'])(
+      'refuses materialKind %s before storing a file or row',
+      async (materialKind) => {
+        const course = await newCourse();
+        const draft = await createSyllabusDraft(admin, course.id);
+        const before = filesUnderRoot().length;
+        const upload = admin
+          .post(`/api/syllabi/${draft.id}/attachments`)
+          .set(CSRF);
+        if (materialKind !== undefined)
+          upload.field('materialKind', materialKind);
+        await upload
+          .attach('file', PDF_BYTES, { filename: 'kind.pdf' })
+          .expect(400);
+        expect(
+          await prisma.syllabusAttachment.count({
+            where: { syllabusId: draft.id },
+          }),
+        ).toBe(0);
+        expect(filesUnderRoot()).toHaveLength(before);
+      },
+    );
+
     it('stores a signed copy under its Vietnamese name and serves it back (US-041 AC1)', async () => {
       const course = await newCourse();
       const draft = await createSyllabusDraft(admin, course.id);
@@ -357,6 +381,7 @@ describe('syllabi', () => {
         'Đề cương ký.pdf',
       ).expect(201);
       expect(uploaded.body).toMatchObject({
+        materialKind: 'SIGNED_SYLLABUS',
         fileName: 'Đề cương ký.pdf',
         fileType: 'PDF',
         sizeBytes: PDF_BYTES.length,
@@ -408,6 +433,7 @@ describe('syllabi', () => {
       const missing = await admin
         .post(`/api/syllabi/${draft.id}/attachments`)
         .set(CSRF)
+        .field('materialKind', 'OTHER')
         .expect(400);
       expect(missing.body.code).toBe('ATTACHMENT_FILE_REQUIRED');
       expect(filesUnderRoot()).toHaveLength(before);

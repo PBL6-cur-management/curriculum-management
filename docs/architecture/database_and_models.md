@@ -34,7 +34,7 @@ Tệp này ghi những gì **đã có migration** trong `source/backend/prisma/`
 | Truy cập                   | Prisma 7.10.0, `@prisma/adapter-pg`                                           |
 | Lược đồ                    | `source/backend/prisma/schema.prisma`                                         |
 | Migration                  | `source/backend/prisma/migrations/` (`prisma.config.ts`)                      |
-| Phiên bản lược đồ hiện tại | `20261019131021_release_versions` (13 migration)                              |
+| Phiên bản lược đồ hiện tại | `20261029155453_syllabus_material_kind` (17 migration)                       |
 
 ### Migration Rule
 
@@ -61,6 +61,8 @@ Nhật ký kiểm toán (NFR-10, bảng `AuditLog`) hoãn theo F01-07 — `docs/
 ---
 
 ## Entities
+
+Migration `20261029155453_syllabus_material_kind` đã áp ngày 2026-10-29: thêm enum `SyllabusMaterialKind` (`SIGNED_SYLLABUS`, `TEXTBOOK`, `LECTURE_SLIDES`, `OTHER`) và cột bắt buộc `SyllabusAttachment.materialKind`, không có mặc định. Các dòng cũ được gán `OTHER` trong migration; tải lên mới phải truyền loại tài liệu.
 
 Migration `20261018141101_auth_session` (F-01) sinh bằng `prisma migrate diff --from-empty` vì lúc dựng không có cơ sở dữ liệu chạy sẵn; đã áp trên PostgreSQL 18 của Testcontainers trong kiểm thử đầu-cuối (`test/migrations.ts`), đã áp trên cơ sở dữ liệu phát triển ngày 2026-10-18.
 
@@ -244,7 +246,7 @@ Seed (F-07): `seed-data/knowledge-blocks.ts` (danh sách rỗng) và, trong `see
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `Syllabus`           | `courseId` (`Restrict`), `revisionNumber Int?`, `status SyllabusStatus`, sáu mục văn bản HTML đã lọc (`courseDescription`, `englishDescription`, `objectives`, `teachingMethods`, `assessmentMethods`, `references`; null = trống), `previousVersionId?` (duy nhất, chuỗi bản), `publishedAt?`; F-13 `sourceRequestId?` (duy nhất), `baseRevisionId?`; F-15 `originRequestId?` | Duy nhất `(courseId, revisionNumber)`; một Nháp thường, một Đã ban hành mỗi học phần (chỉ mục từng phần). `revisionNumber` null chỉ ở bản làm việc của đề xuất (CHECK). Công bố: chuyển bản Đã ban hành sang `HISTORICAL` **trước** khi đặt Nháp thành `PUBLISHED` |
 | `WeeklyContent`      | `syllabusId` (`Cascade`), `weekLabel`, `sortOrder` ≥ 1, `content`, `teachingActivities?`                                                                                                                                                                                                                                                                                       | Chỉ mục `(syllabusId, sortOrder)`                                                                                                                                                                                                                                  |
-| `SyllabusAttachment` | `syllabusId` (`Restrict`), `fileName`, `fileType AttachmentFileType`, `filePath` (duy nhất, tương đối dưới `FILES_ROOT`, dấu `/`), `sizeBytes` > 0, `uploadedById` → `User`, `recordedAt`                                                                                                                                                                                      | Tệp nằm trên đĩa; xóa hàng không tự xóa tệp                                                                                                                                                                                                                        |
+| `SyllabusAttachment` | `syllabusId` (`Restrict`), `fileName`, `materialKind SyllabusMaterialKind` (bắt buộc, không có mặc định), `fileType AttachmentFileType`, `filePath` (duy nhất, tương đối dưới `FILES_ROOT`, dấu `/`), `sizeBytes` > 0, `uploadedById` → `User`, `recordedAt`                                                                                                                                                                                      | Tệp nằm trên đĩa; xóa hàng không tự xóa tệp                                                                                                                                                                                                                        |
 
 ### Chuẩn đầu ra (F-11)
 
@@ -447,3 +449,83 @@ Migration `20261027154125_grade_formula_assessment_clo`, chỉ thêm, không s�
 | `AssessmentCLOMapping`  | `assessmentComponentId` và `cloId` (đều Cascade), `cloWeight? Decimal`; duy nhất `(assessmentComponentId, cloId)`; ô null vẫn là đã ánh xạ                                                                                    |
 
 Năm CHECK nối tay trong migration, không được bỏ khi sinh lại SQL: `Syllabus_failingScore_nonnegative`, `AssessmentComponent_weight_range` (0 < w ≤ 100), `AssessmentComponent_threshold_shape` (điều kiện thì có ngưỡng ≥ 0), `AssessmentComponent_failingScore_nonnegative`, `AssessmentCLOMapping_weight_range`. Tổng 100 và độ phủ CLO kiểm ở dịch vụ, không ở CHECK. Bản đề cương cũ không được điền công thức tự động. `prisma format` căn lại khoảng trắng toàn schema trong cùng lượt.
+
+## Hồ sơ sinh viên, quá trình học và kết quả nguồn (F-17)
+
+Migration `20261027165710_student_records_results` tạo năm bảng dưới đây. Các FK mặc định `Restrict`; riêng dữ liệu bàn giao tài khoản đi theo `ImportBatch` với `Cascade`.
+
+### `Student` — table `Student`
+
+| Column | Type | Notes |
+|---|---|---|
+| `id`, `studentCode`, `fullName` | `String` | `id` CUID2; `studentCode` duy nhất |
+| `cohortId`, `admissionSemesterId`, `statusSemesterId` | `String` | FK tới `Cohort`, học kỳ nhập học và học kỳ trạng thái trong `Semester` |
+| `major`, `status`, `dataSource` | `String`, `StudentStatus`, `StudentDataSource` | Trạng thái `STUDYING` / `ON_LEAVE` / `WITHDRAWN` / `GRADUATED`; nguồn `EXCEL` / `SCHOOL_DB` |
+| `userId` | `String?` | FK `User`, duy nhất; tài khoản có thể chưa liên kết |
+| `createdAt`, `updatedAt` | `DateTime` | `updatedAt` cũng là token chống ghi đè khi đổi quá trình học |
+
+Index `(cohortId, status)` và `(fullName, id)` phục vụ danh sách.
+
+### `ProgramEnrollment` — table `ProgramEnrollment`
+
+| Column | Type | Notes |
+|---|---|---|
+| `id`, `studentId`, `programId`, `cohortId` | `String` | FK sinh viên, chương trình và khóa |
+| `appliedVersionId`, `admissionVersionId` | `String` | FK `ProgramVersion`: bản áp dụng và bản tại thời điểm nhập học |
+| `cohortAssignmentId` | `String?` | FK `CohortVersion` làm căn cứ |
+| `fromSemesterId`, `untilSemesterId` | `String`, `String?` | FK `Semester`; khoảng học kỳ bắt đầu đóng, kết thúc mở |
+| `previousEnrollmentId` | `String?` | FK tự tham chiếu duy nhất, nối chuỗi lịch sử không phân nhánh |
+| `enrollmentType`, `status` | `EnrollmentType`, `EnrollmentStatus` | `PRIMARY` / `SECOND_MAJOR`; `ACTIVE` / `TRANSFERRED` / `ENDED` |
+| `isException`, `basisDecision`, `createdById` | `Boolean`, `String?`, `String?` | Ngoại lệ phải có quyết định không rỗng; người tạo FK `User` |
+| `createdAt`, `updatedAt` | `DateTime` | Dấu thời gian và token kiểm tra thay đổi |
+
+SQL có hai unique index có điều kiện: tối đa một hàng `ACTIVE` cho `(studentId, programId)` và một hàng `ACTIVE` loại `PRIMARY` cho mỗi sinh viên. CHECK `ProgramEnrollment_exception_basis` yêu cầu căn cứ ngoại lệ; `ProgramEnrollment_closed_interval` buộc `ACTIVE` tương đương `untilSemesterId IS NULL`. Index thường `(studentId, programId)` và `(programId, cohortId, status, isException)`.
+
+### `AcademicResult` — table `AcademicResult`
+
+| Column | Type | Notes |
+|---|---|---|
+| `id`, `studentId`, `courseId`, `semesterId` | `String` | FK `Student`, `Course`, `Semester`; duy nhất `(studentId, courseId, semesterId)` |
+| `score10`, `score4`, `letterGrade` | `Decimal(4,2)?`, `Decimal(3,2)?`, `String?` | Điểm nguồn; CHECK giới hạn lần lượt 0..10 và 0..4; API gửi Decimal dạng chuỗi |
+| `status`, `dataSource`, `revision` | `AcademicResultStatus`, `StudentDataSource`, `Int` | `PASSED` / `FAILED` / `IN_PROGRESS` / `EXEMPT`; revision mặc định 1, CHECK > 0 |
+| `createdAt`, `updatedAt` | `DateTime` | Index `(studentId, semesterId)` |
+
+### `AcademicResultChange` — table `AcademicResultChange`
+
+| Column | Type | Notes |
+|---|---|---|
+| `id`, `academicResultId`, `revision` | `String`, `String`, `Int` | FK kết quả; duy nhất `(academicResultId, revision)` |
+| `before`, `after`, `recordedAt` | `Json?`, `Json`, `DateTime` | Ảnh dữ liệu nguồn trước/sau; index `(recordedAt, id)` |
+
+### `StudentCredentialDelivery` — table `StudentCredentialDelivery`
+
+| Column | Type | Notes |
+|---|---|---|
+| `batchId` | `String` | PK đồng thời FK `ImportBatch`, một bản bàn giao cho mỗi phiên |
+| `accountCount` | `Int` | CHECK > 0; không tạo hàng nếu không phát sinh tài khoản mới |
+| `ciphertext`, `iv`, `authTag`, `keyId` | `Bytes?`, `Bytes?`, `Bytes?`, `String?` | XLSX mã hóa và fingerprint khóa; không lưu khóa giải mã |
+| `expiresAt`, `downloadedAt`, `createdAt` | `DateTime`, `DateTime?`, `DateTime` | Hết hạn sau 24 giờ; index `expiresAt`; tải một lần hoặc dọn hết hạn sẽ xóa payload mã hóa, giữ metadata |
+
+## Xét tốt nghiệp (F-19) — lược đồ đã áp dụng
+
+Migration `20261030050730_graduation_review` (áp dụng vào DB dev 2026-10-30) thêm năm enum, sáu model và giá trị `GRADUATION_CONCLUSION_CHANGED` cho `NotificationType`. Mọi FK `Restrict`; khóa chính `cuid(2)`, riêng receipt dùng `changeId`.
+
+| Enum | Giá trị |
+| --- | --- |
+| `GraduationConclusion` | ELIGIBLE, NOT_ELIGIBLE |
+| `GraduationAuditTrigger` | STAFF, BATCH, RESULT_CHANGE |
+| `GraduationBatchStatus` | QUEUED, RUNNING, COMPLETED, COMPLETED_WITH_ERRORS, FAILED |
+| `GraduationBatchItemStatus` | PENDING, REVIEWED, ERROR |
+| `GraduationReauditStatus` | PENDING, RUNNING, COMPLETED, COVERED, FAILED |
+
+| Model | Khóa / index | Ghi chú |
+| --- | --- | --- |
+| `GraduationAuditContext` | unique `(studentId, programId, semesterId)`; `lastAuditId` unique; index `studentId` | Head trỏ audit mới nhất của context |
+| `GraduationAudit` | `operationKey` unique; `supersedesId` unique (chuỗi audit) | `enrollmentId`, `programVersionId`, `auditedById` nullable, `trigger`, `conclusion`, `schemaVersion`, `ruleVersion`, JSON `shortfalls`/`result`/`inputs`, `inputDigest`. Writer chỉ thêm, không cập nhật |
+| `GraduationBatch` | unique `(requestedById, requestKey)`; index `(status, leaseUntil, createdAt)` | `filters` JSON, `previewRevision`, `rosterDigest`, `studentCount`, `enrollmentCount`, `leaseToken`/`leaseUntil`, `failureCode` |
+| `GraduationBatchItem` | unique `(batchId, studentId, programId, semesterId)`; `auditId` unique; index `(batchId, status, id)` | `rosterEnrollmentId` nullable, `rosterIdentity` JSON, `errorCode`/`errorMessage` |
+| `GraduationResultChangeReceipt` | PK `changeId` → `AcademicResultChange` | `targetCount`, `reason` nullable |
+| `GraduationReauditTask` | unique `(changeId, contextId)`; index `(status, leaseUntil, createdAt)` | `baselineAuditId`, `completedAuditId` nullable, `attempts`, `leaseToken`/`leaseUntil`, `errorCode` |
+
+- Tám CHECK trong SQL migration: `schemaVersion > 0`; reviewer bắt buộc khi trigger STAFF/BATCH và null khi RESULT_CHANGE; `studentCount`/`enrollmentCount` dương và `studentCount <= enrollmentCount`; RUNNING phải có lease (batch và task); outcome item nhất quán với status; `targetCount >= 0`; `attempts >= 0`.
+- Back-relation thêm vào `User`, `Student`, `Program`, `Semester`, `ProgramEnrollment`, `ProgramVersion`, `AcademicResultChange`; không đổi cột hiện hữu.

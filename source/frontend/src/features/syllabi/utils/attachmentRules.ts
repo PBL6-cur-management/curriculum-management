@@ -17,7 +17,7 @@ export function acceptedExtensions(rules: AttachmentRules): string[] {
   return rules.fileTypes.flatMap((type) => [...ACCEPTED_EXTENSIONS[type]]);
 }
 
-// Mirrors the server check so a wrong file is refused before a 20 MB upload; the server still decides.
+// Mirrors the server check to refuse invalid files before uploading; the server still decides.
 export function checkAttachment(
   file: Pick<File, 'name' | 'size'>,
   rules: AttachmentRules,

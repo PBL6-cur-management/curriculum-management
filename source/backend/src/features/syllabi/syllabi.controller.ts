@@ -47,6 +47,7 @@ import { GradeFormulaService } from './grade-formula.service.js';
 import { SyllabusAttachmentsService } from './syllabus-attachments.service.js';
 import {
   SyllabusAttachmentDto,
+  UploadAttachmentDto,
   UploadAttachmentFormDto,
 } from './syllabus-attachment.dto.js';
 import {
@@ -233,10 +234,11 @@ export class SyllabiController {
   @ApiCreatedResponse({ type: SyllabusAttachmentDto })
   upload(
     @Param('syllabusId') syllabusId: string,
+    @Body() dto: UploadAttachmentDto,
     @UploadedFile() file: Express.Multer.File | undefined,
     @CurrentAccess() access: AccessContext,
   ) {
-    return this.attachments.upload(syllabusId, file, access);
+    return this.attachments.upload(syllabusId, file, dto.materialKind, access);
   }
 
   @Get('syllabus-attachments/:attachmentId/file')

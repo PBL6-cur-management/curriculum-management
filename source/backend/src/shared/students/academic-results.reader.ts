@@ -4,12 +4,16 @@ import type { AccessContext } from '../authz/access-context.js';
 import { AppException } from '../exception/app.exception.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { RELEASE_ERRORS } from '../releases/release.errors.js';
-import { requireSemesterStart } from '../releases/semester-start.js';
+import {
+  requireSemesterStart,
+  type StartedSemester,
+} from '../releases/semester-start.js';
 import type { AcademicAttemptFact } from './best-academic-results.js';
 import { coversSemester } from './enrollment-period.js';
 import {
   assertStudentProgramRead,
   readsWithoutEnrollment,
+  requireGraduationReauditLookup,
   type StudentReadPurpose,
 } from './student-access.js';
 import type { StudentAppliedVersionLookup } from './student-applied-version.types.js';
@@ -71,7 +75,7 @@ export class AcademicResultsReader {
         coversSemester(
           {
             fromStart: row.fromSemester.startDate,
-            untilStart: row.untilSemester?.startDate ?? null,
+            untilSemester: row.untilSemester,
           },
           semester.startDate,
         ),
@@ -87,14 +91,35 @@ export class AcademicResultsReader {
     purpose: StudentReadPurpose,
     input: StudentAppliedVersionLookup,
   ): Promise<AcademicAttemptFact[]> {
-    const { student, semester } = await this.authorizeRead(
-      db,
-      access,
-      purpose,
-      input,
-    );
+    const { semester } = await this.authorizeRead(db, access, purpose, input);
+    return this.readAuthorized(db, input, semester);
+  }
+
+  async forReauditTask(
+    taskId: string,
+    leaseToken: string,
+    tx: Prisma.TransactionClient,
+  ) {
+    const lookup = await requireGraduationReauditLookup(taskId, leaseToken, tx);
+    return {
+      forStudent: async () => {
+        await requireGraduationReauditLookup(taskId, leaseToken, tx);
+        return this.readAuthorized(
+          tx,
+          lookup,
+          await requireSemesterStart(tx, lookup.semesterId),
+        );
+      },
+    };
+  }
+
+  private async readAuthorized(
+    db: Prisma.TransactionClient,
+    input: StudentAppliedVersionLookup,
+    semester: StartedSemester,
+  ): Promise<AcademicAttemptFact[]> {
     const rows = await db.academicResult.findMany({
-      where: { studentId: student.id },
+      where: { studentId: input.studentId },
       include: { semester: { select: { startDate: true } } },
     });
     const attempts: AcademicAttemptFact[] = [];

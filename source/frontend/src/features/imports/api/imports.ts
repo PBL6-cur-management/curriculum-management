@@ -1,4 +1,7 @@
 import {
+  API_BASE_URL,
+  ApiError,
+  fileNameFromHeader,
   downloadFile,
   getJson,
   sendForm,
@@ -45,3 +48,43 @@ export const downloadTemplate = (type: ImportType) =>
   downloadFile(`/imports/templates/${type}`, 'Mau-nhap.xlsx');
 export const downloadImportFile = (id: string) =>
   downloadFile(`${batchPath(id)}/file`, 'Tep-nhap.xlsx');
+
+export const fetchStudentCredentialStatus = (id: string) =>
+  getJson<components['schemas']['StudentCredentialStatusDto']>(
+    `${batchPath(id)}/student-credentials`,
+  );
+
+export async function downloadStudentCredentials(id: string): Promise<void> {
+  const response = await fetch(
+    `${API_BASE_URL}${batchPath(id)}/student-credentials/download`,
+    {
+      method: 'POST',
+      credentials: 'same-origin',
+      cache: 'no-store',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    },
+  );
+  if (!response.ok) {
+    let body: Partial<components['schemas']['ErrorResponseDto']> | undefined;
+    try {
+      body = await response.json();
+    } catch {
+      body = undefined;
+    }
+    throw new ApiError(response.status, body);
+  }
+  const url = URL.createObjectURL(await response.blob());
+  const link = document.createElement('a');
+  try {
+    link.href = url;
+    link.download = fileNameFromHeader(
+      response.headers.get('Content-Disposition'),
+      'Mat-khau-ban-dau.xlsx',
+    );
+    document.body.append(link);
+    link.click();
+  } finally {
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
+}

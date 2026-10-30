@@ -539,14 +539,15 @@ Duy nhất: (`assessmentComponent`, `clo`).
 
 ### `SyllabusAttachment` — SRS: TaiLieuDinhKem
 
-Bản đề cương đã ký, đính kèm theo bản đề cương (FR-47).
+Đề cương đã ký, giáo trình, slide bài giảng và tài liệu khác, đính kèm theo bản đề cương và phân loại khi tải lên (FR-47).
 
 | Tên lập trình | Tên SRS | Kiểu | BB | Mô tả, ràng buộc |
 |---|---|---|---|---|
 | syllabus | deCuong | → `Syllabus` | C | |
+| ⊕ materialKind | — | `SyllabusMaterialKind` | C | `SIGNED_SYLLABUS` Đề cương đã ký · `TEXTBOOK` Giáo trình · `LECTURE_SLIDES` Slide bài giảng · `OTHER` Tài liệu khác; bắt buộc chọn khi tải lên, không có mặc định |
 | fileName | tenTep | Chuỗi | C | |
 | fileType | loaiTep | Liệt kê | C | `PDF` · `DOCX` Word · `XLSX` Excel · `IMAGE` Ảnh (PNG, JPEG). Nhận diện theo đuôi tệp và chữ ký nội dung |
-| ⊕ sizeBytes | — | Số nguyên | C | Tối đa `ATTACHMENT_MAX_MB` (mặc định 20 MB) |
+| ⊕ sizeBytes | — | Số nguyên | C | Tối đa `ATTACHMENT_MAX_MB` (mặc định 50 MB) |
 | filePath | duongDan | Chuỗi | C | Đường dẫn tương đối dưới `FILES_ROOT`; duy nhất |
 | uploadedBy | nguoiTaiLen | → `User` | C | |
 | recordedAt | thoiDiem | Thời điểm | C | |

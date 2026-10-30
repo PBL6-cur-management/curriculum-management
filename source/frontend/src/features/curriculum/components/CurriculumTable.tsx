@@ -24,8 +24,15 @@ import { useSemesterReorder } from '../hooks/useSemesterReorder';
 import { CurriculumItemActions } from './CurriculumItemActions';
 import { itemElementId } from './CurriculumWarningsPanel';
 import { RequisiteTags } from './RequisiteTags';
+import { EligibilityStatus } from '../../../shared/registration-eligibility/EligibilityStatus';
+import type { EligibilityByItemId } from '../../../shared/registration-eligibility/eligibilityLabels';
+import { VERSION_ID_PARAM } from '../../../shared/releases/versionParams';
+import { ELIGIBILITY_COLUMN_TITLE } from '../constants/curriculumLabels';
 
 interface CurriculumTableProps {
+  studentMode?: boolean;
+  eligibilityByItemId?: EligibilityByItemId;
+  onShowEligibility?: (itemId: string) => void;
   curriculum: Curriculum;
   items: CurriculumItem[];
   // Drag is off while a filter hides rows, or when the caller may not reorder.
@@ -45,9 +52,31 @@ export function CurriculumTable({
   onEdit,
   onRequisites,
   focusId,
+  studentMode = false,
+  eligibilityByItemId,
+  onShowEligibility,
 }: CurriculumTableProps) {
   const { sensors, onDragEnd, isSaving } = useSemesterReorder(curriculum);
   const columns: TableColumnsType<CurriculumItem> = [
+    ...(studentMode
+      ? [
+          {
+            title: ELIGIBILITY_COLUMN_TITLE,
+            key: 'eligibility',
+            render: (_value: unknown, item: CurriculumItem) => {
+              const answer = eligibilityByItemId?.get(item.id);
+              return answer ? (
+                <EligibilityStatus
+                  item={answer}
+                  onShowReasons={() => onShowEligibility?.(item.id)}
+                />
+              ) : (
+                <span>Chưa có kết quả; hãy tính lại.</span>
+              );
+            },
+          },
+        ]
+      : []),
     ...(sortable
       ? [{ key: 'drag', width: 40, render: () => <DragHandle /> }]
       : []),
@@ -118,16 +147,18 @@ export function CurriculumTable({
       render: (_value, item) => (
         <Space size={0} wrap>
           <Link
-            to={generatePath(ROUTES.syllabus, { courseId: item.course.id })}
+            to={`${generatePath(ROUTES.syllabus, { courseId: item.course.id })}${studentMode ? `?${new URLSearchParams({ [VERSION_ID_PARAM]: curriculum.version.id })}` : ''}`}
           >
             {SYLLABUS_LINK}
           </Link>
-          <CurriculumItemActions
-            versionId={curriculum.version.id}
-            item={item}
-            onEdit={onEdit}
-            onRequisites={onRequisites}
-          />
+          {!studentMode && (
+            <CurriculumItemActions
+              versionId={curriculum.version.id}
+              item={item}
+              onEdit={onEdit}
+              onRequisites={onRequisites}
+            />
+          )}
         </Space>
       ),
     },

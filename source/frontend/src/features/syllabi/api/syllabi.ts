@@ -11,6 +11,8 @@ export type CourseSyllabus = components['schemas']['CourseSyllabusDto'];
 export type Syllabus = components['schemas']['SyllabusDto'];
 export type WeeklyContent = components['schemas']['WeeklyContentDto'];
 export type SyllabusAttachment = components['schemas']['SyllabusAttachmentDto'];
+export type SyllabusMaterialKind =
+  components['schemas']['SyllabusMaterialKind'];
 export type AttachmentRules = components['schemas']['AttachmentRulesDto'];
 export type AttachmentFileType = components['schemas']['AttachmentFileType'];
 export type UpdateSyllabusRequest = components['schemas']['UpdateSyllabusDto'];
@@ -109,9 +111,11 @@ export const reorderClos = (syllabusId: string, ids: string[]) =>
 export function uploadAttachment(
   syllabusId: string,
   file: File,
+  materialKind: SyllabusMaterialKind,
 ): Promise<SyllabusAttachment> {
   const form = new FormData();
   form.append(ATTACHMENT_FIELD, file);
+  form.append('materialKind', materialKind);
   return sendForm<SyllabusAttachment>(
     `${syllabusPath(syllabusId)}/attachments`,
     form,

@@ -470,6 +470,7 @@ describe('corrections and signed attachments (US-076, US-077, MH-49)', () => {
       agent
         .post(`/api/syllabi/${syllabusId}/attachments`)
         .set(CSRF)
+        .field('materialKind', 'SIGNED_SYLLABUS')
         .attach('file', PDF_BYTES, { filename: name });
 
     it('adds a signed file to a published revision and never lets one go', async () => {

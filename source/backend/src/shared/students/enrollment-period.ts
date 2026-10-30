@@ -3,14 +3,24 @@ import type { StartedSemester } from '../releases/semester-start.js';
 
 export interface PeriodRow {
   fromStart: Date | null;
-  untilStart: Date | null;
+  untilSemester: { startDate: Date | null } | null;
+}
+
+export function hasKnownEnrollmentBoundaries(
+  row: PeriodRow,
+): row is PeriodRow & { fromStart: Date } {
+  return (
+    row.fromStart !== null &&
+    (row.untilSemester === null || row.untilSemester.startDate !== null)
+  );
 }
 
 // Half-open [from, until): the semester that ends a stay is no longer covered, so a zero-length stay covers nothing.
 export function coversSemester(row: PeriodRow, semesterStart: Date): boolean {
-  if (!row.fromStart) return false;
+  if (!hasKnownEnrollmentBoundaries(row)) return false;
   if (row.fromStart.getTime() > semesterStart.getTime()) return false;
-  return !row.untilStart || semesterStart.getTime() < row.untilStart.getTime();
+  const untilStart = row.untilSemester?.startDate;
+  return !untilStart || semesterStart.getTime() < untilStart.getTime();
 }
 
 export function enrollmentCoversWhere(

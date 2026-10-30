@@ -18,6 +18,7 @@ import {
   type ReleasedVersion,
 } from './fixtures/releases.js';
 import { createSyllabusDraft } from './fixtures/syllabi.js';
+import { createSyntheticStudentFixture } from './fixtures/students.js';
 import { startPostgres, startRedis } from './containers.js';
 import type { TestPostgres, TestRedis } from './containers.js';
 import { createTestApp } from './test-app.js';
@@ -214,6 +215,46 @@ describe('semesters, cohorts and the first release (F-15)', () => {
         .set(CSRF)
         .send({ academicYear: '2090-2091' })
         .expect(200);
+    });
+  });
+
+  describe('an enrollment semester boundary', () => {
+    it('refuses clearing an enrollment end date and preserves the stored date', async () => {
+      const fixture = await createSyntheticStudentFixture(
+        app,
+        'endboundary',
+        undefined,
+        admin,
+      );
+      const end = await createSemester(app, -100, 'ENDB');
+      await prisma.programEnrollment.update({
+        where: { id: fixture.primaryEnrollmentId },
+        data: { untilSemesterId: end.id, status: 'ENDED' },
+      });
+      const before = await prisma.semester.findUniqueOrThrow({
+        where: { id: end.id },
+      });
+      expect(before.startDate).not.toBeNull();
+      expect(
+        await prisma.programVersion.count({
+          where: {
+            effectiveSemesterId: end.id,
+            status: { in: ['ACTIVE', 'HISTORICAL'] },
+          },
+        }),
+      ).toBe(0);
+
+      const response = await admin
+        .patch(`/api/semesters/${end.id}`)
+        .set(CSRF)
+        .send({ startDate: null })
+        .expect(409);
+      expect(response.body.code).toBe('SEMESTER_IN_USE');
+      const after = await prisma.semester.findUniqueOrThrow({
+        where: { id: end.id },
+      });
+      expect(after.startDate).toEqual(before.startDate);
+      expect(after.updatedAt).toEqual(before.updatedAt);
     });
   });
 

@@ -6,6 +6,7 @@ import { DetailPageLayout, PageHeader } from '../../../shared/design-system';
 import { errorMessage } from '../../../shared/forms/applyFieldErrors';
 import { CommitImportButton } from '../components/CommitImportButton';
 import { ImportReport } from '../components/ImportReport';
+import { StudentCredentialDownload } from '../components/StudentCredentialDownload';
 import { IMPORT_TYPE_LABELS } from '../constants/importLabels';
 import { useDownloadImportFile, useImportBatch } from '../hooks/useImports';
 
@@ -31,7 +32,7 @@ export function ImportDetailPage() {
           action={<Button onClick={() => void batch.refetch()}>Thử lại</Button>}
         />
       )}
-      {batch.data && (
+      {batch.data && !batch.isError && (
         <>
           <Descriptions
             column={1}
@@ -91,6 +92,12 @@ export function ImportDetailPage() {
           )}
           <ImportReport batch={batch.data} />
           <CommitImportButton batch={batch.data} />
+          {batch.data.importType === 'STUDENT_LIST' && (
+            <StudentCredentialDownload
+              batchId={batchId}
+              committed={batch.data.status === 'COMMITTED'}
+            />
+          )}
         </>
       )}
     </DetailPageLayout>

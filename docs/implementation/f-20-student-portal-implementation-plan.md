@@ -103,7 +103,7 @@ Everything below in one table. Read this; the rest is detail for whoever builds 
 | US-095 AC2/3: blocked reason and entire concurrent bundle | FE-06/08; codes/text remain server-owned |
 | US-095 AC4: no registration action | BE-06/07; FE-06/08 |
 | US-096 AC1/2: pinned text/CLO/weeks/formula; newer revision does not replace pin | BE-05/07; FE-07/08; U5 required for full formula acceptance |
-| US-096 AC3: signed attachment downloads | BE-05/06/07; FE-07/08 |
+| US-096 AC3: signed attachment downloads | BE-05/06/07; FE-07/08 — Phép chiếu tệp đính kèm phải có `materialKind` và nhóm theo thứ tự `SIGNED_SYLLABUS`, `TEXTBOOK`, `LECTURE_SLIDES`, `OTHER`, cùng nhãn và số lượng như danh sách đề cương. |
 | US-096 AC4: no drafts/requests/comments/internal metadata | BE-05/06/07; FE-07/08; allowlisted serializers |
 | US-097 AC1..3: 360px, <=2 taps, Chrome/Firefox/Edge | FE-03..08; DOC-01 |
 | B5 scenarios 2..6 and portal part of 9 | BE-02..07; FE-01..08; external API part of scenario 9 remains F-21 |

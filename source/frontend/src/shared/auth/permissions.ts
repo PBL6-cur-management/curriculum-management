@@ -4,6 +4,7 @@ import type { Me } from './me';
 export type PermissionCode = components['schemas']['PermissionCode'];
 
 export const PERMISSIONS = {
+  studentViewRegistrationEligibility: 'student.viewRegistrationEligibility',
   versionCompare: 'version.compare',
   versionAssignCohort: 'version.assignCohort',
   userManage: 'user.manage',

@@ -496,7 +496,7 @@ Bảng dưới đây ánh xạ các cột trong file Excel hiện hành sang th�
 | FR-44 | **Mỗi học phần có duy nhất một đề cương chi tiết**, dùng chung cho mọi Chương trình đào tạo | BẮT BUỘC |
 | FR-45 | Đề cương gồm các phần: thông tin chung · mô tả học phần · mục tiêu · danh sách CLO · nội dung theo tuần/chương · phương pháp giảng dạy · phương pháp đánh giá · tài liệu tham khảo | BẮT BUỘC |
 | FR-46 | Hệ thống cho phép soạn thảo nội dung bằng trình soạn thảo văn bản định dạng (rich text) | BẮT BUỘC |
-| FR-47 | Hệ thống cho phép đính kèm tệp (PDF, Word) làm bản đề cương đã ký; tệp đính kèm được lưu theo phiên bản | NÊN CÓ |
+| FR-47 | Hệ thống cho phép đính kèm đề cương đã ký, giáo trình, slide bài giảng và tài liệu khác (PDF, Word…), phân loại khi tải lên; giảng viên tải lên/xóa, không qua duyệt; tệp đính kèm được lưu theo phiên bản | NÊN CÓ |
 | FR-48 | Đề cương hỗ trợ song ngữ Việt – Anh ở các trường: tên học phần, mô tả, CLO | NÊN CÓ |
 #### 5.5.2. Công thức điểm
 

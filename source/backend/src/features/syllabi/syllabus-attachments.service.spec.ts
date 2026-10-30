@@ -7,6 +7,7 @@ import {
   ScopeSource,
   ScopeType,
   SyllabusStatus,
+  SyllabusMaterialKind,
 } from '../../generated/prisma/client.js';
 import {
   AccessContext,
@@ -136,7 +137,12 @@ describe('SyllabusAttachmentsService', () => {
         prisma.syllabus.findUnique.mockResolvedValue(accessRow(status));
 
         await expect(
-          service.upload('s1', upload('Quyết định ký.pdf', PDF_BYTES), R3),
+          service.upload(
+            's1',
+            upload('Quyết định ký.pdf', PDF_BYTES),
+            SyllabusMaterialKind.SIGNED_SYLLABUS,
+            R3,
+          ),
         ).resolves.toMatchObject({ fileName: 'Quyết định ký.pdf' });
       }
       expect(prisma.syllabusAttachment.create).toHaveBeenCalledTimes(2);
@@ -152,7 +158,12 @@ describe('SyllabusAttachmentsService', () => {
       });
 
       await expect(
-        service.upload('s1', upload('Ký.pdf', PDF_BYTES), R3),
+        service.upload(
+          's1',
+          upload('Ký.pdf', PDF_BYTES),
+          SyllabusMaterialKind.SIGNED_SYLLABUS,
+          R3,
+        ),
       ).rejects.toMatchObject({ code: 'OUT_OF_SCOPE' });
       expect(files.write).not.toHaveBeenCalled();
     });
@@ -161,12 +172,21 @@ describe('SyllabusAttachmentsService', () => {
       const result = await service.upload(
         's1',
         upload('Đề cương ký.pdf', PDF_BYTES),
+        SyllabusMaterialKind.SIGNED_SYLLABUS,
         R3,
       );
 
+      expect(prisma.syllabusAttachment.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            materialKind: SyllabusMaterialKind.SIGNED_SYLLABUS,
+          }),
+        }),
+      );
       const path = files.write.mock.calls[0][0] as string;
       expect(path).toMatch(/^syllabi\/s1\/[0-9a-f-]{36}\.pdf$/);
       expect(result).toMatchObject({
+        materialKind: SyllabusMaterialKind.SIGNED_SYLLABUS,
         fileName: 'Đề cương ký.pdf',
         fileType: AttachmentFileType.PDF,
         sizeBytes: PDF_BYTES.length,
@@ -175,20 +195,39 @@ describe('SyllabusAttachmentsService', () => {
     });
 
     it('refuses a missing file', async () => {
-      await expect(service.upload('s1', undefined, R3)).rejects.toMatchObject({
+      await expect(
+        service.upload(
+          's1',
+          undefined,
+          SyllabusMaterialKind.SIGNED_SYLLABUS,
+          R3,
+        ),
+      ).rejects.toMatchObject({
         code: 'ATTACHMENT_FILE_REQUIRED',
       });
     });
 
     it('checks the draft rules before looking at the file', async () => {
-      await expect(service.upload('s1', undefined, R6)).rejects.toMatchObject({
+      await expect(
+        service.upload(
+          's1',
+          undefined,
+          SyllabusMaterialKind.SIGNED_SYLLABUS,
+          R6,
+        ),
+      ).rejects.toMatchObject({
         code: 'SYLLABUS_NOT_FOUND',
       });
     });
 
     it('refuses an executable renamed to .pdf', async () => {
       await expect(
-        service.upload('s1', upload('x.pdf', [0x4d, 0x5a, 0x90]), R3),
+        service.upload(
+          's1',
+          upload('x.pdf', [0x4d, 0x5a, 0x90]),
+          SyllabusMaterialKind.SIGNED_SYLLABUS,
+          R3,
+        ),
       ).rejects.toMatchObject({ code: 'ATTACHMENT_TYPE_NOT_ALLOWED' });
       expect(files.write).not.toHaveBeenCalled();
     });
@@ -197,7 +236,12 @@ describe('SyllabusAttachmentsService', () => {
       prisma.syllabusAttachment.count.mockResolvedValue(10);
 
       await expect(
-        service.upload('s1', upload('a.pdf', PDF_BYTES), R3),
+        service.upload(
+          's1',
+          upload('a.pdf', PDF_BYTES),
+          SyllabusMaterialKind.SIGNED_SYLLABUS,
+          R3,
+        ),
       ).rejects.toMatchObject({ code: 'ATTACHMENT_LIMIT_REACHED' });
       expect(files.write).not.toHaveBeenCalled();
     });
@@ -207,7 +251,12 @@ describe('SyllabusAttachmentsService', () => {
       prisma.syllabusAttachment.create.mockRejectedValue(failure);
 
       await expect(
-        service.upload('s1', upload('a.pdf', PDF_BYTES), R3),
+        service.upload(
+          's1',
+          upload('a.pdf', PDF_BYTES),
+          SyllabusMaterialKind.SIGNED_SYLLABUS,
+          R3,
+        ),
       ).rejects.toBe(failure);
       expect(files.remove).toHaveBeenCalledWith(files.write.mock.calls[0][0]);
     });

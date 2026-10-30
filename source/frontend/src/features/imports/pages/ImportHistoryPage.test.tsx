@@ -5,6 +5,12 @@ import { ImportHistoryPage } from './ImportHistoryPage';
 import { ImportDetailPage } from './ImportDetailPage';
 
 afterEach(() => vi.unstubAllGlobals());
+vi.mock('../hooks/useImports', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../hooks/useImports')>()),
+  useImportTypes: () => ({
+    data: [{ importType: 'CURRICULUM', needsVersion: true }],
+  }),
+}));
 describe('ImportHistoryPage', () => {
   it('polls a validating history row until dry-run and displays three statuses', async () => {
     let reads = 0;

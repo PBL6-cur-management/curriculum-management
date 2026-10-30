@@ -371,3 +371,56 @@ Format:
 - Lỗi bắt được bằng Playwright: lưới ánh xạ dựng lại bằng dữ liệu cũ sau khi lưu; sửa bằng `useEditorRemountKey` (khóa dựng lại theo `updatedAt` khi trình sửa sạch). Chi tiết trong báo cáo triển khai.
 - TC doc 26 ca: 21 tự động Passed + 5 Manual (F12-TC_022..026). Đếm lại 16 tài liệu: 842 ca = 451 Passed + 391 thủ công.
 - Còn nợ: Manual F12-TC_022..026; đầu vào Khoa C1 (đơn vị và ngưỡng công thức, mặc định không đơn vị). Tiếp theo F-17.
+
+## 2026-10-29 — Hoàn tất F-17 Hồ sơ sinh viên và nhập kết quả học tập
+
+- BE-01..BE-10, FE-01..FE-06 và docs đã hoàn tất: Student, ProgramEnrollment, AcademicResult/AcademicResultChange, StudentCredentialDelivery trong migration `20261027165710_student_records_results`; StudentsModule/StudentsSharedModule, MH-51/52 và hai loại nhập STUDENT_LIST/ACADEMIC_RESULT mở rộng pipeline F-09 hiện hữu. Không dựng pipeline thứ hai hoặc cổng sinh viên.
+- Bằng chứng orchestrator trên dev server thật, mỗi spec chạy riêng ngày 2026-10-29: F-17 14/14 gồm auth setup và 5 TC nghiệp vụ; F-16 14/14; F-15 42/42; F-13 37/37; mvp-flow 14/14. E2E tsc 0 và frontend tsc -b 0. Targeted unit trước đó: BE 15 file 109/109, FE 12 file 58/58 với --testTimeout=30000. Lượt docs không chạy lại test, server hoặc full suites.
+- Ghi nhận ba Incident orchestrator đã xử lý, không sửa lại source và không thêm error_log: workbook dùng nhãn Đang học thay enum STUDYING/IN_PROGRESS; program Select có tìm theo label/mã để xử lý tập options dài trong staff scope; nhập sinh viên cần STUDENT_CREDENTIAL_ENCRYPTION_KEY base64 của 32 byte. Browser dùng process env tạm, không ghi giá trị khóa; người dùng tự cấu hình dotenv cục bộ.
+- TC F-17: 32 ca = 28 tự động Passed (5 Playwright, 17 BE e2e, 6 FE unit) + 4 Manual Not run (029..032). Đếm lại từng dòng TC trong 17 file tính năng: **874 = 479 tự động Passed + 395 Manual**; không cộng auth setup, không đếm trùng tầng automation; 5 ca MVP xuyên tính năng theo dõi riêng.
+- Đồng bộ plan/report, test-case/index, database_and_models, features_architecture, general_architecture (wiring mới), technical_reference và snapshot/todo. Không sửa source hoặc cấu hình; không dùng kết quả browser để xóa khoảng trống ma trận BE-10 hay chứng nhận NFR-05.
+- Còn nợ: 4 Manual F-17 và đầu vào Khoa C2; BE-10 matrix gaps; ngân sách test 100 giây đã chốt nhưng chưa đo lại, không thay mục tiêu NFR-05 60 giây; khóa cục bộ người dùng; full suites chưa chạy lại. C1..C10 và các Manual/flake/lịch sử trước đó tiếp tục giữ.
+- Start here: chờ người dùng chọn **F-23 → F-25 → F-24 → F-18 → F-19 → F-22 → F-20 → F-21**. F-26/F-27 hoãn, không xếp lịch.
+
+## 2026-10-29 — Hoãn F-24 và F-25
+
+- Người dùng hoãn F-24 (đồ thị, PDF, dòng thời gian, bảng sức khỏe) và F-25 (ủy quyền, email, nhắc hạn): chưa cần. Không xếp lịch; kế hoạch giữ nguyên. `todo.md` đánh dấu ⏸️.
+- Khóa `STUDENT_CREDENTIAL_ENCRYPTION_KEY` của người dùng hợp lệ: backend khởi động, F17-TC_002 Passed (10 passed gồm 9 auth setup).
+- Start here: chờ người dùng chọn **F-23 → F-18 → F-19 → F-22 → F-20 → F-21**. F-24/F-25/F-26/F-27 hoãn.
+
+## 2026-10-29 — Phân loại tài liệu đính kèm đề cương và nâng giới hạn mặc định
+
+- Theo phê duyệt ngày 2026-10-29, `SyllabusAttachment.materialKind` bắt buộc với enum `SyllabusMaterialKind`: `SIGNED_SYLLABUS`, `TEXTBOOK`, `LECTURE_SLIDES`, `OTHER`. Migration `20261029155453_syllabus_material_kind` đã áp và gán dữ liệu cũ thành `OTHER`, không giữ mặc định cho dòng mới.
+- Backend nhận loại qua DTO multipart, kiểm tra trước khi lưu tệp và trả loại trong dữ liệu đính kèm. Frontend yêu cầu chọn loại trước khi chọn tệp; danh sách trình sửa và chỉ đọc nhóm theo thứ tự Đề cương đã ký, Giáo trình, Slide bài giảng, Tài liệu khác, có số lượng và ẩn nhóm rỗng; giữ nguyên tải xuống/xóa.
+- `ATTACHMENT_MAX_MB` mặc định tăng từ 20 lên 50 MB; giới hạn dùng chung cũng áp dụng cho văn bản đề xuất. Đồng bộ FR-47, từ điển dữ liệu, kiến trúc và một dòng US-096 AC3 của kế hoạch cổng sinh viên để giữ `materialKind` trong phép chiếu và nhóm cùng cách.
+- Bổ sung kiểm thử loại tài liệu, từ chối thiếu/sai loại mà không tạo dòng hoặc lưu tệp, nhóm danh sách và điều chỉnh luồng tải tệp Playwright. Không chạy Vitest, kiểm thử đầu-cuối hoặc Playwright trong lượt bàn giao này; orchestrator chạy các bộ kiểm thử trước khi chốt.
+- Kiểm tra khi tiếp tục ngày 2026-10-30: backend `tsc --noEmit -p tsconfig.json`, frontend `tsc -b`, e2e `tsc --noEmit -p tsconfig.json` đều exit 0; oxlint và Prettier trên các tệp nguồn thay đổi đều đạt. Dự án e2e không có oxlint/Prettier riêng nên dùng bản đã cài của frontend, không thêm dependency. Kiểu API đã sinh từ lượt trước có đủ `materialKind`; không chạy lại `api:types` khi backend đã dừng.
+- Orchestrator chạy kiểm thử ngày 2026-10-30: backend unit syllabi 35/35; frontend `src/features/syllabi` 68/68 sau khi `chooseKind` trong `AttachmentPanel.test.tsx` chờ vùng tải mở khóa (`Form.useWatch` báo lựa chọn ở lượt render sau); backend e2e `syllabi`, `corrections`, `permission-table` 203/203; Playwright F-10 44/46 rồi F10-TC_017/020 Passed khi chạy lại (cả hai lỗi là flake `chooseOption` đã biết: combobox còn `aria-expanded=true` sau 10 giây).
+- Sửa khi kiểm thử: route tải lên trả 400 `whitelistValidation` trên `file` vì lớp DTO khai báo `file` nên instance luôn có trường đó; tách `UploadAttachmentDto` (chỉ `materialKind`, dùng cho `@Body()`) khỏi `UploadAttachmentFormDto` (thêm `file`, chỉ cho Swagger), cùng cách `UploadChangeRequestDocumentDto`. `test/test-env.ts` ghim `ATTACHMENT_MAX_MB=50` vì dotenv cục bộ có thể còn giá trị cũ; `source/backend/README.md` đổi mặc định thành 50.
+- Còn nợ: nếu dotenv cục bộ của người dùng còn `ATTACHMENT_MAX_MB=20`, ứng dụng đang chạy vẫn giới hạn 20 MB; người dùng tự đổi thành 50.
+
+## 2026-10-29 — Hoãn F-23
+
+- Người dùng hoãn F-23 (báo cáo kiểm định): vượt phạm vi cần lúc này. Không xếp lịch; kế hoạch giữ nguyên, `todo.md` đánh dấu ⏸️. Thứ tự: **F-18 → F-19 → F-22 → F-20 → F-21**.
+
+## 2026-10-30 — F-18 Điều kiện đăng ký học phần
+
+- Sửa lỗ hổng mốc kết thúc ghi danh của F-17 trước F-18 (người dùng duyệt): đổi ngày bắt đầu học kỳ bị chặn nếu có ghi danh dùng học kỳ đó làm mốc đầu hoặc cuối; mốc cuối có học kỳ nhưng thiếu ngày là khoảng không hợp lệ, không phải khoảng mở. Ghi tại `error_log.md` mục 2026-10-29.
+- F-18 build bằng Codex theo kế hoạch: `shared/registration-eligibility` (ngữ cảnh khung đã đóng băng, bằng chứng học tập, đồ thị song hành SCC lặp, giới hạn độ sâu `ELIGIBILITY_MAX_DEPTH` mặc định 20), `features/registration-eligibility` (hai route GET riêng tư, bộ chọn sinh viên theo phạm vi); MH-25 thêm cột "Đăng ký được?" và ngăn lý do ở chế độ theo sinh viên, chỉ đọc. Không có migration. Hệ thống chỉ tính điều kiện, không có nút đăng ký (GĐ-05).
+- Chặn khi build: env F-18 cần sửa `env.validation.ts` do lượt tài liệu đính kèm giữ; lấy phương án A (thêm biến, giữ `ATTACHMENT_MAX_MB` 50) theo quy tắc bị chặn thì lấy mặc định.
+- Kiểm chứng của orchestrator: BE unit 179/179, BE e2e 226/226 (gồm spec fix F-17), FE 75/75, Playwright F-07 35/35. Sửa bốn lỗi chỉ nằm trong spec mới (thiếu `reflect-metadata`, mock catalog lệch, vi phạm CHECK `ProgramEnrollment_closed_interval`, tiêu đề cột ẩn của AntD); mã sản phẩm không đổi.
+- TC F-18: 16 ca = 14 tự động Passed + 2 Manual (015/016). Chỉ mục: **890 = 493 tự động Passed + 397 Manual**.
+- Môi trường: container dev Postgres/Redis dừng (exit 255) giữa lượt; đã khởi động lại cùng BE/FE dev server.
+- Còn nợ: Manual F18-TC_015/016, đầu vào Khoa C3, số đo NFR-02 trên phần cứng triển khai.
+- Start here: **F-19** theo mặc định của kế hoạch, rồi F-22 → F-20 → F-21.
+
+
+## 2026-10-30 — F-19 Xét tốt nghiệp
+
+- Build bằng Codex theo kế hoạch: BE-01..BE-12 (migration `20261030050730_graduation_review`), FE-01..FE-06, DOC-01. `schema.d.ts` sinh lại từ BE dev server.
+- Quyết định khi build (lấy mặc định): mọi phản hồi F-19 chứa dữ liệu sinh viên gửi `Cache-Control: no-store, private`, theo F-18.
+- Sửa trong lượt kiểm chứng: fixture điểm thiếu `score10/letterGrade`, body TRANSFER, fixture enrollment ENDED, username chữ hoa và biên nửa mở `[from, until)` là lỗi test; retry tối đa 4 lần cho xung đột serialization 40001/40P01 rồi hoãn ở mức WARN, `Error` thường mang mã `UNCLASSIFIED_EXECUTION` là thay đổi sản phẩm. Frontend: ba lỗi truy vấn trong test, chờ lazy route, tiêu đề AntD confirm lặp trong một dialog (lỗi test); `onOk` của xác nhận đợt xét ném lại lỗi thành unhandled rejection (lỗi sản phẩm, đã sửa).
+- Kiểm chứng của orchestrator: BE tsc 0, unit 363/363; BE e2e graduation 19/19, batches 8/8, corrections 10/10 (chạy riêng; lượt chung 8/10 do `Memory allocation error`), permission-table 185/185 (lượt 2). FE tsc -b 0, oxlint 0, vitest 11 file 85/85 (`--maxWorkers=1`).
+- Còn nợ: 16 ca Manual trong `docs/testing/feature__f-19-graduation-review.md`; chưa có file test case F-19 trong chỉ mục `docs/testing/test-cases/`; đồng bộ `features_architecture.md`/`database_and_models.md`; tách view kết quả sang shared cho F-20; đầu vào Khoa C4.
+- Start here: **F-22**, rồi F-20 → F-21.
+- Đồng bộ docs (2026-10-30): features/database/general architecture, error_log (onOk xác nhận đợt xét), test case `f-19-graduation-review-test-cases.md` 35 ca = 19 Passed + 16 Manual; chỉ mục 925 = 512 Passed + 413 Manual.

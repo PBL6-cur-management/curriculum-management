@@ -165,6 +165,7 @@ enum NotificationType {
   REQUEST_OVERRIDDEN
   REQUEST_COMMENTED
   REQUEST_EFFECTIVE
+  GRADUATION_CONCLUSION_CHANGED
 }
 
 enum NotificationReadStatus {
@@ -201,6 +202,8 @@ model OrgUnit {
 }
 
 model User {
+  graduationAudits GraduationAudit[] @relation("GraduationReviewer")
+  graduationBatches GraduationBatch[] @relation("GraduationBatchRequester")
   student                   Student?                    @relation("StudentAccount")
   createdEnrollments        ProgramEnrollment[]         @relation("EnrollmentCreator")
   importBatches             ImportBatch[]               @relation("ImportBatchPerformedBy")
@@ -341,6 +344,8 @@ model SubjectGroupMember {
 }
 
 model Program {
+  graduationContexts GraduationAuditContext[]
+  graduationBatchItems GraduationBatchItem[]
   enrollments    ProgramEnrollment[]
   importBatches  ImportBatch[]               @relation("ImportBatchProgram")
   id             String                      @id @default(cuid(2))
@@ -365,6 +370,7 @@ model Program {
 // Two partial unique indexes are added by hand in the migration (not modelled by Prisma): see database_and_models.md.
 // A row with sourceRequestId is the working copy of a change request (F-13), not a version of the program.
 model ProgramVersion {
+  graduationAudits GraduationAudit[]
   enrollmentsApplied          ProgramEnrollment[]  @relation("EnrollmentAppliedVersion")
   enrollmentsAdmitted         ProgramEnrollment[]  @relation("EnrollmentAdmissionVersion")
   importBatches               ImportBatch[]        @relation("ImportBatchVersion")
@@ -460,6 +466,8 @@ model ImportBatchFile {
 }
 
 model Semester {
+  graduationContexts GraduationAuditContext[]
+  graduationBatchItems GraduationBatchItem[]
   admittedStudents       Student[]           @relation("StudentAdmissionSemester")
   statusStudents         Student[]           @relation("StudentStatusSemester")
   enrollmentsFrom        ProgramEnrollment[] @relation("EnrollmentFromSemester")
@@ -692,6 +700,13 @@ enum AttachmentFileType {
   IMAGE
 }
 
+enum SyllabusMaterialKind {
+  SIGNED_SYLLABUS
+  TEXTBOOK
+  LECTURE_SLIDES
+  OTHER
+}
+
 // One syllabus per course, kept as numbered revisions. Section texts are sanitized HTML (null = empty).
 // The partial unique indexes (one Draft, one Published per course) and the CHECKs are added by hand in the migration.
 // revisionNumber is null only on the working copy of a change request (sourceRequestId set, F-13).
@@ -747,16 +762,17 @@ model WeeklyContent {
 
 // The file lives on disk under FILES_ROOT; filePath is relative with '/' separators.
 model SyllabusAttachment {
-  id           String             @id @default(cuid(2))
+  id           String               @id @default(cuid(2))
   syllabusId   String
-  syllabus     Syllabus           @relation(fields: [syllabusId], references: [id], onDelete: Restrict)
+  syllabus     Syllabus             @relation(fields: [syllabusId], references: [id], onDelete: Restrict)
   fileName     String
   fileType     AttachmentFileType
-  filePath     String             @unique
+  materialKind SyllabusMaterialKind
+  filePath     String               @unique
   sizeBytes    Int
   uploadedById String
-  uploadedBy   User               @relation("SyllabusAttachmentUploadedBy", fields: [uploadedById], references: [id], onDelete: Restrict)
-  recordedAt   DateTime           @default(now())
+  uploadedBy   User                 @relation("SyllabusAttachmentUploadedBy", fields: [uploadedById], references: [id], onDelete: Restrict)
+  recordedAt   DateTime             @default(now())
 
   @@index([syllabusId, recordedAt])
 }
@@ -1055,6 +1071,8 @@ enum AcademicResultStatus {
 }
 
 model Student {
+  graduationContexts GraduationAuditContext[]
+  graduationBatchItems GraduationBatchItem[]
   id                  String              @id @default(cuid(2))
   studentCode         String              @unique
   fullName            String
@@ -1079,6 +1097,8 @@ model Student {
 }
 
 model ProgramEnrollment {
+  graduationAudits GraduationAudit[]
+  graduationBatchItems GraduationBatchItem[]
   id                   String             @id @default(cuid(2))
   studentId            String
   student              Student            @relation(fields: [studentId], references: [id], onDelete: Restrict)
@@ -1135,6 +1155,7 @@ model AcademicResult {
 }
 
 model AcademicResultChange {
+  graduationReceipt GraduationResultChangeReceipt?
   id               String         @id @default(cuid(2))
   academicResultId String
   academicResult   AcademicResult @relation(fields: [academicResultId], references: [id], onDelete: Restrict)
@@ -1160,4 +1181,162 @@ model StudentCredentialDelivery {
   createdAt    DateTime    @default(now())
 
   @@index([expiresAt])
+}
+
+enum GraduationConclusion {
+  ELIGIBLE
+  NOT_ELIGIBLE
+}
+enum GraduationAuditTrigger {
+  STAFF
+  BATCH
+  RESULT_CHANGE
+}
+enum GraduationBatchStatus {
+  QUEUED
+  RUNNING
+  COMPLETED
+  COMPLETED_WITH_ERRORS
+  FAILED
+}
+enum GraduationBatchItemStatus {
+  PENDING
+  REVIEWED
+  ERROR
+}
+enum GraduationReauditStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  COVERED
+  FAILED
+}
+
+model GraduationAuditContext {
+  id            String   @id @default(cuid(2))
+  studentId     String
+  student       Student  @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  programId     String
+  program       Program  @relation(fields: [programId], references: [id], onDelete: Restrict)
+  semesterId    String
+  semester      Semester @relation(fields: [semesterId], references: [id], onDelete: Restrict)
+  lastAuditId   String?  @unique
+  lastAudit     GraduationAudit? @relation("GraduationContextHead", fields: [lastAuditId], references: [id], onDelete: Restrict)
+  audits        GraduationAudit[] @relation("GraduationContextAudits")
+  reauditTasks  GraduationReauditTask[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([studentId, programId, semesterId])
+  @@index([studentId])
+}
+
+model GraduationAudit {
+  id               String   @id @default(cuid(2))
+  contextId        String
+  context          GraduationAuditContext @relation("GraduationContextAudits", fields: [contextId], references: [id], onDelete: Restrict)
+  currentFor       GraduationAuditContext? @relation("GraduationContextHead")
+  enrollmentId     String
+  enrollment       ProgramEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+  programVersionId String
+  programVersion   ProgramVersion @relation(fields: [programVersionId], references: [id], onDelete: Restrict)
+  auditedAt        DateTime @default(now())
+  auditedById      String?
+  auditedBy        User? @relation("GraduationReviewer", fields: [auditedById], references: [id], onDelete: Restrict)
+  trigger          GraduationAuditTrigger
+  operationKey     String @unique
+  conclusion       GraduationConclusion
+  schemaVersion    Int
+  ruleVersion      String
+  shortfalls       Json
+  result           Json
+  inputs           Json
+  inputDigest      String
+  supersedesId     String? @unique
+  supersedes       GraduationAudit? @relation("GraduationAuditChain", fields: [supersedesId], references: [id], onDelete: Restrict)
+  supersededBy     GraduationAudit? @relation("GraduationAuditChain")
+  batchItem        GraduationBatchItem?
+  baselineTasks    GraduationReauditTask[] @relation("GraduationTaskBaseline")
+  completedTasks   GraduationReauditTask[] @relation("GraduationTaskResult")
+
+  @@index([contextId, auditedAt, id])
+  @@index([enrollmentId, auditedAt])
+}
+
+model GraduationBatch {
+  id              String @id @default(cuid(2))
+  requestedById   String
+  requestedBy     User @relation("GraduationBatchRequester", fields: [requestedById], references: [id], onDelete: Restrict)
+  requestKey      String
+  filters         Json
+  previewRevision String
+  rosterDigest    String
+  studentCount    Int
+  enrollmentCount Int
+  status          GraduationBatchStatus @default(QUEUED)
+  failureCode     String?
+  leaseToken      String?
+  leaseUntil      DateTime?
+  createdAt       DateTime @default(now())
+  startedAt       DateTime?
+  finishedAt      DateTime?
+  items           GraduationBatchItem[]
+
+  @@unique([requestedById, requestKey])
+  @@index([status, leaseUntil, createdAt])
+}
+
+model GraduationBatchItem {
+  id              String @id @default(cuid(2))
+  batchId         String
+  batch           GraduationBatch @relation(fields: [batchId], references: [id], onDelete: Restrict)
+  studentId       String
+  student         Student @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  programId       String
+  program         Program @relation(fields: [programId], references: [id], onDelete: Restrict)
+  semesterId      String
+  semester        Semester @relation(fields: [semesterId], references: [id], onDelete: Restrict)
+  rosterEnrollmentId String?
+  rosterEnrollment ProgramEnrollment? @relation(fields: [rosterEnrollmentId], references: [id], onDelete: Restrict)
+  rosterIdentity  Json
+  status          GraduationBatchItemStatus @default(PENDING)
+  auditId         String? @unique
+  audit           GraduationAudit? @relation(fields: [auditId], references: [id], onDelete: Restrict)
+  errorCode       String?
+  errorMessage    String?
+  finishedAt      DateTime?
+
+  @@unique([batchId, studentId, programId, semesterId])
+  @@index([batchId, status, id])
+}
+
+model GraduationResultChangeReceipt {
+  changeId      String @id
+  change        AcademicResultChange @relation(fields: [changeId], references: [id], onDelete: Restrict)
+  targetCount   Int
+  reason        String?
+  recordedAt    DateTime @default(now())
+  tasks         GraduationReauditTask[]
+}
+
+model GraduationReauditTask {
+  id               String @id @default(cuid(2))
+  changeId         String
+  receipt          GraduationResultChangeReceipt @relation(fields: [changeId], references: [changeId], onDelete: Restrict)
+  contextId        String
+  context          GraduationAuditContext @relation(fields: [contextId], references: [id], onDelete: Restrict)
+  baselineAuditId  String
+  baselineAudit    GraduationAudit @relation("GraduationTaskBaseline", fields: [baselineAuditId], references: [id], onDelete: Restrict)
+  completedAuditId String?
+  completedAudit   GraduationAudit? @relation("GraduationTaskResult", fields: [completedAuditId], references: [id], onDelete: Restrict)
+  status           GraduationReauditStatus @default(PENDING)
+  attempts         Int @default(0)
+  leaseToken       String?
+  leaseUntil       DateTime?
+  errorCode        String?
+  createdAt        DateTime @default(now())
+  finishedAt       DateTime?
+
+  @@unique([changeId, contextId])
+  @@index([status, leaseUntil, createdAt])
 }

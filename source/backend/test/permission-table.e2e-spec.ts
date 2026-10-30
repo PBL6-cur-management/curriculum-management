@@ -66,11 +66,17 @@ describe('permission table', () => {
       const allowedResponse = await sendRequest(allowedAgent, testCase);
       expect(allowedResponse.status).not.toBe(403);
       const beforeDeniedCount = await countWrites(testCase.path);
+      const beforeGraduationCounts = testCase.path.includes('graduation')
+        ? await countGraduationWrites()
+        : null;
       const deniedResponse = await sendRequest(deniedAgent, testCase);
       expect(deniedResponse.status).toBe(403);
       expect(deniedResponse.body.code).toBe('PERMISSION_DENIED');
       if (testCase.method !== 'get') {
         expect(await countWrites(testCase.path)).toBe(beforeDeniedCount);
+        if (beforeGraduationCounts) {
+          expect(await countGraduationWrites()).toEqual(beforeGraduationCounts);
+        }
       }
     },
   );
@@ -90,6 +96,12 @@ describe('permission table', () => {
   }
 
   async function countWrites(path: string): Promise<number> {
+    if (path.includes('graduation')) {
+      return (await countGraduationWrites()).reduce(
+        (total, count) => total + count,
+        0,
+      );
+    }
     if (path.startsWith('/api/imports')) return prisma.importBatch.count();
     if (path.startsWith('/api/students')) {
       return prisma.programEnrollment.count();
@@ -150,5 +162,17 @@ describe('permission table', () => {
     return path.startsWith('/api/users')
       ? prisma.user.count()
       : prisma.rolePermission.count();
+  }
+
+  async function countGraduationWrites(): Promise<number[]> {
+    return Promise.all([
+      prisma.graduationAuditContext.count(),
+      prisma.graduationAudit.count(),
+      prisma.graduationBatch.count(),
+      prisma.graduationBatchItem.count(),
+      prisma.graduationResultChangeReceipt.count(),
+      prisma.graduationReauditTask.count(),
+      prisma.notification.count(),
+    ]);
   }
 });

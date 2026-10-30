@@ -7,8 +7,16 @@ import {
 import { CurriculumItemActions } from './CurriculumItemActions';
 import { itemElementId } from './CurriculumWarningsPanel';
 import { RequisiteTags } from './RequisiteTags';
+import { generatePath, Link } from 'react-router';
+import { ROUTES } from '../../../routes';
+import { VERSION_ID_PARAM } from '../../../shared/releases/versionParams';
+import { EligibilityStatus } from '../../../shared/registration-eligibility/EligibilityStatus';
+import type { EligibilityByItemId } from '../../../shared/registration-eligibility/eligibilityLabels';
 
 interface SemesterBoardProps {
+  studentMode?: boolean;
+  eligibilityByItemId?: EligibilityByItemId;
+  onShowEligibility?: (itemId: string) => void;
   curriculum: Curriculum;
   items: CurriculumItem[];
   onEdit: (item: CurriculumItem) => void;
@@ -21,6 +29,9 @@ export function SemesterBoard({
   items,
   onEdit,
   onRequisites,
+  studentMode = false,
+  eligibilityByItemId,
+  onShowEligibility,
 }: SemesterBoardProps) {
   return (
     <Row gutter={[16, 16]}>
@@ -45,15 +56,19 @@ export function SemesterBoard({
                   renderItem={(item) => (
                     <List.Item
                       id={itemElementId(item.id)}
-                      actions={[
-                        <CurriculumItemActions
-                          key="actions"
-                          versionId={curriculum.version.id}
-                          item={item}
-                          onEdit={onEdit}
-                          onRequisites={onRequisites}
-                        />,
-                      ]}
+                      actions={
+                        studentMode
+                          ? []
+                          : [
+                              <CurriculumItemActions
+                                key="actions"
+                                versionId={curriculum.version.id}
+                                item={item}
+                                onEdit={onEdit}
+                                onRequisites={onRequisites}
+                              />,
+                            ]
+                      }
                     >
                       <Space direction="vertical" size={2}>
                         <span>
@@ -67,6 +82,19 @@ export function SemesterBoard({
                           )}
                         </span>
                         <RequisiteTags item={item} />
+                        {studentMode && eligibilityByItemId?.get(item.id) && (
+                          <EligibilityStatus
+                            item={eligibilityByItemId.get(item.id)!}
+                            onShowReasons={() => onShowEligibility?.(item.id)}
+                          />
+                        )}
+                        {studentMode && item.hasSyllabus && (
+                          <Link
+                            to={`${generatePath(ROUTES.syllabus, { courseId: item.course.id })}?${new URLSearchParams({ [VERSION_ID_PARAM]: curriculum.version.id })}`}
+                          >
+                            Đề cương
+                          </Link>
+                        )}
                       </Space>
                     </List.Item>
                   )}

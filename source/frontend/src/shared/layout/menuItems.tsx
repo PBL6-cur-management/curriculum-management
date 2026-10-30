@@ -7,6 +7,7 @@ export interface AppMenuItem {
   path?: string;
   label: string;
   permission?: PermissionCode;
+  anyPermissions?: readonly PermissionCode[];
   // Hidden when every role the caller holds is listed (display only; the server refuses anyway).
   hideForRoles?: readonly string[];
   children?: readonly AppMenuItem[];
@@ -19,14 +20,43 @@ export const APP_MENU: readonly AppMenuItem[] = [
   {
     path: ROUTES.imports,
     label: 'Nhập liệu',
-    permission: PERMISSIONS.curriculumImportExportExcel,
+    anyPermissions: [
+      PERMISSIONS.curriculumImportExportExcel,
+      PERMISSIONS.dataImportExcel,
+    ],
   },
   {
     path: ROUTES.importHistory,
     label: 'Lịch sử nhập liệu',
-    permission: PERMISSIONS.curriculumImportExportExcel,
+    anyPermissions: [
+      PERMISSIONS.curriculumImportExportExcel,
+      PERMISSIONS.dataImportExcel,
+    ],
   },
   { path: ROUTES.home, label: 'Trang chính' },
+  {
+    label: 'Xét tốt nghiệp',
+    children: [
+      {
+        path: ROUTES.graduationBatches,
+        label: 'Xét hàng loạt',
+        permission: 'graduation.audit',
+        hideForRoles: ['R2', 'R4', 'R5', 'R6'],
+      },
+      {
+        path: ROUTES.graduation,
+        label: 'Xét từng sinh viên',
+        permission: 'graduation.view',
+        hideForRoles: ['R2', 'R4', 'R5', 'R6'],
+      },
+    ],
+  },
+  {
+    path: ROUTES.students,
+    label: 'Sinh viên',
+    permission: 'student.viewProgress',
+    hideForRoles: ['R2', 'R4', 'R5', 'R6'],
+  },
   {
     path: ROUTES.users,
     label: 'Tài khoản',
@@ -110,6 +140,11 @@ function isVisible(
   roleCodes: readonly string[],
 ): boolean {
   if (isHiddenForRoles(item, roleCodes)) return false;
+  if (
+    item.anyPermissions &&
+    !item.anyPermissions.some((code) => permissions.includes(code))
+  )
+    return false;
   return item.children
     ? item.children.some((child) => isVisible(child, permissions, roleCodes))
     : !item.permission || permissions.includes(item.permission);

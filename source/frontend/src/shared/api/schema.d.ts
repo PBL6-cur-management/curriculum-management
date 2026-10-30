@@ -2116,6 +2116,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/imports/{batchId}/student-credentials": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ImportsController_credentialStatus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/imports/{batchId}/student-credentials/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ImportsController_downloadCredentials"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/program-versions/{versionId}/curriculum/export": {
         parameters: {
             query?: never;
@@ -2124,6 +2156,358 @@ export interface paths {
             cookie?: never;
         };
         get: operations["CurriculumExportController_export"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/students/program-options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["StudentsController_programOptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/students": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["StudentsController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/students/{studentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["StudentsController_detail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/students/{studentId}/results": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["StudentsController_results"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/students/{studentId}/applied-version": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["StudentsController_appliedVersion"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/students/{studentId}/enrollment-targets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["StudentsController_enrollmentTargets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/students/{studentId}/enrollments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["StudentsController_createEnrollment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/students/{studentId}/reconcile-enrollments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["StudentsController_reconcile"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/students/{studentId}/registration-eligibility": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RegistrationEligibilityController_read"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/programs/{programId}/registration-eligibility/students": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["EligibilityStudentsController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/students/{studentId}/graduation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GraduationController_live"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/students/{studentId}/graduation-audits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GraduationController_history"];
+        put?: never;
+        post: operations["GraduationController_save"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graduation-audits/{auditId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GraduationController_audit"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graduation/program-options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GraduationController_programs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graduation/student-options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GraduationController_students"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/students/{studentId}/graduation-reaudit-tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GraduationController_tasks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graduation-reaudit-tasks/{taskId}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["GraduationController_retry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graduation-batches/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["GraduationBatchesController_preview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graduation-batches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GraduationBatchesController_list"];
+        put?: never;
+        post: operations["GraduationBatchesController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graduation-batches/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GraduationBatchesController_detail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graduation-batches/{id}/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GraduationBatchesController_items"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graduation-batches/{id}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GraduationBatchesController_export"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3202,8 +3586,11 @@ export interface components {
             cloIds: string[];
         };
         /** @enum {string} */
+        SyllabusMaterialKind: "SIGNED_SYLLABUS" | "TEXTBOOK" | "LECTURE_SLIDES" | "OTHER";
+        /** @enum {string} */
         AttachmentFileType: "PDF" | "DOCX" | "XLSX" | "IMAGE";
         SyllabusAttachmentDto: {
+            materialKind: components["schemas"]["SyllabusMaterialKind"];
             id: string;
             /** @description Original name, UTF-8 decoded */
             fileName: string;
@@ -3406,6 +3793,7 @@ export interface components {
             mappings: components["schemas"]["AssessmentMappingInputDto"][];
         };
         UploadAttachmentFormDto: {
+            materialKind: components["schemas"]["SyllabusMaterialKind"];
             /** Format: binary */
             file: string;
         };
@@ -3766,7 +4154,7 @@ export interface components {
             daysWaiting: number;
         };
         /** @enum {string} */
-        NotificationType: "REQUEST_AWAITING_YOU" | "REQUEST_RETURNED" | "REQUEST_REJECTED" | "REQUEST_APPROVED" | "REQUEST_OVERRIDDEN" | "REQUEST_COMMENTED" | "REQUEST_EFFECTIVE";
+        NotificationType: "REQUEST_AWAITING_YOU" | "REQUEST_RETURNED" | "REQUEST_REJECTED" | "REQUEST_APPROVED" | "REQUEST_OVERRIDDEN" | "REQUEST_COMMENTED" | "REQUEST_EFFECTIVE" | "GRADUATION_CONCLUSION_CHANGED";
         /** @enum {string} */
         NotificationReadStatus: "UNREAD" | "READ";
         NotificationDto: {
@@ -4075,6 +4463,580 @@ export interface components {
         };
         ImportBatchPageDto: {
             items: components["schemas"]["ImportBatchSummaryDto"][];
+            total: number;
+            page: number;
+            pageSize: number;
+        };
+        StudentCredentialStatusDto: {
+            available: boolean;
+            accountCount: number;
+            expiresAt: string | null;
+            downloadedAt: string | null;
+        };
+        StudentProgramOptionDto: {
+            id: string;
+            programCode: string;
+            programName: string;
+        };
+        /** @enum {string} */
+        StudentStatus: "STUDYING" | "ON_LEAVE" | "WITHDRAWN" | "GRADUATED";
+        /** @enum {string} */
+        StudentDataSource: "EXCEL" | "SCHOOL_DB";
+        StudentSummaryDto: {
+            id: string;
+            studentCode: string;
+            fullName: string;
+            cohort: components["schemas"]["CohortDto"];
+            major: string;
+            status: components["schemas"]["StudentStatus"];
+            dataSource: components["schemas"]["StudentDataSource"];
+            updatedAt: string;
+        };
+        StudentPageDto: {
+            items: components["schemas"]["StudentSummaryDto"][];
+            total: number;
+            page: number;
+            pageSize: number;
+        };
+        StudentIssuedVersionDto: {
+            id: string;
+            versionNumber: string;
+            status: components["schemas"]["IssuedVersionStatus"];
+        };
+        /** @enum {string} */
+        EnrollmentType: "PRIMARY" | "SECOND_MAJOR";
+        /** @enum {string} */
+        EnrollmentStatus: "ACTIVE" | "TRANSFERRED" | "ENDED";
+        StudentEnrollmentDto: {
+            id: string;
+            studentId: string;
+            program: components["schemas"]["StudentProgramOptionDto"];
+            cohort: components["schemas"]["CohortDto"];
+            appliedVersion: components["schemas"]["StudentIssuedVersionDto"];
+            admissionVersionId: string;
+            cohortAssignmentId: string | null;
+            fromSemester: components["schemas"]["SemesterDto"];
+            untilSemester: components["schemas"]["SemesterDto"] | null;
+            previousEnrollmentId: string | null;
+            enrollmentType: components["schemas"]["EnrollmentType"];
+            isException: boolean;
+            basisDecision: string | null;
+            status: components["schemas"]["EnrollmentStatus"];
+            createdAt: string;
+            updatedAt: string;
+        };
+        StudentEnrollmentWarningDto: {
+            code: string;
+            message: string;
+            enrollmentId: string | null;
+        };
+        StudentDetailDto: {
+            id: string;
+            studentCode: string;
+            fullName: string;
+            cohort: components["schemas"]["CohortDto"];
+            major: string;
+            status: components["schemas"]["StudentStatus"];
+            dataSource: components["schemas"]["StudentDataSource"];
+            updatedAt: string;
+            userId: string | null;
+            admissionSemester: components["schemas"]["SemesterDto"];
+            statusSemester: components["schemas"]["SemesterDto"];
+            enrollments: components["schemas"]["StudentEnrollmentDto"][];
+            canManageEnrollments: boolean;
+            enrollmentWarnings: components["schemas"]["StudentEnrollmentWarningDto"][];
+        };
+        StudentResultCourseDto: {
+            id: string;
+            courseCode: string;
+            courseName: string;
+        };
+        /** @enum {string} */
+        AcademicResultStatus: "PASSED" | "FAILED" | "IN_PROGRESS" | "EXEMPT";
+        AcademicResultDto: {
+            id: string;
+            studentId: string;
+            course: components["schemas"]["StudentResultCourseDto"];
+            semester: components["schemas"]["SemesterDto"];
+            score10: string | null;
+            score4: string | null;
+            letterGrade: string | null;
+            status: components["schemas"]["AcademicResultStatus"];
+            dataSource: components["schemas"]["StudentDataSource"];
+            revision: number;
+            updatedAt: string;
+        };
+        AcademicResultPageDto: {
+            items: components["schemas"]["AcademicResultDto"][];
+            total: number;
+            page: number;
+            pageSize: number;
+        };
+        /** @enum {string} */
+        AppliedVersionSource: "COHORT" | "EXCEPTION";
+        StudentAppliedVersionDto: {
+            studentId: string;
+            enrollmentId: string;
+            programId: string;
+            semesterId: string;
+            programVersionId: string;
+            source: components["schemas"]["AppliedVersionSource"];
+            cohortAssignmentId: string | null;
+        };
+        StudentEnrollmentTargetDto: {
+            version: components["schemas"]["StudentIssuedVersionDto"];
+            program: components["schemas"]["StudentProgramOptionDto"];
+            effectiveSemester: components["schemas"]["SemesterDto"];
+        };
+        StudentEnrollmentCommandDto: {
+            /** @enum {string} */
+            operation: "ASSIGN_EXCEPTION" | "TRANSFER" | "ADD_SECOND_MAJOR";
+            targetVersionId: string;
+            fromSemesterId: string;
+            basisDecision: string;
+            sourceEnrollmentId?: string;
+            expectedStudentUpdatedAt: string;
+            expectedEnrollmentUpdatedAt?: string;
+        };
+        ReconcileStudentDto: {
+            expectedStudentUpdatedAt: string;
+        };
+        StudentReconciliationDto: {
+            transitioned: number;
+            unchanged: number;
+            blocked: number;
+        };
+        /** @enum {string} */
+        EligibilityVersionSource: "COHORT" | "EXCEPTION";
+        EligibilityContextDto: {
+            studentId: string;
+            enrollmentId: string;
+            programId: string;
+            semesterId: string;
+            programVersionId: string;
+            source: components["schemas"]["EligibilityVersionSource"];
+            cohortAssignmentId: string | null;
+        };
+        /** @enum {string} */
+        EligibilityNameSource: "SNAPSHOT" | "CATALOG";
+        EligibilityCourseRefDto: {
+            id: string;
+            courseCode: string;
+            courseName: string;
+            nameSource: components["schemas"]["EligibilityNameSource"];
+        };
+        /** @enum {string} */
+        EligibilityReasonCode: "COURSE_COMPLETED" | "EQUIVALENT_COMPLETED" | "PREREQUISITE_NOT_PASSED" | "PREREQUISITE_SCORE_MISSING" | "PREREQUISITE_SCORE_TOO_LOW" | "PRIOR_RESULT_MISSING" | "COREQUISITE_REQUIRED" | "COREQUISITE_INELIGIBLE" | "COREQUISITE_RULES_UNAVAILABLE" | "COREQUISITE_DEPTH_LIMIT";
+        EligibilityReasonDto: {
+            code: components["schemas"]["EligibilityReasonCode"];
+            /** @enum {string|null} */
+            causeCode: "COURSE_COMPLETED" | "EQUIVALENT_COMPLETED" | "PREREQUISITE_NOT_PASSED" | "PREREQUISITE_SCORE_MISSING" | "PREREQUISITE_SCORE_TOO_LOW" | "PRIOR_RESULT_MISSING" | "COREQUISITE_REQUIRED" | "COREQUISITE_INELIGIBLE" | "COREQUISITE_RULES_UNAVAILABLE" | "COREQUISITE_DEPTH_LIMIT" | null;
+            message: string;
+            /** @enum {string|null} */
+            relationType: "PRIOR" | "PREREQUISITE" | "COREQUISITE" | null;
+            requiredCourse: components["schemas"]["EligibilityCourseRefDto"] | null;
+            viaCourse: components["schemas"]["EligibilityCourseRefDto"] | null;
+            evidenceCourse: components["schemas"]["EligibilityCourseRefDto"] | null;
+            evidenceResultId: string | null;
+            requiredScore4: string | null;
+            actualScore4: string | null;
+            actualStatus: components["schemas"]["AcademicResultStatus"] | null;
+            path: components["schemas"]["EligibilityCourseRefDto"][];
+        };
+        EligibilityItemDto: {
+            itemId: string;
+            course: components["schemas"]["EligibilityCourseRefDto"];
+            credits: string;
+            catalogStatus: components["schemas"]["CourseStatus"];
+            plannedSemester: number;
+            completed: boolean;
+            /** @enum {string|null} */
+            eligibility: "ELIGIBLE" | "CONDITIONAL" | "INELIGIBLE" | null;
+            statusText: string;
+            reasons: components["schemas"]["EligibilityReasonDto"][];
+            requiredConcurrentCourses: components["schemas"]["EligibilityCourseRefDto"][];
+        };
+        /** @enum {string} */
+        EligibilityWarningCode: "REPLACEMENT_UNAVAILABLE" | "EXTERNAL_REQUISITE" | "EXTERNAL_COREQUISITE_RULES_UNAVAILABLE" | "COURSE_NOT_ACTIVE";
+        EligibilityWarningDto: {
+            code: components["schemas"]["EligibilityWarningCode"];
+            message: string;
+            course: components["schemas"]["EligibilityCourseRefDto"];
+        };
+        RegistrationEligibilityDto: {
+            /** @enum {number} */
+            contractVersion: 1;
+            context: components["schemas"]["EligibilityContextDto"];
+            /** Format: date-time */
+            evaluatedAt: string;
+            items: components["schemas"]["EligibilityItemDto"][];
+            warnings: components["schemas"]["EligibilityWarningDto"][];
+        };
+        EligibilityStudentOptionDto: {
+            id: string;
+            studentCode: string;
+            fullName: string;
+        };
+        EligibilityStudentPageDto: {
+            items: components["schemas"]["EligibilityStudentOptionDto"][];
+            total: number;
+            page: number;
+            pageSize: number;
+        };
+        GraduationCourseRefDto: {
+            id: string;
+            courseCode: string;
+            courseName: string;
+        };
+        GraduationMandatoryCourseShortfallDto: {
+            curriculumItemId: string;
+            course: components["schemas"]["GraduationCourseRefDto"];
+            blockSymbol: string | null;
+            /** @enum {string} */
+            reason: "NOT_TAKEN" | "FAILED" | "IN_PROGRESS";
+            message: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            code: "MANDATORY_COURSE_MISSING";
+            /** @enum {string} */
+            category: "MANDATORY_COURSE";
+        };
+        GraduationConditionalCourseShortfallDto: {
+            curriculumItemId: string;
+            course: components["schemas"]["GraduationCourseRefDto"];
+            blockSymbol: string | null;
+            /** @enum {string} */
+            reason: "NOT_TAKEN" | "FAILED" | "IN_PROGRESS";
+            message: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            code: "CONDITIONAL_COURSE_MISSING";
+            /** @enum {string} */
+            category: "CONDITIONAL_COURSE";
+        };
+        GraduationElectiveCreditShortfallDto: {
+            /** @enum {string} */
+            category: "ELECTIVE_GROUP";
+            groupId: string;
+            groupCode: string;
+            groupName: string;
+            message: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            code: "ELECTIVE_CREDITS_MISSING";
+            requiredCredits: string;
+            earnedCredits: string;
+            missingCredits: string;
+        };
+        GraduationElectiveCourseShortfallDto: {
+            /** @enum {string} */
+            category: "ELECTIVE_GROUP";
+            groupId: string;
+            groupCode: string;
+            groupName: string;
+            message: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            code: "ELECTIVE_COURSES_MISSING";
+            requiredCourses: number;
+            earnedCourses: number;
+            missingCourses: number;
+        };
+        GraduationTotalCreditShortfallDto: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            code: "TOTAL_CREDITS_MISSING";
+            /** @enum {string} */
+            category: "TOTAL_CREDITS";
+            requiredCredits: string;
+            earnedCredits: string;
+            missingCredits: string;
+            message: string;
+        };
+        GraduationContextDto: {
+            studentId: string;
+            programId: string;
+            semesterId: string;
+            enrollmentId: string;
+            studentCode: string;
+            fullName: string;
+            programCode: string;
+            programName: string;
+            cohortId: string;
+            cohortCode: string;
+            programVersionId: string;
+            versionNumber: string;
+            semesterCode: string;
+            /** Format: date */
+            semesterStartDate: string;
+            /** @enum {string} */
+            versionSource: "COHORT" | "EXCEPTION";
+            cohortAssignmentId: string | null;
+        };
+        GraduationWarningDto: {
+            /** @enum {string} */
+            code: "EQUIVALENT_CREDIT_GAP" | "CURRENT_CATALOG_CREDIT_BASIS" | "UNKNOWN_KNOWLEDGE_BLOCK";
+            curriculumItemId: string | null;
+            courseId: string | null;
+            creditGap: string | null;
+            message: string;
+        };
+        GraduationCreditsDto: {
+            requiredTotal: string;
+            recognizedTotal: string;
+            missingTotal: string;
+            compulsory: string;
+            elective: string;
+            free: string;
+        };
+        GraduationGroupProgressDto: {
+            groupId: string;
+            groupCode: string;
+            groupName: string;
+            requiredCredits: string | null;
+            earnedCredits: string;
+            missingCredits: string | null;
+            requiredCourses: number | null;
+            earnedCourses: number;
+            missingCourses: number | null;
+        };
+        GraduationBlockProgressDto: {
+            blockSymbol: string | null;
+            blockName: string | null;
+            earnedCredits: string;
+            compulsoryCredits: string;
+            electiveCredits: string;
+            catalogRequiredCredits: string | null;
+            advisoryGap: string | null;
+        };
+        GraduationRecognitionDto: {
+            curriculumItemId: string;
+            requiredCourse: components["schemas"]["GraduationCourseRefDto"];
+            studiedCourse: components["schemas"]["GraduationCourseRefDto"];
+            attemptId: string;
+            attemptRevision: number;
+            /** @enum {string} */
+            completionStatus: "PASSED" | "EXEMPT";
+            viaEquivalence: boolean;
+            equivalenceGroupId: string | null;
+            requiredCredits: string;
+            recognizedCredits: string;
+            /** @enum {string} */
+            creditBasis: "APPLIED_VERSION_SNAPSHOT" | "CURRENT_CATALOG";
+            /** @enum {string} */
+            category: "MANDATORY_COURSE" | "ELECTIVE_GROUP" | "CONDITIONAL_COURSE";
+            electiveGroupId: string | null;
+            blockSymbol: string | null;
+        };
+        GraduationFreeCreditDto: {
+            course: components["schemas"]["GraduationCourseRefDto"];
+            attemptId: string;
+            credits: string;
+            /** @enum {string} */
+            creditBasis: "APPLIED_VERSION_SNAPSHOT" | "CURRENT_CATALOG";
+            /** @enum {string} */
+            reason: "SURPLUS_EQUIVALENT" | "OUTSIDE_FRAME";
+        };
+        GraduationResultDto: {
+            /** @enum {number} */
+            schemaVersion: 1;
+            /** @enum {string} */
+            ruleVersion: "graduation-v1";
+            /** Format: date-time */
+            evaluatedAt: string;
+            context: components["schemas"]["GraduationContextDto"];
+            /** @enum {string} */
+            conclusion: "ELIGIBLE" | "NOT_ELIGIBLE";
+            shortfalls: (components["schemas"]["GraduationMandatoryCourseShortfallDto"] | components["schemas"]["GraduationConditionalCourseShortfallDto"] | components["schemas"]["GraduationElectiveCreditShortfallDto"] | components["schemas"]["GraduationElectiveCourseShortfallDto"] | components["schemas"]["GraduationTotalCreditShortfallDto"])[];
+            warnings: components["schemas"]["GraduationWarningDto"][];
+            credits: components["schemas"]["GraduationCreditsDto"];
+            electiveGroups: components["schemas"]["GraduationGroupProgressDto"][];
+            knowledgeBlocks: components["schemas"]["GraduationBlockProgressDto"][];
+            recognitions: components["schemas"]["GraduationRecognitionDto"][];
+            freeCredits: components["schemas"]["GraduationFreeCreditDto"][];
+        };
+        GraduationReviewedOutcomeDto: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            status: "REVIEWED";
+            result: components["schemas"]["GraduationResultDto"];
+            /** @enum {string|null} */
+            error: null;
+        };
+        GraduationDiagnosticDto: {
+            code: string;
+            message: string;
+            enrollmentId: string | null;
+        };
+        GraduationCannotAuditOutcomeDto: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            status: "CANNOT_AUDIT";
+            /** @enum {string|null} */
+            result: null;
+            error: components["schemas"]["GraduationDiagnosticDto"];
+        };
+        GraduationOutcomeDto: {
+            /** @enum {string} */
+            status: "REVIEWED" | "CANNOT_AUDIT";
+            result: components["schemas"]["GraduationResultDto"] | null;
+            error: components["schemas"]["GraduationDiagnosticDto"] | null;
+        };
+        GraduationSaveDto: {
+            programId: string;
+            semesterId: string;
+            requestKey: string;
+        };
+        GraduationAuditorDto: {
+            id: string;
+            fullName: string;
+        };
+        GraduationAuditDto: {
+            id: string;
+            contextId: string;
+            enrollmentId: string;
+            programVersionId: string;
+            /** Format: date-time */
+            auditedAt: string;
+            auditedBy: components["schemas"]["GraduationAuditorDto"] | null;
+            /** @enum {string} */
+            trigger: "STAFF" | "BATCH" | "RESULT_CHANGE";
+            supersedesId: string | null;
+            inputDigest: string;
+            result: components["schemas"]["GraduationResultDto"];
+            /** @enum {string} */
+            freshness: "CURRENT" | "RECHECK_PENDING" | "RECHECK_FAILED";
+        };
+        GraduationAuditPageDto: {
+            items: components["schemas"]["GraduationAuditDto"][];
+            total: number;
+            page: number;
+            pageSize: number;
+        };
+        GraduationProgramOptionDto: {
+            id: string;
+            programCode: string;
+            programName: string;
+        };
+        GraduationStudentOptionDto: {
+            id: string;
+            studentCode: string;
+            fullName: string;
+            enrollmentId: string | null;
+            cohortId: string;
+            cohortCode: string;
+        };
+        GraduationStudentOptionPageDto: {
+            items: components["schemas"]["GraduationStudentOptionDto"][];
+            total: number;
+            page: number;
+            pageSize: number;
+        };
+        GraduationReauditTaskDto: {
+            id: string;
+            contextId: string;
+            /** @enum {string} */
+            status: "PENDING" | "RUNNING" | "COMPLETED" | "COVERED" | "FAILED";
+            attempts: number;
+            completedAuditId: string | null;
+            errorCode: string | null;
+        };
+        GraduationReauditTaskPageDto: {
+            items: components["schemas"]["GraduationReauditTaskDto"][];
+            total: number;
+            page: number;
+            pageSize: number;
+        };
+        GraduationBatchFilterDto: {
+            semesterId: string;
+            programId?: string;
+            cohortId?: string;
+        };
+        GraduationBatchFiltersDto: {
+            semesterId: string;
+            programId: string | null;
+            cohortId: string | null;
+        };
+        GraduationBatchPreviewDto: {
+            filters: components["schemas"]["GraduationBatchFiltersDto"];
+            studentCount: number;
+            enrollmentCount: number;
+            previewRevision: string;
+        };
+        GraduationBatchCreateDto: {
+            semesterId: string;
+            programId?: string;
+            cohortId?: string;
+            previewRevision: string;
+            requestKey: string;
+        };
+        GraduationBatchFailureDto: {
+            code: string;
+            message: string;
+        };
+        GraduationBatchDto: {
+            filters: components["schemas"]["GraduationBatchFiltersDto"];
+            studentCount: number;
+            enrollmentCount: number;
+            previewRevision: string;
+            id: string;
+            requestedById: string;
+            /** @enum {string} */
+            status: "QUEUED" | "RUNNING" | "COMPLETED" | "COMPLETED_WITH_ERRORS" | "FAILED";
+            processedCount: number;
+            eligibleCount: number;
+            notEligibleCount: number;
+            errorCount: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            startedAt: string | null;
+            /** Format: date-time */
+            finishedAt: string | null;
+            failure: components["schemas"]["GraduationBatchFailureDto"] | null;
+        };
+        GraduationBatchPageDto: {
+            items: components["schemas"]["GraduationBatchDto"][];
+            total: number;
+            page: number;
+            pageSize: number;
+        };
+        GraduationBatchItemDto: {
+            id: string;
+            studentId: string;
+            studentCode: string;
+            fullName: string;
+            programId: string;
+            programCode: string;
+            programName: string;
+            semesterId: string;
+            enrollmentId: string | null;
+            /** @enum {string} */
+            status: "PENDING" | "REVIEWED" | "ERROR";
+            auditId: string | null;
+            /** @enum {string|null} */
+            conclusion: "ELIGIBLE" | "NOT_ELIGIBLE" | null;
+            shortfallCount: number | null;
+            error: components["schemas"]["GraduationBatchFailureDto"] | null;
+            /** Format: date-time */
+            finishedAt: string | null;
+        };
+        GraduationBatchItemPageDto: {
+            items: components["schemas"]["GraduationBatchItemDto"][];
             total: number;
             page: number;
             pageSize: number;
@@ -7833,6 +8795,49 @@ export interface operations {
             };
         };
     };
+    ImportsController_credentialStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                batchId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentCredentialStatusDto"];
+                };
+            };
+        };
+    };
+    ImportsController_downloadCredentials: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                batchId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One-time workbook of initial passwords. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+        };
+    };
     CurriculumExportController_export: {
         parameters: {
             query?: never;
@@ -7849,6 +8854,584 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    StudentsController_programOptions: {
+        parameters: {
+            query: {
+                semesterId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentProgramOptionDto"][];
+                };
+            };
+        };
+    };
+    StudentsController_list: {
+        parameters: {
+            query: {
+                page?: number;
+                pageSize?: number;
+                semesterId: string;
+                q?: string;
+                cohortId?: string;
+                programId?: string;
+                status?: components["schemas"]["StudentStatus"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentPageDto"];
+                };
+            };
+        };
+    };
+    StudentsController_detail: {
+        parameters: {
+            query: {
+                semesterId: string;
+                programId?: string;
+            };
+            header?: never;
+            path: {
+                studentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentDetailDto"];
+                };
+            };
+        };
+    };
+    StudentsController_results: {
+        parameters: {
+            query: {
+                page?: number;
+                pageSize?: number;
+                semesterId: string;
+                programId: string;
+                resultSemesterId?: string;
+                courseId?: string;
+            };
+            header?: never;
+            path: {
+                studentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AcademicResultPageDto"];
+                };
+            };
+        };
+    };
+    StudentsController_appliedVersion: {
+        parameters: {
+            query: {
+                semesterId: string;
+                programId: string;
+            };
+            header?: never;
+            path: {
+                studentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentAppliedVersionDto"];
+                };
+            };
+        };
+    };
+    StudentsController_enrollmentTargets: {
+        parameters: {
+            query: {
+                semesterId: string;
+                programId: string;
+            };
+            header?: never;
+            path: {
+                studentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentEnrollmentTargetDto"][];
+                };
+            };
+        };
+    };
+    StudentsController_createEnrollment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                studentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StudentEnrollmentCommandDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentEnrollmentDto"];
+                };
+            };
+        };
+    };
+    StudentsController_reconcile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                studentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReconcileStudentDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentReconciliationDto"];
+                };
+            };
+        };
+    };
+    RegistrationEligibilityController_read: {
+        parameters: {
+            query: {
+                programId: string;
+                semesterId: string;
+            };
+            header?: never;
+            path: {
+                studentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RegistrationEligibilityDto"];
+                };
+            };
+        };
+    };
+    EligibilityStudentsController_list: {
+        parameters: {
+            query: {
+                page?: number;
+                pageSize?: number;
+                semesterId: string;
+                q?: string;
+            };
+            header?: never;
+            path: {
+                programId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EligibilityStudentPageDto"];
+                };
+            };
+        };
+    };
+    GraduationController_live: {
+        parameters: {
+            query: {
+                programId: string;
+                semesterId: string;
+            };
+            header?: never;
+            path: {
+                studentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GraduationReviewedOutcomeDto"] | components["schemas"]["GraduationCannotAuditOutcomeDto"];
+                };
+            };
+        };
+    };
+    GraduationController_history: {
+        parameters: {
+            query: {
+                page?: number;
+                pageSize?: number;
+                programId: string;
+                semesterId: string;
+            };
+            header?: never;
+            path: {
+                studentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GraduationAuditPageDto"];
+                };
+            };
+        };
+    };
+    GraduationController_save: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                studentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GraduationSaveDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GraduationAuditDto"];
+                };
+            };
+        };
+    };
+    GraduationController_audit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                auditId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GraduationAuditDto"];
+                };
+            };
+        };
+    };
+    GraduationController_programs: {
+        parameters: {
+            query: {
+                semesterId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GraduationProgramOptionDto"][];
+                };
+            };
+        };
+    };
+    GraduationController_students: {
+        parameters: {
+            query: {
+                page?: number;
+                pageSize?: number;
+                programId: string;
+                semesterId: string;
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GraduationStudentOptionPageDto"];
+                };
+            };
+        };
+    };
+    GraduationController_tasks: {
+        parameters: {
+            query: {
+                page?: number;
+                pageSize?: number;
+                programId: string;
+                semesterId: string;
+            };
+            header?: never;
+            path: {
+                studentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GraduationReauditTaskPageDto"];
+                };
+            };
+        };
+    };
+    GraduationController_retry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                taskId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GraduationReauditTaskDto"];
+                };
+            };
+        };
+    };
+    GraduationBatchesController_preview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GraduationBatchFilterDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GraduationBatchPreviewDto"];
+                };
+            };
+        };
+    };
+    GraduationBatchesController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GraduationBatchPageDto"];
+                };
+            };
+        };
+    };
+    GraduationBatchesController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GraduationBatchCreateDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GraduationBatchDto"];
+                };
+            };
+        };
+    };
+    GraduationBatchesController_detail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GraduationBatchDto"];
+                };
+            };
+        };
+    };
+    GraduationBatchesController_items: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                conclusion?: "ELIGIBLE" | "NOT_ELIGIBLE";
+                outcome?: "PENDING" | "REVIEWED" | "ERROR";
+                q?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GraduationBatchItemPageDto"];
+                };
+            };
+        };
+    };
+    GraduationBatchesController_export: {
+        parameters: {
+            query?: {
+                conclusion?: "ELIGIBLE" | "NOT_ELIGIBLE";
+                outcome?: "PENDING" | "REVIEWED" | "ERROR";
+                q?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
             };
         };
     };

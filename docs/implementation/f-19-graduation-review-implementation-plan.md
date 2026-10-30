@@ -7,12 +7,12 @@ This plan builds EP-19, US-087..US-091 and CV-215..CV-225: semester-explicit gra
 > - Epic and acceptance: `docs/planning/epics.md:185`, B5 acceptance 7/8/9; `docs/planning/user-stories.md:1066`, US-087..091; `docs/planning/task-breakdown.md:413`, CV-215..225.
 > - Requirements: `docs/requirement/REQUIREMENTS.md:566`, FR-84..87; BR-02/04/09/10; §7.4; EC-14..18/33..37/43; NFR-03/09/11/18/20.
 > - Design: `docs/design/data-dictionary.md:303`, `:329`, `:343`, `:686`, `:702`, `:719`; `docs/design/erd.md` M-8/M-9/E-2/E-11; `docs/design/state-diagrams.md` GD/KQ and §13; `docs/design/sequence-diagrams.md:659`; `docs/design/screen-inventory.md:139`, MH-53/54, with future MH-59.
-> - Read-in-full dependency contracts: `docs/implementation/f-17-student-records-results-import-implementation-plan.md`, especially BE-03/07 and D13/U3; `docs/implementation/f-16-version-compare-cohort-assignment-implementation-plan.md`, BE-04; `docs/implementation/f-12-grade-formula-assessment-clo-implementation-plan.md`, F12-01/T-1. All three are **written, not built** at this planning baseline.
+> - Read-in-full dependency contracts: `docs/implementation/f-17-student-records-results-import-implementation-plan.md`, especially BE-03/07 and D13/U3; `docs/implementation/f-16-version-compare-cohort-assignment-implementation-plan.md`, BE-04; `docs/implementation/f-12-grade-formula-assessment-clo-implementation-plan.md`, F12-01/T-1. F-16/F-17/F-12 cùng F-09/F-18 đã build; gate 2026-10-30 dùng source thực tế tại §2/§8, không dùng giả định baseline.
 > - Conventions/exemplars: `docs/implementation/README.md`; F-15 and F-09 implementation plans; `docs/architecture/general_architecture.md`, `features_architecture.md`, `database_and_models.md`; frontend `src/shared/design-system/DESIGN_SYSTEM.md`.
 > - Built-feature evidence: F-02/05/06/07/08/14/15 implement reports under `docs/implement-report/`; actual source, not old plan assertions, establishes existing behavior.
-> - Acceptance authority: `docs/planning/test-plan.md`, KB-063..067/074..080, NT-B5-07/08; NEW manual supplement `docs/testing/feature__f-19-graduation-review.md` is a future DOC-01 deliverable. `docs/planning/deferred-scope.md` continues to exclude general audit logging and unrelated institutional extensions.
+> - Acceptance authority: `docs/planning/test-plan.md`, KB-063..067/074..080, NT-B5-07/08; manual supplement `docs/testing/feature__f-19-graduation-review.md` đã viết ở DOC-01, chưa chạy manual cases. `docs/planning/deferred-scope.md` continues to exclude general audit logging and unrelated institutional extensions.
 
-**Status**: Not started — planned against permitted source inspected on 2026-10-26, Asia/Bangkok. Dependency contracts require source re-verification when built. The Faculty defaults and accepted historical limitations in §8 are not approved by this document.
+**Status**: In progress — backend đã xanh theo orchestrator (2026-10-30): graduation 19/19, batches 8/8, corrections 10/10, permission-table 185/185, unit 363/363, tsc 0. FE-01..FE-06 đã giao mã/specs; report và manual doc DOC-01 đã viết trong scope cho phép, còn chờ frontend runtime/manual acceptance và architecture sync của orchestrator. U3 đã quyết định Option A; BE-02 migration 20261030050730_graduation_review đã apply/generate bởi orchestrator, schema đóng băng. E1 giữ nguyên, E2/E3 dùng defaults đã duyệt.
 
 ## 0. Plan at a glance
 
@@ -105,7 +105,7 @@ Everything below in one table. Read this; the rest is detail for whoever builds 
 
 ## 2. Contract verification
 
-Completed before designing §5. **VERIFIED** rows cite inspected source as it stands on 2026-10-26. **NEW / UNVERIFIED** rows are explicit future contracts, not alleged implementations. The sensitive trees and dotenv files are not inputs. New paths below have inspected existing parents; their absence is intentional.
+Gate kiểm tra lại ngày 2026-10-30: các dòng F-16/F-17/F-12/F-09/F-18 tại §2/§8 dẫn source thực tế và disposition. NEW / UNVERIFIED chỉ còn dành cho endpoints/DTOs F-19 chưa build, không phải dependency bị thiếu. Không đọc sensitive trees hoặc dotenv.
 
 ### 2a. Consumed endpoints and behavioral boundaries
 
@@ -115,10 +115,10 @@ Completed before designing §5. **VERIFIED** rows cite inspected source as it st
 | GET `/api/cohorts` | `source/backend/src/features/semesters/semesters.controller.ts:44`; service `source/backend/src/features/semesters/semesters.service.ts:39`; mapper `source/backend/src/shared/releases/semester.dto.ts:30` | Session | CohortDto[] | Nonpersonal cohort selector |
 | GET `/api/notifications` | `source/backend/src/features/notifications/notifications.controller.ts:30`; `notifications.service.ts:22`; mapper `source/backend/src/features/notifications/notification.dto.ts:52` | Page/unread filter | Own rows only, createdAt/id descending; no graduation-specific target | Existing UI displays the new content-only notice; no new notification fetch adapter |
 | POST `/api/notifications/:id/read` | `source/backend/src/features/notifications/notifications.controller.ts:54`; `notifications.service.ts:53`; same mapper `notification.dto.ts:52` | Session + CSRF | NotificationDto; idempotent read, other recipient 404 | Existing notification interaction, unchanged |
-| F-17 student/program/semester resolver | **UNVERIFIED:** F-17 BE-03; F-16 BE-04 | `forAccess(access, 'GRADUATION').resolveForStudent({studentId,programId,semesterId}, tx?)` | Exact result with resolved version, interval enrollment, COHORT/EXCEPTION and nullable mapping ID | Hard U1/U2 gate; not an internal HTTP call |
-| F-17 transcript and retake facts | **UNVERIFIED:** F-17 BE-07 | `AcademicResultsReader.forAccess(...).forStudent(lookup, tx?)`; `bestAcademicResults(attempts)` | All student-wide attempts through semester; source statuses and exact supplied scales; highest score4, later-date/ID tie | Hard U1; no grade-formula interpretation |
-| F-17 correction producer | **UNVERIFIED:** F-17 BE-01/07, D13 | `AcademicResultChange`, unique `(academicResultId, revision)` | Durable before/after, revision and recordedAt in source write transaction; no consumer/ack | F-19 owns all receipt, fan-out, re-audit and notification work |
-| F-16 cohort resolution | **UNVERIFIED:** F-16 BE-04 | `forCohort/forCohorts(input, tx?)` | Known-date semester selection, PENDING/HISTORICAL valid, no ACTIVE fallback | Used through F-17; bulk program/semester/cohort grouping |
+| F-17 student/program/semester resolver | **MATCHES:** `source/backend/src/shared/students/student-applied-version.reader.ts:39`, `:49`, `:104`; `student-applied-version.types.ts:8`; `student-access.ts:14` | `forAccess(access, 'GRADUATION').resolveForStudent(lookup, tx?)`; bulk `resolveManyForAccess(access, purpose, inputs, tx?)` | Trả programVersionId, enrollmentId, source, cohortAssignmentId; interval fail-closed, exception ưu tiên, không lọc ACTIVE | U1/U2 đạt; dùng returned versionId, không dùng stored pin |
+| F-17 transcript and retake facts | **MATCHES:** `source/backend/src/shared/students/academic-results.reader.ts:30`, `:84`, `:114`; `best-academic-results.ts:39` | `forAccess(access, 'GRADUATION').forStudent(lookup, tx?)`; `bestAcademicResults(attempts)` | Transcript toàn sinh viên đến học kỳ, scales dạng string/null, letterGrade/revision; best score4 rồi ngày mới hơn/ID nhỏ hơn; flags độc lập | U1 đạt; không suy điểm/grade từ F-12 |
+| F-17 correction producer | **RESOLVED U3 Option A:** `source/backend/prisma/schema.prisma:1157`; `source/backend/src/shared/students/academic-result.writer.ts:41`, `:49`, `:148`, `:183` | Feed unique academicResultId/revision, before/after/recordedAt | Atomic create/update/no-op đúng, nhưng before/after chỉ có score10, score4, letterGrade, status, dataSource; không có studentId/courseId/semesterId | BE-09 đọc identity qua academicResult relation và validate five-field snapshots; đã duyệt, không sửa producer |
+| F-16 cohort resolution | **MATCHES:** `source/backend/src/shared/releases/applied-program-version.reader.ts:17`, `:33`; `cohort-version-schedule.ts:34`, `:100`, `:114` | `forCohort/forCohorts(input, tx?)` | Known dates, issued PENDING/ACTIVE/HISTORICAL, dated COHORT selection; không fallback ACTIVE | U2 đạt; F-17 bulk grouping tại `student-applied-version.reader.ts:162` |
 | Frozen row read primitives | `source/backend/src/shared/curriculum/row-course.ts:4`, `:11`; publication `source/backend/src/shared/releases/version.publisher.ts:110` | CurriculumItem with course | Prefer existing snapshots; publisher fills only null snapshots | New graduation reader is stricter: missing issued snapshot is CANNOT_AUDIT, not live fallback |
 | Curriculum totals are not earned credits | `source/backend/src/shared/curriculum/program-credits.ts:29`, `:40`; `source/backend/src/features/curriculum/curriculum-totals.ts:18`, `:41` | Frame rows/groups | Offered semester/block totals and cheapest-member group requirement, not a student's allocation | Mirror Decimal practice only; do not call these as graduation results |
 | Current equivalence membership | `source/backend/prisma/schema.prisma:253`, `:294`; `source/backend/src/features/equivalence-groups/equivalence-groups.service.ts:23`, `:172` | Course.equivalenceGroupId | School-wide current group; merge moves members; no version membership ledger | Read in the same tx and snapshot used membership in each audit |
@@ -146,6 +146,8 @@ Completed before designing §5. **VERIFIED** rows cite inspected source as it st
 | POST `/graduation-reaudit-tasks/:taskId/retry` | NEW/UNVERIFIED BE-09/11 | no body | GraduationReauditTaskDto | R1-only; idempotent, 200 |
 | GET `/graduation/program-options` | NEW/UNVERIFIED BE-11 | semesterId | GraduationProgramOptionDto[] | Staff minimal scoped selector |
 | GET `/graduation/student-options` | NEW/UNVERIFIED BE-11 | programId, semesterId, q, page/pageSize | GraduationStudentOptionPageDto | Staff minimal scoped selector |
+
+**Bảo mật bộ nhớ đệm (quyết định 2026-10-30):** mọi JSON GET của F-19 trong GraduationController và GraduationBatchesController (live, history, audit detail, selectors, task list, batch list/detail/items) cùng XLSX export phải trả `Cache-Control: no-store, private`, dùng `@Header` như F-18. Các POST trả kết quả xét, task hoặc batch cũng giữ cùng header để không lưu phản hồi chứa dữ liệu sinh viên. Không nới assertion thành `no-store` và không thay shared sendFile hoặc endpoint của feature khác.
 
 ### 2b. Consumed response fields
 
@@ -242,14 +244,14 @@ BE-07 GraduationBatchItemValue, BE-09 GraduationReauditTaskDto and BE-11 selecto
 
 | Deliverable | Earlier/design expectation | Actual source and disposition | Found at |
 |---|---|---|---|
-| BE-02/03 | Graduation/Student models already available | Neither is built; F-17/F-16 are hard contract gates, not present modules | `source/backend/prisma/schema.prisma:403`, `:428`, `:537`; `source/backend/src/app.module.ts:38` |
-| BE-04 | Dictionary calls the frame FK programVersion | Actual column is `versionId`; groups also use versionId | `source/backend/prisma/schema.prisma:550`, `:567` |
+| BE-02/03 | Graduation/Student models đã có | **MISMATCH, đã sửa plan:** Student/enrollment/result/feed đã build; chỉ graduation là mới | `source/backend/prisma/schema.prisma:1073`, `:1099`, `:1135`, `:1157`; `source/backend/src/shared/students/students-shared.module.ts:10` |
+| BE-04 | Dictionary calls the frame FK programVersion | **MATCHES:** cột thực tế là versionId ở curriculum item và elective group | `source/backend/prisma/schema.prisma:642`, `:625` |
 | BE-04/05 | Existing credit totals can be reused for earned credit | They sum offered rows or group minima; there is no completion/allocation logic | `source/backend/src/shared/curriculum/program-credits.ts:29`; `source/backend/src/features/curriculum/curriculum-totals.ts:18` |
-| BE-04 | All course facts are frozen | Name/credits are frozen; equivalence and courseType remain catalog facts, and F-17's proposed attempt has no earned-credit snapshot | `source/backend/prisma/schema.prisma:247`, `:253`, `:583`; F-17 BE-01; E2 |
-| BE-03/09 | A worker can call the session-only student facade | Proposed F-17 reader binds AccessContext and forbids fabricated identity; specify a restricted task-backed capability, U1 extension | F-17 BE-03/07, UNVERIFIED |
-| BE-09 | A timestamp cursor reliably consumes changes | The F-17 feed has timestamps/revisions, not a commit-order sequence/ack; use absence of F-19 receipts | F-17 BE-01/07, UNVERIFIED |
+| BE-04 | All course facts are frozen | **MATCHES giới hạn:** name/credits snapshot; equivalence/courseType vẫn catalog, attempt không có earned-credit snapshot; giữ E2 default | `source/backend/prisma/schema.prisma:269`, `:275`, `:659`, `:1135` |
+| BE-03/09 | A worker can call the session-only student facade | **ADDITIVE đã triển khai:** actor facade giữ nguyên; task facade restricted dùng cùng private core, không giả identity | `source/backend/src/shared/students/student-applied-version.reader.ts:94`; `source/backend/src/shared/students/academic-results.reader.ts:98`; helper `source/backend/src/shared/students/student-access.ts:18`; U4 bên dưới |
+| BE-09 | A timestamp cursor reliably consumes changes | **RESOLVED U3 Option A:** receipt theo changeId thay timestamp cursor; identity lấy từ academicResult relation bất biến, before/after validate đúng năm field của producer | `source/backend/prisma/schema.prisma:1157`; `source/backend/src/shared/students/academic-result.writer.ts:41`, `:49`, `:148`, `:183`; quyết định 2026-10-30, không sửa producer |
 | BE-10 | Shared notifier supports anonymous system event | Its actorId is required and actor suppression is unconditional; keep old signature/callers | `source/backend/src/shared/notifications/notification.service.ts:7`, `:23` |
-| BE-03/04 | Historical cohort mappings/calendar are immutable | Correction retargets mappings at old start; calendar protection covers only ACTIVE/HISTORICAL release starts | `source/backend/src/features/releases/corrections.service.ts:143`; `source/backend/src/features/semesters/semesters.service.ts:87`; E1 |
+| BE-03/04 | Historical cohort mappings/calendar are immutable | **MATCHES giới hạn E1:** correction retargets lịch cũ; calendar vẫn hiện hành, có guard from/until enrollment nhưng không immutable history; giữ quyết định E1 | `source/backend/src/features/releases/corrections.service.ts:144`; `source/backend/src/features/semesters/semesters.service.ts:88`; `source/backend/src/shared/students/enrollment-period.ts:9` |
 | FE-04 | Shared CohortSelect can bind one cohortId | It is a multiple-value selector; use a local single Select from the existing cohort hook without changing old callers | `source/frontend/src/shared/releases/CohortSelect.tsx:14`; `source/frontend/src/shared/releases/useReleaseOptions.ts:12` |
 
 ## 3. Decisions
@@ -266,7 +268,7 @@ BE-07 GraduationBatchItemValue, BE-09 GraduationReauditTaskDto and BE-11 selecto
 | D8 | Database roster/progress/receipts are authoritative; BullMQ schedules and retries only | Redis loss/duplicates must not lose decisions or create duplicates | Redis-only batch results or dedup relying only on job IDs |
 | D9 | Freeze roster at confirmation; each enrollment evaluated transactionally against then-current inputs | Bounded work and explicit reproducibility; no 500-student transaction | Live roster drift or unsupported global-snapshot claim |
 | D10 | Re-audit previously audited contexts, including historical/transferred and dual-major contexts | F-17 U3/EC-43; not merely the current PRIMARY enrollment | One student-wide latest result or ACTIVE-only lookup |
-| D11 | Add a task-backed system capability to the unbuilt F-17 boundary, preserving existing methods | Background work has no interactive actor; authorization remains explicit | Fake R1, captured revoked reviewer or duplicated resolution logic |
+| D11 | Add a task-backed system capability to the built F-17 boundary, preserving existing methods | Background work has no interactive actor; authorization remains explicit | Fake R1, captured revoked reviewer or duplicated resolution logic |
 | D12 | F-19 writes automatic notices in the same transaction as new audit and completed target | Exactly-once durable effect; notification cannot outlive a rolled-back audit | Queue-only notices, changing shared notifier signature or fake actor IDs |
 | D13 | Excel exports saved batch item outcomes, including errors; no recalculation or mark formulas | Export must agree with reviewed decisions; F19-04 A | Rerunning audits on download or requiring the F-09 importer |
 | D14 | Stop ambiguous institutional slices with CANNOT_AUDIT and §8 escalation | No unattended business-policy invention | Greedy allocations, fabricated historical credits or treating exemptions as numeric marks |
@@ -288,7 +290,7 @@ BE-07 GraduationBatchItemValue, BE-09 GraduationReauditTaskDto and BE-11 selecto
 
 ## 5. Deliverables
 
-All files and code in this section are **to build**. MODIFY paths inside F-17 are **UNBUILT DEPENDENCY paths**, not claims that the file exists now. Existing parents inspected: backend `src/features`, `src/shared`, `prisma/migrations`, `test/fixtures`; frontend `src/features`, `src/shared`; `docs/testing` and `docs/implement-report`. A NEW nested directory is created with its first step. No source or existing documentation is edited by this planning run.
+§5 là backlog đã duyệt. Gate 2026-10-30 xác nhận MODIFY paths của F-17 đã tồn tại; BE-01 đã giao vocabulary/spec và BE-02 mới giao schema, chưa migration/codegen. Các deliverable còn lại vẫn chưa build trong lượt này.
 
 ### BE-01 — Stable evaluation vocabulary, shortfalls and diagnostics
 
@@ -339,9 +341,10 @@ export interface GraduationContextValue extends GraduationLookup {
   semesterCode: string; semesterStartDate: string;
   versionSource: 'COHORT' | 'EXCEPTION'; cohortAssignmentId: string | null;
 }
-export interface CourseShortfall {
-  code: 'MANDATORY_COURSE_MISSING' | 'CONDITIONAL_COURSE_MISSING';
-  category: 'MANDATORY_COURSE' | 'CONDITIONAL_COURSE';
+export type CourseShortfall = (
+  | { code: 'MANDATORY_COURSE_MISSING'; category: 'MANDATORY_COURSE' }
+  | { code: 'CONDITIONAL_COURSE_MISSING'; category: 'CONDITIONAL_COURSE' }
+) & {
   curriculumItemId: string; course: GraduationCourseRef;
   blockSymbol: string | null; reason: CompletionReason; message: string;
 }
@@ -481,8 +484,8 @@ model GraduationAuditContext {
   semesterId    String
   semester      Semester @relation(fields: [semesterId], references: [id], onDelete: Restrict)
   lastAuditId   String?  @unique
-  lastAudit     GraduationAudit? @relation(GraduationContextHead, fields: [lastAuditId], references: [id], onDelete: Restrict)
-  audits        GraduationAudit[] @relation(GraduationContextAudits)
+  lastAudit     GraduationAudit? @relation("GraduationContextHead", fields: [lastAuditId], references: [id], onDelete: Restrict)
+  audits        GraduationAudit[] @relation("GraduationContextAudits")
   reauditTasks  GraduationReauditTask[]
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -494,15 +497,15 @@ model GraduationAuditContext {
 model GraduationAudit {
   id               String   @id @default(cuid(2))
   contextId        String
-  context          GraduationAuditContext @relation(GraduationContextAudits, fields: [contextId], references: [id], onDelete: Restrict)
-  currentFor       GraduationAuditContext? @relation(GraduationContextHead)
+  context          GraduationAuditContext @relation("GraduationContextAudits", fields: [contextId], references: [id], onDelete: Restrict)
+  currentFor       GraduationAuditContext? @relation("GraduationContextHead")
   enrollmentId     String
   enrollment       ProgramEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
   programVersionId String
   programVersion   ProgramVersion @relation(fields: [programVersionId], references: [id], onDelete: Restrict)
   auditedAt        DateTime @default(now())
   auditedById      String?
-  auditedBy        User? @relation(GraduationReviewer, fields: [auditedById], references: [id], onDelete: Restrict)
+  auditedBy        User? @relation("GraduationReviewer", fields: [auditedById], references: [id], onDelete: Restrict)
   trigger          GraduationAuditTrigger
   operationKey     String @unique
   conclusion       GraduationConclusion
@@ -513,11 +516,11 @@ model GraduationAudit {
   inputs           Json
   inputDigest      String
   supersedesId     String? @unique
-  supersedes       GraduationAudit? @relation(GraduationAuditChain, fields: [supersedesId], references: [id], onDelete: Restrict)
-  supersededBy     GraduationAudit? @relation(GraduationAuditChain)
+  supersedes       GraduationAudit? @relation("GraduationAuditChain", fields: [supersedesId], references: [id], onDelete: Restrict)
+  supersededBy     GraduationAudit? @relation("GraduationAuditChain")
   batchItem        GraduationBatchItem?
-  baselineTasks    GraduationReauditTask[] @relation(GraduationTaskBaseline)
-  completedTasks   GraduationReauditTask[] @relation(GraduationTaskResult)
+  baselineTasks    GraduationReauditTask[] @relation("GraduationTaskBaseline")
+  completedTasks   GraduationReauditTask[] @relation("GraduationTaskResult")
 
   @@index([contextId, auditedAt, id])
   @@index([enrollmentId, auditedAt])
@@ -526,7 +529,7 @@ model GraduationAudit {
 model GraduationBatch {
   id              String @id @default(cuid(2))
   requestedById   String
-  requestedBy     User @relation(GraduationBatchRequester, fields: [requestedById], references: [id], onDelete: Restrict)
+  requestedBy     User @relation("GraduationBatchRequester", fields: [requestedById], references: [id], onDelete: Restrict)
   requestKey      String
   filters         Json
   previewRevision String
@@ -586,9 +589,9 @@ model GraduationReauditTask {
   contextId        String
   context          GraduationAuditContext @relation(fields: [contextId], references: [id], onDelete: Restrict)
   baselineAuditId  String
-  baselineAudit    GraduationAudit @relation(GraduationTaskBaseline, fields: [baselineAuditId], references: [id], onDelete: Restrict)
+  baselineAudit    GraduationAudit @relation("GraduationTaskBaseline", fields: [baselineAuditId], references: [id], onDelete: Restrict)
   completedAuditId String?
-  completedAudit   GraduationAudit? @relation(GraduationTaskResult, fields: [completedAuditId], references: [id], onDelete: Restrict)
+  completedAudit   GraduationAudit? @relation("GraduationTaskResult", fields: [completedAuditId], references: [id], onDelete: Restrict)
   status           GraduationReauditStatus @default(PENDING)
   attempts         Int @default(0)
   leaseToken       String?
@@ -629,8 +632,9 @@ Use a new timestamp later than the actual dependency migrations, not an old rese
 | NEW | `source/backend/src/shared/graduation/graduation-access.ts` | Permission target checks like `source/backend/src/shared/authz/access-context.ts:75` |
 | NEW | `source/backend/src/shared/graduation/graduation-capability.ts` | Narrow domain contracts like `source/backend/src/shared/releases/semester-start.ts:8` |
 | NEW | `source/backend/src/shared/graduation/graduation-access.spec.ts` | Pure authorization tests mirroring `source/backend/src/shared/decimal/decimal.spec.ts:1` layout |
-| MODIFY (unbuilt dependency) | `source/backend/src/shared/students/student-applied-version.reader.ts` | Add restricted task facade to F-17 BE-03; retain original methods |
-| MODIFY (unbuilt dependency) | `source/backend/src/shared/students/academic-results.reader.ts` | Add matching task facade to F-17 BE-07, same underlying transcript selection |
+| MODIFY (built dependency; additive integration) | `source/backend/src/shared/students/student-applied-version.reader.ts` | Add restricted task facade to F-17 BE-03; retain original methods |
+| MODIFY (built dependency; additive integration) | `source/backend/src/shared/students/academic-results.reader.ts` | Add matching task facade to F-17 BE-07, same underlying transcript selection |
+| MODIFY (built dependency; additive integration) | `source/backend/src/shared/students/student-access.ts` | Thêm requireGraduationReauditLookup dùng chung cho hai task factories; không đổi actor authorization |
 | NEW | `source/backend/src/shared/graduation/graduation-capability.spec.ts` | Same synthetic transaction approach as `source/backend/src/shared/releases/version.publisher.spec.ts:1` |
 
 **Shape — additive signatures to build**
@@ -653,17 +657,23 @@ export function assertGraduationWrite(
 
 // Add these methods to the corresponding F-17 classes, not unrestricted overloads.
 // StudentAppliedVersionReader:
-forReauditTask(taskId: string, tx: Prisma.TransactionClient): Promise<{
+forReauditTask(taskId: string, leaseToken: string, tx: Prisma.TransactionClient): Promise<{
   lookup: StudentAppliedVersionLookup;
   resolveForStudent(): Promise<StudentAppliedVersionResult>;
 }>;
 // AcademicResultsReader:
-forReauditTask(taskId: string, tx: Prisma.TransactionClient): Promise<{
+forReauditTask(taskId: string, leaseToken: string, tx: Prisma.TransactionClient): Promise<{
   forStudent(): Promise<AcademicAttemptFact[]>;
 }>;
 ```
 
 These fragments pin method declarations, not standalone executable statements. Both task factories verify the durable task, its receipt/change, context and baseline audit refer to the same student/context in the supplied tx, are processable under its lease, and expose **only that context**. They share F-17's private resolution/attempt implementation; they cannot accept a second lookup or override the target. The capability never leaves internal DI; no controller accepts taskId as authority. Student readers may query the new task tables through Prisma; shared code must not import `features/graduation/*`, avoiding a StudentsSharedModule/GraduationModule cycle. U4 is an explicit additive integration contract, not a claim F-17 already promises system reads.
+
+**U4 — thiết kế chốt theo source 2026-10-30 (chỉ triển khai từ BE-03):**
+- `shared/students/student-access.ts`: thêm `requireGraduationReauditLookup(taskId: string, leaseToken: string, tx: Prisma.TransactionClient): Promise<StudentAppliedVersionLookup>`. Caller đã khóa Program → Student → context trước khi factory khóa/recheck task. Helper đối chiếu RUNNING, leaseToken chính xác, leaseUntil chưa hết, receipt/change/result.studentId, baselineAudit.contextId và context student/program/semester; không nhận lookup do caller tự chọn. Không cho task ID đơn lẻ làm authority; không dùng actorId hoặc R1 giả.
+- `student-applied-version.reader.ts:62`: giữ nguyên `resolve(db, access, purpose, inputs)` và public facades; tách phần đọc interval/exception/cohort thành `private resolveAuthorized(db: Prisma.TransactionClient, inputs: StudentAppliedVersionLookup[]): Promise<StudentAppliedVersionResult[]>`. Actor path vẫn kiểm student identity/`assertStudentProgramRead` rồi gọi core; task path kiểm helper rồi gọi core với đúng một lookup. Không sao chép F-16 logic hoặc đổi error/status semantics.
+- `academic-results.reader.ts:84`: giữ `read`/`authorizeRead`; tách phần select/filter/map/sort transcript thành `private readAuthorized(db: Prisma.TransactionClient, input: StudentAppliedVersionLookup, semester: StartedSemester): Promise<AcademicAttemptFact[]>`. Actor path vẫn authorizeRead rồi core; task path kiểm helper, requireSemesterStart cùng tx rồi core. Không giới hạn transcript theo frame/program và không bỏ cutoff/error ngày thiếu.
+- Hai `forReauditTask(taskId, leaseToken, tx)` chỉ đóng lookup trong closure; không chấp nhận target thứ hai hoặc transaction thay thế. `graduation-capability.ts` truyền token của worker đã claim; không đổi controller/DTO hoặc API hiện hữu. Các tên private là decomposition nội bộ; toàn bộ `shared/students` giữ nguyên trong lượt BE-01/02 này.
 
 Staff read uses GRADUATION_VIEW; writes require GRADUATION_AUDIT in DIRECT mode for the resolved program/student. Reuse F-17's GRADUATION purpose identity predicate, not `has(permission)` alone: a student-bound grant cannot be widened by an OR-ed program target. R1 is system-wide; R3 is restricted to its supervised programs. Owning R6 can use the read-only shared boundary and live endpoint, never history of staff identities, roster, batch, export, retry or save. R2/R4/R5 cannot obtain personal graduation results merely through general curriculum access. Out-of-scope IDs are 404; missing permission is 403. Do not grant new permissions or change seed roles.
 
@@ -812,6 +822,8 @@ Fixture `requiredTotal=120, other recognized=118, required A=3, passed equivalen
 | GET `students/:studentId/graduation-audits` | programId, semesterId required; PageQueryDto | 200 GraduationAuditPageDto; scoped staff GRADUATION_VIEW; exact context only |
 | GET `graduation-audits/:auditId` | none | 200 GraduationAuditDto; scoped staff GRADUATION_VIEW; 404 foreign/missing |
 
+Live GET giữ interval học chương trình dạng nửa mở `[fromSemester, untilSemester)`. Enrollment `TRANSFERRED`/`ENDED` vẫn đọc/lưu được cho học kỳ nằm trong interval; không lọc theo trạng thái hiện tại. Đúng học kỳ `untilSemester` không còn thuộc chương trình cũ: lookup chương trình cũ trả 404 theo scope-filtered identity predicate của F-17, không phải 200 CANNOT_AUDIT và không tự fallback sang chương trình mới. Lookup chương trình mới tại học kỳ chuyển tiếp được xử lý độc lập.
+
 ```ts
 export class GraduationLookupQueryDto {
   @ApiProperty() @IsString() @IsNotEmpty() programId!: string;
@@ -863,6 +875,10 @@ Save: in a Serializable tx, lock the named Program, then Student, then upsert/lo
 Freshness is operational metadata, not an academic conclusion or guarantee that all external data are current. Compare stored input attempt IDs/revisions to relevant source facts through the context semester, including newly inserted attempts; combine this with pending/failed task state. Any relevant source revision not represented means RECHECK_PENDING, or RECHECK_FAILED when its target exhausted retries. Thus a change committed before the next scanner run cannot masquerade as CURRENT. A saved historical row remains readable even when superseded; freshness describes whether that specific row matches relevant current result facts. Version/equivalence administrative changes are reevaluated on a new explicit review/live read; US-091 does not promise automatic listeners for every catalog mutation.
 
 **Rationale:** Existing mapping returns direct DTOs, not invented envelopes (`source/backend/src/features/notifications/notification.dto.ts:52`). Context locking plus unique operationKey/chain constraints makes one append and head update replayable; the source enrollment's materialized version pin is deliberately not authoritative.
+
+Retry transaction nhận cả ORM `P2034` và raw-query `P2010` mang SQLSTATE `40001`/`40P01` (kể cả metadata driver-adapter Prisma 7), cùng giới hạn TRANSACTION_RETRIES; không retry unique/FK/CHECK, auth hoặc domain errors. Scanner/processor log error name, mã Prisma/SQLSTATE và message an toàn; không log raw Prisma invocation, SQL parameters, driver body hay dữ liệu sinh viên. Log cũ thiếu cause không đủ chứng minh SQLSTATE nào đã xảy ra; orchestrator phải xác nhận bằng lượt e2e mới.
+
+Scanner và runner re-audit áp dụng tối đa `TRANSACTION_RETRIES=3` lần retry sau lần thử đầu cho conflict `40001`/`40P01` hoặc ORM `P2034`, gồm claim/select/recovery và driver error chưa được Prisma bọc nhưng có SQLSTATE cấu trúc hợp lệ. Hết giới hạn thì log WARN `GRADUATION_JOB_DEFERRED`, không ném failed job: receipt/targets/audit/head/notices trong transaction đã rollback; feed chưa có receipt hoặc task chưa hoàn tất sẽ được repeat/recovery thử lại. Các lỗi thật vẫn log ERROR, không biến thành conflict theo nội dung message. Scanner log thêm phase SELECT/CONSUME/ENQUEUE; plain Error không rõ loại có mã an toàn `UNCLASSIFIED_EXECUTION`, không log body. Error tổng hợp trong e2e rollback trước receipt commit là lỗi thật được cố tình inject, không phải bằng chứng của SQLSTATE hoặc lỗi production chưa phân loại.
 
 **Gotchas:** Never update Student.status, ProgramEnrollment or AcademicResult from graduation code. A failed append rolls back context/head creation. Do not overwrite a historical result when current equivalence changes. Do not use raw stored JSON as a DTO: decode version one and validate all invariants before mapping; unknown schema versions fail explicitly.
 
@@ -1067,18 +1083,18 @@ NEW POST `/api/graduation-reaudit-tasks/:taskId/retry` returns 200 GraduationRea
 **Scanner algorithm (durable receipt, not timestamp acknowledgment):**
 
 1. Select at most BATCH_CHUNK_SIZE F-17 AcademicResultChange rows with **no GraduationResultChangeReceipt**, ordered recordedAt/id for fairness. There is **no advancing timestamp/ID cursor**: an older recordedAt can commit later. Process each event in a Serializable transaction with named retry limits; lock its feed row using parameterized `FOR UPDATE SKIP LOCKED`, skip if already claimed, then recheck receipt. Receipt PK remains the uniqueness backstop. Reading/locking is not mutating feed contents.
-2. For each change derive student and changed semester(s) from validated before/after; source attempt identity/student/course/semester must obey U3. Load all previously saved GraduationAuditContext rows of that student with requested semester date >= changed-result semester date, regardless of current enrollment status, program, cohort, auditedBy validity or current Student.status. This includes both dual-major programs and historical/TRANSFERRED/ENDED contexts. Unknown chronology is an explicit failed scan diagnostic/retry, not a receipt pretending zero targets.
+2. **U3 Option A — đã duyệt 2026-10-30:** derive studentId/courseId/semesterId qua `AcademicResultChange.academicResult`; identity bất biến qua writer hiện hữu, không có delete path và FK Restrict. Validate before/after theo đúng năm field score10/score4/letterGrade/status/dataSource; create có before null. Không thay producer hoặc backfill. Load mọi saved context của student có semester.startDate >= changed result semester.startDate, không lọc status/program/reviewer; ngày thiếu là diagnostic/retry, không receipt zero-target.
 3. Lock all involved Program IDs in sorted order, Student, then contexts in stable order. Requery context heads after locks. Staff-save source paths use the same Student lock; a newly created context after this receipt is safe because its first audit reads the already committed corrected source facts. No ACTIVE-only optimization or “changed course is not in frame” exclusion: a new equivalence/free-credit attempt may still matter.
 4. Insert receipt and all `(changeId,contextId)` tasks atomically, with baselineAuditId=head observed under lock. A zero-target change gets targetCount=0/reason=`NO_PREVIOUS_AUDIT`; replay is a no-op. Never create receipt without all required targets, and never use createMany skipDuplicates to conceal an incomplete fan-out. Store targetCount for diagnostics; do not delete/prune F-17 feed rows.
 5. After commit enqueue ID-only task jobs. Recovery scans PENDING and expired RUNNING tasks as well as feed rows without receipts. Crash after receipt/before enqueue is safe. A receipt is acknowledgment of **durable target creation**, not proof the re-audits completed.
 
 **Runner algorithm (one context transaction):**
 
-1. Claim task with lease/attempt count; establish sorted Program → Student → context lock order, then recheck task/lease token. Obtain both BE-03 restricted task facades inside the supplied tx. No fake session/R1, no using original reviewer's access, no copy of F-16 version selection.
+1. Claim task bằng lease/token, chưa tăng attempts; khóa theo thứ tự Program → Student → context rồi recheck task/lease token. Lấy cả hai restricted task facades trong supplied tx. Không tạo session/R1 giả, không dùng quyền reviewer cũ, không sao chép F-16 version selection. Attempts chỉ tăng khi COMPLETED/COVERED commit cùng audit hoặc khi ghi nhận lỗi không phải conflict sau rollback; claim, transaction bị rollback vì conflict và lease bị mất không tiêu budget. Conflict hết retry trả task về PENDING bằng update có token fence; nếu chính update này vẫn conflict sau giới hạn, giữ RUNNING với budget chưa tiêu để phục hồi khi lease hết hạn. Không sửa lease đã thuộc worker kế tiếp. Process crash trước khi ghi nhận outcome cũng để lại lease chưa tiêu budget; recovery tiếp tục, còn lỗi thực được ghi nhận vẫn giới hạn JOB_ATTEMPTS.
 2. Read the current context head and fresh input. If its snapshot already contains the changed result ID at an equal/newer revision (and all currently relevant attempts/revisions match), mark task COVERED with completedAuditId=current head; append no duplicate audit and notify nobody. A later correction may cover several older feed events; preserve every receipt/task linkage. Current-head coverage is checked from academic input facts, not event timestamp order.
 3. Otherwise evaluate **current committed source facts**, not event.after patched onto stale input. Append RESULT_CHANGE audit with operationKey hash of `RESULT_CHANGE + taskId`, actor null and supersedesId=immediately previous head. Store the new version/input snapshot, advance head and mark task COMPLETED/completedAuditId in the same tx. Even if conclusion is unchanged, changed input produces a new saved audit as US-091 AC1 requires.
 4. Compare prior head conclusion and new conclusion. Call BE-10 only on actual ELIGIBLE ↔ NOT_ELIGIBLE transition, in this very tx. Commit audit/head/task/notices as one unit; duplicate delivery sees completed task/operationKey and cannot resend. Compare the actual immediately previous head, not baselineAuditId if other reviews have intervened.
-5. Failed evaluation leaves old head immutable, marks task FAILED/errorCode after tx rollback, and exposes RECHECK_FAILED. No false new NOT_ELIGIBLE/ELIGIBLE, and no “conclusion changed” notice on an operational error. Infrastructure transient failure retries according to JOB_ATTEMPTS/leases, then persists FAILED; the R1 retry endpoint is the explicit repair mechanism.
+5. Failed evaluation leaves old head immutable, marks task FAILED/errorCode after tx rollback, and exposes RECHECK_FAILED. No false new NOT_ELIGIBLE/ELIGIBLE, and no “conclusion changed” notice on an operational error. Lỗi hạ tầng không phải expected transaction conflict dùng JOB_ATTEMPTS/leases rồi FAILED; endpoint retry R1 là cơ chế sửa chữa chủ động. Conflict được defer theo chính sách WARN ở trên, không ghi FAILED/errorCode hoặc phát notice.
 
 Source revision can change while Redis is unavailable: freshness still detects it before scanning, and scanner/recovery catches up when execution resumes. If writer lock cooperation is unavailable, Serializable retries plus another durable event preserve eventual convergence, but no claim of instantaneous consistency is made; U3 must be reverified. Relevant source result creates count as changes, not just updates. Changes after a context semester do not re-audit that context. Catalog/equivalence-only edits are not invented result events; explicit review/live read uses current equivalence per F19-02.
 
@@ -1125,7 +1141,7 @@ Notification writer runs only from BE-09's fenced append transaction. Query Role
 
 Content snapshot: `Kết luận tốt nghiệp của sinh viên {studentCode} — {fullName}, chương trình {programCode}, học kỳ {semesterCode} đã đổi từ “{oldLabel}” sang “{newLabel}”.` Labels are `Đủ điều kiện` / `Chưa đủ điều kiện`. Include program/semester to distinguish independent contexts. No grade details or unescaped HTML. Existing content-only notification interaction already supports null request links (`source/frontend/src/shared/notifications/NotificationItem.tsx:28`); do not fabricate a ChangeRequest or alter shared request-navigation semantics.
 
-NEW GET `/api/graduation-batches/:batchId/export` takes the same q/conclusion/outcome filters as items, without page/pageSize, and returns XLSX with Content-Type `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` and filename `xet-tot-nghiep-{batchId}.xlsx`. Require own batch/current staff audit access and terminal COMPLETED/COMPLETED_WITH_ERRORS; otherwise 409. FAILED batches remain inspectable in UI, but partial export is not presented as a completed review. Revalidate access on download; revoked creator cannot retain access through a guessed ID. Use `sendFile(res, body, fileName, mime)` unchanged and `Cache-Control: no-store` for private downloads.
+NEW GET `/api/graduation-batches/:batchId/export` takes the same q/conclusion/outcome filters as items, without page/pageSize, and returns XLSX with Content-Type `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` and filename `xet-tot-nghiep-{batchId}.xlsx`. Require own batch/current staff audit access and terminal COMPLETED/COMPLETED_WITH_ERRORS; otherwise 409. FAILED batches remain inspectable in UI, but partial export is not presented as a completed review. Revalidate access on download; revoked creator cannot retain access through a guessed ID. Use `sendFile(res, body, fileName, mime)` unchanged and `Cache-Control: no-store, private` for private downloads.
 
 Workbook sheets (Vietnamese headings, frozen header, no executable formulas):
 
@@ -1137,7 +1153,7 @@ Workbook sheets (Vietnamese headings, frozen header, no executable formulas):
 
 Null/not-applicable cells are blank, not false zeroes; ERROR rows say `Không xét được`, no academic conclusion. The summary column joins saved shortfall messages with line breaks; eligible rows say “Không còn thiếu hạng mục nào”. Decimal values export as exact text (not floating arithmetic), student codes text preserving leading zeros. Neutralize leading formula triggers in untrusted text or use an explicit safe text-cell function; never create formula objects from names/messages. Read saved item.auditId/decoded result only; later corrections cannot rewrite an old batch export. Include schema/rule metadata and errors, no raw transcript/feed. Filters/order match SQL result list, with bounded pagination while collecting rows.
 
-ExcelJS is **approved by the existing stack specification** (`docs/design/tech-stack.md:44`), absent from the inspected dependencies (`source/backend/package.json:35`). If absent when building, run backend `pnpm add exceljs` as the F-09 plan prescribes and retain the resolved version in pnpm-lock.yaml. Use the CJS-compatible default import `import ExcelJS from 'exceljs'`, never unverified named imports. If F-09 has landed, reuse its installed version/public safe-text helper after inspection; otherwise export is self-contained. No other new runtime dependency, ImportBatch state/file coupling or generic export platform.
+ExcelJS ^4.4.0 đã cài (`source/backend/package.json:50`). F-09 dùng default import và literal string cells tại `source/backend/src/features/imports/sheets/sheet-writer.ts:1`, `:28`; không có public safe-text helper. BE-10 tái dùng package/cách ghi string, không import code feature/imports, không cài package hoặc đổi lockfile; exporter/spec F-19 tự bảo vệ formula-injection theo literal XLSX text. Không có runtime dependency mới hoặc coupling ImportBatch.
 
 **Rationale:** Existing notifier's actorId and actor suppression are mandatory (`source/backend/src/shared/notifications/notification.service.ts:7`, `:23`), while the exported R1 predicate already defines active recipients (`source/backend/src/shared/change-requests/academic-office.ts:11`). RFC5987 filenames are already handled (`source/backend/src/shared/files/send-file.ts:16`).
 
@@ -1216,7 +1232,7 @@ NEW safe graduation selectors, rather than assuming that `student.viewProgress` 
 | GET `/api/graduation/program-options` | semesterId | GraduationProgramOptionDto[]: id:string, programCode:string, programName:string. Scoped staff view/audit only; active directed R3 programs, R1 eligible programs; no version inference |
 | GET `/api/graduation/student-options` | programId, semesterId; optional q/page/pageSize | GraduationStudentOptionPageDto with items/total/page/pageSize. Each item: id:string, studentCode:string, fullName:string, enrollmentId:string\|null, cohortId:string, cohortCode:string. Interval covers semester; ambiguous enrollmentId null disables selection with explicit diagnostic |
 
-Both return labels/IDs only, never grades, account IDs or other-program enrollments. For ambiguity in admission cohort as well as enrollment, return a 409 diagnostic rather than choose one cohort for the declared non-null fields. Use parameterized q capped at SEARCH_MAX. Authorization/data filtering precedes page/count; own R6 is rejected from both staff selectors. Shared semesters/cohorts are the verified nonpersonal existing endpoints in §2a. No need to consume/map the larger unbuilt F-17 student/profile/program-option DTOs on these screens.
+Both return labels/IDs only, never grades, account IDs or other-program enrollments. For ambiguity in admission cohort as well as enrollment, return a 409 diagnostic rather than choose one cohort for the declared non-null fields. Use parameterized q capped at SEARCH_MAX. Authorization/data filtering precedes page/count; own R6 is rejected from both staff selectors. Shared semesters/cohorts are the verified nonpersonal existing endpoints in §2a. No need to consume/map the larger built F-17 student/profile/program-option DTOs on these screens.
 
 One shared GraduationEvaluator provider resolves/evaluates without persistence for F-20/F-21; those consumers supply an independently authorized capability, not bypass student ownership. AuditWriter is used only for explicit staff/batch/system persistence. StudentsSharedModule exports its amended readers without importing GraduationModule; no `shared/*` imports `features/*`. Inject existing global Prisma/Authz modules according to their actual module exports; do not register extra Prisma clients or duplicate the global queue configuration.
 
@@ -1290,6 +1306,10 @@ Benchmark an opt-in 500-student synthetic cohort using realistic multisemester a
 
 ### FE-01 — Generate the API contract before writing adapters
 
+**Đối chiếu frontend 2026-10-30:** orchestrator đã generate `schema.d.ts`; lượt frontend không generate/sửa file này. Live response dùng union từ `operations['GraduationController_live']['responses'][200]['content']['application/json']`, vì component GraduationOutcomeDto là base nullable rộng, còn endpoint thực có oneOf/discriminator REVIEWED/CANNOT_AUDIT. Query types lấy từ generated operation parameters; không có component GraduationBatchItemQueryDto trong output. Các credit strings, shortfall discriminators, nullable minima, audit/freshness, batch/item/task/options và notification enum khớp BE-06/07/09/11. Đây là sửa alias của plan theo backend đúng, không phải thay contract.
+
+**Giới hạn lượt frontend được duyệt:** presentation/types thuần dự kiến ở `src/shared/graduation/*` đặt trong `src/features/graduation/{components,schema}/*`, chưa xuất cho F-20; không sửa ngoài scope. Dùng PermissionCode literals đã generate như student records thay vì sửa shared/auth/permissions.ts. DOC-01 chỉ cập nhật plan/report và manual doc được chỉ định; architecture docs/index ngoài danh sách được phép để orchestrator đồng bộ. Không thêm Playwright spec khi FE-06 chỉ định Vitest/manual; không sửa fixtures/select.ts.
+
 **What / why:** Generate every nested graduation schema/enum from the implemented backend; no guessed TypeScript transport types.
 
 **Files**
@@ -1328,14 +1348,14 @@ Run against the implemented backend serving `http://localhost:3000/api/docs-json
 | NEW | `source/frontend/src/features/graduation/hooks/useGraduation.ts` | Query/mutation/invalidation pattern `source/frontend/src/features/releases/hooks/useReleases.ts:27` |
 | NEW | `source/frontend/src/features/graduation/constants/graduationLabels.ts` | Label maps like `source/frontend/src/features/releases/constants/releaseLabels.ts:1` |
 | NEW | `source/frontend/src/features/graduation/constants/graduationUi.ts` | Named UI constants; shared notification constants mirror `source/frontend/src/shared/notifications/notificationConstants.ts:1` |
-| NEW | `source/frontend/src/shared/graduation/types.ts` | Generated type aliases like `source/frontend/src/shared/notifications/types.ts:1`, safe future F-20 reuse |
+| NEW | `source/frontend/src/features/graduation/schema/graduation.ts` | Generated schema/operation aliases; feature-local theo scope lượt frontend, shared extraction cho F-20 để sau |
 
 **Shape**
 
 ```ts
 type Schemas = components['schemas'];
 export type GraduationResult = Schemas['GraduationResultDto'];
-export type GraduationOutcome = Schemas['GraduationOutcomeDto'];
+export type GraduationOutcome = operations['GraduationController_live']['responses'][200]['content']['application/json'];
 export type GraduationAudit = Schemas['GraduationAuditDto'];
 export type GraduationBatch = Schemas['GraduationBatchDto'];
 export type GraduationBatchItem = Schemas['GraduationBatchItemDto'];
@@ -1348,7 +1368,7 @@ export const GRADUATION_QUERY_KEYS = {
   audit: (id: string) => [...GRADUATION_QUERY_ROOT, 'audit', id] as const,
   batches: (page: number) => [...GRADUATION_QUERY_ROOT, 'batches', page] as const,
   batch: (id: string) => [...GRADUATION_QUERY_ROOT, 'batch', id] as const,
-  items: (id: string, filters: Schemas['GraduationBatchItemQueryDto']) =>
+  items: (id: string, filters: NonNullable<operations['GraduationBatchesController_items']['parameters']['query']>) =>
     [...GRADUATION_QUERY_ROOT, 'items', id, filters] as const,
 };
 export function fetchGraduation(lookup: GraduationLookup): Promise<GraduationOutcome>;
@@ -1356,11 +1376,11 @@ export function saveGraduation(lookup: GraduationLookup, requestKey: string): Pr
 export function previewGraduationBatch(input: Schemas['GraduationBatchFilterDto']):
   Promise<Schemas['GraduationBatchPreviewDto']>;
 export function createGraduationBatch(input: Schemas['GraduationBatchCreateDto']): Promise<GraduationBatch>;
-export function downloadGraduationBatch(id: string, filters: GraduationBatchFilters): Promise<void>;
+export function downloadGraduationBatch(id: string, filters: GraduationExportFilters): Promise<void>;
 export const GRADUATION_UI = { POLL_INTERVAL_MS: 2_000, SEARCH_DEBOUNCE_MS: 300 } as const;
 ```
 
-Use generated aliases in shared/graduation/types.ts and re-export in feature adapter, not duplicate declarations across both files. Add concrete adapter functions for every BE-06/07/09/11 read/mutation, using `getJson`/`sendJson`/`downloadFile` unchanged (`source/frontend/src/shared/api/client.ts:70`, `:77`, `:115`). Adapter path starts `/students/...` or `/graduation-*`, without duplicating API_BASE_URL's `/api`. Encode opaque IDs, URLSearchParams for q/context/filters; do not coerce decimals into JS numbers. Body DTOs use generated schemas. Query DTOs may not appear as component schemas when Swagger emits parameters inline: in that case alias the operation's parameter type from generated `operations`/`paths`, rather than creating a falsely promised component. Name a UI-only filter type as a Pick of those generated parameters.
+Use generated aliases in features/graduation/schema/graduation.ts and re-export in feature adapter, not duplicate declarations across both files. Add concrete adapter functions for every BE-06/07/09/11 read/mutation, using `getJson`/`sendJson`/`downloadFile` unchanged (`source/frontend/src/shared/api/client.ts:70`, `:77`, `:115`). Adapter path starts `/students/...` or `/graduation-*`, without duplicating API_BASE_URL's `/api`. Encode opaque IDs, URLSearchParams for q/context/filters; do not coerce decimals into JS numbers. Body DTOs use generated schemas. Query DTOs may not appear as component schemas when Swagger emits parameters inline: in that case alias the operation's parameter type from generated `operations`/`paths`, rather than creating a falsely promised component. Export filters alias generated export-operation parameters (q/outcome/conclusion, không pagination); không tự khai báo wire shape.
 
 Hooks key **all** student/program/semester and list filters/page/pageSize to avoid cross-context cached personal results; extend the displayed skeleton accordingly where pageSize can vary. Disable queries until all context IDs are present. Poll only QUEUED/RUNNING batches and visible staff task panels; stop terminal polling, unauthorized/session errors and unmounted queries. Poll uses passive backend endpoints, not repeated writes. One user save/create action gets one `crypto.randomUUID()` requestKey retained through network retry; create a new key only for a new deliberate action. Preview mutation never creates a batch. Clear confirmed preview on any filter change and 409 drift.
 
@@ -1368,7 +1388,7 @@ Successful save invalidates that context's live/history and saved audit detail; 
 
 **Rationale:** Release hooks centralize query roots/invalidation (`source/frontend/src/features/releases/hooks/useReleases.ts:27`, `:39`). Shared generated aliases let F-20 reuse presentation without importing another feature's service or reproducing enums.
 
-**Gotchas:** GET live may return a valid CANNOT_AUDIT domain payload; do not show a green conclusion. Request failures use existing ApiError handling, not custom envelope assumptions. Do not put PII/raw transcript into query keys or localStorage; opaque context IDs are sufficient.
+**Gotchas:** GET live may return a valid CANNOT_AUDIT domain payload; do not show a green conclusion. Request failures use existing ApiError handling, not custom envelope assumptions. Không lưu response PII/raw transcript trong query keys hoặc localStorage. Keys chỉ chứa opaque context IDs, pagination và request filters (gồm q do người dùng nhập để tách cache); các query dữ liệu riêng có gcTime=0, không persist browser storage. Lỗi 401/403/404 không tiếp tục trình bày snapshot/history đã có như dữ liệu được phép xem.
 
 **Verify:** Frontend `pnpm exec tsc -b --pretty false`; FE-06 adapter/hook tests assert complete URLs, request keys/CSRF use, filter/page cache separation, terminal polling stop, 409 preview invalidation and no graduation calculation in clients.
 
@@ -1387,9 +1407,11 @@ Successful save invalidates that context's live/history and saved audit detail; 
 | NEW | `source/frontend/src/features/graduation/components/GraduationContextForm.tsx` | AntD vertical form like `source/frontend/src/features/releases/components/SemesterForm.tsx:1` |
 | NEW | `source/frontend/src/features/graduation/components/GraduationHistoryTable.tsx` | DataTable anatomy `source/frontend/src/shared/design-system/DataTable.tsx:1` |
 | NEW | `source/frontend/src/features/graduation/components/GraduationReauditPanel.tsx` | Inline action/error pattern `source/frontend/src/features/releases/pages/VersionDetailPage.tsx:15` |
-| NEW | `source/frontend/src/shared/graduation/GraduationResultView.tsx` | Read-only table/card presentation like `source/frontend/src/features/releases/components/FrozenRowsTable.tsx:1`, but shared for F-20 |
-| NEW | `source/frontend/src/shared/graduation/GraduationShortfalls.tsx` | Existing DataTable/EmptyState components, no new visual primitives |
-| NEW | `source/frontend/src/shared/graduation/graduationPresentation.ts` | Pure formatting helpers like `source/frontend/src/features/releases/utils/format.ts:1` |
+| NEW | `source/frontend/src/features/graduation/components/GraduationResultView.tsx` | Pure result-only presentation, chưa xuất shared boundary cho F-20 |
+| NEW | `source/frontend/src/features/graduation/components/GraduationShortfalls.tsx` | Existing EmptyState/AntD Collapse/List, không thêm visual primitives |
+| NEW | `source/frontend/src/features/graduation/components/graduationPresentation.ts` | Pure decimal-string/time formatting |
+| NEW | `source/frontend/src/features/graduation/components/GraduationAuditSummary.tsx` | Metadata/freshness của immutable audit, không tính lại kết quả |
+| NEW | `source/frontend/src/features/graduation/components/GraduationError.tsx` | ApiError/network copy và scoped 401/403/404 state |
 
 **Shape**
 
@@ -1399,6 +1421,7 @@ export function GraduationAuditPage(): ReactElement;
 export function GraduationContextForm(props: {
   value: GraduationLookup | null;
   onChange: (lookup: GraduationLookup | null) => void;
+  onSubmit: (lookup: GraduationLookup) => void;
 }): ReactElement;
 export function GraduationResultView(props: {
   result: GraduationResult;
@@ -1421,7 +1444,7 @@ Evidence sections: group progress including both minima; knowledge-block allocat
 
 Freshness banners: “Kết quả học tập đã thay đổi, đang chờ xét lại” and “Không thể tự động xét lại, cần kiểm tra dữ liệu”. Old saved conclusion is labeled historical and never shown as current assurance. R1 task panel lists pending/failed system work and “Thử xét lại”; it does not expose feed bodies. R3 sees coarse freshness only. CANNOT_AUDIT is a neutral/error Alert with stable diagnostic and “Chưa thể kết luận”, not “Chưa đủ điều kiện”. A missing mapping directs contact with Phòng Đào tạo without asking the client to pick a substitute version.
 
-Shared components accept **result data only**, import generated shared aliases and design-system primitives, and contain no staff hooks, permissions, mutation, route assumptions or academic calculations. Future F-20 may compose them; F-21 consumes the same result JSON, not this UI. Loading Skeleton, retryable transport Alert, 403/404, unassigned context, empty history and unsupported-version states are distinct.
+Result presentation components accept **result data only**, import generated feature-local aliases and design-system primitives, and contain no staff hooks, permissions, mutation, route assumptions or academic calculations. Trước khi F-20 dùng lại cần chuyển pure files sang shared boundary trong scope được duyệt; không import chéo feature trong lượt này. F-21 consumes the same result JSON, not this UI. Loading Skeleton, retryable transport Alert, 403/404, unassigned context, empty history and unsupported-version states are distinct.
 
 **Rationale:** Reuse current design-system components rather than nonexistent PageContainer/ApiErrorAlert mentioned in old plans; current exports live in `source/frontend/src/shared/design-system/index.ts:1`. RequirePermission checks presence only (`source/frontend/src/shared/auth/RequirePermission.tsx:11`), so backend remains authoritative for personal scope.
 
@@ -1441,23 +1464,20 @@ Shared components accept **result data only**, import generated shared aliases a
 |---|---|---|
 | NEW | `source/frontend/src/features/graduation/pages/GraduationBatchesPage.tsx` | ListPageLayout/PageHeader/DataTable `source/frontend/src/features/users/pages/UserListPage.tsx:23` |
 | NEW | `source/frontend/src/features/graduation/pages/GraduationBatchPage.tsx` | Detail states `source/frontend/src/features/releases/pages/VersionDetailPage.tsx:15` |
-| NEW | `source/frontend/src/features/graduation/components/GraduationBatchForm.tsx` | Validated AntD form `source/frontend/src/features/releases/components/SemesterForm.tsx:1` |
-| NEW | `source/frontend/src/features/graduation/components/GraduationBatchProgress.tsx` | Shared StatusTag `source/frontend/src/shared/design-system/StatusTag.tsx:16` + AntD Progress |
-| NEW | `source/frontend/src/features/graduation/components/GraduationBatchResultsTable.tsx` | Shared DataTable `source/frontend/src/shared/design-system/DataTable.tsx:1` |
+| NEW | `source/frontend/src/features/graduation/components/GraduationBatchFilters.tsx` | AntD Form rules; single program/cohort selectors; preview/confirm nằm trong list page |
 
 **Shape**
 
 ```tsx
 export function GraduationBatchesPage(): ReactElement;
 export function GraduationBatchPage(): ReactElement;
-export function GraduationBatchForm(props: {
-  onCreated: (batchId: string) => void;
+export function GraduationBatchFilters(props: {
+  onChange: (filters: GraduationBatchFilter) => void;
+  requireProgram: boolean;
 }): ReactElement;
-export function GraduationBatchProgress(props: { batch: GraduationBatch }): ReactElement;
-export function GraduationBatchResultsTable(props: { batchId: string }): ReactElement;
 ```
 
-List page title “Xét tốt nghiệp hàng loạt”, action “Tạo đợt xét”; semester required, program/cohort at-least-one validator; both means intersection. Reuse SemesterSelect (`source/frontend/src/shared/releases/SemesterSelect.tsx:14`). The existing CohortSelect is multi-select (`source/frontend/src/shared/releases/CohortSelect.tsx:14`), incompatible with one cohortId: compose a local single AntD Select inside GraduationBatchForm from existing useCohorts (`source/frontend/src/shared/releases/useReleaseOptions.ts:12`), without replacing/changing the shared component. Use scoped graduation program options. No F-09 wizard dependency. Preview shows separate student/context counts and filters; confirm disabled only for no roster/request failure. Warn that individual data problems are recorded as errors while others continue, and inputs are read per student, not atomically frozen for the cohort.
+Trang “Xét tốt nghiệp hàng loạt” đặt form tạo đợt ngay trong Card phạm vi, với hai thao tác “Xem trước danh sách” và “Xác nhận đợt xét”, không thêm nút mở form thứ ba. Học kỳ bắt buộc; R1 chọn ít nhất program hoặc cohort, cả hai là giao nhau; R3 luôn chọn chương trình phụ trách theo backend đã build. Reuse SemesterSelect. CohortSelect hiện hữu là multi-select nên GraduationBatchFilters dùng single AntD Select qua hook feature bọc fetchCohorts của shared/releases/semesters.ts; không đổi shared caller. Preview/confirm orchestration nằm trong GraduationBatchesPage; progress và result table nằm trong GraduationBatchPage, không thêm wrapper chỉ dùng một lần. Dùng scoped graduation program options. Preview hiển thị student/context counts; không confirm roster rỗng hoặc request chưa hợp lệ. Cảnh báo lỗi một lượt không chặn lượt khác và input được đọc từng lượt, không đóng băng cả khóa cùng lúc.
 
 Use `App.useApp().modal.confirm()` (“Bắt đầu xét tốt nghiệp?”), not static Modal.confirm; retain previewRevision/requestKey through retry. Change any filter or receive 409 clears preview and requires review again; an old modal cannot submit new filters with old revision. On creation navigate to durable batch detail, including when enqueue is delayed. Never poll preview or auto-create while mounting.
 
@@ -1485,9 +1505,9 @@ List retains user's own historic batches with page/count/status. FAILED remains 
 |---|---|---|
 | MODIFY | `source/frontend/src/routes.ts` | Typed route constants `source/frontend/src/routes.ts:1` |
 | MODIFY | `source/frontend/src/router.tsx` | Named-export lazy routes `source/frontend/src/router.tsx:10` |
-| MODIFY | `source/frontend/src/shared/auth/permissions.ts` | Generated PermissionCode map `source/frontend/src/shared/auth/permissions.ts:6` |
+| NEW | `source/frontend/src/features/graduation/components/RequireGraduationStaff.tsx` | Staff role + generated PermissionCode boundary; không sửa shared permission registry |
 | MODIFY | `source/frontend/src/shared/layout/menuItems.tsx` | Permission/hideForRoles leaves `source/frontend/src/shared/layout/menuItems.tsx:6`, `:16` |
-| MODIFY (unbuilt dependency) | `source/frontend/src/features/students/pages/StudentDetailPage.tsx` | F-17 FE-04 route-only entry; inspect actual path when U1 lands |
+| MODIFY (built dependency; additive integration) | `source/frontend/src/features/students/pages/StudentDetailPage.tsx` | F-17 FE-04 route-only entry; inspect actual path when U1 lands |
 | MODIFY | `source/frontend/src/shared/layout/menuItems.test.tsx` | Existing role/permission tests `source/frontend/src/shared/layout/menuItems.test.tsx:1` |
 
 **Shape**
@@ -1499,13 +1519,13 @@ graduationBatches: '/graduation/batches',
 graduationBatch: '/graduation/batches/:batchId',
 ```
 
-Add permission aliases `graduationView: 'graduation.view'`, `graduationAudit: 'graduation.audit'` to the existing typed map, not a new registry. Lazy-load four pages under RequireAuth/AppLayout. Single/audit routes require graduation.view **and staff role**; batches require graduation.audit and staff role. A local staff boundary renders existing 403 Result using current Me roles; it is display protection, not a substitute for BE scope. R6 with graduation.view cannot open staff pages by pasting URLs; its read-only consumption belongs to F-20.
+Dùng generated PermissionCode literals `graduation.view`/`graduation.audit` tại boundary/menu/entry như F-17; không sửa shared/auth/permissions.ts ngoài scope. Lazy-load four pages under RequireAuth/AppLayout. Single/audit routes require graduation.view **and staff role**; batches require graduation.audit and staff role. A local staff boundary renders existing 403 Result using current Me roles; it is display protection, not a substitute for BE scope. R6 with graduation.view cannot open staff pages by pasting URLs; its read-only consumption belongs to F-20.
 
 Menu group “Xét tốt nghiệp” has “Xét từng sinh viên” (view) and “Xét hàng loạt” (audit), hidden for only-R6 identities using existing hideForRoles semantics. Mixed staff/R6 identities remain staff-capable when actual permissions allow it. Do not show leaves to R2/R4/R5 merely through curriculum access. On MH-52 add a permission-gated “Xét tốt nghiệp” Link with selected studentId/programId/semesterId query; it navigates only, never evaluates/saves on click. Without an unambiguous context disable with explanation rather than default another program/semester. Preserve F-17 progress/results behavior.
 
 **Rationale:** Router uses named-export lazy imports (`source/frontend/src/router.tsx:10`); menu hiding is presentation-only (`source/frontend/src/shared/layout/menuItems.tsx:16`). This is route integration, not an unbuilt F-20 portal or navigation refactor.
 
-**Gotchas:** No public student search, menu-only security or staff-page import into F-17. MH-52 uses route constants only. Reverify the unbuilt StudentDetailPage path before editing.
+**Gotchas:** No public student search, menu-only security or staff-page import into F-17. MH-52 uses route constants only. StudentDetailPage đã tồn tại; re-read trước integration FE-05, không đổi F-17 DTO.
 
 **Verify:** Frontend `pnpm exec vitest run src/shared/layout/menuItems.test.tsx`; FE-06 router tests for R1/R3/R6/mixed/denied roles, lazy imports/direct URL 403; MH-52 context round trip.
 
@@ -1526,7 +1546,7 @@ Menu group “Xét tốt nghiệp” has “Xét từng sinh viên” (view) and
 | NEW | `source/frontend/src/features/graduation/pages/GraduationAuditPage.test.tsx` | Same read-only history/detail approach |
 | NEW | `source/frontend/src/features/graduation/pages/GraduationBatchesPage.test.tsx` | List/confirm tests `source/frontend/src/features/users/pages/UserListPage.test.tsx:1` |
 | NEW | `source/frontend/src/features/graduation/pages/GraduationBatchPage.test.tsx` | Progress/filter/export tests, fresh QueryClient per test |
-| NEW | `source/frontend/src/shared/graduation/GraduationResultView.test.tsx` | Pure shared-component tests, synthetic generated DTO fixtures |
+| NEW | `source/frontend/src/features/graduation/components/GraduationResultView.test.tsx` | Pure result-only component tests, synthetic generated DTO fixtures |
 | NEW | `source/frontend/src/features/graduation/graduationRoutes.test.tsx` | Memory-router role/URL checks without browser network |
 | MODIFY | `source/frontend/src/shared/notifications/NotificationBell.test.tsx` | New enum/content-only rendering, retain all old types |
 
@@ -1553,7 +1573,7 @@ Add compile-time generated-schema checks for literal codes/statuses/null branche
 
 **Gotchas:** Accessibility verification means actual keyboard/label/focus assertions, not claiming a new audit package exists. No prohibited real datasets, network services or credentials. UI snapshots cannot prove backend authorization/arithmetic.
 
-**Verify:** Frontend `pnpm exec vitest run src/features/graduation src/shared/graduation src/shared/layout/menuItems.test.tsx src/shared/notifications/NotificationBell.test.tsx`; `pnpm lint`; `pnpm build`. Manual browser checks remain separate.
+**Verify:** Orchestrator chạy frontend `pnpm exec vitest run src/features/graduation src/shared/layout/menuItems.test.tsx src/shared/notifications/NotificationBell.test.tsx`; không chạy Vitest/Playwright trong sandbox vì spawn EPERM đã biết. Builder kiểm `pnpm exec tsc -b --pretty false`. Manual browser checks remain separate; không có Playwright spec được chỉ định ở bước này.
 
 **Depends on:** FE-01..05; stable BE-12 DTO fixtures.
 
@@ -1561,15 +1581,15 @@ Add compile-time generated-schema checks for literal codes/statuses/null branche
 
 **What / why:** Record shipped boundaries/actual verification, particularly institutional gates, rather than presenting this plan as implemented behavior.
 
-**Files — future implementation deliverables only, NOT changes in this planning run**
+**Files — scope triển khai frontend ngày 2026-10-30**
 
 | Action | Path | Mirror / rationale |
 |---|---|---|
-| NEW | `docs/implement-report/f-19-graduation-review-implement-report.md` | Built-feature deviation/verification reports such as F-15 under the inspected `docs/implement-report/` |
+| MODIFY | `docs/implement-report/f-19-graduation-review-implement-report.md` | Bổ sung từng FE step/DOC-01 vào report backend đã có |
 | NEW | `docs/testing/feature__f-19-graduation-review.md` | Manual cases in inspected `docs/testing/` |
-| MODIFY | `docs/architecture/features_architecture.md` | Actual module/read/write/worker contracts after implementation |
-| MODIFY | `docs/architecture/database_and_models.md` | Six new tables, additive enum and SQL checks |
-| MODIFY | `docs/architecture/general_architecture.md` | Shared evaluator/capability and queue topology if actual composition changes |
+| DEFER (orchestrator; ngoài scope lượt frontend) | `docs/architecture/features_architecture.md` | Actual module/read/write/worker contracts after implementation |
+| DEFER (orchestrator; ngoài scope lượt frontend) | `docs/architecture/database_and_models.md` | Six new tables, additive enum and SQL checks |
+| DEFER (orchestrator; ngoài scope lượt frontend) | `docs/architecture/general_architecture.md` | Shared evaluator/capability and queue topology if actual composition changes |
 
 **Shape**
 
@@ -1623,7 +1643,7 @@ flowchart TD
   F6 --> D
 ```
 
-1. **Dependency stop gate:** Reverify actual F-17/F-16 code and F-12 status semantics against U1..U4. Do not migrate against absent F-17 schema or silently modify other plans. E1 is an accepted historical limitation; E2/E3 build with the stated diagnostics/defaults and Faculty input owed, not pending build approval.
+1. **Dependency stop gate — DONE 2026-10-30:** U3 Option A đã duyệt: identity từ academicResult relation, five-field snapshots giữ nguyên. Orchestrator validate schema, chạy unit 13/13, apply migration 20261030050730_graduation_review và generate; backend tsc 0. Tiếp tục BE-03..BE-12, không schema change/frontend trong lượt này.
 2. Build BE-01/02/03, Prisma generation immediately after schema/migration, then BE-04/05. **Pause A:** pure fixture demo proves all unambiguous four-check cases, exact codes and 3→2 recognition. Review policy diagnostics before persistence depends on them.
 3. Build BE-06/07, BE-10 notifier/export, then BE-08/09. BE-08's typed handler token keeps dispatch independent of BE-09 concrete classes; BE-11 binds real providers, never production no-ops. Complete wiring/Swagger and targeted BE-12. **Pause B:** HTTP live/save/history and a correction show preserved old audit, one new audit and one changed-conclusion notice.
 4. FE-01 generation, FE-02 adapters and FE-03 single screen. **Pause C:** staff browser demo of explicit version, shortfalls/equivalence, save/history and foreign-program denial; R6 staff navigation hidden/blocked.
@@ -1682,21 +1702,21 @@ Check keyboard/labels/validation/focus, reduced motion, loading/empty/error and 
 
 ### Assumed contracts of unbuilt features
 
-All assumptions are **UNVERIFIED at source** because these features are written plans, not built code. They are hard integration gates unless explicitly non-runtime/future dependencies. Reinspect actual implementation/report and adjust this plan deliberately before building; no endpoint/provider below is claimed to exist now.
+Đã reverify ngày 2026-10-30. U3 đã giải quyết bằng Option A, không còn dependency stop gate mở; U4 là additive integration F-19. U8/U9 là contract tương lai/HTTP cần acceptance, không giả vờ runtime đã verify.
 
 | ID / feature | Assumed contract | Impact if absent/different | Mitigation / acceptance gate |
 |---|---|---|---|
-| U1 — F-17 schema and identity | Student linked uniquely to User; interval ProgramEnrollment with program/cohort, dated half-open interval, exception basis and updatedAt; AcademicResult unique student/course/semester and revision; ownership/read purpose GRADUATION | Wrong person/version, lost retakes/history, migration/authorization break | BE-02 waits for actual names/keys. BE-03 uses actor-bound reader; no guessed identity mapping or student-scope shortcut |
-| U1 — F-17 version reader | `StudentAppliedVersionReader.forAccess(access,'GRADUATION').resolveForStudent(input,tx?)`; exact student/enrollment/program/semester/version/source/mapping response. Exception wins; normal calls F-16 even if materialized pin lags | Current/latest pin can give a wrong graduation conclusion | Returned versionId authoritative; historical TRANSFERRED/ENDED and dual major included; no ACTIVE/latest fallback |
-| U1 — F-17 results/helper | `AcademicResultsReader.forAccess(...).forStudent(input,tx?)`: student-wide attempts through semester; supplied nullable scales; bestAcademicResults highest score4 among scored PASSED/FAILED, later-semester/ID ties, independent pass/exempt/in-progress flags | Wrong transfer/equivalence/retake completion | No current-frame restriction or grade threshold inference; verify exact letterGrade/revision fields |
-| U2 — F-16 resolution | AppliedProgramVersionReader.forCohort/forCohorts honors known semester.startDate, COHORT interval/provenance, applicable PENDING/HISTORICAL and no latest ACTIVE fallback; F-17 owns student selection | Wrong past/future/cohort context | Through F-17 capability only; bounded bulk resolution; preserve E1 limitation |
-| U3 — F-17 D13 feed/writers | Durable AcademicResultChange unique academicResultId/revision, full before/after/recordedAt in source tx; create/update emits, no-op does not; existing attempt identity/semester immutable; writers lock Programs sorted → Students sorted → enrollments | Lost/duplicate/racing corrections | F-19 owns receipt/targets, no high-water cursor. Reverify locks/event JSON; match both old/new semesters if contract expands. No producer behavior/schema change assumed |
-| U4 — F-17 system continuation | Add restricted `forReauditTask(taskId,tx)` facades over same private resolver/transcript logic; validate task/receipt/context/student/lease; preserve existing user APIs/callers | Revoked actor/fake R1 breaks background authorization | BE-03 additive integration owned by F-19; no unrestricted overload/cycle/copied resolver. If owner rejects seam, stop for an authorized capability alternative |
-| U5 — F-09 / Excel | F-09 not built; ExcelJS named in `docs/design/tech-stack.md:44`, absent from dependencies at `source/backend/package.json:35`. F-17 imports depend indirectly on F-09; F-19 export does not use its files/jobs | Hidden dependency or extra package | Only add ExcelJS if absent; reuse actual installed version/public safe-text helper after inspection. Core graduation tests may use F-17 shared writers without Excel pipeline |
-| U6 — F-12 authority | Grading formulas unbuilt; official/imported PASSED/FAILED/EXEMPT/IN_PROGRESS and supplied scales remain authoritative; formula does not infer F-19 official transcript status | Inconsistent formula/import conclusions | Never evaluate formulas/GPA/thresholds. F-12 is a semantic contract, not runtime prerequisite when F-17 facts exist; verify later source preserves this boundary |
-| U7 — F-18 / F-22 parallel plans | No content assumed/read. F-18 may later share read facts. Future F-22 sync must use F-17 result writer/feed, not bypass it or call graduation | Parallel engines or invisible sync corrections | Producer-agnostic durable consumer; required future seam is writer/revision/feed; no connector/credential access here |
-| U8 — F-20 / F-21 consumers | Use schemaVersion=1/ruleVersion graduation-v1, shared evaluator/authorized capability, explicit context/time, stable codes and separate outcome/freshness | Portal/API drift or old audit mistaken as live | No staff persistence side effects by default. F-21 supplies independently authorized integration capability, not fake user/R1; token/API design out of scope |
-| U9 — New F-19 HTTP contract | All proposed endpoints/DTOs in §2/BE-01/06/07/09/11 are new, not verified runtime APIs; future FE aliases generated serializer schemas | Swagger nullability/union/field drift | Real HTTP/JSON snapshot assertions in BE-12, then FE-01 generation/type checks; change backend annotations, never hand-patch generated types |
+| U1 — F-17 schema and identity | **MATCHES:** `source/backend/prisma/schema.prisma:1073`, `:1099`, `:1135`; `source/backend/src/shared/students/student-access.ts:14`, `:126`; `enrollment-period.ts:9` | Student.userId unique nullable, interval/program/cohort/exception/updatedAt và unique result triple/revision đúng; ownership GRADUATION có sẵn | BE-02 dùng đúng tên/key; giữ half-open, không lọc enrollment.status |
+| U1 — F-17 version reader | **MATCHES:** `source/backend/src/shared/students/student-applied-version.reader.ts:39`, `:49`, `:104`, `:162`; `student-applied-version.types.ts:8` | Exception trước cohort; returned programVersionId authoritative, bulk resolveManyForAccess có supplied tx | BE-03 dùng facade hiện có cho staff, không đổi endpoint/DTO/caller |
+| U1 — F-17 results/helper | **MATCHES:** `source/backend/src/shared/students/academic-results.reader.ts:30`, `:84`, `:114`; `best-academic-results.ts:39` | Student-wide cutoff, nullable string scales, letterGrade/revision, highest score4/later date/smaller ID, completion flags độc lập | Tái dùng bestAcademicResults; không inferred grade hoặc frame filter |
+| U2 — F-16 resolution | **MATCHES:** `source/backend/src/shared/releases/applied-program-version.reader.ts:17`, `:33`; `cohort-version-schedule.ts:34`, `:100`, `:114`; F-17 caller `source/backend/src/shared/students/student-applied-version.reader.ts:162` | Known semester, issued PENDING/HISTORICAL, dated mapping, no latest ACTIVE fallback | Dùng qua F-17, giữ E1/current calendar; không thay F-16 |
+| U3 — F-17 D13 feed/writers | **RESOLVED Option A, 2026-10-30:** `source/backend/src/shared/students/academic-result.writer.ts:41`, `:49`, `:172`; `source/backend/prisma/schema.prisma:1157` | Snapshot đúng năm field, không identity; lấy student/course/semester qua immutable academicResult relation. Orchestrator xác nhận không có delete path, FK Restrict | BE-09 dùng parent identity và validate actual snapshot; không sửa producer. Student-only result lock giao nhau với Program → Student lock F-19 |
+| U4 — F-17 system continuation | **ADDITIVE đã triển khai:** `source/backend/src/shared/students/student-applied-version.reader.ts:94` và `source/backend/src/shared/students/academic-results.reader.ts:98`; helper `source/backend/src/shared/students/student-access.ts:18`; providers export tại `students-shared.module.ts:10` | forReauditTask(taskId: string, leaseToken: string, tx: Prisma.TransactionClient) ở đúng hai reader; pin context sau khi kiểm RUNNING/nonexpired lease/token, receipt/change/baseline/student và khóa task trong supplied tx | Tách private authorized input/core selection trong cùng file, giữ nguyên actor facade/auth checks/callers; không copied resolver, fake AccessContext hoặc module cycle. Spec graduation-capability.spec.ts kiểm revalidation trên mỗi restricted read |
+| U5 — F-09 / Excel | **MISMATCH đã hiệu chỉnh:** `source/backend/package.json:50`; `source/backend/src/features/imports/sheets/sheet-writer.ts:1`, `:8`, `:28` | F-09 đã build; exceljs ^4.4.0 đã cài. writeSheet là feature-private, không có public safe-text helper; string values được ghi literal, không formula objects | BE-10 tái dùng package ExcelJS đã cài và cách ghi literal string; không import feature/imports hoặc thêm package. Safe-text cases do graduation exporter/spec sở hữu |
+| U6 — F-12 authority | **MISMATCH baseline, boundary MATCHES:** `source/backend/src/features/syllabi/grade-formula.service.ts:78`, `:126`, `:207`; official facts `source/backend/src/shared/students/academic-results.reader.ts:114` | F-12 đã build; chỉ assessment/formula/mapping, không ghi AcademicResult hoặc suy official pass status | Không runtime dependency vào formula service; PASSED/FAILED/EXEMPT/IN_PROGRESS và supplied scales từ F-17 vẫn authoritative |
+| U7 — F-18 / F-22 parallel plans | **MISMATCH baseline đã sửa:** `source/backend/src/shared/registration-eligibility/academic-evidence.ts:20`, `:57`; `eligibility-context.reader.ts:33`, `:162`; helper chung `source/backend/src/shared/students/best-academic-results.ts:39` | F-18 đã tính completion PASSED/EXEMPT qua equivalence, ưu tiên exact course. Không dùng completionEvidence/compareEvidence cho graduation: chúng phụ thuộc EligibilityEvaluationContext, ưu tiên course/score trước allocation; không có exclusive cross-bucket allocation, EXEMPT provenance hay graduation credit basis | Tái dùng bestAcademicResults và F-17 attempts; F-19 giữ riêng allocator theo E2/E3, không sửa F-18. F-22 tương lai phải đi qua writer/feed F-17 (`academic-result.writer.ts:70`) |
+| U8 — F-20 / F-21 consumers | **FUTURE, không có contract runtime để verify:** `source/backend/src/app.module.ts:63` hiện chỉ wire F-18; NEW F-19 vocabulary nằm ở BE-01 | Giữ schemaVersion=1/ruleVersion graduation-v1 và authorized capability, context/time/freshness riêng | Không xây F-20/F-21; không fake R1; không persistence side effects mặc định |
+| U9 — New F-19 HTTP contract | **NEW, chưa build theo source baseline:** `source/backend/src/app.module.ts:63`; BE-06/11 là owner của endpoints/DTOs §2 | Đây không phải dependency thiếu: chưa có F-19 runtime serializer/OpenAPI; BE-01 mới là domain vocabulary | Giữ serializer/JSON tests tại BE-12 trước FE-01 codegen; không thay generated types bằng tay |
 
 ### Decision register — accepted 2026-10-26; Faculty defaults remain provisional
 

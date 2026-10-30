@@ -82,11 +82,10 @@ export class StudentsReadService {
   ): Promise<StudentProgramOptionDto[]> {
     const scope = staffStudentScope(access);
     return this.prisma.$transaction(async (tx) => {
-      const semester = await requireSemesterStart(tx, query.semesterId);
+      await requireSemesterStart(tx, query.semesterId);
       const rows = await tx.program.findMany({
         where: {
           ...(scope.all ? {} : { id: { in: [...scope.programIds] } }),
-          enrollments: { some: enrollmentCoversWhere(semester) },
         },
         select: {
           id: true,

@@ -99,4 +99,24 @@ describe('StudentAppliedVersionReader', () => {
     const { run } = build([enrollment(), enrollment({ id: 'e2' })]);
     await expect(run()).rejects.toMatchObject({ code: 'ENROLLMENT_AMBIGUOUS' });
   });
+
+  it('rejects an enrollment with an unknown end start before cohort resolution', async () => {
+    const { run, cohortVersions } = build([
+      enrollment({ untilSemester: { id: 'end', startDate: null } }),
+    ]);
+    await expect(run()).rejects.toMatchObject({
+      code: 'INVALID_ENROLLMENT_INTERVAL',
+    });
+    expect(cohortVersions.forCohorts).not.toHaveBeenCalled();
+  });
+
+  it('rejects an enrollment with an unknown from start instead of treating it as absent', async () => {
+    const { run, cohortVersions } = build([
+      enrollment({ fromSemester: { id: 'from', startDate: null } }),
+    ]);
+    await expect(run()).rejects.toMatchObject({
+      code: 'INVALID_ENROLLMENT_INTERVAL',
+    });
+    expect(cohortVersions.forCohorts).not.toHaveBeenCalled();
+  });
 });

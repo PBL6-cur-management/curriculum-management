@@ -58,6 +58,111 @@ async function upload(file = new File(['sheet'], 'Khung.xlsx')) {
     await screen.findByText(file.name);
 }
 describe('ImportPage', () => {
+  it.each(['STUDENT_LIST', 'ACADEMIC_RESULT'] as const)(
+    'uploads %s without a version and invalidates student/user roots once',
+    async (importType) => {
+      let committed = false;
+      const wave = (status: 'DRY_RUN' | 'COMMITTED') =>
+        batch({
+          importType,
+          program: null,
+          versionId: null,
+          status,
+          canCommit: status === 'DRY_RUN',
+        });
+      const fetchMock = vi.fn(
+        async (input: RequestInfo | URL, init?: RequestInit) => {
+          const path = String(input);
+          if (path.endsWith('/auth/me'))
+            return json({
+              roles: [{ roleCode: 'R1' }],
+              permissions: ['data.importExcel'],
+            });
+          if (path.endsWith('/imports/types'))
+            return json([{ importType, needsVersion: false }]);
+          if (path.endsWith('/student-credentials'))
+            return json({
+              available: false,
+              accountCount: 0,
+              expiresAt: null,
+              downloadedAt: null,
+            });
+          if (path.endsWith('/commit')) {
+            committed = true;
+            return json(wave('COMMITTED'));
+          }
+          if (init?.method === 'POST') return json(wave('DRY_RUN'));
+          return json(wave(committed ? 'COMMITTED' : 'DRY_RUN'));
+        },
+      );
+      vi.stubGlobal('fetch', fetchMock);
+      const { client } = renderImport(
+        <ImportPage />,
+        `/imports?type=${importType}`,
+      );
+      const invalidate = vi.spyOn(client, 'invalidateQueries');
+      await upload(new File(['synthetic'], 'Tong-hop.xlsx'));
+      expect(
+        screen.queryByLabelText('Bản nháp chương trình'),
+      ).not.toBeInTheDocument();
+      fireEvent.click(screen.getByRole('button', { name: 'Chạy thử' }));
+      fireEvent.click(
+        await screen.findByRole('button', { name: 'Xác nhận nhập' }),
+      );
+      fireEvent.click(
+        await screen.findByRole('button', { name: 'Ghi dữ liệu' }),
+      );
+      await screen.findByText('Đã ghi', { exact: true });
+      const form = fetchMock.mock.calls.find(
+        ([path, init]) =>
+          String(path).endsWith('/imports') && init?.method === 'POST',
+      )?.[1]?.body;
+      expect(form).toBeInstanceOf(FormData);
+      if (!(form instanceof FormData)) throw new Error('Thiếu form');
+      expect(form.get('importType')).toBe(importType);
+      expect(form.has('versionId')).toBe(false);
+      await waitFor(() =>
+        expect(
+          invalidate.mock.calls.filter(
+            ([options]) => JSON.stringify(options?.queryKey) === '["students"]',
+          ),
+        ).toHaveLength(1),
+      );
+      expect(
+        invalidate.mock.calls.filter(
+          ([options]) => JSON.stringify(options?.queryKey) === '["users"]',
+        ),
+      ).toHaveLength(1);
+    },
+  );
+  it('resets a crafted student type to the server-authorized catalog before template download', async () => {
+    const fetchMock = setup();
+    vi.stubGlobal(
+      'URL',
+      class extends URL {
+        static createObjectURL = vi.fn(() => 'blob:synthetic');
+        static revokeObjectURL = vi.fn();
+      },
+    );
+    const click = vi
+      .spyOn(HTMLAnchorElement.prototype, 'click')
+      .mockImplementation(() => undefined);
+    renderImport(<ImportPage />, '/imports?type=STUDENT_LIST');
+    fireEvent.click(await screen.findByRole('button', { name: 'Tải tệp mẫu' }));
+    await waitFor(() =>
+      expect(
+        fetchMock.mock.calls.some(([path]) =>
+          String(path).includes('/templates/COURSE_CATALOG'),
+        ),
+      ).toBe(true),
+    );
+    expect(
+      fetchMock.mock.calls.some(([path]) =>
+        String(path).includes('/templates/STUDENT_LIST'),
+      ),
+    ).toBe(false);
+    click.mockRestore();
+  });
   it('offers only types returned by the server and explains an empty result', async () => {
     setup({ types: [] });
     renderImport(<ImportPage />);

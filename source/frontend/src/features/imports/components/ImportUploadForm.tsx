@@ -58,12 +58,17 @@ export function ImportUploadForm({
       form={form}
       layout="vertical"
       initialValues={{
-        importType: initialType ?? types[0].importType,
+        importType: types.some((option) => option.importType === initialType)
+          ? initialType
+          : types[0].importType,
         versionId: initialVersion,
       }}
       onFinish={(values) => {
         const file = values.files[0]?.originFileObj;
-        if (file)
+        if (
+          file &&
+          types.some((option) => option.importType === values.importType)
+        )
           onUpload({
             importType: values.importType,
             versionId: needsVersion ? values.versionId : undefined,
@@ -86,6 +91,18 @@ export function ImportUploadForm({
           }
         />
       </Form.Item>
+      {(importType === 'STUDENT_LIST' || importType === 'ACADEMIC_RESULT') && (
+        <Alert
+          type="info"
+          showIcon
+          title={
+            importType === 'STUDENT_LIST'
+              ? 'Dùng mã chương trình, học kỳ nhập học và học kỳ trạng thái trong tệp mẫu. Trạng thái: STUDYING, ON_LEAVE, WITHDRAWN, GRADUATED.'
+              : 'Mỗi dòng là một lần học theo mã sinh viên, mã học phần và học kỳ. Giữ nguyên điểm từng thang; trạng thái: PASSED, FAILED, IN_PROGRESS, EXEMPT.'
+          }
+          description="Dữ liệu từ cơ sở dữ liệu Trường được ưu tiên. Cảnh báo thiếu chương trình vẫn tạo hồ sơ và tài khoản nhưng chưa tạo ghi danh."
+        />
+      )}
       {needsVersion && (
         <>
           {targets.error && (
@@ -177,7 +194,7 @@ export function ImportUploadForm({
       )}
       <Flex gap="small" wrap>
         <Button
-          disabled={!importType}
+          disabled={!types.some((option) => option.importType === importType)}
           loading={template.isPending}
           onClick={() => template.mutate(importType)}
         >

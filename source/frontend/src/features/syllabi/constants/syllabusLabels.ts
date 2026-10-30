@@ -2,7 +2,21 @@ import type {
   AttachmentFileType,
   Syllabus,
   SyllabusSectionField,
+  SyllabusMaterialKind,
 } from '../api/syllabi';
+
+export const MATERIAL_KIND_ORDER = [
+  'SIGNED_SYLLABUS',
+  'TEXTBOOK',
+  'LECTURE_SLIDES',
+  'OTHER',
+] as const satisfies readonly SyllabusMaterialKind[];
+export const MATERIAL_KIND_LABELS: Record<SyllabusMaterialKind, string> = {
+  SIGNED_SYLLABUS: 'Đề cương đã ký',
+  TEXTBOOK: 'Giáo trình',
+  LECTURE_SLIDES: 'Slide bài giảng',
+  OTHER: 'Tài liệu khác',
+};
 
 export const SYLLABUS_STATUS_LABELS: Record<Syllabus['status'], string> = {
   DRAFT: 'Nháp',

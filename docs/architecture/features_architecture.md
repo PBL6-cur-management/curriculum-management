@@ -291,6 +291,8 @@ Kế hoạch: `docs/implementation/f-08-consistency-check-implementation-plan.md
 
 Kế hoạch: `docs/implementation/f-10-syllabus-implementation-plan.md`; báo cáo dựng: `docs/implement-report/f-10-syllabus-implement-report.md`. Mã xong, chưa đi thử bằng trình duyệt.
 
+Tệp đính kèm bắt buộc có `materialKind` khi tải lên: `SIGNED_SYLLABUS` (Đề cương đã ký), `TEXTBOOK` (Giáo trình), `LECTURE_SLIDES` (Slide bài giảng), `OTHER` (Tài liệu khác). DTO từ chối loại thiếu hoặc không hợp lệ trước khi lưu tệp. `ATTACHMENT_MAX_MB` mặc định 50 MB, dùng chung cho tệp đề cương và văn bản đề xuất; vẫn giới hạn 10 tệp mỗi bản đề cương. `AttachmentUploader` yêu cầu chọn loại, không chọn sẵn và khóa bộ chọn tệp trước khi chọn loại. `AttachmentList` dùng chung cho trình sửa và trang chỉ đọc, nhóm theo thứ tự trên với nhãn và số lượng, ẩn nhóm rỗng; giữ nguyên tải xuống và xóa.
+
 ### Backend — `src/features/syllabi/`
 
 - Một đề cương mỗi học phần, đánh bản số (`revisionNumber`); nhiều nhất một Nháp và một Đã ban hành (chỉ mục từng phần). `GET/POST /api/courses/:courseId/syllabus`, `PATCH /syllabi/:id` (sáu mục văn bản đi qua `sanitizeRichText`, ≤ 100 000 ký tự), tuần (`POST`, `PUT …/order`, `PATCH`, `DELETE`, ≤ 60 dòng), tệp đính kèm (`POST` multipart, `GET …/file`, `DELETE`; PDF, DOCX, XLSX, ảnh; ≤ `ATTACHMENT_MAX_MB`, ≤ 10 tệp).
@@ -442,3 +444,64 @@ Báo cáo giữ số dòng worksheet và tên cột. Severity trên wire là ERR
 - Trình sửa đề cương có sáu tab; mỗi tab bật theo quyền nội dung, CLO hoặc công thức. Route dùng `shared/auth/RequireAnyPermission`.
 - `GradeFormulaTab`, `AssessmentCloTab`, `GradeFormulaView` (trang xem); hook `useGradeFormula`, `useEditorRemountKey`; tiện ích số thập phân `utils/gradeFormulaValues.ts`.
 - `SyllabusActions` có hành động công thức riêng: qua yêu cầu (`Đề xuất sửa công thức điểm`) hoặc trực tiếp (`Sửa công thức điểm`).
+
+## 17. Hồ sơ sinh viên và nhập kết quả học tập (F-17)
+
+### Backend — `src/features/students/`, `src/features/imports/`
+
+- `StudentsController` cung cấp `GET /api/students/program-options`, `GET /api/students`, `GET /api/students/:studentId`, cùng các tuyến con `results`, `applied-version`, `enrollment-targets`. `StudentsReadService` đọc theo ngữ cảnh học kỳ/chương trình; các tuyến đọc hồ sơ dùng `student.viewProgress`, riêng danh sách đích gán dùng `version.assignCohort`.
+- `studentReadWhere` giới hạn R1, R3 theo chương trình phụ trách và R6 theo `Student.userId`; không suy quyền đọc sinh viên từ vai trò R2/R4/R5. R1 và chính sinh viên có thể đọc kết quả khi chưa có quá trình học; R3 phải có quá trình học trong chương trình phụ trách bao phủ học kỳ được chọn. `program-options` kiểm học kỳ có ngày bắt đầu và dùng `staffStudentScope`: R1 thấy toàn bộ chương trình, R3 chỉ thấy chương trình trong phạm vi, không yêu cầu chương trình đã có sinh viên theo học.
+- `POST /api/students/:studentId/enrollments` nhận `ASSIGN_EXCEPTION`, `TRANSFER`, `ADD_SECOND_MAJOR`; `POST /api/students/:studentId/reconcile-enrollments` đối soát thủ công. Cả hai yêu cầu R1 có grant `version.assignCohort` ở chế độ `DIRECT`, phạm vi `ALL` trong chính assignment R1; có khóa bản ghi, transaction và token `expectedStudentUpdatedAt` (thêm `expectedEnrollmentUpdatedAt` khi áp dụng).
+- `StudentsSharedModule` xuất `StudentAppliedVersionReader`, `AcademicResultsReader`, `EnrollmentReconciler`, `StudentAccountProvisioner`. Bộ đọc phiên bản áp dụng dùng lịch gán khóa và chuỗi quá trình học; bộ đọc kết quả lấy toàn bộ bảng điểm đến học kỳ chọn, không chỉ các học phần trong chương trình hiện tại. `bestAcademicResults` chọn lần có `score4` cao nhất trong `PASSED`/`FAILED`, hòa thì học kỳ mới hơn, rồi `id` nhỏ hơn; giữ riêng cờ miễn học và đang học, không suy lại trạng thái từ điểm.
+- `ImportsModule` mở rộng pipeline Excel sẵn có với `STUDENT_LIST` và `ACADEMIC_RESULT`, không nhận `versionId`. Quyền nhập bắt buộc R1 có `data.importExcel` với `DIRECT`/`ALL` trong assignment R1. Chạy thử không ghi nghiệp vụ; commit kiểm lại quyền, tệp, dữ liệu và kế hoạch trong transaction trước khi ghi toàn bộ. Kết quả nguồn có khóa `(studentId, courseId, semesterId)`, revision và lịch sử `AcademicResultChange`.
+- Sinh viên mới được chuẩn bị tài khoản trước transaction để không giữ khóa trong lúc hash mật khẩu; commit chỉ dùng tài khoản còn cần sau khi kiểm lại. `StudentCredentialsService.store` chỉ tạo bản bàn giao cho tài khoản thực sự mới, trong cùng transaction với hồ sơ. `STUDENT_LIST` được kiểm khóa mã hóa tại cả upload và commit, kể cả tệp chỉ cập nhật hồ sơ; `ACADEMIC_RESULT` không có bước kiểm khóa này.
+- Chủ phiên R1 dùng `GET /api/imports/:batchId/student-credentials` xem trạng thái và `POST /api/imports/:batchId/student-credentials/download` tải XLSX một lần. Chỉ nhận phiên `STUDENT_LIST` đã `COMMITTED`, đúng người thực hiện và còn quyền nhập; download dùng CSRF, `Cache-Control: no-store`, khóa hàng `FOR UPDATE`, giải mã rồi xóa payload trước khi trả tệp. Hết hạn sau 24 giờ; quét `imports-sweep` dọn payload hết hạn nhưng giữ số lượng và dấu thời gian.
+- Queue `student-enrollment` chạy job `reconcile-enrollments` lúc khởi động và mỗi ngày 00:10 `Asia/Ho_Chi_Minh`; đối soát chuỗi không ngoại lệ theo lịch gán khóa. Trường hợp hồi tố cần xử lý riêng có mã `RETROACTIVE_COHORT_RECONCILIATION_REQUIRED`, không âm thầm ghi lại lịch sử.
+- `ScopeSourceReader.OWN_ENROLLMENT` đã suy `studentIds` và `programIds` từ liên kết tài khoản, giữ cả chương trình trong lịch sử. Riêng `CourseUsageReader.hasStudyResults` vẫn trả `false`; không coi chặn sửa học phần theo kết quả học tập là đã được nối vào F-17.
+
+### Frontend — `src/features/students/`, `src/features/imports/`
+
+#### `StudentListPage`, `StudentDetailPage` — Hồ sơ sinh viên (`/students`, `/students/:studentId`)
+
+- Route lazy-load bọc `RequireStudentStaff`; màn hình nhân viên không thay thế giao diện tự phục vụ R6. Danh sách có bộ lọc và phân trang; chi tiết giữ `semesterId`/`programId` trên URL, yêu cầu chọn học kỳ trước khi đọc hồ sơ.
+- Chi tiết hiển thị thông tin sinh viên, cảnh báo quá trình học, lịch sử gán và kết quả nguồn. `EnrollmentCommandModal` và đối soát chỉ bật khi R1 có quyền và khả năng quản lý do backend trả; không bật thao tác cho `WITHDRAWN`/`GRADUATED`. Liên kết tài khoản chỉ hiển thị cho R1 có `user.manage`.
+- Màn hình nhập Excel dùng chung hỗ trợ hai loại mới, mẫu tải về, chạy thử, xác nhận và lịch sử; `StudentCredentialDownload` hiển thị trạng thái bản bàn giao và tải bằng POST, không đưa mật khẩu ban đầu vào dữ liệu bảng báo cáo. Hook làm mới cache sinh viên sau commit.
+
+## 18. Điều kiện đăng ký học phần (F-18)
+
+- `RegistrationEligibilityModule` cung cấp GET `/api/students/:studentId/registration-eligibility?programId&semesterId` và GET `/api/programs/:programId/registration-eligibility/students?semesterId&q&page&pageSize`. Cả hai dùng `student.viewRegistrationEligibility`, cookie/session guards và `Cache-Control: no-store, private`.
+- `RegistrationEligibilitySharedModule` xuất `RegistrationEligibilityReader.forAccess(access).evaluate(input, tx?)`. Reader ràng buộc F-17 resolution/results với purpose ELIGIBILITY, dùng đúng returned programVersionId trong cùng tx hoặc một RepeatableRead transaction. R1/R3 scope và own-R6 policy do F-17 thực thi; picker chỉ R1/R3, SQL intersection program/enrollment/semester, không thay F-17 program-options.
+- Frozen CurriculumRequisite là nguồn quy tắc duy nhất, kể cả empty snapshot. Credits/name snapshot bắt buộc, zero được giữ; malformed facts trả lỗi conflict. PASSED/EXEMPT hoàn thành; FAILED đủ PRIOR nhưng không đủ prerequisite. Điểm so sánh exact Decimal; unscored EXEMPT không chứng minh positive threshold. Equivalent student-wide và one-hop ACTIVE replacement cho DISCONTINUED prerequisite không tạo co-registration substitution.
+- Pure evaluator dùng iterative SCC, dependency-first condensed depth tối đa ELIGIBILITY_MAX_DEPTH (1..20, default 20). Completed node bỏ khỏi graph; CONDITIONAL có full transitive concurrent bundle; INELIGIBLE có own/transitive leaf blockers, viaCourse/causeCode và simple paths; không persist verdict hoặc cache server.
+- MH-25 thêm context staff-only, scoped remote picker, table/board `Đăng ký được?`, shared EligibilityStatus/EligibilityReasons. Navigate tới applied version trước join itemId, kiểm exact item set và refetch một lần khi mismatch. Student mode không add/edit/requisites-edit/drag; syllabus links pin version. Không chọn sinh viên thì ordinary behavior và không có eligibility column.
+- Client query keys đủ student/program/semester hoặc picker query; staleTime/gcTime=0, cancel trước remove khi đổi context, không previous-data placeholder. Server messages/score strings là display facts, không client evaluator. F-20 tự chọn authorized enrollment và sở hữu MH-58; F-21 phải có principal adapter độc lập, không giả R1. Chưa tuyên bố các consumer đó được build.
+
+## 19. Xét tốt nghiệp (F-19)
+
+### Backend — `src/features/graduation/`, `src/shared/graduation/`
+
+Quyền `graduation.view` (xem) và `graduation.audit` (lưu lần xét, đợt xét, tác vụ xét lại). Mọi phản hồi chứa dữ liệu sinh viên gửi `Cache-Control: no-store, private`, như F-18.
+
+| Method | Route | Quyền | Hành vi |
+| --- | --- | --- | --- |
+| GET | /api/students/:studentId/graduation | view | Xét trực tiếp theo program/semester, không ghi |
+| POST | /api/students/:studentId/graduation-audits | audit | Lưu lần xét; `requestKey` idempotent, key dùng cho context khác bị từ chối |
+| GET | /api/students/:studentId/graduation-audits | view | Lịch sử audit của context |
+| GET | /api/graduation-audits/:auditId | view | Chi tiết audit đã lưu; schema lưu không hỗ trợ bị từ chối, không tính lại |
+| GET | /api/graduation/program-options, /api/graduation/student-options | view hoặc audit | Picker trong phạm vi |
+| GET | /api/students/:studentId/graduation-reaudit-tasks | audit | Tác vụ xét lại của context |
+| POST | /api/graduation-reaudit-tasks/:taskId/retry | audit | Thử lại tác vụ FAILED, không xóa lịch sử |
+| POST | /api/graduation-batches/preview | audit | Xem trước roster, không ghi |
+| POST | /api/graduation-batches | audit | Xác nhận theo `previewRevision`; roster lệch trả 409, không tạo roster dở dang |
+| GET | /api/graduation-batches, `/:id`, `/:id/items`, `/:id/export` | audit | Danh sách, tiến độ, item lọc phía server, xuất XLSX |
+
+- Phạm vi: R1/R3 theo scope chương trình, R6 chỉ đọc của mình; vai khác bị chặn. Context độc lập theo `(studentId, programId, semesterId)`, gồm song ngành và khoảng nửa mở `[from, until)` của enrollment; không fallback chương trình hiện hành.
+- Engine dùng `bestAcademicResults` của F-17 và khung đã ban hành của phiên bản áp dụng; tin trạng thái PASSED, không suy từ điểm. Kết quả gồm năm mã thiếu (bắt buộc, tự chọn theo tín chỉ/số học phần, tổng TC, điều kiện), warning và tín chỉ tự do; giá trị là decimal string, không làm tròn. Trường hợp không quyết định được (miễn học chưa xác nhận, bucket tương đương tranh chấp) trả diagnostic với result null, không phải NOT_ELIGIBLE. Quy tắc phân bổ/miễn học theo mặc định của plan (E2/E3), còn nợ Khoa C4.
+- Audit append-only; head của context trỏ audit mới nhất, audit cũ không sửa/xóa qua API. Đợt xét đóng băng roster khi xác nhận và chạy nền theo chunk; item lỗi là ERROR, khác NOT_ELIGIBLE; requester được kiểm lại trước khi chạy nền.
+- Thay đổi kết quả F-17 tạo receipt và task xét lại; audit mới mang trigger RESULT_CHANGE, reviewer null. Thông báo `GRADUATION_CONCLUSION_CHANGED` chỉ gửi R1 khi kết luận đổi, ghi cùng transaction với audit/head; task cũ hơn được đánh COVERED. Export đợt cũ giữ outcome đã đóng băng. Wiring queue: `general_architecture.md` §F-19.
+
+### Frontend — `src/features/graduation/`
+
+- Routes lazy-load bọc `RequireGraduationStaff` (R1/R3, kể cả tài khoản mixed): `/graduation` (MH-53), `/graduation/audits/:auditId`, `/graduation/batches` (MH-54), `/graduation/batches/:batchId`. Menu trong `shared/layout/menuItems.tsx`; MH-52 (`StudentDetailPage`) có entry chỉ điều hướng với context hiện tại, không lưu/đánh giá.
+- MH-53 xem trực tiếp rồi lưu rõ ràng, hiển thị đúng kết quả POST trả về; retry giữ requestKey. Chi tiết audit chỉ đọc; R1 thấy panel tác vụ xét lại và retry, R3 chỉ thấy trạng thái freshness. MH-54 tách preview khỏi tạo, theo dõi tiến độ bền (mẫu số enrollmentCount), lọc phía server và xuất XLSX; export tắt khi batch chưa terminal hoặc FAILED. Lỗi xác nhận batch hiển thị qua state của trang, `onOk` không reject.
+- Frontend chỉ trình bày credit/shortfall/conclusion của backend, không tính lại. View kết quả (`GraduationResultView`) giữ trong feature; tách sang shared để F-20 dùng còn hoãn.

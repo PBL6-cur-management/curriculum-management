@@ -15,7 +15,10 @@ import { USER_REF_SELECT } from '../../shared/dtos/ref.dto.js';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
 import { PERMISSIONS } from '../../shared/authz/permission-codes.js';
 import { courseTarget } from '../../shared/courses/course-target.js';
-import { SyllabusStatus } from '../../generated/prisma/client.js';
+import {
+  SyllabusStatus,
+  type SyllabusMaterialKind,
+} from '../../generated/prisma/client.js';
 import {
   assertDraftWrite,
   assertRevisionVisible,
@@ -44,6 +47,7 @@ export class SyllabusAttachmentsService {
   async upload(
     syllabusId: string,
     file: Express.Multer.File | undefined,
+    materialKind: SyllabusMaterialKind,
     access: AccessContext,
   ): Promise<SyllabusAttachmentDto> {
     const found = await this.prisma.syllabus.findUnique({
@@ -83,6 +87,7 @@ export class SyllabusAttachmentsService {
       const row = await this.prisma.syllabusAttachment.create({
         data: {
           syllabusId,
+          materialKind,
           fileName,
           fileType: spec.type,
           filePath,

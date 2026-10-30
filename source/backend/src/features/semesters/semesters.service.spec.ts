@@ -55,6 +55,7 @@ describe('SemestersService', () => {
     update: ReturnType<typeof vi.fn>;
   };
   let activate: ReturnType<typeof vi.fn>;
+  let programEnrollment: { count: ReturnType<typeof vi.fn> };
   let queryRaw: ReturnType<typeof vi.fn>;
   let service: SemestersService;
   const current = {
@@ -88,8 +89,15 @@ describe('SemestersService', () => {
       update: vi.fn(),
     };
     activate = vi.fn().mockResolvedValue(true);
+    programEnrollment = { count: vi.fn().mockResolvedValue(0) };
     queryRaw = vi.fn().mockResolvedValue([]);
-    const db = { semester, programVersion, cohort, $queryRaw: queryRaw };
+    const db = {
+      semester,
+      programVersion,
+      programEnrollment,
+      cohort,
+      $queryRaw: queryRaw,
+    };
     const prisma = {
       ...db,
       $transaction: vi.fn((run: (tx: unknown) => unknown) => run(db)),
@@ -191,6 +199,37 @@ describe('SemestersService', () => {
       await service.updateSemester('s1', { startDate: '2027-01-18' }, R1);
       await service.updateSemester('s1', { academicYear: '2026-2027' }, R1);
 
+      expect(semester.update).toHaveBeenCalledTimes(2);
+    });
+
+    it.each(['fromSemesterId', 'untilSemesterId'] as const)(
+      'refuses changing or clearing an enrollment %s boundary',
+      async (boundary) => {
+        programEnrollment.count.mockImplementation(
+          async (input: { where: { OR: Record<string, string>[] } }) =>
+            input.where.OR.some((clause) => clause[boundary] === 's1') ? 1 : 0,
+        );
+
+        for (const startDate of ['2027-01-25', null]) {
+          await expect(
+            service.updateSemester('s1', { startDate }, R1),
+          ).rejects.toMatchObject({ code: 'SEMESTER_IN_USE' });
+        }
+        expect(programEnrollment.count).toHaveBeenCalledWith({
+          where: {
+            OR: [{ fromSemesterId: 's1' }, { untilSemesterId: 's1' }],
+          },
+        });
+        expect(semester.update).not.toHaveBeenCalled();
+        expect(activate).not.toHaveBeenCalled();
+      },
+    );
+
+    it('permits unchanged dates and metadata edits for an enrollment boundary', async () => {
+      programEnrollment.count.mockResolvedValue(1);
+      await service.updateSemester('s1', { startDate: '2027-01-18' }, R1);
+      await service.updateSemester('s1', { academicYear: '2026-2027' }, R1);
+      expect(programEnrollment.count).not.toHaveBeenCalled();
       expect(semester.update).toHaveBeenCalledTimes(2);
     });
 

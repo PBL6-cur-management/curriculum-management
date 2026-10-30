@@ -81,6 +81,8 @@ src/
 │   ├── notifications/     thông báo trong ứng dụng, đếm chưa đọc (F-14)
 │   ├── releases/          ban hành khởi tạo, lịch sử phiên bản, đính chính, hàng đợi `release-activation` (F-15)
 │   ├── semesters/         học kỳ và khóa tuyển sinh (F-15)
+│   ├── students/          hồ sơ, kết quả nguồn, quá trình học; queue `student-enrollment` (F-17)
+│   ├── graduation/        xét tốt nghiệp, đợt xét, xét lại khi đổi điểm; queue `graduation-review` (F-19)
 │   └── health/            trạng thái hệ thống
 ├── shared/
 │   ├── config/            env.validation.ts — lớp Env (class-validator); sai thì dừng khi khởi động
@@ -99,6 +101,7 @@ src/
 │   ├── change-requests/   StaleChecker, released-base.ts, academic-office.ts, ApprovalRecorder, approval-rules.ts, RequestNotifier, diff/ (F-13, F-14) + ChangeRequestsSharedModule
 │   ├── notifications/     NotificationService + NotificationsSharedModule (F-14)
 │   ├── releases/          VersionPublisher, VersionActivator, SyllabusPublisher, version-number.ts (`major.minor`), release-locks.ts, correction-access.ts + ReleasesSharedModule (F-15)
+│   ├── students/          StudentsSharedModule: StudentAppliedVersionReader, AcademicResultsReader, EnrollmentReconciler, StudentAccountProvisioner; writer/khóa/phạm vi/mã hóa dùng chung (F-17)
 │   ├── files/             FileStorageService (dưới `FILES_ROOT`), sendFile, uploadedFileName, attachment-types.ts (F-10)
 │   ├── rich-text/         sanitizeRichText, richTextToPlain (F-10)
 │   ├── collections/       group-by.ts (thay `Map.groupBy`, target ES2023)
@@ -147,7 +150,13 @@ test/                      đầu-cuối: global-setup.ts dựng một PostgreSQ
 
 ### Chưa dựng
 
-Bộ đọc phạm vi suy ra cho sinh viên (`OWN_ENROLLMENT`, F-17); nó phải trả cả `programIds` của các chương trình sinh viên theo học để `program.view` của R6 dùng được (nhóm chuyên môn có từ F-03, Giám đốc CTĐT từ F-06). Nhật ký kiểm toán hoãn (F01-07, `docs/planning/deferred-scope.md` §2).
+Bộ đọc phạm vi suy ra cho sinh viên (`OWN_ENROLLMENT`, F-17) đã nối `Student.userId` để trả `studentIds` và `programIds` từ toàn bộ lịch sử quá trình học; tài khoản chưa liên kết hồ sơ không có phạm vi suy ra. Nhóm chuyên môn có từ F-03, Giám đốc CTĐT từ F-06. Nhật ký kiểm toán hoãn (F01-07, `docs/planning/deferred-scope.md` §2).
+
+### Module sinh viên và nhập dữ liệu (F-17)
+
+- `AppModule` nạp `StudentsModule`; module này nạp `StudentsSharedModule` và đăng ký BullMQ queue `student-enrollment`, cung cấp controller đọc hồ sơ/ghi quá trình học cùng scheduler/processor đối soát. `ImportsModule` cũng nạp `StudentsSharedModule` và cung cấp `StudentCredentialsService`; không import trực tiếp `StudentsModule` hay service của feature khác.
+- `StudentsSharedModule` nạp `ReleasesSharedModule` để dùng lịch gán khóa/bản đã ban hành, xuất bốn provider đọc phiên bản, đọc kết quả, đối soát và chuẩn bị tài khoản. Nguồn sự thật vẫn ở PostgreSQL, Redis chỉ điều phối công việc.
+- Frontend thêm route lazy `/students`, `/students/:studentId` dưới `RequireStudentStaff` (R1/R3 và `student.viewProgress`). Feature imports tái sử dụng pipeline và trang lịch sử hiện có; `shared/students/studentQueryRoot.ts` là gốc cache dùng chung để invalidate hồ sơ sau nhập thành công.
 
 ---
 
@@ -231,3 +240,17 @@ Trình duyệt ──/api/...──► (Vite proxy | Caddy) ──► NestJS
 - `gradingEditPath` là năng lực riêng với đường sửa nội dung: null khi người gọi không có ô quyền `gradingFormula.edit` trên bản sao yêu cầu.
 - GRADING_FORMULA nay đi qua duyệt cuối như các loại đề cương khác; chỉ ORGANIZATION nằm ngoài duyệt cuối.
 - Trình sửa đề cương vào được khi có một trong ba quyền (nội dung, CLO, công thức); guard route dùng `RequireAnyPermission`.
+
+## Điều kiện đăng ký (F-18) — transaction và privacy boundary
+
+- HTTP `features/registration-eligibility/` chỉ giữ concrete DTO/controller, whitelist mapper và scoped picker. Domain `shared/registration-eligibility/` giữ vocabulary, bulk frozen context, academic evidence, iterative SCC evaluator và actor-bound reader. Shared module nhập StudentsSharedModule, không nhập StudentsModule/service của feature khác.
+- Mỗi answer dùng một RepeatableRead snapshot; supplied tx được truyền nguyên vẹn cho F-17 và context reader, không nested transaction. Input bắt buộc studentId/programId/semesterId, không nhận version override hoặc transcript do client cung cấp. evaluatedAt là thời điểm bắt đầu phép tính trên current authoritative facts, không chứng nhận immutable historical replay.
+- Main GET hỗ trợ R1/R3 trong scope và own R6; staff picker riêng dùng SQL temporal membership cùng purpose ELIGIBILITY. Hai route no-store/private, không public/system bypass. Không table/migration, worker, Redis cache, dependency hoặc write path mới.
+- Client shared registration-eligibility components chỉ nhập shared primitives/generated schema. Curriculum feature sở hữu request/query/context composition; F-20 có thể dùng presentation chung và server facade sau này. Logout giữ clear toàn bộ QueryClient; đổi subject/context hủy và xóa query cá nhân, kiểm identity/version/item set trước render.
+
+## Xét tốt nghiệp (F-19) — wiring
+
+- `AppModule` nạp `GraduationModule`; module này nạp `GraduationSharedModule` (`src/shared/graduation/`: vocabulary, access/capability, input reader/codec, engine/allocation, audit writer, notification writer) và đăng ký BullMQ queue `graduation-review`. Không import trực tiếp feature module khác.
+- Queue có bốn job: `run-batch`, `scan-result-changes` (lặp mỗi 5 giây), `run-reaudit`, `recover-graduation`; 3 lần thử, exponential backoff 5 giây. Batch và task xét lại giữ lease 60 giây trong DB, gia hạn/rào bằng `clock_timestamp()`; bộ phục hồi đọc trạng thái DB để chạy tiếp, không dựa vào job còn trong Redis.
+- Xung đột serialization 40001/40P01 được thử tối đa 4 lần trong job (1 lần đầu + `GRADUATION_LIMITS.TRANSACTION_RETRIES` = 3), hết lượt thì hoãn ở mức WARN; `Error` không phân loại mang mã `UNCLASSIFIED_EXECUTION`, log đã khử dữ liệu sinh viên.
+- Producer F-17 không đổi: scanner đọc `AcademicResultChange`, ghi `GraduationResultChangeReceipt` bền rồi tạo task cho các context đã có audit.

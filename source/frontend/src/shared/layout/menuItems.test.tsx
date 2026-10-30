@@ -8,6 +8,66 @@ import {
 } from './menuItems';
 
 describe('app menu', () => {
+  it('shows graduation leaves only to permitted staff and keeps mixed staff/student identities', () => {
+    for (const roles of [['R1'], ['R3'], ['R6', 'R3']]) {
+      const menu = toMenuItems(
+        APP_MENU,
+        ['graduation.view', 'graduation.audit'],
+        roles,
+      );
+      const group = menu.find((item) => item.key === 'group:Xét tốt nghiệp');
+      expect(
+        group && 'children' in group && group.children.map((item) => item.key),
+      ).toEqual([ROUTES.graduationBatches, ROUTES.graduation]);
+    }
+    for (const roles of [['R2'], ['R4'], ['R5'], ['R6'], ['R5', 'R6']])
+      expect(
+        toMenuItems(
+          APP_MENU,
+          ['graduation.view', 'graduation.audit'],
+          roles,
+        ).map((item) => item.key),
+      ).not.toContain('group:Xét tốt nghiệp');
+    expect(
+      toMenuItems(APP_MENU, [], ['R1']).map((item) => item.key),
+    ).not.toContain('group:Xét tốt nghiệp');
+    const viewOnly = toMenuItems(APP_MENU, ['graduation.view'], ['R3']).find(
+      (item) => item.key === 'group:Xét tốt nghiệp',
+    );
+    expect(
+      viewOnly &&
+        'children' in viewOnly &&
+        viewOnly.children.map((item) => item.key),
+    ).toEqual([ROUTES.graduation]);
+    expect(selectedMenuPath(APP_MENU, '/graduation/batches/batch')).toBe(
+      ROUTES.graduationBatches,
+    );
+    expect(selectedMenuPath(APP_MENU, '/graduation/audits/audit')).toBe(
+      ROUTES.graduation,
+    );
+  });
+  it('shows student records only to R1/R3 staff including multi-role users', () => {
+    for (const roles of [['R1'], ['R3'], ['R6', 'R3']])
+      expect(
+        toMenuItems(APP_MENU, ['student.viewProgress'], roles).map(
+          (item) => item.key,
+        ),
+      ).toContain(ROUTES.students);
+    for (const roles of [['R6'], ['R5']])
+      expect(
+        toMenuItems(APP_MENU, ['student.viewProgress'], roles).map(
+          (item) => item.key,
+        ),
+      ).not.toContain(ROUTES.students);
+  });
+  it('opens import navigation for data-only permission without broadening other entries', () => {
+    const keys = toMenuItems(APP_MENU, ['data.importExcel'], ['R1']).map(
+      (item) => item.key,
+    );
+    expect(keys).toContain(ROUTES.imports);
+    expect(keys).toContain(ROUTES.importHistory);
+    expect(keys).not.toContain(ROUTES.students);
+  });
   it('nests the equivalence groups under Học phần for holders of course.view', () => {
     const items = toMenuItems(APP_MENU, ['course.view']);
     const courses = items.find((item) => item.key === 'group:Học phần');

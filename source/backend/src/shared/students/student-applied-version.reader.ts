@@ -7,9 +7,13 @@ import { AppliedProgramVersionReader } from '../releases/applied-program-version
 import { APPLIED_VERSION_ERRORS } from '../releases/applied-version.errors.js';
 import { issuedVersionFact } from '../releases/cohort-version-schedule.js';
 import { requireSemesterStart } from '../releases/semester-start.js';
-import { coversSemester } from './enrollment-period.js';
+import {
+  coversSemester,
+  hasKnownEnrollmentBoundaries,
+} from './enrollment-period.js';
 import {
   assertStudentProgramRead,
+  requireGraduationReauditLookup,
   type StudentReadPurpose,
 } from './student-access.js';
 import type {
@@ -84,6 +88,38 @@ export class StudentAppliedVersionReader {
       assertStudentProgramRead(access, purpose, student, input.programId);
     }
 
+    return this.resolveAuthorized(db, inputs, semesters);
+  }
+
+  async forReauditTask(
+    taskId: string,
+    leaseToken: string,
+    tx: Prisma.TransactionClient,
+  ) {
+    const lookup = await requireGraduationReauditLookup(taskId, leaseToken, tx);
+    return {
+      lookup,
+      resolveForStudent: async () => {
+        await requireGraduationReauditLookup(taskId, leaseToken, tx);
+        return (await this.resolveAuthorized(tx, [lookup]))[0]!;
+      },
+    };
+  }
+
+  private async resolveAuthorized(
+    db: Prisma.TransactionClient,
+    inputs: StudentAppliedVersionLookup[],
+    knownSemesters?: Map<
+      string,
+      Awaited<ReturnType<typeof requireSemesterStart>>
+    >,
+  ): Promise<StudentAppliedVersionResult[]> {
+    const semesters =
+      knownSemesters ??
+      new Map<string, Awaited<ReturnType<typeof requireSemesterStart>>>();
+    if (!knownSemesters)
+      for (const id of new Set(inputs.map((input) => input.semesterId)))
+        semesters.set(id, await requireSemesterStart(db, id));
     const enrollments = await db.programEnrollment.findMany({
       where: {
         OR: inputs.map((input) => ({
@@ -103,25 +139,25 @@ export class StudentAppliedVersionReader {
     >();
     inputs.forEach((input, index) => {
       const semester = semesters.get(input.semesterId)!;
-      const covering = enrollments.filter(
-        (row) =>
-          row.studentId === input.studentId &&
-          row.programId === input.programId &&
-          coversSemester(
-            {
-              fromStart: row.fromSemester.startDate,
-              untilStart: row.untilSemester?.startDate ?? null,
-            },
-            semester.startDate,
-          ),
-      );
+      const covering = enrollments.filter((row) => {
+        if (
+          row.studentId !== input.studentId ||
+          row.programId !== input.programId
+        )
+          return false;
+        const period = {
+          fromStart: row.fromSemester.startDate,
+          untilSemester: row.untilSemester,
+        };
+        if (!hasKnownEnrollmentBoundaries(period))
+          throw new AppException(STUDENT_ERRORS.INVALID_ENROLLMENT_INTERVAL);
+        return coversSemester(period, semester.startDate);
+      });
       if (covering.length === 0)
         throw new AppException(STUDENT_ERRORS.ENROLLMENT_NOT_FOUND);
       if (covering.length > 1)
         throw new AppException(STUDENT_ERRORS.ENROLLMENT_AMBIGUOUS);
       const row = covering[0]!;
-      if (!row.fromSemester.startDate)
-        throw new AppException(STUDENT_ERRORS.INVALID_ENROLLMENT_INTERVAL);
       if (row.isException) {
         const version = issuedVersionFact(row.appliedVersion);
         if (

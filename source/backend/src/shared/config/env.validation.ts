@@ -1,5 +1,9 @@
 import { plainToInstance } from 'class-transformer';
 import {
+  ELIGIBILITY_DEFAULTS,
+  ELIGIBILITY_LIMITS,
+} from '../registration-eligibility/eligibility.constants.js';
+import {
   IsIn,
   IsInt,
   IsNotEmpty,
@@ -17,7 +21,7 @@ const MAX_PORT = 65535;
 const SESSION_SECRET_MIN_LENGTH = 32;
 const DEFAULT_SESSION_IDLE_MINUTES = 60;
 const DEFAULT_FILES_ROOT = 'files';
-const DEFAULT_ATTACHMENT_MAX_MB = 20;
+const DEFAULT_ATTACHMENT_MAX_MB = 50;
 // 32 bytes in base64: 43 characters and one padding sign.
 const CREDENTIAL_KEY_PATTERN = /^[A-Za-z0-9+/]{43}=$/;
 
@@ -75,6 +79,11 @@ export class Env {
       'STUDENT_CREDENTIAL_ENCRYPTION_KEY must be the base64 of exactly 32 bytes',
   })
   STUDENT_CREDENTIAL_ENCRYPTION_KEY?: string;
+
+  @IsInt()
+  @Min(ELIGIBILITY_LIMITS.MIN_DEPTH)
+  @Max(ELIGIBILITY_LIMITS.MAX_DEPTH)
+  ELIGIBILITY_MAX_DEPTH: number = ELIGIBILITY_DEFAULTS.MAX_DEPTH;
 }
 
 export function validateEnv(raw: Record<string, unknown>): Env {

@@ -10,8 +10,56 @@ import type { StartedSemester } from '../releases/semester-start.js';
 import { enrollmentCoversWhere } from './enrollment-period.js';
 import { STUDENT_ROLES } from './student.constants.js';
 import { STUDENT_ERRORS } from './student.errors.js';
+import { GRADUATION_ERRORS } from '../graduation/graduation.errors.js';
+import type { StudentAppliedVersionLookup } from './student-applied-version.types.js';
 
 export type StudentReadPurpose = 'PROGRESS' | 'ELIGIBILITY' | 'GRADUATION';
+
+export async function requireGraduationReauditLookup(
+  taskId: string,
+  leaseToken: string,
+  tx: Prisma.TransactionClient,
+): Promise<StudentAppliedVersionLookup> {
+  await tx.$queryRaw`SELECT "id" FROM "GraduationReauditTask" WHERE "id" = ${taskId} FOR UPDATE`;
+  const task = await tx.graduationReauditTask.findUnique({
+    where: { id: taskId },
+    include: {
+      context: { include: { semester: true } },
+      baselineAudit: true,
+      receipt: {
+        include: {
+          change: {
+            include: { academicResult: { include: { semester: true } } },
+          },
+        },
+      },
+    },
+  });
+  if (
+    !task ||
+    task.status !== 'RUNNING' ||
+    task.leaseToken !== leaseToken ||
+    !leaseToken ||
+    !task.leaseUntil ||
+    task.leaseUntil.getTime() <= Date.now()
+  )
+    throw new AppException(GRADUATION_ERRORS.ACCESS_REVOKED);
+  const context = task.context;
+  const result = task.receipt.change.academicResult;
+  if (
+    task.baselineAudit.contextId !== context.id ||
+    result.studentId !== context.studentId ||
+    !result.semester.startDate ||
+    !context.semester.startDate ||
+    result.semester.startDate > context.semester.startDate
+  )
+    throw new AppException(GRADUATION_ERRORS.INPUT_INVALID);
+  return {
+    studentId: context.studentId,
+    programId: context.programId,
+    semesterId: context.semesterId,
+  };
+}
 
 const PURPOSE_PERMISSIONS: Record<StudentReadPurpose, PermissionCode[]> = {
   PROGRESS: [PERMISSIONS.STUDENT_VIEW_PROGRESS],

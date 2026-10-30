@@ -6,6 +6,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Curriculum } from '../api/curriculum';
 import { curriculum as fixture, item } from '../testFixtures';
 import { CurriculumPage } from './CurriculumPage';
+import {
+  eligibilityAnswerFixture,
+  conditionalItemFixture,
+} from '../eligibilityTestFixtures';
+import type { RegistrationEligibility } from '../api/registrationEligibility';
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status });
@@ -15,14 +20,38 @@ function renderPage(
   status = 200,
   search = '',
   permissions = ['changeRequest.create'],
+  roles: string[] = [],
+  answer?: RegistrationEligibility,
 ) {
   vi.stubGlobal(
     'fetch',
     vi.fn((input: RequestInfo | URL) => {
       const url = String(input);
-      if (url === '/api/auth/me') return Promise.resolve(json({ permissions }));
+      if (url === '/api/auth/me')
+        return Promise.resolve(
+          json({ permissions, roles: roles.map((roleCode) => ({ roleCode })) }),
+        );
+      if (url === '/api/semesters')
+        return Promise.resolve(
+          json([
+            {
+              id: 'sem1',
+              semesterCode: 'SYN-2026',
+              startDate: '2026-01-01',
+              academicYear: '2026-2027',
+              termInYear: 1,
+            },
+          ]),
+        );
+      if (url.includes('/registration-eligibility?'))
+        return Promise.resolve(json(answer ?? {}, answer ? 200 : 403));
       if (url === '/api/program-versions/v1/curriculum')
         return Promise.resolve(json(status === 200 ? data : {}, status));
+      if (
+        url.startsWith('/api/program-versions/') &&
+        url.endsWith('/curriculum')
+      )
+        return new Promise<Response>(() => {});
       return Promise.resolve(
         json({ items: [], total: 0, page: 1, pageSize: 20 }),
       );
@@ -53,6 +82,7 @@ function renderPage(
       </App>
     </QueryClientProvider>,
   );
+  return router;
 }
 
 const bodyRows = () => screen.getAllByRole('row').slice(1);
@@ -67,6 +97,93 @@ Element.prototype.scrollIntoView = vi.fn();
 afterEach(() => vi.unstubAllGlobals());
 
 describe('CurriculumPage', () => {
+  it('shows a read-only student answer with board parity and clears back to ordinary browsing', async () => {
+    const data = fixture();
+    renderPage(
+      data,
+      200,
+      '?studentId=s1&semesterId=sem1',
+      ['student.viewRegistrationEligibility'],
+      ['R1'],
+      eligibilityAnswerFixture({
+        items: data.items.map((row) => conditionalItemFixture(row.id)),
+      }),
+    );
+    await screen.findByRole('columnheader', { name: 'Đăng ký được?' });
+    expect(
+      screen.queryByRole('button', { name: 'Thêm học phần' }),
+    ).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Xem lý do MAT101' }));
+    expect(await screen.findByText('Phải đăng ký cùng')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+    fireEvent.click(screen.getByText('Theo học kỳ'));
+    expect(screen.getAllByText('Được có điều kiện')).toHaveLength(3);
+    fireEvent.click(screen.getByRole('button', { name: 'Bỏ chọn sinh viên' }));
+    // Still on the semester board, which prints code and name in one line.
+    await vi.waitFor(() =>
+      expect(screen.queryByText('Được có điều kiện')).not.toBeInTheDocument(),
+    );
+    expect(screen.getAllByText(/Giải tích 1/).length).toBeGreaterThan(0);
+  });
+  it.each(['R2', 'R4', 'R5', 'R6'])(
+    'never searches or evaluates a crafted staff context for %s',
+    async (role) => {
+      renderPage(
+        fixture(),
+        200,
+        '?studentId=s1&semesterId=sem1',
+        ['student.viewRegistrationEligibility'],
+        [role],
+      );
+      await screen.findByText('Bạn không có quyền xem khung theo sinh viên');
+      expect(
+        vi
+          .mocked(fetch)
+          .mock.calls.some(([input]) =>
+            String(input).includes('registration-eligibility'),
+          ),
+      ).toBe(false);
+    },
+  );
+  it('requires an explicit known semester and does not guess one', async () => {
+    renderPage(
+      fixture(),
+      200,
+      '?studentId=s1',
+      ['student.viewRegistrationEligibility'],
+      ['R3'],
+    );
+    await screen.findByText('Chọn học kỳ để tính điều kiện đăng ký');
+    expect(
+      vi
+        .mocked(fetch)
+        .mock.calls.some(([input]) =>
+          String(input).includes('/registration-eligibility?'),
+        ),
+    ).toBe(false);
+  });
+  it('replaces the browsed version before joining eligibility rows and drops old focus', async () => {
+    const answer = eligibilityAnswerFixture();
+    answer.context.programVersionId = 'v2';
+    const router = renderPage(
+      fixture(),
+      200,
+      '?studentId=s1&semesterId=sem1&focus=old-item',
+      ['student.viewRegistrationEligibility'],
+      ['R1'],
+      answer,
+    );
+    await screen.findByText(
+      'Đang mở khung của phiên bản áp dụng cho sinh viên...',
+    );
+    await vi.waitFor(() =>
+      expect(router.state.location.pathname).toContain('/versions/v2/'),
+    );
+    expect(router.state.location.search).not.toContain('focus=');
+    expect(
+      screen.queryByRole('columnheader', { name: 'Đăng ký được?' }),
+    ).not.toBeInTheDocument();
+  });
   it('requests the version export URL and displays a scoped refusal', async () => {
     renderPage(fixture(), 200, '', ['curriculum.importExportExcel']);
     const exportButton = await screen.findByRole('button', {

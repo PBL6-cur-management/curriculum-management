@@ -8,6 +8,7 @@ import {
 import { COURSE_QUERY_ROOT } from '../../../shared/courses/courseQueryKeys';
 import { CURRICULUM_QUERY_ROOT } from '../../../shared/curriculum/curriculumQueryRoot';
 import { OUTCOME_QUERY_ROOT } from '../../../shared/outcomes/outcomeQueryRoot';
+import { STUDENT_QUERY_ROOT } from '../../../shared/students/studentQueryRoot';
 import { PROGRAM_QUERY_KEYS } from '../../programs/hooks/usePrograms';
 import {
   commitImport,
@@ -18,6 +19,7 @@ import {
   fetchImports,
   fetchImportTargets,
   fetchImportTypes,
+  fetchStudentCredentialStatus,
   type ImportQuery,
 } from '../api/imports';
 import {
@@ -32,6 +34,7 @@ export const IMPORT_QUERY_KEYS = {
   targets: ['imports', 'targets'] as const,
   list: (query: ImportQuery) => ['imports', 'list', query] as const,
   detail: (id: string) => ['imports', 'detail', id] as const,
+  credentials: (id: string) => ['imports', 'credentials', id] as const,
 };
 export function useImportTypes() {
   return useQuery({
@@ -86,10 +89,25 @@ export function useImportBatch(id: string) {
       CURRICULUM_QUERY_ROOT,
       OUTCOME_QUERY_ROOT,
       PROGRAM_QUERY_KEYS.all,
+      ...(query.data.importType === 'STUDENT_LIST' ||
+      query.data.importType === 'ACADEMIC_RESULT'
+        ? [
+            STUDENT_QUERY_ROOT,
+            ['users'] as const,
+            IMPORT_QUERY_KEYS.credentials(query.data.id),
+          ]
+        : []),
     ]) {
       void client.invalidateQueries({ queryKey });
     }
-  }, [client, query.data?.id, query.data?.status]);
+  }, [client, query.data?.id, query.data?.status, query.data?.importType]);
+  useEffect(() => {
+    if (query.isError)
+      client.removeQueries({
+        queryKey: IMPORT_QUERY_KEYS.detail(id),
+        exact: true,
+      });
+  }, [client, id, query.isError]);
   return query;
 }
 export function useCreateImport() {
@@ -117,4 +135,13 @@ export function useDownloadTemplate() {
 }
 export function useDownloadImportFile() {
   return useMutation({ mutationFn: downloadImportFile });
+}
+
+export function useStudentCredentialStatus(id: string, enabled: boolean) {
+  return useQuery({
+    queryKey: IMPORT_QUERY_KEYS.credentials(id),
+    queryFn: () => fetchStudentCredentialStatus(id),
+    enabled,
+    retry: false,
+  });
 }

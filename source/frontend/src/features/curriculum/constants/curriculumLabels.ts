@@ -35,3 +35,7 @@ export const MINIMUM_REQUIRED_MESSAGE = 'Nhập ít nhất một yêu cầu tố
 // Repeated in the syllabi feature's labels: features do not import each other.
 export const SYLLABUS_LINK = 'Đề cương';
 export const NO_SYLLABUS_TAG = 'Chưa có đề cương';
+export const ELIGIBILITY_STUDENT_PARAM = 'studentId';
+export const ELIGIBILITY_SEMESTER_PARAM = 'semesterId';
+export const ELIGIBILITY_COLUMN_TITLE = 'Đăng ký được?';
+export const ELIGIBILITY_CONTEXT_RELOAD_LIMIT = 1;

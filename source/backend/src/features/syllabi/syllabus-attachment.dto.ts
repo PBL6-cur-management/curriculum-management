@@ -1,8 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { AttachmentFileType } from '../../generated/prisma/client.js';
+import { IsEnum } from 'class-validator';
+import {
+  AttachmentFileType,
+  SyllabusMaterialKind,
+} from '../../generated/prisma/client.js';
 import { UserRefDto } from '../../shared/dtos/ref.dto.js';
 
-export class UploadAttachmentFormDto {
+// The validated body: `file` stays out, or the whitelist rejects the empty field the class declares.
+export class UploadAttachmentDto {
+  @ApiProperty({ enum: SyllabusMaterialKind, enumName: 'SyllabusMaterialKind' })
+  @IsEnum(SyllabusMaterialKind)
+  materialKind!: SyllabusMaterialKind;
+}
+
+export class UploadAttachmentFormDto extends UploadAttachmentDto {
   @ApiProperty({ type: 'string', format: 'binary' }) file!: unknown;
 }
 
@@ -17,6 +28,8 @@ export class AttachmentRulesDto {
 }
 
 export class SyllabusAttachmentDto {
+  @ApiProperty({ enum: SyllabusMaterialKind, enumName: 'SyllabusMaterialKind' })
+  materialKind!: SyllabusMaterialKind;
   @ApiProperty() id!: string;
   @ApiProperty({ description: 'Original name, UTF-8 decoded' })
   fileName!: string;
@@ -29,6 +42,7 @@ export class SyllabusAttachmentDto {
 }
 
 export interface AttachmentRow {
+  materialKind: SyllabusMaterialKind;
   id: string;
   fileName: string;
   fileType: AttachmentFileType;
@@ -42,6 +56,7 @@ export function toAttachmentDto(
   canDelete: boolean,
 ): SyllabusAttachmentDto {
   return {
+    materialKind: row.materialKind,
     id: row.id,
     fileName: row.fileName,
     fileType: row.fileType,

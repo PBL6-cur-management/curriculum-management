@@ -219,3 +219,22 @@ oxlint (`pnpm lint`; máy chủ bật `--type-aware`, lời hứa bị bỏ quê
 - API truyền tỷ trọng, ngưỡng và điểm liệt dạng chuỗi thập phân (`toWireDecimal`), không dùng số JSON.
 - Frontend (`features/syllabi/utils/gradeFormulaValues.ts`) cộng tỷ trọng theo phần trăm nguyên (hundredths) để tổng 100 chính xác, nhận dấu phẩy khi nhập và gửi chuỗi chuẩn hóa; không thêm thư viện.
 - Form tải lại từ máy chủ dùng khóa dựng lại gắn với `updatedAt` (`hooks/useEditorRemountKey.ts`): chỉ dựng lại khi trình sửa chưa có dữ liệu nhập.
+
+## 12. Mã hóa bàn giao tài khoản và đối soát sinh viên (F-17)
+
+**Library**: `node:crypto` (Node.js tích hợp), `exceljs`, `bullmq`; không thêm thư viện mã hóa riêng.
+
+### Configuration
+
+- `STUDENT_CREDENTIAL_ENCRYPTION_KEY` là biến tùy chọn, chuỗi base64 giải mã thành đúng 32 byte. `Env` dùng `@IsOptional()` và `@Matches(CREDENTIAL_KEY_PATTERN)`: thiếu biến vẫn khởi động được, nhưng giá trị có mặt sai định dạng bị chặn lúc kiểm môi trường. Không ghi giá trị khóa vào tài liệu, log hoặc báo cáo import.
+- `credentialKeyFrom` kiểm lại độ dài sau giải mã khi sử dụng; thiếu khóa hoặc độ dài không hợp lệ ném HTTP 503 `STUDENT_CREDENTIALS_UNAVAILABLE`. `ImportsService.create` kiểm ngay với mọi `STUDENT_LIST` trước khi đọc sheet/tạo batch; `commit` kiểm lại trước khi đổi sang `COMMITTING`, không chỉ khi tệp có sinh viên mới. `ACADEMIC_RESULT` không phụ thuộc khóa này. Worker chỉ gọi mã hóa khi thực sự có tài khoản mới; không được bỏ qua phát hành thông tin tài khoản để nhập hồ sơ thành công một phần.
+- `STUDENT_CREDENTIALS` quy định AES-256-GCM, IV ngẫu nhiên 12 byte, authentication tag 16 byte, TTL 24 giờ. AAD gắn `batchId` với người thực hiện; `keyId` là 16 ký tự hex đầu của SHA-256 khóa, chỉ là fingerprint, không phải khóa dự phòng.
+- Queue `student-enrollment` dùng chung cấu hình Redis/BullMQ; scheduler `student-enrollment-daily` chạy `10 0 * * *` theo `Asia/Ho_Chi_Minh`, thêm một job khởi động với ID mới mỗi lần để job hoàn tất cũ không nuốt lượt chạy. Retry 3 lần, backoff 5 giây; Redis chỉ giữ lịch/job, dữ liệu quyết định đọc từ PostgreSQL.
+
+### Usage Pattern
+
+- `StudentAccountProvisioner` chuẩn hóa mã sinh viên, dùng username chữ thường, sinh mật khẩu tạm và hash bằng `PasswordService` trước khi khóa transaction. XLSX bàn giao chỉ chứa mã sinh viên, username và mật khẩu tạm; `StudentCredentialDelivery` giữ bản mã, không giữ khóa.
+- Tải bản bàn giao là POST có CSRF, không dùng GET/prefetch. `consume` kiểm chủ phiên và quyền hiện tại, khóa hàng `FOR UPDATE`, rồi xóa `ciphertext`/`iv`/`authTag`/`keyId` và ghi `downloadedAt` trong transaction. HTTP response đặt `Cache-Control: no-store`; đã tiêu thụ thì không có cơ chế tải lại nếu truyền tệp thất bại phía client.
+- Bản đã tải trả `CREDENTIALS_ALREADY_DOWNLOADED`; hết hạn hoặc thiếu thành phần payload trả `CREDENTIALS_EXPIRED`. Thiếu khóa lúc giải mã vẫn trả `STUDENT_CREDENTIALS_UNAVAILABLE`; khóa khác nhưng hợp lệ, AAD sai hoặc bản mã bị sửa trả `CREDENTIALS_UNREADABLE`. Không có vòng khóa cũ để giải mã sau xoay khóa. API trạng thái chỉ xét payload, hạn và dấu tải, không thử giải mã để bảo đảm khóa hiện tại dùng được.
+- Quét `imports-sweep` gọi `purgeExpired`, chỉ xóa payload mã hóa và giữ metadata bàn giao. Không dùng tệp XLSX mật khẩu rõ làm báo cáo import hay lưu dưới `FILES_ROOT`.
+- Ghi quá trình học dùng khóa chương trình/sinh viên/quá trình học cùng token thời gian; `EnrollmentReconciler` chạy transaction `Serializable`, còn bộ đọc kết quả dùng `RepeatableRead` khi không nhận transaction từ caller. Điểm nguồn gửi Decimal dạng chuỗi; miễn học và đang học giữ nguyên trạng thái, không tự chuyển thành điểm hoặc trượt.

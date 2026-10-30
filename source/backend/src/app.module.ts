@@ -30,6 +30,8 @@ import { ReleasesModule } from './features/releases/releases.module.js';
 import { SemestersModule } from './features/semesters/semesters.module.js';
 import { ImportsModule } from './features/imports/imports.module.js';
 import { StudentsModule } from './features/students/students.module.js';
+import { RegistrationEligibilityModule } from './features/registration-eligibility/registration-eligibility.module.js';
+import { GraduationModule } from './features/graduation/graduation.module.js';
 
 @Module({
   imports: [
@@ -59,6 +61,8 @@ import { StudentsModule } from './features/students/students.module.js';
     ReleasesModule,
     ImportsModule,
     StudentsModule,
+    RegistrationEligibilityModule,
+    GraduationModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: CsrfGuard },

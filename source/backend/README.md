@@ -22,7 +22,7 @@ Cần Node.js 22 (≥ 22.22), pnpm 10, Docker.
 | `SESSION_SECRET`       | chuỗi ngẫu nhiên ≥ 32 ký tự                  | Có                                  |
 | `SESSION_IDLE_MINUTES` | `60`                                         | Không, mặc định `60`                |
 | `FILES_ROOT`           | `files` (thư mục tệp đính kèm; cần sao lưu)  | Không, mặc định `files`             |
-| `ATTACHMENT_MAX_MB`    | `20`                                         | Không, mặc định `20`                |
+| `ATTACHMENT_MAX_MB`    | `50`                                         | Không, mặc định `50`                |
 | `BULLMQ_PREFIX`        | `ctdt` (tiền tố khóa Redis của hàng đợi)     | Không, mặc định `bull` của BullMQ   |
 | `SEED_ADMIN_USERNAME`  | `admin`                                      | Chỉ khi chạy seed, mặc định `admin` |
 | `SEED_ADMIN_PASSWORD`  | mật khẩu tạm ≥ 8 ký tự, có chữ và số         | Chỉ khi chạy seed                   |

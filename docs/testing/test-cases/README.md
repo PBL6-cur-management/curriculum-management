@@ -20,10 +20,13 @@
 
 - [F-16 So sánh phiên bản, gán khóa](./f-16-version-compare-cohort-assignment-test-cases.md) — 27 ca: 22 tự động Passed ngày 10/27/26 (5 Playwright, 7 Backend e2e, 10 Frontend unit); 5 Manual chưa chạy (023..027). TC_008/014 Failed lượt 1 do helper fixture, Passed lượt 2 sau sửa; không phải lỗi ứng dụng.
 - [F-12 Công thức điểm, ánh xạ đánh giá–CLO](./f-12-grade-formula-assessment-clo-test-cases.md) — 26 ca: 21 tự động Passed ngày 10/27/26 (4 Playwright, 14 Backend e2e, 3 nhóm Frontend unit); 5 Manual chưa chạy (022..026). TC_004 Failed lượt 1 do lưới ánh xạ dựng lại bằng dữ liệu cũ (lỗi ứng dụng, đã sửa), Passed lượt sau.
+- [F-17 Hồ sơ sinh viên, nhập kết quả học tập](./f-17-student-records-results-import-test-cases.md) — 32 ca: 28 tự động Passed ngày 10/29/26 (5 Playwright, 17 Backend e2e, 6 Frontend unit); 4 Manual Not run (029..032). Playwright 14/14 gồm auth setup; chỉ tính 5 TC nghiệp vụ.
+- [F-18 Điều kiện đăng ký học phần](./f-18-course-registration-eligibility-test-cases.md) — 16 ca: 14 tự động Passed ngày 10/30/26 (Backend unit/e2e Testcontainers, Frontend unit); 2 Manual Not run (015/016). Không có Playwright riêng; Playwright F-07 35/35 là hồi quy MH-25.
+- [F-19 Xét tốt nghiệp](./f-19-graduation-review-test-cases.md) — 35 ca: 19 tự động Passed ngày 10/30/26 (16 Backend e2e/unit Testcontainers, 3 nhóm Frontend unit); 16 Manual Not run (020..035). Không có Playwright riêng.
 
 ## Tổng kết thực thi theo chỉ mục
 
-Đếm trực tiếp các dòng TC trong 16 tài liệu tính năng ngày 2026-10-27: **842 ca = 451 tự động Passed + 391 thủ công chưa chạy**. Phân rã: 13 tính năng MVP 759/381/378 (tổng/Passed/thủ công); F-09 30/27/3; F-16 27/22/5; F-12 26/21/5. Không cộng 9 auth setup, không đếm trùng các tầng automation của cùng TC. Năm ca MVP xuyên tính năng trong mvp-flow-test-cases.md đã Passed, được theo dõi riêng, không cộng vào tổng theo tính năng này.
+Đếm trực tiếp các dòng `Fxx-TC_nnn` trong 19 tài liệu `f-*-test-cases.md` ngày 2026-10-30: **925 ca = 512 tự động Passed + 413 thủ công chưa chạy**; không còn ca tự động chưa có kết quả trong chỉ mục. Phân rã: 13 tính năng MVP 759/381/378 (tổng/Passed/thủ công); F-09 30/27/3; F-16 27/22/5; F-12 26/21/5; F-17 32/28/4; F-18 16/14/2; F-19 35/19/16. Passed tự động là dòng có `Is Test?`/`Automated? = Yes` và `Test Result`/`Result = Passed`; Manual là dòng No, mỗi TC chỉ tính một lần. Không cộng auth setup hoặc đếm trùng các tầng automation của cùng TC. Năm ca MVP xuyên tính năng trong mvp-flow-test-cases.md đã Passed, được theo dõi riêng, không cộng vào tổng theo tính năng này.
 
 ## Mục đích và phạm vi
 

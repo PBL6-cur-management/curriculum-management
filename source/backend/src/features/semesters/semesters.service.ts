@@ -99,7 +99,12 @@ export class SemestersService {
               },
             },
           });
-          if (standing > 0)
+          const enrollmentCount = await tx.programEnrollment.count({
+            where: {
+              OR: [{ fromSemesterId: id }, { untilSemesterId: id }],
+            },
+          });
+          if (standing > 0 || enrollmentCount > 0)
             throw new AppException(SEMESTER_ERRORS.SEMESTER_IN_USE);
         }
         const updated = await tx.semester.update({

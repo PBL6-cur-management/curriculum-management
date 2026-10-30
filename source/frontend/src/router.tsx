@@ -1,4 +1,6 @@
 import { lazy } from 'react';
+import { RequireStudentStaff } from './features/students/components/RequireStudentStaff';
+import { RequireGraduationStaff } from './features/graduation/components/RequireGraduationStaff';
 import { createBrowserRouter } from 'react-router';
 import { LoginPage } from './features/auth/pages/LoginPage';
 import { ROUTES } from './routes';
@@ -7,6 +9,27 @@ import { AppLayout } from './shared/layout/AppLayout';
 import { RequireAnyPermission } from './shared/auth/RequireAnyPermission';
 import { RequirePermission } from './shared/auth/RequirePermission';
 import { PERMISSIONS } from './shared/auth/permissions';
+
+const GraduationReviewPage = lazy(() =>
+  import('./features/graduation/pages/GraduationReviewPage').then((module) => ({
+    default: module.GraduationReviewPage,
+  })),
+);
+const GraduationAuditPage = lazy(() =>
+  import('./features/graduation/pages/GraduationAuditPage').then((module) => ({
+    default: module.GraduationAuditPage,
+  })),
+);
+const GraduationBatchesPage = lazy(() =>
+  import('./features/graduation/pages/GraduationBatchesPage').then(
+    (module) => ({ default: module.GraduationBatchesPage }),
+  ),
+);
+const GraduationBatchPage = lazy(() =>
+  import('./features/graduation/pages/GraduationBatchPage').then((module) => ({
+    default: module.GraduationBatchPage,
+  })),
+);
 
 const UserListPage = lazy(() =>
   import('./features/users/pages/UserListPage').then((module) => ({
@@ -243,6 +266,17 @@ const ImportDetailPage = lazy(() =>
   })),
 );
 
+const StudentListPage = lazy(() =>
+  import('./features/students/pages/StudentListPage').then((module) => ({
+    default: module.StudentListPage,
+  })),
+);
+const StudentDetailPage = lazy(() =>
+  import('./features/students/pages/StudentDetailPage').then((module) => ({
+    default: module.StudentDetailPage,
+  })),
+);
+
 export const router = createBrowserRouter([
   { path: ROUTES.login, element: <LoginPage /> },
   {
@@ -254,27 +288,90 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <HomePage /> },
           {
+            path: ROUTES.graduation,
+            element: (
+              <RequireGraduationStaff>
+                <GraduationReviewPage />
+              </RequireGraduationStaff>
+            ),
+          },
+          {
+            path: ROUTES.graduationAudit,
+            element: (
+              <RequireGraduationStaff>
+                <GraduationAuditPage />
+              </RequireGraduationStaff>
+            ),
+          },
+          {
+            path: ROUTES.graduationBatches,
+            element: (
+              <RequireGraduationStaff permission="graduation.audit">
+                <GraduationBatchesPage />
+              </RequireGraduationStaff>
+            ),
+          },
+          {
+            path: ROUTES.graduationBatch,
+            element: (
+              <RequireGraduationStaff permission="graduation.audit">
+                <GraduationBatchPage />
+              </RequireGraduationStaff>
+            ),
+          },
+          {
+            path: ROUTES.students,
+            element: (
+              <RequireStudentStaff>
+                <StudentListPage />
+              </RequireStudentStaff>
+            ),
+          },
+          {
+            path: ROUTES.studentDetail,
+            element: (
+              <RequireStudentStaff>
+                <StudentDetailPage />
+              </RequireStudentStaff>
+            ),
+          },
+          {
             path: ROUTES.imports,
             element: (
-              <RequirePermission code={PERMISSIONS.curriculumImportExportExcel}>
+              <RequireAnyPermission
+                codes={[
+                  PERMISSIONS.curriculumImportExportExcel,
+                  PERMISSIONS.dataImportExcel,
+                ]}
+              >
                 <ImportPage />
-              </RequirePermission>
+              </RequireAnyPermission>
             ),
           },
           {
             path: ROUTES.importHistory,
             element: (
-              <RequirePermission code={PERMISSIONS.curriculumImportExportExcel}>
+              <RequireAnyPermission
+                codes={[
+                  PERMISSIONS.curriculumImportExportExcel,
+                  PERMISSIONS.dataImportExcel,
+                ]}
+              >
                 <ImportHistoryPage />
-              </RequirePermission>
+              </RequireAnyPermission>
             ),
           },
           {
             path: ROUTES.importDetail,
             element: (
-              <RequirePermission code={PERMISSIONS.curriculumImportExportExcel}>
+              <RequireAnyPermission
+                codes={[
+                  PERMISSIONS.curriculumImportExportExcel,
+                  PERMISSIONS.dataImportExcel,
+                ]}
+              >
                 <ImportDetailPage />
-              </RequirePermission>
+              </RequireAnyPermission>
             ),
           },
           { path: ROUTES.account, element: <AccountPage /> },

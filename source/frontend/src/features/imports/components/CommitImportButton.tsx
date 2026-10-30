@@ -35,7 +35,10 @@ export function CommitImportButton({ batch }: CommitImportButtonProps) {
           programId: batch.program.id,
           versionId: batch.versionId,
         })
-      : ROUTES.courses;
+      : batch.importType === 'STUDENT_LIST' ||
+          batch.importType === 'ACADEMIC_RESULT'
+        ? ROUTES.students
+        : ROUTES.courses;
   return (
     <Flex vertical gap="small">
       {commit.error && (
@@ -86,7 +89,11 @@ export function CommitImportButton({ batch }: CommitImportButtonProps) {
           Ghi {batch.totalRows} dòng vào{' '}
           {batch.program
             ? `${batch.program.programCode} — ${batch.program.programName}`
-            : 'danh mục học phần'}
+            : batch.importType === 'STUDENT_LIST'
+              ? 'hồ sơ sinh viên'
+              : batch.importType === 'ACADEMIC_RESULT'
+                ? 'kết quả học tập'
+                : 'danh mục học phần'}
           ?
         </Typography.Paragraph>
         <Alert

@@ -145,14 +145,35 @@ describe('StudentsReadService', () => {
   describe('programOptions', () => {
     it('limits a director to directed programs', async () => {
       await service.programOptions(director, { semesterId: 'sem' });
-      expect(programFindMany.mock.calls[0]![0].where.id).toEqual({
-        in: ['p1'],
+      expect(programFindMany.mock.calls[0]![0].where).toEqual({
+        id: { in: ['p1'] },
       });
     });
 
-    it('lists any program with a covering enrollment for the office', async () => {
-      await service.programOptions(office, { semesterId: 'sem' });
-      expect(programFindMany.mock.calls[0]![0].where).not.toHaveProperty('id');
+    it('lists all programs for the office including those without enrollments', async () => {
+      programFindMany.mockResolvedValue([
+        {
+          id: 'new-program',
+          programCode: 'NEW',
+          versions: [{ programName: 'Chương trình mới' }],
+        },
+      ]);
+      await expect(
+        service.programOptions(office, { semesterId: 'sem' }),
+      ).resolves.toEqual([
+        {
+          id: 'new-program',
+          programCode: 'NEW',
+          programName: 'Chương trình mới',
+        },
+      ]);
+      expect(programFindMany.mock.calls[0]![0].where).toEqual({});
+    });
+
+    it('returns no options when the staff scope has no programs', async () => {
+      await expect(
+        service.programOptions(director, { semesterId: 'sem' }),
+      ).resolves.toEqual([]);
     });
   });
 

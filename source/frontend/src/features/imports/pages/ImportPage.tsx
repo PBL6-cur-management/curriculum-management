@@ -11,6 +11,7 @@ import { errorMessage } from '../../../shared/forms/applyFieldErrors';
 import { CommitImportButton } from '../components/CommitImportButton';
 import { ImportReport } from '../components/ImportReport';
 import { ImportUploadForm } from '../components/ImportUploadForm';
+import { StudentCredentialDownload } from '../components/StudentCredentialDownload';
 import {
   useCreateImport,
   useImportBatch,
@@ -81,10 +82,16 @@ export function ImportPage() {
           action={<Button onClick={() => void batch.refetch()}>Thử lại</Button>}
         />
       )}
-      {batch.data && (
+      {batch.data && !batch.isError && (
         <>
           <ImportReport batch={batch.data} />
           <CommitImportButton batch={batch.data} />
+          {batch.data.importType === 'STUDENT_LIST' && (
+            <StudentCredentialDownload
+              batchId={batch.data.id}
+              committed={batch.data.status === 'COMMITTED'}
+            />
+          )}
         </>
       )}
     </DetailPageLayout>

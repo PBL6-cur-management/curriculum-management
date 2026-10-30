@@ -25,7 +25,7 @@ import {
   IMPORT_STATUS_LABELS,
   IMPORT_TYPE_LABELS,
 } from '../constants/importLabels';
-import { useImports } from '../hooks/useImports';
+import { useImports, useImportTypes } from '../hooks/useImports';
 
 const columns: TableColumnsType<ImportSummary> = [
   {
@@ -67,6 +67,7 @@ const columns: TableColumnsType<ImportSummary> = [
   },
 ];
 export function ImportHistoryPage() {
+  const types = useImportTypes();
   const [search, setSearch] = useSearchParams();
   const importType = (
     Object.keys(IMPORT_TYPE_LABELS) as ImportSummary['importType'][]
@@ -112,9 +113,10 @@ export function ImportHistoryPage() {
             allowClear
             value={importType}
             style={{ minWidth: 200 }}
-            options={Object.entries(IMPORT_TYPE_LABELS).map(
-              ([value, label]) => ({ value, label }),
-            )}
+            options={types.data?.map((option) => ({
+              value: option.importType,
+              label: IMPORT_TYPE_LABELS[option.importType],
+            }))}
             onChange={(value) => change({ importType: value })}
           />
           <Select
@@ -156,8 +158,8 @@ export function ImportHistoryPage() {
           <DataTable
             rowKey="id"
             columns={columns}
-            dataSource={batches.data?.items ?? []}
-            total={batches.data?.total ?? 0}
+            dataSource={batches.isError ? [] : (batches.data?.items ?? [])}
+            total={batches.isError ? 0 : (batches.data?.total ?? 0)}
             page={query.page!}
             pageSize={query.pageSize}
             loading={batches.isPending || batches.isFetching}

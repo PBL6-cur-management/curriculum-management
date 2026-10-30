@@ -22,6 +22,7 @@ import {
   type UpdateCloRequest,
   type UpdateSyllabusRequest,
   type UpdateWeeklyContentRequest,
+  type SyllabusMaterialKind,
 } from '../api/syllabi';
 
 export const SYLLABUS_QUERY_KEYS = {
@@ -166,8 +167,15 @@ export const useReorderClos = (courseId: string) =>
   );
 
 export const useUploadAttachment = (courseId: string, syllabusId: string) =>
-  useSyllabusMutation(courseId, (file: File) =>
-    uploadAttachment(syllabusId, file),
+  useSyllabusMutation(
+    courseId,
+    ({
+      file,
+      materialKind,
+    }: {
+      file: File;
+      materialKind: SyllabusMaterialKind;
+    }) => uploadAttachment(syllabusId, file, materialKind),
   );
 
 export const useDeleteAttachment = (courseId: string) =>
