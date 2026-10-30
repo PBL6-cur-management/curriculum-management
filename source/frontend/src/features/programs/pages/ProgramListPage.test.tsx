@@ -99,7 +99,7 @@ describe('ProgramListPage', () => {
     const second = screen.getByText('Công nghệ thông tin').closest('tr')!;
     expect(second).toHaveTextContent('Cử nhân');
     expect(second).toHaveTextContent('1.0');
-    expect(second).toHaveTextContent('—');
+    expect(second).toHaveTextContent('Chưa gán');
     const request = programRequests(fetchMock).at(-1)!;
     expect(request.searchParams.get('status')).toBe('ACTIVE');
     expect(request.searchParams.get('page')).toBe('1');
