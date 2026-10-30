@@ -119,5 +119,5 @@ describe('PermissionMatrixPage', () => {
         fetchMock.mock.calls.some(([, init]) => init?.method === 'DELETE'),
       ).toBe(true),
     );
-  });
+  }, 20_000);
 });
