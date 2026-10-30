@@ -311,6 +311,18 @@ const PortalGraduationPage = lazy(() =>
     }),
   ),
 );
+const ProgramComparisonPage = lazy(
+  () => import('./features/reports/pages/ProgramComparisonPage'),
+);
+const CreditDistributionPage = lazy(
+  () => import('./features/reports/pages/CreditDistributionPage'),
+);
+const AccreditationExportPage = lazy(
+  () => import('./features/reports/pages/AccreditationExportPage'),
+);
+const ChangeRequestStatisticsPage = lazy(
+  () => import('./features/reports/pages/ChangeRequestStatisticsPage'),
+);
 const IntegrationClientsPage = lazy(() =>
   import('./features/integration-clients/pages/IntegrationClientsPage').then(
     (module) => ({ default: module.IntegrationClientsPage }),
@@ -437,6 +449,38 @@ export const router = createBrowserRouter([
               >
                 <ImportPage />
               </RequireAnyPermission>
+            ),
+          },
+          {
+            path: ROUTES.reportComparison,
+            element: (
+              <RequirePermission code={PERMISSIONS.reportBenchmark}>
+                <ProgramComparisonPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: ROUTES.reportCredits,
+            element: (
+              <RequirePermission code={PERMISSIONS.reportBenchmark}>
+                <CreditDistributionPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: ROUTES.reportAccreditation,
+            element: (
+              <RequirePermission code={PERMISSIONS.reportExportAccreditation}>
+                <AccreditationExportPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: ROUTES.reportStatistics,
+            element: (
+              <RequirePermission code={PERMISSIONS.changeRequestStatistics}>
+                <ChangeRequestStatisticsPage />
+              </RequirePermission>
             ),
           },
           {

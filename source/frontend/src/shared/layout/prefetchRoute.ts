@@ -24,6 +24,14 @@ const LOADERS: Record<string, () => Promise<unknown>> = {
   [ROUTES.imports]: () => import('../../features/imports/pages/ImportPage'),
   [ROUTES.importHistory]: () =>
     import('../../features/imports/pages/ImportHistoryPage'),
+  [ROUTES.reportComparison]: () =>
+    import('../../features/reports/pages/ProgramComparisonPage'),
+  [ROUTES.reportCredits]: () =>
+    import('../../features/reports/pages/CreditDistributionPage'),
+  [ROUTES.reportAccreditation]: () =>
+    import('../../features/reports/pages/AccreditationExportPage'),
+  [ROUTES.reportStatistics]: () =>
+    import('../../features/reports/pages/ChangeRequestStatisticsPage'),
   [ROUTES.integrationClients]: () =>
     import('../../features/integration-clients/pages/IntegrationClientsPage'),
   [ROUTES.schoolSync]: () =>

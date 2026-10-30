@@ -81,6 +81,31 @@ export const APP_MENU: readonly AppMenuItem[] = [
     ],
   },
   {
+    label: 'Báo cáo',
+    children: [
+      {
+        path: ROUTES.reportComparison,
+        label: 'So sánh chương trình',
+        permission: PERMISSIONS.reportBenchmark,
+      },
+      {
+        path: ROUTES.reportCredits,
+        label: 'Phân bổ tín chỉ',
+        permission: PERMISSIONS.reportBenchmark,
+      },
+      {
+        path: ROUTES.reportAccreditation,
+        label: 'Hồ sơ kiểm định',
+        permission: PERMISSIONS.reportExportAccreditation,
+      },
+      {
+        path: ROUTES.reportStatistics,
+        label: 'Thống kê đề xuất',
+        permission: PERMISSIONS.changeRequestStatistics,
+      },
+    ],
+  },
+  {
     path: ROUTES.imports,
     label: 'Nhập liệu',
     anyPermissions: [
