@@ -3,7 +3,12 @@ import { Alert, App, Button, Flex, Skeleton, Tabs, Tooltip } from 'antd';
 import { Link, useParams, useSearchParams } from 'react-router';
 import { ROUTES } from '../../../routes';
 import { useMe } from '../../../shared/auth/useMe';
-import { DetailPageLayout, PageHeader } from '../../../shared/design-system';
+import {
+  BackLink,
+  DetailPageLayout,
+  FilterBar,
+  PageHeader,
+} from '../../../shared/design-system';
 import type { EnrollmentCommand, StudentEnrollment } from '../api/students';
 import { AcademicResultsTable } from '../components/AcademicResultsTable';
 import { EnrollmentCommandModal } from '../components/EnrollmentCommandModal';
@@ -63,9 +68,9 @@ export function StudentDetailPage() {
         }
         actions={
           <Flex gap="small" wrap>
-            <Link to={`${ROUTES.students}?${search}`}>
-              ← Danh sách sinh viên
-            </Link>
+            <BackLink to={`${ROUTES.students}?${search}`}>
+              Danh sách sinh viên
+            </BackLink>
             {me?.permissions.includes('graduation.view') &&
               me.roles.some(
                 (role) => role.roleCode === 'R1' || role.roleCode === 'R3',
@@ -91,9 +96,9 @@ export function StudentDetailPage() {
           </Flex>
         }
       />
-      <Flex gap="small" wrap>
+      <FilterBar>
         <StudentFilters params={context} onChange={change} />
-      </Flex>
+      </FilterBar>
       {!context.semesterId ? (
         <Alert type="info" title="Chọn học kỳ để xem hồ sơ sinh viên" />
       ) : detail.isPending ? (
@@ -116,20 +121,27 @@ export function StudentDetailPage() {
               isR1 && Boolean(me?.permissions.includes('user.manage'))
             }
           />
-          {student.enrollmentWarnings.map((warning, index) => (
-            <Alert
-              key={`${warning.code}-${index}`}
-              type="warning"
-              showIcon
-              title={warning.message}
-            />
-          ))}
-          {!student.enrollments.length && (
+          {(student.enrollmentWarnings.length > 0 ||
+            !student.enrollments.length) && (
+            // One grouped warning instead of a stack: everything here needs the same reader (R1) to act.
             <Alert
               type="warning"
               showIcon
-              title="Chưa xác định được chương trình"
-              description="Hồ sơ đã tồn tại nhưng chưa có ghi danh. Phòng Đào tạo cần gán chương trình ngoại lệ hoặc kiểm tra dữ liệu nhập."
+              title="Ghi danh cần xử lý"
+              description={
+                <ul style={{ margin: 0, paddingInlineStart: 20 }}>
+                  {student.enrollmentWarnings.map((warning, index) => (
+                    <li key={`${warning.code}-${index}`}>{warning.message}</li>
+                  ))}
+                  {!student.enrollments.length && (
+                    <li>
+                      <strong>Chưa xác định được chương trình</strong>: hồ sơ đã
+                      tồn tại nhưng chưa có ghi danh. Phòng Đào tạo cần gán
+                      chương trình ngoại lệ hoặc kiểm tra dữ liệu nhập.
+                    </li>
+                  )}
+                </ul>
+              }
             />
           )}
           {!context.programId ? (
