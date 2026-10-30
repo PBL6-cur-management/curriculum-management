@@ -6,8 +6,6 @@ import {
   Flex,
   Popconfirm,
   Result,
-  Skeleton,
-  Typography,
   App,
 } from 'antd';
 import { generatePath, Link, useParams } from 'react-router';
@@ -35,6 +33,11 @@ import {
   useWithdrawChangeRequest,
 } from '../hooks/useChangeRequests';
 import { formatDateTime } from '../utils/format';
+import {
+  BackLink,
+  PageHeader,
+  PageSkeleton,
+} from '../../../shared/design-system';
 
 // Where the target lives; null when the viewer has no screen for it.
 function targetLink(request: ChangeRequestDetail): string | null {
@@ -52,7 +55,7 @@ export function ChangeRequestDetailPage() {
   const { message } = App.useApp();
   const { data: request, isPending, error } = useChangeRequest(requestId);
   const withdraw = useWithdrawChangeRequest(requestId);
-  if (isPending) return <Skeleton active />;
+  if (isPending) return <PageSkeleton />;
   if (!request) {
     if (error instanceof ApiError && error.status === 403)
       return <Result status="403" title="Bạn không có quyền xem đề xuất này" />;
@@ -61,38 +64,40 @@ export function ChangeRequestDetailPage() {
   const link = targetLink(request);
   return (
     <Flex vertical gap="middle">
-      <Flex justify="space-between" align="center" wrap gap="small">
-        <Flex gap="small" align="center" wrap>
-          <Typography.Title level={2} style={{ margin: 0 }}>
-            {request.requestCode} — {request.title}
-          </Typography.Title>
-          <RequestStatusTag status={request.status} />
-        </Flex>
-        <Flex gap="small" wrap>
-          <Link to={ROUTES.changeRequests}>Về danh sách</Link>
-          {request.permissions.canEdit && (
-            <Link to={generatePath(ROUTES.changeRequestEdit, { requestId })}>
-              <Button type="primary">Tiếp tục soạn</Button>
-            </Link>
-          )}
-          {request.permissions.canWithdraw && (
-            <Popconfirm
-              title={WITHDRAW_CONFIRM}
-              okText="Rút"
-              cancelText="Hủy"
-              onConfirm={() =>
-                withdraw.mutateAsync().catch((reason: unknown) => {
-                  void message.error(
-                    errorMessage(reason, 'Không rút được đề xuất.'),
-                  );
-                })
-              }
-            >
-              <Button>Rút đề xuất</Button>
-            </Popconfirm>
-          )}
-        </Flex>
-      </Flex>
+      <BackLink to={ROUTES.changeRequests}>Về danh sách</BackLink>
+      <PageHeader
+        title={
+          <>
+            {request.requestCode} — {request.title}{' '}
+            <RequestStatusTag status={request.status} />
+          </>
+        }
+        actions={
+          <>
+            {request.permissions.canEdit && (
+              <Link to={generatePath(ROUTES.changeRequestEdit, { requestId })}>
+                <Button type="primary">Tiếp tục soạn</Button>
+              </Link>
+            )}
+            {request.permissions.canWithdraw && (
+              <Popconfirm
+                title={WITHDRAW_CONFIRM}
+                okText="Rút"
+                cancelText="Hủy"
+                onConfirm={() =>
+                  withdraw.mutateAsync().catch((reason: unknown) => {
+                    void message.error(
+                      errorMessage(reason, 'Không rút được đề xuất.'),
+                    );
+                  })
+                }
+              >
+                <Button>Rút đề xuất</Button>
+              </Popconfirm>
+            )}
+          </>
+        }
+      />
       {request.status === 'WITHDRAWN' && (
         <Alert
           type="warning"
@@ -101,6 +106,16 @@ export function ChangeRequestDetailPage() {
         />
       )}
       <ConflictAlert conflicts={request.conflicts} />
+      {/* The decision first, then what is being decided, then the context. */}
+      <ApprovalPanel request={request} />
+      {request.steps.length > 0 && (
+        <Card title="Tiến độ phê duyệt">
+          <StepProgress steps={request.steps} />
+        </Card>
+      )}
+      <Card title="Thay đổi so với bản đang áp dụng">
+        <RequestDiff requestId={requestId} />
+      </Card>
       <Card title="Thông tin đề xuất">
         <Descriptions column={{ xs: 1, md: 2 }} size="small">
           <Descriptions.Item label="Loại">
@@ -142,20 +157,11 @@ export function ChangeRequestDetailPage() {
           </Descriptions.Item>
         </Descriptions>
       </Card>
-      {request.steps.length > 0 && (
-        <Card title="Tiến độ phê duyệt">
-          <StepProgress steps={request.steps} />
-        </Card>
-      )}
       {request.release && <ReleaseCard release={request.release} />}
-      <ApprovalPanel request={request} />
       <ApprovalHistory
         requestId={requestId}
         submissionRound={request.submissionRound}
       />
-      <Card title="Thay đổi so với bản đang áp dụng">
-        <RequestDiff requestId={requestId} />
-      </Card>
       <DocumentsCard request={request} />
       <CommentsCard
         requestId={requestId}

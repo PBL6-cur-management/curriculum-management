@@ -99,7 +99,7 @@ describe('ChangeRequestListPage', () => {
     const first = screen
       .getByRole('link', { name: 'DX-2026-0001' })
       .closest('tr')!;
-    expect(within(first).getByText('—')).toBeInTheDocument();
+    expect(within(first).getByText('Không chờ')).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText('Số ngày chờ tối thiểu'), {
       target: { value: '3' },
     });

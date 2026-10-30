@@ -1,12 +1,9 @@
-import { Button, Flex, Result, Table, Typography } from 'antd';
+import { Button, Flex, Result } from 'antd';
 import type { TableColumnsType } from 'antd';
 import { useCallback, useState } from 'react';
 import { generatePath, Link } from 'react-router';
 import { ROUTES } from '../../../routes';
-import {
-  DEFAULT_PAGE_SIZE,
-  PAGE_SIZE_OPTIONS,
-} from '../../../shared/api/pagination';
+import { DEFAULT_PAGE_SIZE } from '../../../shared/api/pagination';
 import { PERMISSIONS } from '../../../shared/auth/permissions';
 import { useCan } from '../../../shared/auth/useCan';
 import { RequestStatusTag } from '../../../shared/change-requests/RequestStatusTag';
@@ -23,11 +20,18 @@ import {
 } from '../constants/changeRequestLabels';
 import { useChangeRequests } from '../hooks/useChangeRequests';
 import { formatDateTime } from '../utils/format';
+import {
+  DataTable,
+  formatEmpty,
+  PageHeader,
+} from '../../../shared/design-system';
 
 const INITIAL_QUERY: ChangeRequestQuery = {
   page: 1,
   pageSize: DEFAULT_PAGE_SIZE,
 };
+
+const NOT_WAITING = 'Không chờ';
 
 const COLUMNS: TableColumnsType<ChangeRequestSummary> = [
   {
@@ -73,7 +77,8 @@ const COLUMNS: TableColumnsType<ChangeRequestSummary> = [
   {
     title: 'Số ngày chờ',
     dataIndex: 'daysWaiting',
-    render: (days: number | null) => days ?? '—',
+    // Null while the request is not waiting on any approver (draft, closed).
+    render: (days: number | null) => formatEmpty(days, NOT_WAITING),
   },
   {
     title: 'Cập nhật',
@@ -99,43 +104,35 @@ export function ChangeRequestListPage() {
     return <Result status="error" title="Không thể tải danh sách đề xuất" />;
   return (
     <Flex vertical gap="middle">
-      <Flex justify="space-between" align="center" wrap gap="small">
-        <Typography.Title level={2} style={{ margin: 0 }}>
-          Đề xuất thay đổi
-        </Typography.Title>
-        <Flex gap="small">
-          {canCreateOrganizational && (
-            <Link to={ROUTES.changeRequestOrganizationalNew}>
-              <Button>Đề xuất tổ chức</Button>
-            </Link>
-          )}
-          {canCreate && (
-            <Link to={ROUTES.changeRequestNew}>
-              <Button type="primary">Tạo đề xuất</Button>
-            </Link>
-          )}
-        </Flex>
-      </Flex>
+      <PageHeader
+        title="Đề xuất thay đổi"
+        actions={
+          <>
+            {canCreateOrganizational && (
+              <Link to={ROUTES.changeRequestOrganizationalNew}>
+                <Button>Đề xuất tổ chức</Button>
+              </Link>
+            )}
+            {canCreate && (
+              <Link to={ROUTES.changeRequestNew}>
+                <Button type="primary">Tạo đề xuất</Button>
+              </Link>
+            )}
+          </>
+        }
+      />
       <ChangeRequestFilters value={query} onChange={applyFilters} />
-      <Table<ChangeRequestSummary>
+      <DataTable<ChangeRequestSummary>
         rowKey="id"
         columns={COLUMNS}
         dataSource={data?.items ?? []}
+        total={data?.total ?? 0}
+        page={query.page ?? 1}
+        pageSize={query.pageSize}
         loading={isFetching}
-        locale={{ emptyText: NO_REQUESTS }}
-        pagination={{
-          current: query.page,
-          pageSize: query.pageSize,
-          total: data?.total ?? 0,
-          pageSizeOptions: PAGE_SIZE_OPTIONS,
-          showSizeChanger: true,
-        }}
-        onChange={(pagination) =>
-          setQuery((current) => ({
-            ...current,
-            page: pagination.current ?? current.page,
-            pageSize: pagination.pageSize ?? current.pageSize,
-          }))
+        emptyText={NO_REQUESTS}
+        onPageChange={(page, pageSize) =>
+          setQuery((current) => ({ ...current, page, pageSize }))
         }
       />
     </Flex>
