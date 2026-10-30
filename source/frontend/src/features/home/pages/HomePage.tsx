@@ -64,7 +64,12 @@ export function HomePage() {
             .filter((leaf) => leaf !== undefined);
           if (!links.length) return null;
           return (
-            <Flex key={section.title} vertical gap={10} style={{ minWidth: 200 }}>
+            <Flex
+              key={section.title}
+              vertical
+              gap={10}
+              style={{ minWidth: 200 }}
+            >
               <Typography.Text
                 strong
                 style={{ color: token.colorTextSecondary }}

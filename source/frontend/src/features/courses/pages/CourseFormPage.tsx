@@ -140,7 +140,7 @@ export function CourseFormPage() {
           <Alert
             type="warning"
             showIcon
-            message="Học phần đang được dùng ở các chương trình sau"
+            title="Học phần đang được dùng ở các chương trình sau"
             description={<ProgramsUsingList programs={course.programsUsing} />}
           />
         ) : (

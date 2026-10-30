@@ -95,7 +95,7 @@ export function AssignDirectorModal({
         >
           <DatePicker format={ISO_DAY_FORMAT} />
         </Form.Item>
-        {error && <Alert type="error" showIcon message={error} />}
+        {error && <Alert type="error" showIcon title={error} />}
       </Form>
     </Modal>
   );

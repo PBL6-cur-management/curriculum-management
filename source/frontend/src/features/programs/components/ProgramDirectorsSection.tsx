@@ -106,7 +106,7 @@ export function ProgramDirectorsSection({
         <Alert
           type="error"
           showIcon
-          message="Không tải được danh sách Giám đốc CTĐT."
+          title="Không tải được danh sách Giám đốc CTĐT."
         />
       )}
       <Table<ProgramDirector>

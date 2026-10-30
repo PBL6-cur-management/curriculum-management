@@ -32,7 +32,7 @@ export function CurriculumWarningsPanel({
           role="listitem"
           type={ALERT_TYPE[warning.severity]}
           showIcon
-          message={warning.message}
+          title={warning.message}
           action={
             warning.itemId ? (
               <Button

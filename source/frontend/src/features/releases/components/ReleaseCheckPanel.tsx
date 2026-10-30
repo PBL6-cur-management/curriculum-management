@@ -42,7 +42,7 @@ export function ReleaseCheckPanel({
         <Alert
           type={check.canRelease ? 'success' : 'error'}
           showIcon
-          message={check.canRelease ? CHECK_CLEAN_NOTE : CHECK_BLOCKED_NOTE}
+          title={check.canRelease ? CHECK_CLEAN_NOTE : CHECK_BLOCKED_NOTE}
         />
         <Button loading={refreshing} onClick={onRerun}>
           {CHECK_RERUN_LABEL}

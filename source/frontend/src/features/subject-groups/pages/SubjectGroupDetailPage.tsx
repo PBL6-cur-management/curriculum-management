@@ -59,7 +59,7 @@ export function SubjectGroupDetailPage() {
       >
         <Typography.Paragraph>{group.faculty.unitName}</Typography.Paragraph>
         {group.status === 'ACTIVE' && !group.hasActiveCoordinator && (
-          <Alert type="warning" message={NO_COORDINATOR_LABEL} />
+          <Alert type="warning" title={NO_COORDINATOR_LABEL} />
         )}
         {canManage && group.status === 'ACTIVE' && (
           <Flex gap={8}>

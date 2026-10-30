@@ -40,13 +40,13 @@ function syllabusIssueText(
 export function FinalApprovalPreview({ preview }: FinalApprovalPreviewProps) {
   return (
     <Flex vertical gap="middle">
-      <Alert type="info" showIcon message={FINAL_KIND_LABELS[preview.kind]} />
-      {preview.stale && <Alert type="error" showIcon message={STALE_NOTE} />}
+      <Alert type="info" showIcon title={FINAL_KIND_LABELS[preview.kind]} />
+      {preview.stale && <Alert type="error" showIcon title={STALE_NOTE} />}
       {preview.copyIssues.length > 0 && (
         <Alert
           type="error"
           showIcon
-          message="Bản đề cương được đề xuất chưa đủ điều kiện ban hành"
+          title="Bản đề cương được đề xuất chưa đủ điều kiện ban hành"
           description={preview.copyIssues
             .map((code) => CONDITION_LABELS[code] ?? code)
             .join('; ')}

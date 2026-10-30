@@ -122,7 +122,7 @@ export function CourseRelationsSection({
         <Alert
           type="error"
           showIcon
-          message={errorMessage(error, 'Không tải được quan hệ học phần.')}
+          title={errorMessage(error, 'Không tải được quan hệ học phần.')}
         />
       ) : (
         <Table

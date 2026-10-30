@@ -68,10 +68,10 @@ export function EndMemberModal({ groupId, row, onClose }: EndMemberModalProps) {
         {row?.memberRole === 'MEMBER' && (
           <Alert
             type="info"
-            message="Các dòng Điều phối của người này trong nhóm cũng kết thúc theo."
+            title="Các dòng Điều phối của người này trong nhóm cũng kết thúc theo."
           />
         )}
-        {error && <Alert type="error" message={error} />}
+        {error && <Alert type="error" title={error} />}
       </Form>
     </Modal>
   );

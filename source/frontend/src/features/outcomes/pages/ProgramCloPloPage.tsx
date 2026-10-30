@@ -1,4 +1,4 @@
-import { Collapse, Flex, Result, Skeleton, Table, Typography } from 'antd';
+import { Collapse, Flex, Result, Table, Typography } from 'antd';
 import type { TableColumnsType } from 'antd';
 import { generatePath, Link, useParams } from 'react-router';
 import { ROUTES } from '../../../routes';
@@ -14,6 +14,7 @@ import {
 } from '../constants/outcomeLabels';
 import { useCloPloFilters } from '../hooks/useCloPloFilters';
 import { useProgramCloPlo } from '../hooks/useOutcomes';
+import { PageHeader, PageSkeleton } from '../../../shared/design-system';
 
 function ProgramCloPloView({
   matrix,
@@ -99,7 +100,7 @@ function ProgramCloPloView({
 export function ProgramCloPloPage() {
   const { programId = '', versionId = '' } = useParams();
   const { data, isPending, error } = useProgramCloPlo(versionId);
-  if (isPending) return <Skeleton active />;
+  if (isPending) return <PageSkeleton />;
   if (!data) {
     if (error instanceof ApiError && error.status === 403)
       return <Result status="403" title="Bạn không có quyền xem ma trận này" />;
@@ -111,13 +112,14 @@ export function ProgramCloPloPage() {
   return (
     <Flex vertical gap="middle">
       <OutcomeNav programId={programId} versionId={versionId} />
-      <Typography.Title level={2} style={{ margin: 0 }}>
-        Ma trận CLO–PLO — {version.programName} ({versionLabel(version)})
-      </Typography.Title>
-      <Typography.Text type="secondary">
-        Dấu ✓ là CLO đã gắn PLO; dấu chấm là PLO mà học phần chưa đóng góp. Bấm
-        “Xem / sửa” để đổi liên kết của một học phần.
-      </Typography.Text>
+      <PageHeader
+        title={
+          <>
+            Ma trận CLO–PLO — {version.programName} ({versionLabel(version)})
+          </>
+        }
+        subtitle="Dấu ✓ là CLO đã gắn PLO; dấu chấm là PLO mà học phần chưa đóng góp. Bấm “Xem / sửa” để đổi liên kết của một học phần."
+      />
       <RequestDraftBanner request={version.sourceRequest} />
       <ProgramCloPloView matrix={data} programId={programId} />
     </Flex>

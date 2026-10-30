@@ -109,7 +109,7 @@ export function RequisitesModal({
         <Alert
           type="error"
           showIcon
-          message={serverError}
+          title={serverError}
           style={{ marginBottom: 16 }}
         />
       )}

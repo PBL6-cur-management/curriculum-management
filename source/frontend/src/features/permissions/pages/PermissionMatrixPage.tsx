@@ -18,10 +18,7 @@ import { PageHeader } from '../../../shared/design-system';
 import { usePermissionMatrix } from '../hooks/usePermissionMatrix';
 import { useMatrixIndex } from '../hooks/useMatrixIndex';
 import type { PermissionMatrix } from '../api/permissionMatrix';
-import {
-  FUNCTION_GROUP_LABELS,
-  cellKeyOf,
-} from '../constants/matrixLabels';
+import { FUNCTION_GROUP_LABELS, cellKeyOf } from '../constants/matrixLabels';
 import { MatrixCell, MatrixLegend } from '../components/MatrixCell';
 import { RoleEditorDrawer } from '../components/RoleEditorDrawer';
 
@@ -107,7 +104,9 @@ export function PermissionMatrixPage() {
       width: 136,
       render: (_: unknown, permission: PermissionRow) => (
         <MatrixCell
-          cellKey={cellKeyOf(index.cell(role.roleCode, permission.permissionCode))}
+          cellKey={cellKeyOf(
+            index.cell(role.roleCode, permission.permissionCode),
+          )}
           locked={index.locked(role.roleCode, permission.permissionCode)}
         />
       ),
@@ -139,7 +138,9 @@ export function PermissionMatrixPage() {
               onChange={setOnlyDifferent}
               aria-label="Chỉ hiện quyền khác nhau giữa các vai trò"
             />
-            <Typography.Text>Chỉ hiện quyền khác nhau giữa các vai trò</Typography.Text>
+            <Typography.Text>
+              Chỉ hiện quyền khác nhau giữa các vai trò
+            </Typography.Text>
           </Flex>
         </Flex>
         <MatrixLegend />
@@ -164,15 +165,21 @@ export function PermissionMatrixPage() {
       ) : (
         <Collapse
           key={`${search}|${onlyDifferent}`}
-          defaultActiveKey={search || onlyDifferent ? groups : groups.slice(0, 1)}
+          defaultActiveKey={
+            search || onlyDifferent ? groups : groups.slice(0, 1)
+          }
           items={groups.map((group) => {
             const rows = visible.filter((item) => item.functionGroup === group);
             return {
               key: group,
               label: (
                 <Flex gap={8} align="baseline">
-                  <Typography.Text strong>{FUNCTION_GROUP_LABELS[group]}</Typography.Text>
-                  <Typography.Text type="secondary">{rows.length} quyền</Typography.Text>
+                  <Typography.Text strong>
+                    {FUNCTION_GROUP_LABELS[group]}
+                  </Typography.Text>
+                  <Typography.Text type="secondary">
+                    {rows.length} quyền
+                  </Typography.Text>
                 </Flex>
               ),
               styles: { body: { padding: 0 } },

@@ -70,7 +70,7 @@ export function AddRelationModal({ course, onClose }: AddRelationModalProps) {
         <Alert
           type="error"
           showIcon
-          message={serverError}
+          title={serverError}
           style={{ marginBottom: 16 }}
         />
       )}
