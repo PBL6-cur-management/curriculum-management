@@ -1,116 +1,201 @@
 import { useMemo, useState } from 'react';
-import { Result, Select, Space, Table, Tag, Typography } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
+import {
+  Button,
+  Collapse,
+  Flex,
+  Input,
+  Result,
+  Skeleton,
+  Switch,
+  Table,
+  Typography,
+} from 'antd';
 import type { TableColumnsType } from 'antd';
 import { useCan } from '../../../shared/auth/useCan';
 import { PERMISSIONS } from '../../../shared/auth/permissions';
+import { PageHeader } from '../../../shared/design-system';
 import { usePermissionMatrix } from '../hooks/usePermissionMatrix';
+import { useMatrixIndex } from '../hooks/useMatrixIndex';
 import type { PermissionMatrix } from '../api/permissionMatrix';
 import {
-  CELL_OPTIONS,
   FUNCTION_GROUP_LABELS,
-  NO_CELL_LABEL,
+  cellKeyOf,
 } from '../constants/matrixLabels';
-import { MatrixCell } from '../components/MatrixCell';
+import { MatrixCell, MatrixLegend } from '../components/MatrixCell';
+import { RoleEditorDrawer } from '../components/RoleEditorDrawer';
 
 type PermissionRow = PermissionMatrix['permissions'][number];
 
 export function PermissionMatrixPage() {
   const { data, isPending, isError } = usePermissionMatrix();
-  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
-  const [group, setGroup] = useState<string>();
   const editable = useCan(PERMISSIONS.permissionManage);
-  const roles = data?.roles ?? [];
-  const shownRoles = selectedRoles.length
-    ? roles.filter((role) => selectedRoles.includes(role.roleCode))
-    : roles;
-  const permissions = useMemo(
-    () =>
-      (data?.permissions ?? []).filter(
-        (item) => !group || item.functionGroup === group,
-      ),
-    [data, group],
+  const index = useMatrixIndex(data);
+  const [search, setSearch] = useState('');
+  const [onlyDifferent, setOnlyDifferent] = useState(false);
+  const [editingRole, setEditingRole] = useState<string>();
+  const roles = useMemo(() => data?.roles ?? [], [data]);
+
+  const visible = useMemo(() => {
+    const term = search.trim().toLocaleLowerCase('vi');
+    return (data?.permissions ?? []).filter((permission) => {
+      if (
+        term &&
+        !permission.permissionName.toLocaleLowerCase('vi').includes(term) &&
+        !permission.permissionCode.toLowerCase().includes(term)
+      )
+        return false;
+      if (!onlyDifferent) return true;
+      const keys = new Set(
+        roles.map((role) =>
+          cellKeyOf(index.cell(role.roleCode, permission.permissionCode)),
+        ),
+      );
+      return keys.size > 1;
+    });
+  }, [data, search, onlyDifferent, roles, index]);
+
+  const groups = useMemo(
+    () => [...new Set(visible.map((permission) => permission.functionGroup))],
+    [visible],
   );
+
+  if (isError)
+    return (
+      <Result
+        status="error"
+        title="Không tải được ma trận quyền"
+        subTitle="Kiểm tra kết nối rồi tải lại trang."
+      />
+    );
+
   const columns: TableColumnsType<PermissionRow> = [
     {
       title: 'Quyền',
       key: 'permission',
+      fixed: 'left',
+      width: 280,
       render: (_, item) => (
-        <Space direction="vertical" size={0}>
-          <span>{item.permissionName}</span>
-          <Typography.Text code>{item.permissionCode}</Typography.Text>
-          <Typography.Text type="secondary">{item.source}</Typography.Text>
-        </Space>
+        <Flex vertical title={item.source ?? undefined}>
+          <Typography.Text>{item.permissionName}</Typography.Text>
+          <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+            {item.permissionCode}
+          </Typography.Text>
+        </Flex>
       ),
     },
-    ...shownRoles.map((role) => ({
-      title: `${role.roleCode} ${role.roleName}`,
+    ...roles.map((role) => ({
+      title: (
+        <Flex vertical gap={2}>
+          <span>
+            {role.roleCode} {role.roleName}
+          </span>
+          {editable && (
+            <Button
+              type="link"
+              size="small"
+              icon={<EditOutlined />}
+              style={{ padding: 0, height: 'auto', alignSelf: 'flex-start' }}
+              onClick={() => setEditingRole(role.roleCode)}
+            >
+              Sửa quyền
+            </Button>
+          )}
+        </Flex>
+      ),
       key: role.roleCode,
+      width: 136,
       render: (_: unknown, permission: PermissionRow) => (
         <MatrixCell
-          roleCode={role.roleCode}
-          permissionCode={permission.permissionCode}
-          cell={data?.cells.find(
-            (cell) =>
-              cell.roleCode === role.roleCode &&
-              cell.permissionCode === permission.permissionCode,
-          )}
-          locked={Boolean(
-            data?.lockedCells.some(
-              (cell) =>
-                cell.roleCode === role.roleCode &&
-                cell.permissionCode === permission.permissionCode,
-            ),
-          )}
-          editable={editable}
+          cellKey={cellKeyOf(index.cell(role.roleCode, permission.permissionCode))}
+          locked={index.locked(role.roleCode, permission.permissionCode)}
         />
       ),
     })),
   ];
-  if (isError)
-    return <Result status="error" title="Không thể tải ma trận quyền" />;
-  const groups = [
-    ...new Set(
-      (data?.permissions ?? []).map((permission) => permission.functionGroup),
-    ),
-  ];
+
   return (
-    <Space direction="vertical" style={{ width: '100%' }}>
-      <Typography.Title level={2}>Ma trận quyền</Typography.Title>
-      <Space>
-        <Select
-          mode="multiple"
-          placeholder="Lọc vai trò"
-          value={selectedRoles}
-          onChange={setSelectedRoles}
-          options={roles.map((role) => ({
-            value: role.roleCode,
-            label: `${role.roleCode} — ${role.roleName}`,
-          }))}
+    <Flex vertical gap={20}>
+      <PageHeader title="Ma trận quyền" />
+      <Typography.Text type="secondary" style={{ marginTop: -12 }}>
+        {roles.length} vai trò · {data?.permissions.length ?? 0} quyền.{' '}
+        {editable
+          ? 'Chọn “Sửa quyền” ở cột vai trò để thay đổi; mọi thay đổi được xác nhận một lần.'
+          : 'Bạn chỉ có quyền xem.'}
+      </Typography.Text>
+      <Flex wrap gap={16} align="center" justify="space-between">
+        <Flex wrap gap={16} align="center">
+          <Input.Search
+            allowClear
+            placeholder="Tìm theo tên hoặc mã quyền"
+            style={{ width: 300 }}
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+          <Flex align="center" gap={8}>
+            <Switch
+              size="small"
+              checked={onlyDifferent}
+              onChange={setOnlyDifferent}
+              aria-label="Chỉ hiện quyền khác nhau giữa các vai trò"
+            />
+            <Typography.Text>Chỉ hiện quyền khác nhau giữa các vai trò</Typography.Text>
+          </Flex>
+        </Flex>
+        <MatrixLegend />
+      </Flex>
+      {isPending ? (
+        <Skeleton active paragraph={{ rows: 10 }} title={false} />
+      ) : groups.length === 0 ? (
+        <Result
+          status="info"
+          title="Không có quyền nào khớp bộ lọc"
+          extra={
+            <Button
+              onClick={() => {
+                setSearch('');
+                setOnlyDifferent(false);
+              }}
+            >
+              Xóa bộ lọc
+            </Button>
+          }
         />
-        <Select
-          allowClear
-          placeholder="Nhóm chức năng"
-          value={group}
-          onChange={setGroup}
-          options={groups.map((value) => ({
-            value,
-            label: FUNCTION_GROUP_LABELS[value],
-          }))}
+      ) : (
+        <Collapse
+          key={`${search}|${onlyDifferent}`}
+          defaultActiveKey={search || onlyDifferent ? groups : groups.slice(0, 1)}
+          items={groups.map((group) => {
+            const rows = visible.filter((item) => item.functionGroup === group);
+            return {
+              key: group,
+              label: (
+                <Flex gap={8} align="baseline">
+                  <Typography.Text strong>{FUNCTION_GROUP_LABELS[group]}</Typography.Text>
+                  <Typography.Text type="secondary">{rows.length} quyền</Typography.Text>
+                </Flex>
+              ),
+              styles: { body: { padding: 0 } },
+              children: (
+                <Table<PermissionRow>
+                  rowKey="permissionCode"
+                  size="middle"
+                  columns={columns}
+                  dataSource={rows}
+                  pagination={false}
+                  scroll={{ x: 'max-content' }}
+                />
+              ),
+            };
+          })}
         />
-      </Space>
-      <Table<PermissionRow>
-        rowKey="permissionCode"
-        columns={columns}
-        dataSource={permissions}
-        loading={isPending}
-        pagination={false}
+      )}
+      <RoleEditorDrawer
+        role={roles.find((role) => role.roleCode === editingRole)}
+        permissions={data?.permissions ?? []}
+        index={index}
+        onClose={() => setEditingRole(undefined)}
       />
-      <Space wrap>
-        {CELL_OPTIONS.map((option) => (
-          <Tag key={option.key}>{option.label}</Tag>
-        ))}
-        <Tag>{NO_CELL_LABEL}</Tag>
-      </Space>
-    </Space>
+    </Flex>
   );
 }

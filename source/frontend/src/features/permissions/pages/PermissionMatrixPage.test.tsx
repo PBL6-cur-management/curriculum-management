@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { App } from 'antd';
 import { describe, expect, it, vi } from 'vitest';
 import { PermissionMatrixPage } from './PermissionMatrixPage';
@@ -78,38 +78,46 @@ describe('PermissionMatrixPage', () => {
   it('renders the 41 permission rows across six role columns', async () => {
     renderPage(false);
     expect(await screen.findByText('Quyền 41')).toBeInTheDocument();
-    expect(screen.getByText('R6 Vai trò 6')).toBeInTheDocument();
+    expect(screen.getAllByText('R6 Vai trò 6').length).toBeGreaterThan(0);
   });
 
-  it('does not show editable cell controls without permission.manage and locks protected cells', async () => {
-    // Typography.Link renders an <a> without href, which has no link role.
-    const { container } = renderPage(false);
+  it('hides edit controls without permission.manage', async () => {
+    renderPage(false);
     await screen.findByText('Quyền 41');
-    expect(container.querySelectorAll('td a')).toHaveLength(0);
+    expect(screen.queryByRole('button', { name: /Sửa quyền/ })).toBeNull();
   });
 
-  it('keeps locked cells read-only for an editor', async () => {
+  it('shows cell state as text and marks locked cells', async () => {
+    renderPage(false);
+    await screen.findByText('Quyền 41');
+    const row = screen.getByText('Quyền 1').closest('tr')!;
+    expect(row.textContent).toContain('Toàn bộ');
+    expect(row.querySelector('[aria-label*="khóa"]')).not.toBeNull();
+  });
+
+  it('keeps locked cells read-only in the role editor', async () => {
     renderPage(true);
     await screen.findByText('Quyền 41');
-    const row = screen.getByText('Quyền 1').closest('tr');
-    expect(row?.querySelectorAll('a')).toHaveLength(5);
+    fireEvent.click((await screen.findAllByRole('button', { name: /Sửa quyền/ }))[0]);
+    expect(await screen.findByText(/đã khóa/)).toBeInTheDocument();
   });
 
-  it('deletes a cell only after confirmation', async () => {
+  it('applies batched changes only after one confirmation', async () => {
     const { fetchMock } = renderPage(true);
     await screen.findByText('Quyền 41');
-    fireEvent.click(screen.getByText('X'));
-    const emptyOptions = await screen.findAllByText('– Không có quyền');
-    fireEvent.click(emptyOptions[emptyOptions.length - 1]);
+    fireEvent.click((await screen.findAllByRole('button', { name: /Sửa quyền/ }))[1]);
+    const group = await screen.findByRole('radiogroup', { name: 'Quyền Quyền 1' });
+    fireEvent.click(within(group).getByText('Không'));
+    expect(await screen.findByText('1 thay đổi chưa áp dụng')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Áp dụng thay đổi' }));
     expect(
       fetchMock.mock.calls.some(([, init]) => init?.method === 'DELETE'),
     ).toBe(false);
-    fireEvent.click(screen.getByRole('button', { name: 'OK' }));
-    expect(await screen.findByText('Quyền 41')).toBeInTheDocument();
+    fireEvent.click(await screen.findByRole('button', { name: 'Áp dụng' }));
     await vi.waitFor(() =>
       expect(
         fetchMock.mock.calls.some(([, init]) => init?.method === 'DELETE'),
       ).toBe(true),
     );
-  });
+  }, 20_000);
 });

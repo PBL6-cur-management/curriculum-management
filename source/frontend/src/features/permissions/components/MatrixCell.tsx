@@ -1,89 +1,87 @@
-import { useState } from 'react';
-import { App, Dropdown, Tooltip, Typography } from 'antd';
 import { LockOutlined } from '@ant-design/icons';
-import type { MenuProps } from 'antd';
-import type { PermissionCode } from '../../../shared/auth/permissions';
-import type { MatrixCell as MatrixCellDto } from '../api/permissionMatrix';
+import { Flex, Typography, theme } from 'antd';
+import type { CellKey } from '../constants/matrixLabels';
 import {
   CELL_OPTIONS,
-  CELL_SYMBOLS,
+  LOCKED_REASON,
   NO_CELL_LABEL,
+  NO_CELL_SHORT,
 } from '../constants/matrixLabels';
-import { useMatrixMutations } from '../hooks/usePermissionMatrix';
 
 interface MatrixCellProps {
-  roleCode: string;
-  permissionCode: PermissionCode;
-  cell: MatrixCellDto | undefined;
+  cellKey: CellKey;
   locked: boolean;
-  editable: boolean;
 }
 
-function symbol(cell: MatrixCellDto | undefined) {
-  if (!cell) return NO_CELL_LABEL;
-  const option = CELL_OPTIONS.find(
-    (entry) => entry.mode === cell.mode && entry.scope === cell.scope,
-  );
-  return option ? CELL_SYMBOLS[option.key] : NO_CELL_LABEL;
-}
-
-export function MatrixCell({
-  roleCode,
-  permissionCode,
-  cell,
-  locked,
-  editable,
-}: MatrixCellProps) {
-  const { modal } = App.useApp();
-  const { set, clear } = useMatrixMutations();
-  const [open, setOpen] = useState(false);
-  const current = symbol(cell);
-  const items: MenuProps['items'] = [
-    ...CELL_OPTIONS.map((option) => ({ key: option.key, label: option.label })),
-    { key: 'none', label: NO_CELL_LABEL },
-  ];
-  function choose(key: string) {
-    const next = CELL_OPTIONS.find((option) => option.key === key);
-    const label = next?.label ?? NO_CELL_LABEL;
-    modal.confirm({
-      title: 'Xác nhận thay đổi quyền',
-      content: `Đổi quyền của ${roleCode} với ${permissionCode} từ ${current} sang ${label}? Thay đổi có hiệu lực ngay.`,
-      onOk: () =>
-        next
-          ? set.mutateAsync({
-              roleCode,
-              permissionCode,
-              body: { mode: next.mode, scope: next.scope },
-            })
-          : clear.mutateAsync({ roleCode, permissionCode }),
-    });
-    setOpen(false);
-  }
-  const content = (
-    <>
-      {current}
-      {locked && <LockOutlined style={{ marginLeft: 6 }} />}
-    </>
-  );
-  const tooltip = locked
-    ? 'Ô quyền này được khóa để bảo vệ quyền quản trị.'
-    : cell
-      ? `Cập nhật lần cuối: ${cell.updatedBy?.fullName ?? 'Hệ thống'}, ${new Date(cell.updatedAt).toLocaleString('vi-VN')}`
-      : current;
+// Ô chỉ đọc: chấm hình dạng + chữ ngắn, đọc được không cần hover và không chỉ dựa vào màu.
+export function MatrixCell({ cellKey, locked }: MatrixCellProps) {
+  const { token } = theme.useToken();
+  if (cellKey === 'none')
+    return (
+      <Flex
+        align="center"
+        gap={6}
+        aria-label={`${NO_CELL_LABEL}${locked ? ` (${LOCKED_REASON})` : ''}`}
+      >
+        <Typography.Text type="secondary">{NO_CELL_SHORT}</Typography.Text>
+        {locked && (
+          <LockOutlined
+            aria-hidden
+            style={{ color: token.colorTextTertiary, fontSize: 12 }}
+          />
+        )}
+      </Flex>
+    );
+  const option = CELL_OPTIONS.find((entry) => entry.key === cellKey)!;
+  const direct = option.mode === 'DIRECT';
+  const all = option.scope === 'ALL';
+  const color = direct ? token.colorPrimary : token.colorWarning;
   return (
-    <Tooltip title={tooltip}>
-      {editable && !locked ? (
-        <Dropdown
-          open={open}
-          onOpenChange={setOpen}
-          menu={{ items, onClick: ({ key }) => choose(key) }}
-          trigger={['click']}
-        >
-          <Typography.Link>{content}</Typography.Link>
-        </Dropdown>
-      ) : (
-        <span>{content}</span>
+    <Flex
+      align="center"
+      gap={6}
+      aria-label={`${option.label}${locked ? ` (${LOCKED_REASON})` : ''}`}
+      title={option.label}
+    >
+      <span
+        aria-hidden
+        style={{
+          width: 10,
+          height: 10,
+          flexShrink: 0,
+          borderRadius: direct ? '50%' : 2,
+          background: all ? color : 'transparent',
+          border: `2px solid ${color}`,
+          transform: direct ? undefined : 'rotate(45deg) scale(0.85)',
+        }}
+      />
+      <Typography.Text style={{ fontSize: token.fontSizeSM }}>
+        {option.short}
+      </Typography.Text>
+      {locked && (
+        <LockOutlined
+          aria-hidden
+          style={{ color: token.colorTextTertiary, fontSize: 12 }}
+        />
       )}
-    </Tooltip>
+    </Flex>
+  );
+}
+
+export function MatrixLegend() {
+  return (
+    <Flex wrap gap={20} align="center">
+      {CELL_OPTIONS.map((option) => (
+        <MatrixCell key={option.key} cellKey={option.key} locked={false} />
+      ))}
+      <Flex align="center" gap={6}>
+        <Typography.Text type="secondary">{NO_CELL_SHORT}</Typography.Text>
+        <Typography.Text style={{ fontSize: 12 }}>{NO_CELL_LABEL}</Typography.Text>
+      </Flex>
+      <Flex align="center" gap={6}>
+        <LockOutlined aria-hidden />
+        <Typography.Text style={{ fontSize: 12 }}>Bị khóa</Typography.Text>
+      </Flex>
+    </Flex>
   );
 }

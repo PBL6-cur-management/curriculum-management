@@ -1,28 +1,42 @@
 import type { PermissionMatrix } from '../api/permissionMatrix';
 
 export const CELL_OPTIONS = [
-  { key: 'X', label: 'X — Trực tiếp, toàn bộ', mode: 'DIRECT', scope: 'ALL' },
+  {
+    key: 'X',
+    label: 'Trực tiếp, toàn bộ',
+    short: 'Toàn bộ',
+    mode: 'DIRECT',
+    scope: 'ALL',
+  },
   {
     key: 'P',
-    label: 'P — Trực tiếp, theo phạm vi',
+    label: 'Trực tiếp, theo phạm vi',
+    short: 'Phạm vi',
     mode: 'DIRECT',
     scope: 'SCOPED',
   },
   {
     key: 'D',
-    label: 'Đ — Qua đề xuất, toàn bộ',
+    label: 'Qua đề xuất, toàn bộ',
+    short: 'Đề xuất',
     mode: 'VIA_REQUEST',
     scope: 'ALL',
   },
   {
     key: 'DP',
-    label: 'Đ(P) — Qua đề xuất, theo phạm vi',
+    label: 'Qua đề xuất, theo phạm vi',
+    short: 'Đề xuất · phạm vi',
     mode: 'VIA_REQUEST',
     scope: 'SCOPED',
   },
 ] as const;
-export const NO_CELL_LABEL = '– Không có quyền';
-export const CELL_SYMBOLS = { X: 'X', P: 'P', D: 'Đ', DP: 'Đ(P)' } as const;
+
+export type CellKey = (typeof CELL_OPTIONS)[number]['key'] | 'none';
+
+export const NO_CELL_LABEL = 'Không có quyền';
+export const NO_CELL_SHORT = '—';
+export const LOCKED_REASON = 'Ô này bị khóa để luôn giữ quyền quản trị.';
+
 export const FUNCTION_GROUP_LABELS: Record<
   PermissionMatrix['permissions'][number]['functionGroup'],
   string
@@ -37,3 +51,20 @@ export const FUNCTION_GROUP_LABELS: Record<
   DATA_REPORT: 'Dữ liệu và báo cáo',
   STUDENT_LOOKUP: 'Tra cứu sinh viên',
 };
+
+export function cellKeyOf(
+  cell: { mode: string; scope: string } | undefined,
+): CellKey {
+  if (!cell) return 'none';
+  return (
+    CELL_OPTIONS.find(
+      (option) => option.mode === cell.mode && option.scope === cell.scope,
+    )?.key ?? 'none'
+  );
+}
+
+export function cellLabel(key: CellKey): string {
+  return key === 'none'
+    ? NO_CELL_LABEL
+    : CELL_OPTIONS.find((option) => option.key === key)!.label;
+}
