@@ -8,7 +8,6 @@ import {
   Input,
   Modal,
   Result,
-  Skeleton,
   Typography,
 } from 'antd';
 import type { Dayjs } from 'dayjs';
@@ -30,6 +29,7 @@ import {
   useFinalApprovalPreview,
   useFinalApprove,
 } from '../hooks/useApprovals';
+import { PageHeader, PageSkeleton } from '../../../shared/design-system';
 
 interface Values {
   decisionNumber: string;
@@ -56,7 +56,7 @@ export function FinalApprovalPage() {
   const approve = useFinalApprove(requestId);
   const back = generatePath(ROUTES.changeRequestDetail, { requestId });
 
-  if (preview.isPending) return <Skeleton active />;
+  if (preview.isPending) return <PageSkeleton />;
   if (!preview.data) {
     const refused =
       preview.error instanceof ApiError && preview.error.status === 403;
@@ -110,9 +110,7 @@ export function FinalApprovalPage() {
   return (
     <Flex vertical gap="middle">
       <Link to={back}>← Đề xuất {data.requestCode}</Link>
-      <Typography.Title level={2} style={{ margin: 0 }}>
-        {FINAL_APPROVAL_TITLE}
-      </Typography.Title>
+      <PageHeader title={FINAL_APPROVAL_TITLE} />
       <FinalApprovalPreview preview={data} />
       <Form<Values>
         form={form}

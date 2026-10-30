@@ -48,7 +48,7 @@ describe('ApprovalQueuePage', () => {
     const rows = screen.getAllByRole('row').slice(1);
     expect(within(rows[0]).getByText('DX-2026-0002')).toBeInTheDocument();
     expect(within(rows[0]).getByText('9')).toBeInTheDocument();
-    expect(within(rows[0]).getByText('—')).toBeInTheDocument();
+    expect(within(rows[0]).getByText('Chính mình')).toBeInTheDocument();
     expect(within(rows[1]).getByText('G1')).toBeInTheDocument();
     expect(within(rows[1]).getByText('Giảng viên B')).toBeInTheDocument();
   });

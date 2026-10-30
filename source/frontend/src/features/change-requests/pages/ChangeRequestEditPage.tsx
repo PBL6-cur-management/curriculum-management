@@ -1,4 +1,4 @@
-import { Flex, Result, Skeleton, Typography } from 'antd';
+import { Flex, Result, Typography } from 'antd';
 import { useState } from 'react';
 import { generatePath, Navigate, useParams } from 'react-router';
 import { ROUTES } from '../../../routes';
@@ -13,13 +13,14 @@ import { RequestHeaderCard } from '../components/RequestHeaderCard';
 import { SubmitConfirmModal } from '../components/SubmitConfirmModal';
 import { WorkspaceCard } from '../components/WorkspaceCard';
 import { useChangeRequest } from '../hooks/useChangeRequests';
+import { PageHeader, PageSkeleton } from '../../../shared/design-system';
 
 // The creator's workbench for one Draft: header, the copy or the items, documents, the diff, and "Gửi duyệt".
 export function ChangeRequestEditPage() {
   const { requestId = '' } = useParams();
   const { data: request, isPending, isError } = useChangeRequest(requestId);
   const [confirming, setConfirming] = useState(false);
-  if (isPending) return <Skeleton active />;
+  if (isPending) return <PageSkeleton />;
   if (isError || !request)
     return <Result status="404" title="Không tìm thấy đề xuất" />;
   if (!request.permissions.canEdit)
@@ -33,9 +34,13 @@ export function ChangeRequestEditPage() {
     <Flex vertical gap="middle">
       <Flex justify="space-between" align="center" wrap gap="small">
         <Flex gap="small" align="center" wrap>
-          <Typography.Title level={2} style={{ margin: 0 }}>
-            {request.requestCode} — {request.title}
-          </Typography.Title>
+          <PageHeader
+            title={
+              <>
+                {request.requestCode} — {request.title}
+              </>
+            }
+          />
           <RequestStatusTag status={request.status} />
         </Flex>
         <RequestDraftActions

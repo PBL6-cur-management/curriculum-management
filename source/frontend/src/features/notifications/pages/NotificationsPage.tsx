@@ -1,4 +1,4 @@
-import { Button, Flex, List, Result, Segmented, Typography } from 'antd';
+import { Button, Flex, List, Result, Segmented } from 'antd';
 import { useState } from 'react';
 import {
   DEFAULT_PAGE_SIZE,
@@ -10,6 +10,7 @@ import {
   useMarkAllNotificationsRead,
   useNotifications,
 } from '../../../shared/notifications/useNotifications';
+import { PageHeader } from '../../../shared/design-system';
 
 const INITIAL_QUERY: NotificationQuery = {
   page: 1,
@@ -25,14 +26,20 @@ export function NotificationsPage() {
   if (isError) return <Result status="error" title="Không thể tải thông báo" />;
   return (
     <Flex vertical gap="middle">
-      <Flex justify="space-between" align="center" wrap gap="small">
-        <Typography.Title level={2} style={{ margin: 0 }}>
-          Thông báo
-        </Typography.Title>
-        <Button onClick={() => markAll.mutate()} loading={markAll.isPending}>
-          Đánh dấu tất cả đã đọc
-        </Button>
-      </Flex>
+      <PageHeader
+        title="Thông báo"
+        subtitle={data ? `${data.total} thông báo${query.unread ? ' chưa đọc' : ''}` : undefined}
+        actions={
+          <>
+            <Button
+              onClick={() => markAll.mutate()}
+              loading={markAll.isPending}
+            >
+              Đánh dấu tất cả đã đọc
+            </Button>
+          </>
+        }
+      />
       <Segmented
         options={[
           { label: 'Tất cả', value: VIEW.ALL },
@@ -48,7 +55,6 @@ export function NotificationsPage() {
         }
       />
       <List
-        bordered
         loading={isFetching}
         dataSource={data?.items ?? []}
         locale={{ emptyText: 'Không có thông báo.' }}

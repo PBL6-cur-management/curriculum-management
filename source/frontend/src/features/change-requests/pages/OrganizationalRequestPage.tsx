@@ -1,6 +1,7 @@
-import { Flex, Typography } from 'antd';
+import { Flex } from 'antd';
 import { CreateRequestPanel } from '../components/CreateRequestPanel';
 import { ORGANIZATION_TYPES } from '../requestTypes';
+import { PageHeader } from '../../../shared/design-system';
 
 const DEFAULTS = {
   requestType: 'ORGANIZATION',
@@ -11,9 +12,7 @@ const DEFAULTS = {
 export function OrganizationalRequestPage() {
   return (
     <Flex vertical gap="middle">
-      <Typography.Title level={2} style={{ margin: 0 }}>
-        Đề xuất thay đổi tổ chức
-      </Typography.Title>
+      <PageHeader title="Đề xuất thay đổi tổ chức" />
       <CreateRequestPanel types={ORGANIZATION_TYPES} defaults={DEFAULTS} />
     </Flex>
   );
