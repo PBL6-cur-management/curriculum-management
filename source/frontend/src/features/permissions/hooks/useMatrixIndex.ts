@@ -10,7 +10,9 @@ const keyOf = (roleCode: string, permissionCode: string) =>
   `${roleCode}|${permissionCode}`;
 
 // Lookup O(1) cho mỗi ô, dựng một lần mỗi khi dữ liệu ma trận đổi.
-export function useMatrixIndex(data: PermissionMatrix | undefined): MatrixIndex {
+export function useMatrixIndex(
+  data: PermissionMatrix | undefined,
+): MatrixIndex {
   return useMemo(() => {
     const cells = new Map<string, MatrixCell>();
     const locked = new Set<string>();

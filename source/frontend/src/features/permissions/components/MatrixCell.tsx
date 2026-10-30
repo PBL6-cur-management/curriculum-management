@@ -76,7 +76,9 @@ export function MatrixLegend() {
       ))}
       <Flex align="center" gap={6}>
         <Typography.Text type="secondary">{NO_CELL_SHORT}</Typography.Text>
-        <Typography.Text style={{ fontSize: 12 }}>{NO_CELL_LABEL}</Typography.Text>
+        <Typography.Text style={{ fontSize: 12 }}>
+          {NO_CELL_LABEL}
+        </Typography.Text>
       </Flex>
       <Flex align="center" gap={6}>
         <LockOutlined aria-hidden />

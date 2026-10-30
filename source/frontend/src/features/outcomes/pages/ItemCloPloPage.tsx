@@ -1,13 +1,4 @@
-import {
-  Alert,
-  App,
-  Button,
-  Empty,
-  Flex,
-  Result,
-  Skeleton,
-  Typography,
-} from 'antd';
+import { Alert, App, Button, Empty, Flex, Result, Typography } from 'antd';
 import { useState } from 'react';
 import { generatePath, Link, useParams } from 'react-router';
 import { ROUTES } from '../../../routes';
@@ -33,6 +24,7 @@ import {
   SAVED,
 } from '../constants/outcomeLabels';
 import { useItemCloPlo, useReplaceCloPloLinks } from '../hooks/useOutcomes';
+import { PageHeader, PageSkeleton } from '../../../shared/design-system';
 
 interface ItemCloPloEditorProps {
   itemId: string;
@@ -87,7 +79,7 @@ function ItemCloPloEditor({ itemId, matrix }: ItemCloPloEditorProps) {
 export function ItemCloPloPage() {
   const { programId = '', versionId = '', itemId = '' } = useParams();
   const { data, isPending, error } = useItemCloPlo(itemId);
-  if (isPending) return <Skeleton active />;
+  if (isPending) return <PageSkeleton />;
   if (!data) {
     if (error instanceof ApiError && error.status === 403)
       return <Result status="403" title="Bạn không có quyền xem ma trận này" />;
@@ -97,14 +89,20 @@ export function ItemCloPloPage() {
   return (
     <Flex vertical gap="middle">
       <OutcomeNav programId={programId} versionId={versionId} />
-      <Typography.Title level={2} style={{ margin: 0 }}>
-        CLO–PLO — {item.course.courseCode} {item.course.courseName}
-      </Typography.Title>
-      <Typography.Text type="secondary">
-        {`${version.programName} (${versionLabel(version)}) · học kỳ ${item.plannedSemester}`}
-        {revision &&
-          ` · Theo đề cương bản ${revision.revisionNumber}${revision.status === 'DRAFT' ? ' (nháp)' : ''}`}
-      </Typography.Text>
+      <PageHeader
+        title={
+          <>
+            CLO–PLO — {item.course.courseCode} {item.course.courseName}
+          </>
+        }
+        subtitle={
+          <>
+            {`${version.programName} (${versionLabel(version)}) · học kỳ ${item.plannedSemester}`}
+            {revision &&
+              ` · Theo đề cương bản ${revision.revisionNumber}${revision.status === 'DRAFT' ? ' (nháp)' : ''}`}
+          </>
+        }
+      />
       <RequestDraftBanner request={version.sourceRequest} />
       <OutcomeEditNotice
         editPath={data.editPath}

@@ -71,9 +71,9 @@ export function AcceptMismatchModal({
       <Alert
         type="warning"
         showIcon
-        message={`Chênh lệch: bắt buộc ${formatGap(gap.compulsory)}, tự chọn ${formatGap(gap.elective)}, tổng ${formatGap(gap.total)} tín chỉ.`}
+        title={`Chênh lệch: bắt buộc ${formatGap(gap.compulsory)}, tự chọn ${formatGap(gap.elective)}, tổng ${formatGap(gap.total)} tín chỉ.`}
       />
-      {staleNote && <Alert type="error" showIcon message={staleNote} />}
+      {staleNote && <Alert type="error" showIcon title={staleNote} />}
       <Form<Values> form={form} layout="vertical" onFinish={submit}>
         <Form.Item
           name="reason"

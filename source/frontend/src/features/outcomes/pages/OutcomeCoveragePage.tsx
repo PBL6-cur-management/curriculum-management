@@ -1,4 +1,4 @@
-import { Alert, Flex, Result, Skeleton, Typography } from 'antd';
+import { Alert, Flex, Result, Typography } from 'antd';
 import type { TableColumnsType } from 'antd';
 import { generatePath, Link, useParams } from 'react-router';
 import { ROUTES } from '../../../routes';
@@ -9,6 +9,11 @@ import { CoverageSection } from '../components/CoverageSection';
 import { OutcomeNav } from '../components/OutcomeNav';
 import { GROUP_FILTER_NOTE } from '../constants/outcomeLabels';
 import { useOutcomeCoverage } from '../hooks/useOutcomes';
+import {
+  PageHeader,
+  PageSkeleton,
+  SummaryStrip,
+} from '../../../shared/design-system';
 
 type PloGap = components['schemas']['PloHeaderDto'];
 type CloGap = components['schemas']['CloGapDto'];
@@ -17,7 +22,7 @@ type CourseGap = components['schemas']['CourseGapDto'];
 export function OutcomeCoveragePage() {
   const { programId = '', versionId = '' } = useParams();
   const { data, isPending, error } = useOutcomeCoverage(versionId);
-  if (isPending) return <Skeleton active />;
+  if (isPending) return <PageSkeleton />;
   if (!data) {
     if (error instanceof ApiError && error.status === 403)
       return <Result status="403" title="Bạn không có quyền xem báo cáo này" />;
@@ -69,13 +74,39 @@ export function OutcomeCoveragePage() {
   return (
     <Flex vertical gap="large">
       <OutcomeNav programId={programId} versionId={versionId} />
-      <Typography.Title level={2} style={{ margin: 0 }}>
-        Kiểm tra phủ chuẩn đầu ra — {data.version.programName} (
-        {versionLabel(data.version)})
-      </Typography.Title>
-      <Typography.Text type="secondary">
-        Chỉ để theo dõi: thiếu sót không chặn việc lưu.
-      </Typography.Text>
+      <PageHeader
+        title={
+          <>
+            Kiểm tra phủ chuẩn đầu ra — {data.version.programName} (
+            {versionLabel(data.version)})
+          </>
+        }
+        subtitle="Chỉ để theo dõi: thiếu sót không chặn việc lưu."
+      />
+      <SummaryStrip
+        label="Thiếu sót chuẩn đầu ra"
+        items={[
+          {
+            label: 'PLO chưa có học phần',
+            value: data.plosWithoutCourse.length,
+            tone: data.plosWithoutCourse.length ? 'warning' : 'success',
+          },
+          {
+            label: 'CLO chưa gắn PLO',
+            value: data.closWithoutPlo.length,
+            tone: data.closWithoutPlo.length ? 'warning' : 'success',
+          },
+          {
+            label: 'Học phần chưa gắn PLO',
+            value: data.coursesWithoutPlo.length,
+            tone: data.coursesWithoutPlo.length ? 'warning' : 'success',
+          },
+          {
+            label: 'Học phần chưa có đề cương',
+            value: data.coursesWithoutSyllabus,
+          },
+        ]}
+      />
       {data.filteredToGroups && (
         <Alert type="info" showIcon title={GROUP_FILTER_NOTE} />
       )}

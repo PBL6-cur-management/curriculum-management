@@ -83,11 +83,19 @@ export function UserListPage() {
               placeholder="Tìm tài khoản"
               allowClear
               onSearch={(q) =>
-                setParams((current) => ({ ...current, page: 1, q: q || undefined }))
+                setParams((current) => ({
+                  ...current,
+                  page: 1,
+                  q: q || undefined,
+                }))
               }
               onChange={(event) => {
                 if (!event.target.value)
-                  setParams((current) => ({ ...current, page: 1, q: undefined }));
+                  setParams((current) => ({
+                    ...current,
+                    page: 1,
+                    q: undefined,
+                  }));
               }}
             />
             <OrgUnitSelect

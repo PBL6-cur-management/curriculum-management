@@ -169,9 +169,7 @@ describe('UserListPage', () => {
         ? Promise.reject(new Error('Network unavailable'))
         : Promise.resolve(
             new Response(
-              JSON.stringify(
-                String(input).includes('org-units') ? [] : users,
-              ),
+              JSON.stringify(String(input).includes('org-units') ? [] : users),
               { status: 200 },
             ),
           ),

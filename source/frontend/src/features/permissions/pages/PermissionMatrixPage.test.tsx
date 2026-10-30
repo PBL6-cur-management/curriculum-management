@@ -98,17 +98,25 @@ describe('PermissionMatrixPage', () => {
   it('keeps locked cells read-only in the role editor', async () => {
     renderPage(true);
     await screen.findByText('Quyền 41');
-    fireEvent.click((await screen.findAllByRole('button', { name: /Sửa quyền/ }))[0]);
+    fireEvent.click(
+      (await screen.findAllByRole('button', { name: /Sửa quyền/ }))[0],
+    );
     expect(await screen.findByText(/đã khóa/)).toBeInTheDocument();
   });
 
   it('applies batched changes only after one confirmation', async () => {
     const { fetchMock } = renderPage(true);
     await screen.findByText('Quyền 41');
-    fireEvent.click((await screen.findAllByRole('button', { name: /Sửa quyền/ }))[1]);
-    const group = await screen.findByRole('radiogroup', { name: 'Quyền Quyền 1' });
+    fireEvent.click(
+      (await screen.findAllByRole('button', { name: /Sửa quyền/ }))[1],
+    );
+    const group = await screen.findByRole('radiogroup', {
+      name: 'Quyền Quyền 1',
+    });
     fireEvent.click(within(group).getByText('Không'));
-    expect(await screen.findByText('1 thay đổi chưa áp dụng')).toBeInTheDocument();
+    expect(
+      await screen.findByText('1 thay đổi chưa áp dụng'),
+    ).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Áp dụng thay đổi' }));
     expect(
       fetchMock.mock.calls.some(([, init]) => init?.method === 'DELETE'),

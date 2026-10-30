@@ -1,15 +1,4 @@
-import {
-  Alert,
-  Empty,
-  Flex,
-  Result,
-  Segmented,
-  Skeleton,
-  Space,
-  Tabs,
-  Tag,
-  Typography,
-} from 'antd';
+import { Alert, Empty, Flex, Result, Segmented, Tabs, Tag } from 'antd';
 import { useState } from 'react';
 import { generatePath, Link, useParams, useSearchParams } from 'react-router';
 import { ROUTES } from '../../../routes';
@@ -33,6 +22,12 @@ import {
 } from '../constants/syllabusLabels';
 import { useCourseSyllabus } from '../hooks/useSyllabus';
 import { translated } from '../utils/syllabusLanguage';
+import {
+  BackLink,
+  formatEmpty,
+  PageHeader,
+  PageSkeleton,
+} from '../../../shared/design-system';
 
 export function SyllabusPage() {
   const { courseId = '' } = useParams();
@@ -48,7 +43,7 @@ export function SyllabusPage() {
   );
   const canViewCourse = useCan(PERMISSIONS.courseView);
   const [language, setLanguage] = useState<SyllabusLanguage>('vi');
-  if (isPending) return <Skeleton active />;
+  if (isPending) return <PageSkeleton />;
   if (!data) {
     if (error instanceof ApiError && error.status === 403)
       return (
@@ -66,37 +61,39 @@ export function SyllabusPage() {
   );
   return (
     <Flex vertical gap="middle">
-      <Flex justify="space-between" align="center" wrap gap="small">
-        <Space wrap>
-          <Typography.Title level={2} style={{ margin: 0 }}>
+      {canViewCourse && (
+        <BackLink
+          to={generatePath(ROUTES.courseDetail, { courseId: data.course.id })}
+        >
+          {BACK_TO_COURSE}
+        </BackLink>
+      )}
+      <PageHeader
+        title={
+          <>
             {data.course.courseCode} — {name.text}
-          </Typography.Title>
-          {name.missing && <Tag>{NOT_TRANSLATED}</Tag>}
-        </Space>
-        <Space wrap>
-          {canViewCourse && (
-            <Link
-              to={generatePath(ROUTES.courseDetail, {
-                courseId: data.course.id,
-              })}
-            >
-              {BACK_TO_COURSE}
-            </Link>
-          )}
-          <Segmented
-            options={[...LANGUAGE_OPTIONS]}
-            value={language}
-            onChange={setLanguage}
-          />
-          <SyllabusActions data={data} />
-        </Space>
-      </Flex>
+            {name.missing && (
+              <Tag style={{ marginLeft: 8 }}>{NOT_TRANSLATED}</Tag>
+            )}
+          </>
+        }
+        actions={
+          <>
+            <Segmented
+              options={[...LANGUAGE_OPTIONS]}
+              value={language}
+              onChange={setLanguage}
+            />
+            <SyllabusActions data={data} />
+          </>
+        }
+      />
       <RequestDraftBanner request={data.draft?.sourceRequest ?? null} />
       {data.version && (
         <Alert
           type="info"
           showIcon
-          message={`Đề cương theo phiên bản ${data.version.versionNumber ?? '—'} của chương trình ${data.version.programCode}`}
+          title={`Đề cương theo phiên bản ${formatEmpty(data.version.versionNumber)} của chương trình ${data.version.programCode}`}
           description={
             <Link
               to={generatePath(ROUTES.versionDetail, {

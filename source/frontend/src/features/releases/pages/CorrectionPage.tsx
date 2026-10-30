@@ -56,7 +56,7 @@ export function CorrectionPage() {
       <Alert
         type="info"
         showIcon
-        message="Sửa bản nháp đính chính ở các màn hình dưới đây, rồi ban hành. Phiên bản gốc không bị sửa tại chỗ."
+        title="Sửa bản nháp đính chính ở các màn hình dưới đây, rồi ban hành. Phiên bản gốc không bị sửa tại chỗ."
       />
       <Space wrap>
         <Link to={generatePath(ROUTES.programVersionInfo, params)}>

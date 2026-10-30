@@ -64,7 +64,8 @@ export function RoleEditorDrawer({
   function change(permission: Permission, next: CellKey) {
     setPending((previous) => {
       const updated = new Map(previous);
-      if (next === current(permission)) updated.delete(permission.permissionCode);
+      if (next === current(permission))
+        updated.delete(permission.permissionCode);
       else updated.set(permission.permissionCode, next);
       return updated;
     });
@@ -78,8 +79,8 @@ export function RoleEditorDrawer({
   async function apply() {
     const changes = [...pending.entries()];
     const name = (code: string) =>
-      permissions.find((item) => item.permissionCode === code)?.permissionName ??
-      code;
+      permissions.find((item) => item.permissionCode === code)
+        ?.permissionName ?? code;
     modal.confirm({
       title: `Áp dụng ${changes.length} thay đổi cho ${roleCode}?`,
       width: 520,
@@ -91,9 +92,7 @@ export function RoleEditorDrawer({
             <Typography.Text key={code}>
               {name(code)}:{' '}
               <Typography.Text type="secondary">
-                {cellLabel(
-                  cellKeyOf(index.cell(roleCode, code)),
-                )}
+                {cellLabel(cellKeyOf(index.cell(roleCode, code)))}
               </Typography.Text>{' '}
               → <Typography.Text strong>{cellLabel(next)}</Typography.Text>
             </Typography.Text>
@@ -117,7 +116,9 @@ export function RoleEditorDrawer({
               });
             else await clear.mutateAsync({ roleCode, permissionCode });
           }
-          message.success(`Đã áp dụng ${changes.length} thay đổi cho ${roleCode}`);
+          message.success(
+            `Đã áp dụng ${changes.length} thay đổi cho ${roleCode}`,
+          );
           close();
         } finally {
           setSaving(false);
@@ -164,7 +165,10 @@ export function RoleEditorDrawer({
             {permissions
               .filter((item) => item.functionGroup === group)
               .map((permission) => {
-                const locked = index.locked(roleCode, permission.permissionCode);
+                const locked = index.locked(
+                  roleCode,
+                  permission.permissionCode,
+                );
                 const changed = pending.has(permission.permissionCode);
                 return (
                   <Flex
@@ -180,8 +184,13 @@ export function RoleEditorDrawer({
                     }}
                   >
                     <Flex vertical style={{ minWidth: 0 }}>
-                      <Typography.Text>{permission.permissionName}</Typography.Text>
-                      <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                      <Typography.Text>
+                        {permission.permissionName}
+                      </Typography.Text>
+                      <Typography.Text
+                        type="secondary"
+                        style={{ fontSize: 12 }}
+                      >
                         {permission.permissionCode}
                       </Typography.Text>
                     </Flex>

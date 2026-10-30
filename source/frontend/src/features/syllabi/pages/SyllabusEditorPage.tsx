@@ -1,13 +1,4 @@
-import {
-  Alert,
-  App,
-  Flex,
-  Result,
-  Skeleton,
-  Tabs,
-  Tooltip,
-  Typography,
-} from 'antd';
+import { Alert, App, Flex, Result, Tabs, Tooltip, Collapse } from 'antd';
 import { useCallback, useState } from 'react';
 import { generatePath, Link, useParams, useSearchParams } from 'react-router';
 import { ROUTES } from '../../../routes';
@@ -39,6 +30,11 @@ import {
 } from '../constants/syllabusLabels';
 import { useCourseSyllabus } from '../hooks/useSyllabus';
 import type { EditorTabProps } from '../types';
+import {
+  BackLink,
+  PageHeader,
+  PageSkeleton,
+} from '../../../shared/design-system';
 
 // The order users see. Each tab is enabled by the right that writes it: text, weekly rows and files by syllabus.edit,
 // CLOs by clo.edit, formula and mappings by gradingFormula.edit.
@@ -97,6 +93,9 @@ interface EditorTab {
   disabledHint?: string;
 }
 
+// A long list of programs pushes the editor below the fold; past this many it folds away.
+const PROGRAMS_SHOWN_OPEN = 3;
+
 export function SyllabusEditorPage() {
   const { courseId = '' } = useParams();
   const { modal } = App.useApp();
@@ -107,7 +106,7 @@ export function SyllabusEditorPage() {
   const [dirty, setDirty] = useState(false);
   const onDirtyChange = useCallback((value: boolean) => setDirty(value), []);
   const { data, isPending, error } = useCourseSyllabus(courseId, requestId);
-  if (isPending) return <Skeleton active />;
+  if (isPending) return <PageSkeleton />;
   if (!data) {
     if (error instanceof ApiError && error.status === 403)
       return (
@@ -181,18 +180,36 @@ export function SyllabusEditorPage() {
 
   return (
     <Flex vertical gap="middle">
-      <Flex justify="space-between" align="center" wrap gap="small">
-        <Typography.Title level={2} style={{ margin: 0 }}>
-          Sửa đề cương — {course.courseCode} {course.courseName}
-        </Typography.Title>
-        <Link to={backLink}>{BACK_TO_SYLLABUS}</Link>
-      </Flex>
+      <BackLink to={backLink}>{BACK_TO_SYLLABUS}</BackLink>
+      <PageHeader
+        title={
+          <>
+            Sửa đề cương — {course.courseCode} {course.courseName}
+          </>
+        }
+      />
       <RequestDraftBanner request={draft.sourceRequest} />
       <Alert
         type="info"
         showIcon
         title={PROGRAMS_USING_NOTICE}
-        description={<ProgramsUsingList programs={programsUsing} />}
+        description={
+          programsUsing.length > PROGRAMS_SHOWN_OPEN ? (
+            <Collapse
+              ghost
+              size="small"
+              items={[
+                {
+                  key: 'programs',
+                  label: `Xem ${programsUsing.length} chương trình`,
+                  children: <ProgramsUsingList programs={programsUsing} />,
+                },
+              ]}
+            />
+          ) : (
+            <ProgramsUsingList programs={programsUsing} />
+          )
+        }
       />
       <Tabs
         activeKey={activeTab}

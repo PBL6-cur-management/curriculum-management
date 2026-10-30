@@ -44,7 +44,7 @@ export function DeactivateGroupModal({
       {impact.isError ? (
         <Alert
           type="error"
-          message="Không tải được danh sách ảnh hưởng; chưa thể ngừng sử dụng nhóm."
+          title="Không tải được danh sách ảnh hưởng; chưa thể ngừng sử dụng nhóm."
         />
       ) : !impact.data ? (
         <Spin />
@@ -74,7 +74,7 @@ export function DeactivateGroupModal({
           </Typography.Paragraph>
         </>
       )}
-      {error && <Alert type="error" message={error} />}
+      {error && <Alert type="error" title={error} />}
     </Modal>
   );
 }

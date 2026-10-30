@@ -125,7 +125,7 @@ export function AddMemberModal({
         >
           <DatePicker format={ISO_DAY_FORMAT} />
         </Form.Item>
-        {error && <Alert type="error" message={error} />}
+        {error && <Alert type="error" title={error} />}
       </Form>
     </Modal>
   );

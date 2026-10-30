@@ -69,7 +69,7 @@ export function EndDirectorModal({
             }
           />
         </Form.Item>
-        {error && <Alert type="error" showIcon message={error} />}
+        {error && <Alert type="error" showIcon title={error} />}
       </Form>
     </Modal>
   );
