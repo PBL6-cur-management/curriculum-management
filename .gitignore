@@ -9,3 +9,6 @@ source/backend/prisma/seed-data/dut/data/private/
 
 # Local-only helper scripts (viewer accounts and similar), never committed
 source/backend/scripts/local/
+
+# Taiga MCP config holds personal credentials
+.mcp.json
