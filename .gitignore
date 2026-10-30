@@ -12,3 +12,5 @@ source/backend/scripts/local/
 
 # Taiga MCP config holds personal credentials
 .mcp.json
+# Uploaded files (FILES_ROOT in local .env)
+source/backend/storage/
