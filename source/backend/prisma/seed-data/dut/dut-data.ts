@@ -1,5 +1,4 @@
 import type {
-  CatalogExtract,
   DutCohort,
   DutCourse,
   DutSemester,
@@ -7,6 +6,7 @@ import type {
 } from './extract/extract-catalog.js';
 import type { DutProgram, FrameReport } from './extract/extract-frames.js';
 import type { DutRelation } from './extract/extract-relations.js';
+import type { ProgramFrames } from './extract/program-map.js';
 export type {
   CatalogExtract,
   DutCohort,
@@ -28,7 +28,6 @@ export const DUT_DATA_FILES = {
   PROGRAMS: 'programs.json',
   REPORT: 'report.json',
 } as const;
-export const DEFAULT_LEGACY_ROOT = '../current-data-dut/pbl6-data';
 export interface DutCatalogFile {
   units: DutUnit[];
   courses: DutCourse[];
@@ -41,8 +40,21 @@ export interface DutProgramsFile {
 }
 export interface DutReportFile {
   malformedLines: Record<string, number>;
+  scope: {
+    frames: number;
+    // Thạc sĩ / tiến sĩ frames: outside the SRS degree levels, so neither they nor their students are seeded.
+    excludedFramesWithStudents: {
+      frameCode: string;
+      level: string;
+      students: number;
+    }[];
+  };
+  // Frame → program mapping by rule, for the Khoa to confirm.
+  programs: ProgramFrames[];
   missingCourseCodes: string[];
-  snapshotConflicts: CatalogExtract['snapshotConflicts'];
+  ownersInferredFromCode: number;
+  estimatedSemesters: string[];
+  nextTermCode: string;
   conflictingRelationPairs: number;
   excludedRelationPairs: number;
   cycleSkippedRelations: DutRelation[];

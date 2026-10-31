@@ -2,6 +2,7 @@ import { Button, Flex, Form, Select } from 'antd';
 import { useEffect } from 'react';
 import type { VersionRef } from '../api/releases';
 import { isIssuedVersion } from '../utils/versionComparison';
+import { formatDecisionNumber } from '../../../shared/releases/decisionNumber';
 
 interface VersionComparisonSelectorsProps {
   versions: VersionRef[];
@@ -24,7 +25,7 @@ export function VersionComparisonSelectors({
   }, [form, beforeVersionId, afterVersionId]);
   const options = versions.filter(isIssuedVersion).map((version) => ({
     value: version.id,
-    label: `${version.versionNumber} · ${version.decisionNumber} · ${version.effectiveSemester?.semesterCode}`,
+    label: `${version.versionNumber} · ${formatDecisionNumber(version.decisionNumber)} · ${version.effectiveSemester?.semesterCode}`,
   }));
   return (
     <Form

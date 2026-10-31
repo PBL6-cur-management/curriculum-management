@@ -121,6 +121,7 @@ export const SEMESTER = {
   academicYear: '2026-2027',
   termInYear: 2,
   startDate: '2027-01-18',
+  startDateEstimated: false,
 };
 
 export const COHORT = { id: 'k1', cohortCode: 'K2026', intakeYear: 2026 };

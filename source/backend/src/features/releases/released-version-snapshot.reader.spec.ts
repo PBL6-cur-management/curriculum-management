@@ -153,17 +153,22 @@ describe('released version snapshot reader', () => {
       readReleasedVersionSnapshot(tx, 'other', 'v'),
     ).rejects.toMatchObject({ code: 'PROGRAM_VERSION_NOT_FOUND' });
   });
-  it.each([
-    'versionNumber',
-    'decisionNumber',
-    'publishedAt',
-    'effectiveSemester',
-  ])('refuses missing release fact %s', async (field) => {
+  it.each(['versionNumber', 'publishedAt', 'effectiveSemester'])(
+    'refuses missing release fact %s',
+    async (field) => {
+      const { tx, version } = setup();
+      Object.assign(version, { [field]: null });
+      await expect(
+        readReleasedVersionSnapshot(tx, 'p', 'v'),
+      ).rejects.toMatchObject({ code: 'VERSION_NOT_ISSUED' });
+    },
+  );
+  it('reads a released version that has no decision number yet (seeded from the school data)', async () => {
     const { tx, version } = setup();
-    Object.assign(version, { [field]: null });
+    Object.assign(version, { decisionNumber: null });
     await expect(
       readReleasedVersionSnapshot(tx, 'p', 'v'),
-    ).rejects.toMatchObject({ code: 'VERSION_NOT_ISSUED' });
+    ).resolves.toMatchObject({ version: { decisionNumber: null } });
   });
   it('refuses a request copy even with forged publication facts', async () => {
     const { tx, version } = setup();

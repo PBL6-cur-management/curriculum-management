@@ -1,5 +1,7 @@
 # Bàn giao
 
+> **Cập nhật 2026-10-31 (nhánh `feat/dut-real-reseed`)**: `ctdt_real` đã được dựng lại từ bản sao CSDL Trường (42 CTĐT, 89 phiên bản, 1 923 sinh viên; số quyết định NULL, học kỳ có ngày thật). Dựng lại: `pnpm db:rebuild:real --yes` trong `source/backend` (có `pg_dump` trước reset). Agent phải xin người dùng đồng ý cho biến `PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION`; người dùng chạy tay trong terminal thì không bị chặn. Xem [báo cáo](../implement-report/dut-real-reseed-implement-report.md). Các mục bên dưới là lịch sử trước reseed.
+
 ## Bàn giao 2026-10-31 (tối)
 
 **Nhánh**: `main` sau PR #43. Cây làm việc sạch; nhánh cũ (`refactor/program-workspace-tabs`, các nhánh tính năng đã gộp, worktree `cm-f26-leftovers`) đã dọn.

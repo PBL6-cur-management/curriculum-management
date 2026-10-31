@@ -9,20 +9,11 @@ import type { CatalogSeedResult } from './seed-catalog.js';
 
 export const DUT_PROGRAM_TX_TIMEOUT_MS = 60_000;
 
-// The DUT source has no legal decision numbers. Issued versions still need one (applied-version rules refuse an
-// issued version without it), so the seed writes a labelled placeholder that the Khoa replaces later.
-export function dutDecisionPlaceholder(
-  programCode: string,
-  versionNumber: string,
-): string {
-  return `DUT-${programCode}-${versionNumber}`;
-}
-
-const ISSUED_STATUSES = ['PENDING', 'ACTIVE', 'HISTORICAL'] as const;
+// The school's data carries no decision number or signing date, so seeded versions have none (NULL, shown as
+// "Chưa có số quyết định"); the Khoa enters the real ones. No placeholder is ever invented.
 export interface ProgramsSeedResult {
   created: string[];
   skippedExisting: string[];
-  backfilledDecisions: number;
 }
 interface ProgramSeedContext {
   facultyId: string;
@@ -40,12 +31,16 @@ function requiredValue<Value>(
   return value;
 }
 
+// A released version freezes each row's course name and credits, as the publisher does (released-version readers
+// refuse a row without them). Drafts stay live.
 async function writeVersionContent(
   tx: Prisma.TransactionClient,
   versionId: string,
   version: DutVersion,
-  courseIds: ReadonlyMap<string, string>,
+  catalog: Pick<CatalogSeedResult, 'courseIds' | 'courses'>,
+  released: boolean,
 ): Promise<void> {
+  const courseIds = catalog.courseIds;
   const groups = version.groups.length
     ? await tx.electiveGroup.createManyAndReturn({
         data: version.groups.map((group) => ({ versionId, ...group })),
@@ -68,6 +63,20 @@ async function writeVersionContent(
           htDa: item.htDa,
           tqDa: item.tqDa,
           note: item.note,
+          ...(released
+            ? {
+                courseNameSnapshot: requiredValue(
+                  catalog.courses,
+                  item.courseCode,
+                  'course',
+                ).courseName,
+                creditsSnapshot: requiredValue(
+                  catalog.courses,
+                  item.courseCode,
+                  'course',
+                ).credits,
+              }
+            : {}),
         })),
         select: { id: true, courseId: true },
       })
@@ -145,10 +154,6 @@ async function writeProgram(
         programId: row.id,
         ...versionDescription(entry.version),
         versionNumber: `${index + 1}.0`,
-        decisionNumber: dutDecisionPlaceholder(
-          program.programCode,
-          `${index + 1}.0`,
-        ),
         status: statuses[index],
         effectiveSemesterId: entry.semesterId,
         publishedById: ctx.publisherId,
@@ -157,12 +162,7 @@ async function writeProgram(
         previousVersionId,
       },
     });
-    await writeVersionContent(
-      tx,
-      version.id,
-      entry.version,
-      ctx.catalog.courseIds,
-    );
+    await writeVersionContent(tx, version.id, entry.version, ctx.catalog, true);
     if (entry.version.cohortCode)
       await tx.cohortVersion.create({
         data: {
@@ -183,7 +183,7 @@ async function writeProgram(
     const version = await tx.programVersion.create({
       data: { programId: row.id, ...versionDescription(draft) },
     });
-    await writeVersionContent(tx, version.id, draft, ctx.catalog.courseIds);
+    await writeVersionContent(tx, version.id, draft, ctx.catalog, false);
   }
 }
 
@@ -192,11 +192,7 @@ export async function seedDutPrograms(
   file: DutProgramsFile,
   ctx: ProgramSeedContext,
 ): Promise<ProgramsSeedResult> {
-  const result: ProgramsSeedResult = {
-    created: [],
-    skippedExisting: [],
-    backfilledDecisions: 0,
-  };
+  const result: ProgramsSeedResult = { created: [], skippedExisting: [] };
   const today = todayDate();
   for (const program of file.programs) {
     const existing = await prisma.program.findUnique({
@@ -204,11 +200,6 @@ export async function seedDutPrograms(
       select: { id: true },
     });
     if (existing) {
-      result.backfilledDecisions += await backfillDecisionNumbers(
-        prisma,
-        existing.id,
-        program.programCode,
-      );
       result.skippedExisting.push(program.programCode);
       continue;
     }
@@ -219,33 +210,4 @@ export async function seedDutPrograms(
     result.created.push(program.programCode);
   }
   return result;
-}
-
-// Re-running the seed on an older database fills only the missing placeholders; a number entered by hand stays.
-async function backfillDecisionNumbers(
-  prisma: PrismaClient,
-  programId: string,
-  programCode: string,
-): Promise<number> {
-  const missing = await prisma.programVersion.findMany({
-    where: {
-      programId,
-      decisionNumber: null,
-      sourceRequestId: null,
-      versionNumber: { not: null },
-      status: { in: [...ISSUED_STATUSES] },
-    },
-    select: { id: true, versionNumber: true },
-  });
-  for (const version of missing)
-    await prisma.programVersion.update({
-      where: { id: version.id },
-      data: {
-        decisionNumber: dutDecisionPlaceholder(
-          programCode,
-          version.versionNumber!,
-        ),
-      },
-    });
-  return missing.length;
 }

@@ -13,7 +13,7 @@ import {
 } from '../../../shared/releases/useReleaseOptions';
 import { CohortForm } from '../components/CohortForm';
 import { SemesterForm } from '../components/SemesterForm';
-import { formatDay } from '../utils/format';
+import { SemesterStartDate } from '../components/SemesterStartDate';
 import { PageHeader } from '../../../shared/design-system';
 
 type SemesterDialog = { semester?: Semester } | null;
@@ -66,8 +66,12 @@ export function SemestersPage() {
             {
               title: 'Ngày bắt đầu',
               dataIndex: 'startDate',
-              render: (day: string | null) =>
-                day ? formatDay(day) : 'Chưa có',
+              render: (_: unknown, semester) => (
+                <SemesterStartDate
+                  startDate={semester.startDate}
+                  estimated={semester.startDateEstimated}
+                />
+              ),
             },
             {
               title: '',

@@ -36,7 +36,7 @@ export class IssuedVersionDto {
     enumName: 'IssuedVersionStatus',
   })
   status!: IssuedVersionStatus;
-  @ApiProperty() decisionNumber!: string;
+  @ApiProperty({ type: String, nullable: true }) decisionNumber!: string | null;
   @ApiProperty({ type: SemesterDto }) effectiveSemester!: SemesterDto;
 }
 export class SyllabusComparisonLinkDto {

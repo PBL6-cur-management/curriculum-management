@@ -55,6 +55,7 @@ export class SemestersService {
           academicYear: dto.academicYear,
           termInYear: dto.termInYear,
           startDate: dto.startDate ? fromIsoDay(dto.startDate) : null,
+          startDateEstimated: false,
         },
       });
       this.logger.log(
@@ -184,10 +185,12 @@ export class SemestersService {
 
 const dayOrNull = (date: Date | null) => (date ? toIsoDay(date) : null);
 
+// A start date saved here is the Phòng Đào tạo's own, so it stops being an estimate.
 function semesterData(
   dto: Partial<CreateSemesterDto>,
 ): Prisma.SemesterUpdateInput {
   return {
+    startDateEstimated: dto.startDate === undefined ? undefined : false,
     semesterCode: dto.semesterCode,
     academicYear: dto.academicYear,
     termInYear: dto.termInYear,

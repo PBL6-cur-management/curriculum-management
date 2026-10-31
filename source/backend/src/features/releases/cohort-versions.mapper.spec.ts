@@ -16,6 +16,7 @@ describe('cohort version mappers', () => {
     academicYear: 'Y',
     termInYear: 1,
     startDate: date,
+    startDateEstimated: false,
     createdAt: date,
     updatedAt: date,
   };
@@ -44,6 +45,7 @@ describe('cohort version mappers', () => {
       academicYear: 'Y',
       termInYear: 1,
       startDate: '2026-01-01',
+      startDateEstimated: false,
     });
     expect(dto.version).toEqual({
       id: 'v',

@@ -60,8 +60,8 @@ function fixture() {
     status: 'ARCHIVED',
     sourceRequestId: null as string | null,
     versionNumber: '1.0',
-    decisionNumber: 'SYN-QD',
-    publishedAt: new Date('2024-01-01T00:00:00.000Z'),
+    decisionNumber: 'SYN-QD' as string | null,
+    publishedAt: new Date('2024-01-01T00:00:00.000Z') as Date | null,
     effectiveSemester: { startDate: new Date('2024-09-01T00:00:00.000Z') },
     programName: 'Chương trình tổng hợp',
     program: { programCode: 'SYN' },
@@ -197,6 +197,14 @@ describe('GraduationInputReader', () => {
     expect(data.db.course.findMany).toHaveBeenCalledTimes(2);
   });
 
+  it('accepts a released version that has no decision number yet (seeded from the school data)', async () => {
+    const data = fixture();
+    data.version.decisionNumber = null;
+    await expect(data.read()).resolves.toMatchObject({
+      context: { programVersionId: 'version-resolved' },
+    });
+  });
+
   it('retains exception resolution and allows future semesters without a latest-version fallback', async () => {
     const data = fixture();
     vi.mocked(data.capability.resolve).mockResolvedValue({
@@ -237,7 +245,7 @@ describe('GraduationInputReader', () => {
       data.version.curriculumItems[0]!.creditsSnapshot = null;
     if (kind === 'empty') data.version.curriculumItems = [];
     if (kind === 'draft') data.version.status = 'DRAFT';
-    if (kind === 'unpublished') data.version.decisionNumber = '';
+    if (kind === 'unpublished') data.version.publishedAt = null;
     if (kind === 'working-copy') data.version.sourceRequestId = 'request';
     if (kind === 'not-effective')
       data.version.effectiveSemester.startDate = new Date(

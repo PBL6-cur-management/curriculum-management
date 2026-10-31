@@ -69,7 +69,6 @@ export async function readReleasedVersionSnapshot(
     version.status === 'DRAFT' ||
     version.sourceRequestId !== null ||
     !version.versionNumber ||
-    !version.decisionNumber ||
     !version.publishedAt ||
     !version.effectiveSemester
   ) {

@@ -13,6 +13,7 @@ export const semester = {
   academicYear: '2025-2026',
   termInYear: 1,
   startDate: '2025-08-01',
+  startDateEstimated: false,
 } satisfies components['schemas']['SemesterDto'];
 export const cohort = {
   id: 'c1',

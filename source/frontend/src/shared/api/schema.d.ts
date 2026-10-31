@@ -4790,6 +4790,8 @@ export interface components {
       termInYear: number;
       /** Format: date */
       startDate: string | null;
+      /** @description The start date is an estimate (the school calendar has none for this term), not an official date */
+      startDateEstimated: boolean;
     };
     ReleasedVersionDto: {
       id: string;
@@ -5216,7 +5218,7 @@ export interface components {
       id: string;
       versionNumber: string;
       status: components['schemas']['IssuedVersionStatus'];
-      decisionNumber: string;
+      decisionNumber: string | null;
       effectiveSemester: components['schemas']['SemesterDto'];
     };
     /** @enum {string} */

@@ -3,6 +3,7 @@ import { generatePath, Link } from 'react-router';
 import { ROUTES } from '../../../routes';
 import type { CohortVersionAssignment } from '../api/releases';
 import { VersionStatusTag } from './VersionStatusTag';
+import { formatDecisionNumber } from '../../../shared/releases/decisionNumber';
 
 interface CohortVersionAssignmentsTableProps {
   programId: string;
@@ -42,7 +43,7 @@ export function CohortVersionAssignmentsTable({
         },
         {
           title: 'Số quyết định',
-          render: (_, row) => row.version.decisionNumber,
+          render: (_, row) => formatDecisionNumber(row.version.decisionNumber),
         },
         {
           title: 'Từ học kỳ / ngày bắt đầu',

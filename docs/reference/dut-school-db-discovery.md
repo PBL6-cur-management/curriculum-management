@@ -253,3 +253,7 @@ pnpm exec tsx scripts/school-discovery/profile.ts      # thống kê + quan hệ
 ```
 
 Scripts đọc cấu hình từ `D:\dut-mirror\.env` (đổi bằng `DUT_MIRROR_ROOT`/`DUT_MIRROR_ENV`); hướng dẫn bật tunnel/container ở `D:\dut-mirror\README.md`.
+
+## Đính chính 2026-10-31
+
+`tmProxDUT.tmKehoach` dừng ở HK2 2020-2021 như đã nêu, nhưng `DHBK_CDS.tmKehoach` có ngày bắt đầu chính thức tới kỳ 2620. Reseed dùng bảng này; chỉ 5 kỳ hè phải ước lượng (cờ `Semester.startDateEstimated`). Các câu "lịch học kỳ chỉ tới 2020" ở trên chỉ đúng với `tmProxDUT`. Xem [báo cáo reseed](../implement-report/dut-real-reseed-implement-report.md).

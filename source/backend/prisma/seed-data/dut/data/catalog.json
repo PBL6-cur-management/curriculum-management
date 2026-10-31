@@ -2,39 +2,118 @@
   "units": [
     {
       "unitCode": "DUT-013",
-      "unitName": "K. Giáo dục thể chất"
+      "unitName": "K. Giáo dục thể chất",
+      "unitType": "FACULTY"
+    },
+    {
+      "unitCode": "DUT-100",
+      "unitName": "Phòng ban",
+      "unitType": "FACULTY"
+    },
+    {
+      "unitCode": "DUT-101",
+      "unitName": "K. Cơ khí",
+      "unitType": "FACULTY"
+    },
+    {
+      "unitCode": "DUT-103",
+      "unitName": "K. Cơ khí Giao thông và Năng lượng",
+      "unitType": "FACULTY"
+    },
+    {
+      "unitCode": "DUT-104",
+      "unitName": "K. Cơ khí Giao thông và Năng lượng (N)",
+      "unitType": "FACULTY"
+    },
+    {
+      "unitCode": "DUT-105",
+      "unitName": "K. Điện",
+      "unitType": "FACULTY"
+    },
+    {
+      "unitCode": "DUT-106",
+      "unitName": "K. Điện tử và Trí tuệ nhân tạo",
+      "unitType": "FACULTY"
+    },
+    {
+      "unitCode": "DUT-107",
+      "unitName": "K. Hóa, Môi trường và KHSS",
+      "unitType": "FACULTY"
+    },
+    {
+      "unitCode": "DUT-115",
+      "unitName": "P. Đào tạo và BĐCL",
+      "unitType": "OFFICE"
+    },
+    {
+      "unitCode": "DUT-116",
+      "unitName": "P. Kế hoạch - Tài chính",
+      "unitType": "OFFICE"
+    },
+    {
+      "unitCode": "DUT-117",
+      "unitName": "K. Hóa, Môi trường và KHSS (MT)",
+      "unitType": "FACULTY"
     },
     {
       "unitCode": "DUT-118",
-      "unitName": "K. Quản lý dự án và Công nghiệp"
+      "unitName": "K. Quản lý dự án và Công nghiệp",
+      "unitType": "FACULTY"
+    },
+    {
+      "unitCode": "DUT-122",
+      "unitName": "K. Điện tử và trí tuệ nhân tạo (122)",
+      "unitType": "FACULTY"
+    },
+    {
+      "unitCode": "DUT-123",
+      "unitName": "K. Điện tử và trí tuệ nhân tạo (123)",
+      "unitType": "FACULTY"
+    },
+    {
+      "unitCode": "DUT-207",
+      "unitName": "K. Kinh tế - ĐH Kinh tế",
+      "unitType": "FACULTY"
     },
     {
       "unitCode": "DUT-209",
-      "unitName": "K. Lý luận chính trị - ĐH Kinh tế"
+      "unitName": "K. Lý luận chính trị - ĐH Kinh tế",
+      "unitType": "FACULTY"
     },
     {
       "unitCode": "DUT-210",
-      "unitName": "K. Luật - ĐH Kinh tế"
+      "unitName": "K. Luật - ĐH Kinh tế",
+      "unitType": "FACULTY"
     },
     {
       "unitCode": "DUT-305",
-      "unitName": "K. Vật lý - ĐH Sư phạm"
+      "unitName": "K. Vật lý - ĐH Sư phạm",
+      "unitType": "FACULTY"
     },
     {
       "unitCode": "DUT-319",
-      "unitName": "K. Toán - ĐH Sư phạm"
+      "unitName": "K. Toán - ĐH Sư phạm",
+      "unitType": "FACULTY"
     },
     {
       "unitCode": "DUT-413",
-      "unitName": "K. Anh chuyên ngành - ĐH Ngoại ngữ"
+      "unitName": "K. Anh chuyên ngành - ĐH Ngoại ngữ",
+      "unitType": "FACULTY"
+    },
+    {
+      "unitCode": "DUT-416",
+      "unitName": "K. Pháp - ĐH Ngoại ngữ",
+      "unitType": "FACULTY"
+    },
+    {
+      "unitCode": "DUT-418",
+      "unitName": "K. Quốc tế học - ĐH Ngoại ngữ",
+      "unitType": "FACULTY"
     },
     {
       "unitCode": "DUT-507",
-      "unitName": "Trung tâm AEC"
-    },
-    {
-      "unitCode": "DUT-UNASSIGNED",
-      "unitName": "Chưa xác định khoa phụ trách"
+      "unitName": "Trung tâm ngoại ngữ",
+      "unitType": "FACULTY"
     }
   ],
   "courses": [
@@ -45,6 +124,374 @@
       "credits": "0",
       "courseType": "CONDITIONAL",
       "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130021",
+      "courseName": "Giáo dục thể chất 2",
+      "englishName": "Physical Education 2",
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130031",
+      "courseName": "Giáo dục thể chất 3",
+      "englishName": "Physical Education 3",
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130041",
+      "courseName": "Giáo dục thể chất 4",
+      "englishName": "Physical Education 4",
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130051",
+      "courseName": "Giáo dục thể chất 5",
+      "englishName": "Physical Education 5",
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130061",
+      "courseName": "GDTC 3 Nam",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130071",
+      "courseName": "GDTC 3 Nữ",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130101",
+      "courseName": "GDTC 3 BD Nam",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130111",
+      "courseName": "GDTC 3 BC Nam",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130121",
+      "courseName": "GDTC 3 BR Nam",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130141",
+      "courseName": "GDTC 4 BR Nam",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130151",
+      "courseName": "GDTC 4 BC Nam",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130161",
+      "courseName": "GDTC 4 BĐ Nam",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130181",
+      "courseName": "GDTC 4 BC Nữ",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130191",
+      "courseName": "GDTC 2 Nam",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130201",
+      "courseName": "GDTC 2 Nữ",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130221",
+      "courseName": "GDTC 2 Bóng chuyền",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130231",
+      "courseName": "GDTC 2 Bóng rổ",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130241",
+      "courseName": "GDTC 2 Bóng đá",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130251",
+      "courseName": "GDTC 2 Cầu lông",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130261",
+      "courseName": "GDTC 2 Bóng bàn",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130401",
+      "courseName": "GDTC 5 BC Nam",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130431",
+      "courseName": "GDTC 5 BC Nữ",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130451",
+      "courseName": "GDTC 4 BR Nữ",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130490",
+      "courseName": "GDTC 3 Vovinam Nam",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130510",
+      "courseName": "GDTC3 BC Nữ",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130520",
+      "courseName": "GDTC 3 BR Nữ",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130530",
+      "courseName": "GDTC 3 CL Nữ",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130580",
+      "courseName": "GDTC 3 BB",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130590",
+      "courseName": "GDTC 3 CL Nam Nữ",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130600",
+      "courseName": "GDTC 4 BN Nam",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130610",
+      "courseName": "GDTC 4 CL Nam",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130640",
+      "courseName": "GDTC 4 Vovinam Nam",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130660",
+      "courseName": "GDTC 4 BB",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130740",
+      "courseName": "GDTC 2 Vovinam",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130750",
+      "courseName": "GDTC 4 TD Nam",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130760",
+      "courseName": "GDTC 4 TD Nữ",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130770",
+      "courseName": "GDTC 2 (Pickleball)",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130780",
+      "courseName": "GDTC 3 (Pickleball)",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130790",
+      "courseName": "GDTC 4 (Pickleball)",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130800",
+      "courseName": "GDTC 2 (Đá cầu)",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130810",
+      "courseName": "GDTC 3 (Đá cầu)",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "0130820",
+      "courseName": "GDTC 4 (Đá cầu)",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-013"
+    },
+    {
+      "courseCode": "1000001",
+      "courseName": "Phí Bảo hiểm thân thể năm học",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "LAB",
+      "ownerUnitCode": "DUT-100"
+    },
+    {
+      "courseCode": "1013330",
+      "courseName": "Lập trình Python",
+      "englishName": "Python programming",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-101"
+    },
+    {
+      "courseCode": "1020023",
+      "courseName": "Toán rời rạc",
+      "englishName": "Discrete Mathematics",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1020042",
+      "courseName": "Cấu trúc dữ liệu",
+      "englishName": "Data Structures",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
     },
     {
       "courseCode": "1020072",
@@ -74,6 +521,38 @@
       "courseCode": "1020141",
       "courseName": "Phân tích & T.kế hướng đối tượng",
       "englishName": "Object - Oriented Analysis and Design",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1020173",
+      "courseName": "Chuyên đề 1",
+      "englishName": "Special Topic No.1",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1020213",
+      "courseName": "Đồ họa máy tính",
+      "englishName": "Computer Graphics",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1020232",
+      "courseName": "Lập trình hướng đối tượng",
+      "englishName": "Object - Oriented Programming",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1020242",
+      "courseName": "Kỹ thuật Truyền số liệu",
+      "englishName": "Data Communications Technique",
       "credits": "2",
       "courseType": "THEORY",
       "ownerUnitCode": "KHOA_CNTT"
@@ -175,6 +654,126 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1020563",
+      "courseName": "Thực tập Tốt nghiệp (CNTT)",
+      "englishName": "Graduate Internship",
+      "credits": "3",
+      "courseType": "INTERNSHIP",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1020573",
+      "courseName": "Đồ án Tốt nghiệp",
+      "englishName": "Graduate Project",
+      "credits": "10",
+      "courseType": "CAPSTONE",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1020593",
+      "courseName": "Lập trình JAVA",
+      "englishName": "Java Programming",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1020633",
+      "courseName": "Chuyên đề 2",
+      "englishName": "Special Topic No.2",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1020673",
+      "courseName": "Chuyên đề Công nghệ phần mềm",
+      "englishName": "Software engineering topics",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1020691",
+      "courseName": "Tin học Đại cương",
+      "englishName": "General Informatics",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1020701",
+      "courseName": "TH Tin học đại cương",
+      "englishName": "General Informatics Lab",
+      "credits": "1",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1020783",
+      "courseName": "TH Cấu trúc dữ liệu",
+      "englishName": "Data Structure Lab",
+      "credits": "1",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1020893",
+      "courseName": "TH LT hướng đối tượng",
+      "englishName": "Object - Oriented Programming Lab",
+      "credits": "1",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1020943",
+      "courseName": "TH Lập trình JAVA",
+      "englishName": "Java Programming Lab",
+      "credits": "1",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1020983",
+      "courseName": "TH Lập trình mạng",
+      "englishName": "Network Programming Lab",
+      "credits": "1",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1020992",
+      "courseName": "Đồ án Công nghệ phần mềm",
+      "englishName": "Software Engineering Project",
+      "credits": "2",
+      "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021182",
+      "courseName": "Phương pháp tính",
+      "englishName": "Numerical Methods",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021232",
+      "courseName": "Quy hoạch tuyến tính",
+      "englishName": "Linear Programming",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021252",
+      "courseName": "Nhập môn ngành",
+      "englishName": "Introduction to IT Engineering",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1021263",
       "courseName": "Toán rời rạc",
       "englishName": "Discrete Mathematics",
@@ -183,9 +782,193 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1021273",
+      "courseName": "TH Cấu trúc dữ liệu",
+      "englishName": "Data Structure Lab",
+      "credits": "0.5",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021283",
+      "courseName": "Kỹ thuật số ứng dụng",
+      "englishName": "Applied Digital Techniques",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021293",
+      "courseName": "Lập trình hệ thống",
+      "englishName": "System Programming",
+      "credits": "1.5",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021303",
+      "courseName": "TH Lập trình hệ thống",
+      "englishName": "System Programming Lab",
+      "credits": "0.5",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021313",
+      "courseName": "Lập trình hướng đối tượng",
+      "englishName": "Object - Oriented Programming",
+      "credits": "1.5",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021323",
+      "courseName": "TH Lập trình hướng đối tượng",
+      "englishName": "Object - Oriented Programming Lab",
+      "credits": "0.5",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021343",
+      "courseName": "Đồ án Giải thuật & Lập trình",
+      "englishName": "Algorithm & programming Project",
+      "credits": "2",
+      "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021353",
+      "courseName": "Kiến trúc Máy tính & Vi xử lý",
+      "englishName": "Computer Architecture and Microprocessor",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021363",
+      "courseName": "Đồ án Lập trình HT & Vi điều khiển",
+      "englishName": "Embedded System Programming & Microcontrollers Project",
+      "credits": "2",
+      "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021373",
+      "courseName": "P.Tích & T.Kế H.Thống thông tin",
+      "englishName": "Information System Analysis and Design",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1021383",
       "courseName": "Vi điều khiển",
       "englishName": "Microcontrollers",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021393",
+      "courseName": "TH Vi điều khiển",
+      "englishName": "Microcontrollers Lab",
+      "credits": "0.5",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021403",
+      "courseName": "Thực tập công nhân",
+      "englishName": "Worker Intership",
+      "credits": "2",
+      "courseType": "INTERNSHIP",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021413",
+      "courseName": "Đồ án P.Tích & T.Kế H.Thống thông tin",
+      "englishName": "Information System Analysis and Design Project",
+      "credits": "2",
+      "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021423",
+      "courseName": "Đồ án Cơ sở ngành mạng",
+      "englishName": "Basic Project of Network Specialty",
+      "credits": "2",
+      "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021433",
+      "courseName": "Anh văn CN CNTT",
+      "englishName": "English for Information Technology",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021443",
+      "courseName": "TH Lập trình mạng",
+      "englishName": "Network Programming Lab",
+      "credits": "0.5",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021453",
+      "courseName": "Tương tác người máy",
+      "englishName": "Human Computer Interaction",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021463",
+      "courseName": "Công nghệ di động",
+      "englishName": "Mobile Technology",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021473",
+      "courseName": "Lập trình hàm",
+      "englishName": "Function programming",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021483",
+      "courseName": "Lập trình logic",
+      "englishName": "Logic Programming",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021493",
+      "courseName": "Lập trình .NET",
+      "englishName": ".NET Programming",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021503",
+      "courseName": "Lập trình trên Linux",
+      "englishName": "Linux Programming",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021513",
+      "courseName": "Hệ điều hành Linux",
+      "englishName": "Linux Operating Systems",
       "credits": "2",
       "courseType": "THEORY",
       "ownerUnitCode": "KHOA_CNTT"
@@ -199,9 +982,105 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1021533",
+      "courseName": "Kỹ thuật bảo mật",
+      "englishName": "Security Techniques",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021543",
+      "courseName": "Kỹ thuật chuyển mạch",
+      "englishName": "Switching Techniques",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021553",
+      "courseName": "Thiết kế Hệ thống mạng",
+      "englishName": "Network sysstem designing",
+      "credits": "1.5",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021563",
+      "courseName": "TH Thiết kế Hệ thống mạng",
+      "englishName": "Network sysstem designing Lab",
+      "credits": "0.5",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021573",
+      "courseName": "Lập trình Hệ thống nhúng",
+      "englishName": "Embedded System Programming",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021583",
+      "courseName": "Xử lý ảnh",
+      "englishName": "Image Processing",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021593",
+      "courseName": "Nguyên lý hệ điều hành",
+      "englishName": "Principles of Operating System",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1021603",
       "courseName": "Hệ thống thời gian thực",
       "englishName": "Real-time Systems",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021613",
+      "courseName": "Thiết kế Hệ thống nhúng",
+      "englishName": "Embedded System Designing",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021623",
+      "courseName": "Kiểm thử Hệ thống nhúng",
+      "englishName": "Embedded System Tesing",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021633",
+      "courseName": "Đồ án Chuyên ngành HTN",
+      "englishName": "Specialized project in Embedded Systems",
+      "credits": "2",
+      "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021643",
+      "courseName": "Thực tập Tốt nghiệp (HTN)",
+      "englishName": "Graduation internship",
+      "credits": "2",
+      "courseType": "INTERNSHIP",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021653",
+      "courseName": "Mạng các hệ thống nhúng",
+      "englishName": "Networks of Embeded Systems",
       "credits": "2",
       "courseType": "THEORY",
       "ownerUnitCode": "KHOA_CNTT"
@@ -223,11 +1102,51 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1021683",
+      "courseName": "Logic mờ",
+      "englishName": "Fuzzy Logic",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1021693",
       "courseName": "Xử lý tiếng nói",
       "englishName": "Speech processing",
       "credits": "2",
       "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021703",
+      "courseName": "Kỹ thuật robot",
+      "englishName": "Robot technique",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021713",
+      "courseName": "Công nghệ FPGA",
+      "englishName": "FPGA Technology",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021723",
+      "courseName": "Chuyên đề CN Hệ thống nhúng",
+      "englishName": "Special Topic in Embedded Systems",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021733",
+      "courseName": "Đồ án Tốt nghiệp (HTN)",
+      "englishName": "Graduation Project",
+      "credits": "10",
+      "courseType": "CAPSTONE",
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
@@ -239,6 +1158,22 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1021763",
+      "courseName": "Đồ án Tốt nghiệp (HTTT)",
+      "englishName": "Graduation Project",
+      "credits": "10",
+      "courseType": "CAPSTONE",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021773",
+      "courseName": "Phát triển phần mềm mã nguồn mở",
+      "englishName": "Open Source Development",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1021783",
       "courseName": "Quản lý dự án CNTT",
       "englishName": "Project Management",
@@ -247,11 +1182,51 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1021793",
+      "courseName": "Đồ án chuyên ngành CNPM",
+      "englishName": "Project of Software Engineering Specialty",
+      "credits": "2",
+      "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1021803",
       "courseName": "Thực tập Tốt nghiệp (CNPM)",
       "englishName": "Graduation Internship",
       "credits": "2",
       "courseType": "INTERNSHIP",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021813",
+      "courseName": "Đảm bảo chất lượng phần mềm",
+      "englishName": "Software Quality Assurance",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021823",
+      "courseName": "Các phương pháp đặc tả hình thức",
+      "englishName": "Formal Specification Methods",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021833",
+      "courseName": "Xử lý dữ liệu & các HT thông tin",
+      "englishName": "Data Processing and Information Systems",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021843",
+      "courseName": "Các HT nhúng & thời gian thực",
+      "englishName": "Realtime Embedded Systems",
+      "credits": "2",
+      "courseType": "THEORY",
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
@@ -271,6 +1246,14 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1021873",
+      "courseName": "Quy trình phần mềm",
+      "englishName": "Software Procedure",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1021883",
       "courseName": "Chuyên đề CN CNPM",
       "englishName": "Special Topics in Software Engineering",
@@ -283,6 +1266,22 @@
       "courseName": "Kiến trúc hướng dịch vụ",
       "englishName": "Service Oriented Architecture",
       "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021923",
+      "courseName": "An toàn thông tin mạng",
+      "englishName": "Network Information Security",
+      "credits": "1.5",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1021933",
+      "courseName": "TH An toàn TT mạng",
+      "englishName": "Network Information Security Lab",
+      "credits": "0.5",
       "courseType": "THEORY",
       "ownerUnitCode": "KHOA_CNTT"
     },
@@ -319,6 +1318,14 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1022033",
+      "courseName": "Đồ án chuyên ngành HTTT",
+      "englishName": "Project of Information System Specialty",
+      "credits": "2",
+      "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1022043",
       "courseName": "Thực tập tốt nghiệp (HTTT)",
       "englishName": "Graduation Internship",
@@ -335,9 +1342,57 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1022063",
+      "courseName": "Web ngữ nghĩa",
+      "englishName": "Semantic Web",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1022073",
+      "courseName": "Tích hợp hệ thống",
+      "englishName": "Intergrated Systems",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1022083",
+      "courseName": "HT đảm bảo an toàn TT",
+      "englishName": "System of Information Safety Assurance",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1022093",
       "courseName": "Ngôn ngữ hình thức",
       "englishName": "Formal Languages",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1022103",
+      "courseName": "Xử lý tín hiệu số",
+      "englishName": "Digital Signal Processing",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1022113",
+      "courseName": "Phân tích & TK giải thuật",
+      "englishName": "Algorithm Analysis and Design",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1022190",
+      "courseName": "Chuyên đề",
+      "englishName": "Special Topic",
       "credits": "2",
       "courseType": "THEORY",
       "ownerUnitCode": "KHOA_CNTT"
@@ -351,6 +1406,30 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1022523",
+      "courseName": "Lập trình .NET",
+      "englishName": ".NET Programming",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1022533",
+      "courseName": "TH lập trình .NET",
+      "englishName": ".NET Programming Lab",
+      "credits": "1",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1022543",
+      "courseName": "Đồ án 1",
+      "englishName": "Project No.1",
+      "credits": "2",
+      "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1022553",
       "courseName": "Lý thuyết thông tin",
       "englishName": "Information Theory",
@@ -359,10 +1438,34 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1022563",
+      "courseName": "Đồ án 2",
+      "englishName": "Project No.2",
+      "credits": "2",
+      "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1022573",
       "courseName": "Mã hóa và mật mã",
       "englishName": "Cryptography and Cryptology",
       "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1022583",
+      "courseName": "Đồ án 3",
+      "englishName": "Project No.3",
+      "credits": "2",
+      "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1022593",
+      "courseName": "TH lập trình hệ thống nhúng",
+      "englishName": "Embedded System Programming Lab",
+      "credits": "1",
       "courseType": "THEORY",
       "ownerUnitCode": "KHOA_CNTT"
     },
@@ -375,11 +1478,35 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1022613",
+      "courseName": "Khởi tạo doanh nghiệp",
+      "englishName": "Business Creation",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1022693",
+      "courseName": "Mật mã học",
+      "englishName": "Cryptology",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1022703",
       "courseName": "Phân tích và xử lý mã độc",
       "englishName": "Malware analysis and processing",
       "credits": "2",
       "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1022713",
+      "courseName": "Đồ án chuyên ngành ATTT",
+      "englishName": "Project of Information Security",
+      "credits": "2",
+      "courseType": "PROJECT",
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
@@ -391,11 +1518,27 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1022733",
+      "courseName": "Quản trị & An toàn hệ thống",
+      "englishName": "System Security and Administration",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1022743",
       "courseName": "Chuyên đề CN ATTT",
       "englishName": "Special Topics in Information Security",
       "credits": "2",
       "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1022753",
+      "courseName": "Đồ án Tốt nghiệp (ATTT)",
+      "englishName": "Graduation Project",
+      "credits": "10",
+      "courseType": "CAPSTONE",
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
@@ -407,11 +1550,75 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1022770",
+      "courseName": "Cấu trúc dữ liệu",
+      "englishName": "Data Structure",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1022773",
+      "courseName": "An toàn di động & IoT",
+      "englishName": "IoT and Mobility Security",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1022783",
+      "courseName": "Toán rời rạc",
+      "englishName": "Discrete Mathematics",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1022793",
+      "courseName": "Toán chuyên đề CNTT",
+      "englishName": "Specific Mathematics for IT",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1022800",
+      "courseName": "Toán nâng cao (PPtính)",
+      "englishName": "Advanced Mathematics (Computing Methods)",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1022803",
+      "courseName": "Kỹ thuật lập trình",
+      "englishName": "Programming Technique",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1022810",
       "courseName": "Lập trình hướng đối tượng",
       "englishName": "Object - Oriented Programming",
       "credits": "3",
       "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1022813",
+      "courseName": "TH kỹ thuật lập trình",
+      "englishName": "Programming Technique Lab",
+      "credits": "1",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1022823",
+      "courseName": "PBL 2: Đồ án lập trình",
+      "englishName": "PBL2 Project of Programming",
+      "credits": "3",
+      "courseType": "PROJECT",
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
@@ -479,11 +1686,43 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1022883",
+      "courseName": "Công nghệ Web",
+      "englishName": "Web Technology",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1022890",
+      "courseName": "Lập trình di động",
+      "englishName": "Mobile programming",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1022913",
       "courseName": "Nguyên lý hệ điều hành",
       "englishName": "Principles of Operating System",
       "credits": "2.5",
       "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1022920",
+      "courseName": "Kỹ thuật lập trình",
+      "englishName": "Programming Technique",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1022923",
+      "courseName": "PBL1: Đồ án cơ sở",
+      "englishName": "PBL1 Project of Programming",
+      "credits": "2",
+      "courseType": "PROJECT",
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
@@ -503,6 +1742,22 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1022943",
+      "courseName": "PBL3: Đồ án lập trình ứng dụng",
+      "englishName": "PBL3: Project of Application Development",
+      "credits": "3",
+      "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1022950",
+      "courseName": "Kiến trúc máy tính và vi xử lý",
+      "englishName": "Computer Architecture and Microprocessor",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1022970",
       "courseName": "Cấu trúc máy tính và vi xử lý",
       "englishName": "Computer Architecture and Microprocessor",
@@ -511,9 +1766,57 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1023053",
+      "courseName": "PBL 1: Đồ án cơ sở (Nhật)",
+      "englishName": "PBL1 Project of Programming",
+      "credits": "2",
+      "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1023060",
       "courseName": "TH kỹ thuật lập trình (1TC)",
       "englishName": "Programming Technique Lab",
+      "credits": "0",
+      "courseType": "LAB",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023090",
+      "courseName": "PBL 4: Đồ án hệ thống thông minh",
+      "englishName": "PBL4 Intelligent systems Project",
+      "credits": "3",
+      "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023100",
+      "courseName": "Lập trình Game",
+      "englishName": "Game Programming",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023110",
+      "courseName": "PBL 5: Đồ án Công nghệ phần mềm",
+      "englishName": "PBL5 Software Engineering Project",
+      "credits": "3",
+      "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023120",
+      "courseName": "Quản trị mạng",
+      "englishName": "Network Administration",
+      "credits": "2.5",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023130",
+      "courseName": "TH Quản trị mạng",
+      "englishName": "Network Administration Lab",
       "credits": "0",
       "courseType": "LAB",
       "ownerUnitCode": "KHOA_CNTT"
@@ -527,11 +1830,59 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1023150",
+      "courseName": "PBL 6: Đồ án chuyên ngành",
+      "englishName": "PBL6 Specialized project",
+      "credits": "3",
+      "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023160",
+      "courseName": "Xử lý song song và phân tán",
+      "englishName": "Parallel Programming and Distributed Systems",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023170",
+      "courseName": "Các hệ thống thời gian thực",
+      "englishName": "Real time systems",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023180",
+      "courseName": "Xử lý dữ liệu lớn",
+      "englishName": "Big Data Processing",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1023190",
       "courseName": "Đồ án Tốt nghiệp",
       "englishName": "Graduation Thesis",
       "credits": "6",
       "courseType": "CAPSTONE",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023200",
+      "courseName": "Xử lý tín hiệu số",
+      "englishName": "Digital Signal Processing",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023210",
+      "courseName": "TH Xử lý tín hiệu số",
+      "englishName": "Digital Signal Processing Lab",
+      "credits": "0",
+      "courseType": "LAB",
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
@@ -543,11 +1894,35 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1023230",
+      "courseName": "PBL 4: Hệ điều hành và mạng máy tính",
+      "englishName": "PBL4 Operating Systems and Computer Network Project",
+      "credits": "3",
+      "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023240",
+      "courseName": "Vi điều khiển",
+      "englishName": "Microcontrollers",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1023260",
       "courseName": "Khoa học dữ liệu",
       "englishName": "Data Science",
       "credits": "3",
       "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023270",
+      "courseName": "PBL 5: Kỹ thuật máy tính",
+      "englishName": "PBL5 Computer Technique Project",
+      "credits": "2",
+      "courseType": "PROJECT",
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
@@ -575,6 +1950,118 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1023310",
+      "courseName": "TH Vi điều khiển",
+      "englishName": "Microcontrollers Lab",
+      "credits": "0",
+      "courseType": "LAB",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023320",
+      "courseName": "TH Xử lý tín hiệu số",
+      "englishName": "Digital Signal Processing Lab",
+      "credits": "0",
+      "courseType": "LAB",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023410",
+      "courseName": "PBL 6: An toàn thông tin",
+      "englishName": "PBL6 Information Security Project",
+      "credits": "4",
+      "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023420",
+      "courseName": "Hệ phân tán",
+      "englishName": "Distributed Systems",
+      "credits": "1",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023430",
+      "courseName": "Chuyên đề CN Mạng",
+      "englishName": "Special Topics in Networking",
+      "credits": "1",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023440",
+      "courseName": "Lập trình mạng nâng cao",
+      "englishName": "Advanced Network Programming",
+      "credits": "1",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023450",
+      "courseName": "Xử lý song song",
+      "englishName": "Parallel Programming",
+      "credits": "1",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023460",
+      "courseName": "Điện toán đám mây",
+      "englishName": "Cloud Computing Technology",
+      "credits": "1",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023470",
+      "courseName": "PBL 6: Mạng và Truyền thông",
+      "englishName": "PBL6 Network and Communication Project",
+      "credits": "4",
+      "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023480",
+      "courseName": "Chuyên đề CNPM",
+      "englishName": "Special Topics in Software Engineering",
+      "credits": "1",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023490",
+      "courseName": "Mã nguồn mở",
+      "englishName": "Open Source Software",
+      "credits": "1",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023500",
+      "courseName": "Công nghệ mới",
+      "englishName": "New Technology",
+      "credits": "1",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023510",
+      "courseName": "PBL 6: Công nghệ phần mềm",
+      "englishName": "PBL6 Software Engineering Project",
+      "credits": "4",
+      "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023560",
+      "courseName": "PBL 6: Hệ thống thông tin",
+      "englishName": "PBL6 Information System Project",
+      "credits": "4",
+      "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1023570",
       "courseName": "Phát triển ứng dụng IoT",
       "englishName": "IoT Application Development",
@@ -591,6 +2078,14 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1023580",
+      "courseName": "Quản lý dự án CNTT",
+      "englishName": "Project Management",
+      "credits": "1",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1023583",
       "courseName": "Lập trình di động",
       "englishName": "Mobile programming",
@@ -602,6 +2097,14 @@
       "courseCode": "1023590",
       "courseName": "Nhập môn ngành (CNTT DT - HTDN)",
       "englishName": "Introduction to IT Engineering",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023593",
+      "courseName": "Chuyên đề CNTT",
+      "englishName": "Special Topics in Information Technology",
       "credits": "2",
       "courseType": "THEORY",
       "ownerUnitCode": "KHOA_CNTT"
@@ -631,11 +2134,27 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1023613",
+      "courseName": "Capstone Project (Nhật)",
+      "englishName": "Capstone Project",
+      "credits": "15",
+      "courseType": "CAPSTONE",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1023620",
       "courseName": "Kiểm thử xâm nhập",
       "englishName": "Penetration Testing",
       "credits": "2",
       "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023623",
+      "courseName": "Capstone Project (Anh)",
+      "englishName": "Capstone Project",
+      "credits": "15",
+      "courseType": "CAPSTONE",
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
@@ -671,9 +2190,41 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1023650",
+      "courseName": "Kiến trúc phần mềm",
+      "englishName": "Software architecture",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1023653",
       "courseName": "Trực quan hóa dữ liệu",
       "englishName": "Data visualization",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023663",
+      "courseName": "PBL 6: Khoa học dữ liệu và trí tuệ nhân tạo",
+      "englishName": "PBL6 Data Science and Artificial Intelligence Project",
+      "credits": "4",
+      "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023673",
+      "courseName": "Xử lý ngôn ngữ tự nhiên",
+      "englishName": "Natural language processing",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023683",
+      "courseName": "Học sâu",
+      "englishName": "Deep Learning",
       "credits": "2",
       "courseType": "THEORY",
       "ownerUnitCode": "KHOA_CNTT"
@@ -732,6 +2283,22 @@
       "englishName": "PBL3: Project of Application Development",
       "credits": "3",
       "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023760",
+      "courseName": "Khai phá dữ liệu",
+      "englishName": "Data mining",
+      "credits": "1",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1023770",
+      "courseName": "Thương mại điện tử",
+      "englishName": "E-Commerce",
+      "credits": "1",
+      "courseType": "THEORY",
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
@@ -1023,6 +2590,14 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1024240",
+      "courseName": "PBL2: Dự án lập trình tính toán",
+      "englishName": "PBL2 Computing and Programming Project",
+      "credits": "2",
+      "courseType": "PROJECT",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1024430",
       "courseName": "Thực tập chuyên ngành",
       "englishName": "Specialized Internship",
@@ -1031,12 +2606,20 @@
       "ownerUnitCode": "KHOA_CNTT"
     },
     {
+      "courseCode": "1024770",
+      "courseName": "Thực tập tốt nghiệp (3TC)",
+      "englishName": "Graduation Internship",
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
       "courseCode": "1024810",
       "courseName": "Capstone Project (Phần 1, TTTN)",
       "englishName": "Capstone Project (Part 1,internship)",
       "credits": "5",
       "courseType": "INTERNSHIP",
-      "ownerUnitCode": "DUT-UNASSIGNED"
+      "ownerUnitCode": "KHOA_CNTT"
     },
     {
       "courseCode": "1024820",
@@ -1044,7 +2627,23 @@
       "englishName": "Capstone Project (part 2)",
       "credits": "10",
       "courseType": "CAPSTONE",
-      "ownerUnitCode": "DUT-UNASSIGNED"
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1024830",
+      "courseName": "Capstone Project (Phần 1, TTTN)",
+      "englishName": "Capstone Project (Part 1,internship)",
+      "credits": "5",
+      "courseType": "INTERNSHIP",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1024840",
+      "courseName": "Capstone Project (Phần 2, ĐATN)",
+      "englishName": "Capstone Project (part 2)",
+      "credits": "10",
+      "courseType": "CAPSTONE",
+      "ownerUnitCode": "KHOA_CNTT"
     },
     {
       "courseCode": "1024870",
@@ -1052,7 +2651,7 @@
       "englishName": "Graduation Internship (Software Engineering)",
       "credits": "5",
       "courseType": "INTERNSHIP",
-      "ownerUnitCode": "DUT-UNASSIGNED"
+      "ownerUnitCode": "KHOA_CNTT"
     },
     {
       "courseCode": "1024880",
@@ -1060,7 +2659,7 @@
       "englishName": "Graduation Internship (Data Science)",
       "credits": "5",
       "courseType": "INTERNSHIP",
-      "ownerUnitCode": "DUT-UNASSIGNED"
+      "ownerUnitCode": "KHOA_CNTT"
     },
     {
       "courseCode": "1024890",
@@ -1068,7 +2667,7 @@
       "englishName": "Graduation Internship (Japan Program)",
       "credits": "5",
       "courseType": "INTERNSHIP",
-      "ownerUnitCode": "DUT-UNASSIGNED"
+      "ownerUnitCode": "KHOA_CNTT"
     },
     {
       "courseCode": "1024900",
@@ -1076,7 +2675,7 @@
       "englishName": "Capstone Project (Data Science)",
       "credits": "10",
       "courseType": "PROJECT",
-      "ownerUnitCode": "DUT-UNASSIGNED"
+      "ownerUnitCode": "KHOA_CNTT"
     },
     {
       "courseCode": "1024910",
@@ -1084,7 +2683,7 @@
       "englishName": "Graduation Internship (Information Security)",
       "credits": "5",
       "courseType": "THEORY",
-      "ownerUnitCode": "DUT-UNASSIGNED"
+      "ownerUnitCode": "KHOA_CNTT"
     },
     {
       "courseCode": "1024920",
@@ -1092,7 +2691,7 @@
       "englishName": "Graduation Internship (Information Systems)",
       "credits": "5",
       "courseType": "THEORY",
-      "ownerUnitCode": "DUT-UNASSIGNED"
+      "ownerUnitCode": "KHOA_CNTT"
     },
     {
       "courseCode": "1024930",
@@ -1100,7 +2699,7 @@
       "englishName": "Graduation Internship (Computer Engineering)",
       "credits": "5",
       "courseType": "THEORY",
-      "ownerUnitCode": "DUT-UNASSIGNED"
+      "ownerUnitCode": "KHOA_CNTT"
     },
     {
       "courseCode": "1024940",
@@ -1108,7 +2707,7 @@
       "englishName": "Capstone Project (Information Security)",
       "credits": "10",
       "courseType": "PROJECT",
-      "ownerUnitCode": "DUT-UNASSIGNED"
+      "ownerUnitCode": "KHOA_CNTT"
     },
     {
       "courseCode": "1024950",
@@ -1116,7 +2715,7 @@
       "englishName": "Capstone Project (Information Systems)",
       "credits": "10",
       "courseType": "PROJECT",
-      "ownerUnitCode": "DUT-UNASSIGNED"
+      "ownerUnitCode": "KHOA_CNTT"
     },
     {
       "courseCode": "1024960",
@@ -1124,7 +2723,7 @@
       "englishName": "Capstone Project (Computer Engineering)",
       "credits": "10",
       "courseType": "PROJECT",
-      "ownerUnitCode": "DUT-UNASSIGNED"
+      "ownerUnitCode": "KHOA_CNTT"
     },
     {
       "courseCode": "1024970",
@@ -1132,7 +2731,7 @@
       "englishName": null,
       "credits": "2",
       "courseType": "THEORY",
-      "ownerUnitCode": "DUT-UNASSIGNED"
+      "ownerUnitCode": "KHOA_CNTT"
     },
     {
       "courseCode": "1024980",
@@ -1140,7 +2739,7 @@
       "englishName": null,
       "credits": "3",
       "courseType": "THEORY",
-      "ownerUnitCode": "DUT-UNASSIGNED"
+      "ownerUnitCode": "KHOA_CNTT"
     },
     {
       "courseCode": "1024990",
@@ -1148,7 +2747,7 @@
       "englishName": null,
       "credits": "3",
       "courseType": "PROJECT",
-      "ownerUnitCode": "DUT-UNASSIGNED"
+      "ownerUnitCode": "KHOA_CNTT"
     },
     {
       "courseCode": "1025000",
@@ -1156,7 +2755,7 @@
       "englishName": null,
       "credits": "3",
       "courseType": "THEORY",
-      "ownerUnitCode": "DUT-UNASSIGNED"
+      "ownerUnitCode": "KHOA_CNTT"
     },
     {
       "courseCode": "1025040",
@@ -1164,7 +2763,207 @@
       "englishName": null,
       "credits": "2",
       "courseType": "THEORY",
-      "ownerUnitCode": "DUT-UNASSIGNED"
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1025050",
+      "courseName": "Nhập môn ngành (N)",
+      "englishName": null,
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1025060",
+      "courseName": "Kỹ thuật lập trình",
+      "englishName": null,
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1025070",
+      "courseName": "Thực hành kỹ thuật lập trình",
+      "englishName": null,
+      "credits": "1",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1025080",
+      "courseName": "Toán rời rạc",
+      "englishName": null,
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1025090",
+      "courseName": "Phương pháp tính",
+      "englishName": null,
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1025100",
+      "courseName": "Nhập môn ngành",
+      "englishName": null,
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1025110",
+      "courseName": "Nhập môn ngành",
+      "englishName": null,
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1025120",
+      "courseName": "Kỹ năng mềm",
+      "englishName": null,
+      "credits": "1",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "1032310",
+      "courseName": "Vẽ kỹ thuật",
+      "englishName": "Engineering Drawing",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-103"
+    },
+    {
+      "courseCode": "1040451",
+      "courseName": "Kỹ thuật nhiệt",
+      "englishName": "Thermal Engineering",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-104"
+    },
+    {
+      "courseCode": "1050921",
+      "courseName": "TN Kỹ thuật điện",
+      "englishName": "Electrical Engineering Lab",
+      "credits": "0.5",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-105"
+    },
+    {
+      "courseCode": "1050931",
+      "courseName": "Kỹ thuật điện",
+      "englishName": "Electrical Engineering",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-105"
+    },
+    {
+      "courseCode": "1052200",
+      "courseName": "TN kỹ thuật điện",
+      "englishName": "Electrical Engineering Lab",
+      "credits": "1",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-105"
+    },
+    {
+      "courseCode": "1060143",
+      "courseName": "Kỹ thuật Lập trình",
+      "englishName": "Computer Programming",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-106"
+    },
+    {
+      "courseCode": "1060732",
+      "courseName": "Kỹ thuật số ứng dụng",
+      "englishName": "Applied Digital Circuits Engineering",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-106"
+    },
+    {
+      "courseCode": "1061062",
+      "courseName": "Kỹ thuật Điện tử",
+      "englishName": "Electronic Engineering",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-106"
+    },
+    {
+      "courseCode": "1062950",
+      "courseName": "Lập trình hướng đối tượng",
+      "englishName": "Object Oriented Programming",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-106"
+    },
+    {
+      "courseCode": "1073431",
+      "courseName": "Hóa đại cương",
+      "englishName": "General Chemistry",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-107"
+    },
+    {
+      "courseCode": "1080011",
+      "courseName": "Hình hoạ",
+      "englishName": "Descriptive Geometry",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-103"
+    },
+    {
+      "courseCode": "1080401",
+      "courseName": "Vẽ Kỹ thuật",
+      "englishName": "Engineering Drawing",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-103"
+    },
+    {
+      "courseCode": "1080491",
+      "courseName": "Cơ học ứng dụng",
+      "englishName": "Applied Mechanics",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-103"
+    },
+    {
+      "courseCode": "1150010",
+      "courseName": "Giáo dục quốc phòng",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-115"
+    },
+    {
+      "courseCode": "1160010",
+      "courseName": "Học phí đợt 1",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-116"
+    },
+    {
+      "courseCode": "1160020",
+      "courseName": "Học phí",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-116"
+    },
+    {
+      "courseCode": "1170011",
+      "courseName": "Môi trường",
+      "englishName": "Environment",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-117"
     },
     {
       "courseCode": "1172630",
@@ -1172,13 +2971,29 @@
       "englishName": null,
       "credits": "2",
       "courseType": "THEORY",
-      "ownerUnitCode": "DUT-UNASSIGNED"
+      "ownerUnitCode": "DUT-117"
     },
     {
       "courseCode": "1180933",
       "courseName": "Quản trị học",
       "englishName": "Principles of Management",
       "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-118"
+    },
+    {
+      "courseCode": "1182043",
+      "courseName": "Kinh tế ngành",
+      "englishName": "Economics for Engineering",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-118"
+    },
+    {
+      "courseCode": "1182173",
+      "courseName": "Kinh tế ngành",
+      "englishName": "Economics for Engineering",
+      "credits": "3",
       "courseType": "THEORY",
       "ownerUnitCode": "DUT-118"
     },
@@ -1191,10 +3006,130 @@
       "ownerUnitCode": "DUT-118"
     },
     {
+      "courseCode": "1183030",
+      "courseName": "Khởi tạo doanh nghiệp công nghệ",
+      "englishName": "Technology Enterprise Initialization",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-118"
+    },
+    {
+      "courseCode": "1220100",
+      "courseName": "Xác suất thống kê",
+      "englishName": "Probability and Statistics",
+      "credits": "4",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-123"
+    },
+    {
+      "courseCode": "1221720",
+      "courseName": "Lập trình trên Linux",
+      "englishName": "Linux Programming",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-123"
+    },
+    {
+      "courseCode": "1221770",
+      "courseName": "Lập trình Java",
+      "englishName": "Java Programming",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-123"
+    },
+    {
+      "courseCode": "1221850",
+      "courseName": "Hệ thống nhúng",
+      "englishName": "Embedded Systems",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-123"
+    },
+    {
+      "courseCode": "1221880",
+      "courseName": "Chương trình dịch",
+      "englishName": "Compiler",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-123"
+    },
+    {
+      "courseCode": "1222110",
+      "courseName": "Chuyên đề công nghệ",
+      "englishName": "Special Topics in Technology",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-123"
+    },
+    {
+      "courseCode": "1222150",
+      "courseName": "Tiếng Anh 7",
+      "englishName": "English 7",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-123"
+    },
+    {
+      "courseCode": "1222990",
+      "courseName": "Cấu trúc dữ liệu",
+      "englishName": "Data Structures",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-122"
+    },
+    {
+      "courseCode": "1230670",
+      "courseName": "Phương trình vi phân",
+      "englishName": "Differential Equations",
+      "credits": "4",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-123"
+    },
+    {
+      "courseCode": "1232680",
+      "courseName": "TH Thiết kế hệ thống vi xử lý",
+      "englishName": "Microprocessor System Design Lab",
+      "credits": "0",
+      "courseType": "LAB",
+      "ownerUnitCode": "DUT-123"
+    },
+    {
+      "courseCode": "2070043",
+      "courseName": "Kế toán doanh nghiệp (CNTT)",
+      "englishName": "Business Accounting (IT)",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-207"
+    },
+    {
       "courseCode": "2090101",
       "courseName": "Tư tưởng Hồ Chí Minh",
       "englishName": "Ho Chi Minh Thoughts",
       "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-209"
+    },
+    {
+      "courseCode": "2090121",
+      "courseName": "Đường lối CM của ĐCS Việt Nam",
+      "englishName": "Revolutionary way of Vietnam Communist Party",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-209"
+    },
+    {
+      "courseCode": "2090131",
+      "courseName": "Những nguyên lý cơ bản của CN Mac-Lênin 1",
+      "englishName": "Basic Principles of Maxism - Leninnism (part 1)",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-209"
+    },
+    {
+      "courseCode": "2090141",
+      "courseName": "Những nguyên lý CB của CN Mac-Lênin 2",
+      "englishName": "Basic Principles of Maxism - Leninnism (part 2)",
+      "credits": "3",
       "courseType": "THEORY",
       "ownerUnitCode": "DUT-209"
     },
@@ -1247,6 +3182,38 @@
       "ownerUnitCode": "DUT-305"
     },
     {
+      "courseCode": "3050021",
+      "courseName": "Vật lý 2",
+      "englishName": "Physics 2",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-305"
+    },
+    {
+      "courseCode": "3050641",
+      "courseName": "Vật lý 2",
+      "englishName": "Physics 2",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-305"
+    },
+    {
+      "courseCode": "3050650",
+      "courseName": "Vật lý 3",
+      "englishName": "Physics 3",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-305"
+    },
+    {
+      "courseCode": "3050651",
+      "courseName": "TN Vật lý",
+      "englishName": "Physics Experiment",
+      "credits": "1",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-305"
+    },
+    {
       "courseCode": "3050660",
       "courseName": "TN Vật lý (Cơ-Nhiệt)",
       "englishName": "Physics Experiment (Mechanics and Thermodynamics)",
@@ -1263,12 +3230,28 @@
       "ownerUnitCode": "DUT-305"
     },
     {
+      "courseCode": "3050720",
+      "courseName": "TN Vật lý Cơ và Nhiệt",
+      "englishName": null,
+      "credits": "1",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-305"
+    },
+    {
       "courseCode": "3050730",
       "courseName": "Vật lý Điện, Từ và Quang",
       "englishName": null,
       "credits": "3",
       "courseType": "THEORY",
-      "ownerUnitCode": "DUT-UNASSIGNED"
+      "ownerUnitCode": "DUT-305"
+    },
+    {
+      "courseCode": "3050740",
+      "courseName": "TN Vật lý Điện, Từ và Quang",
+      "englishName": null,
+      "credits": "1",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-305"
     },
     {
       "courseCode": "3050750",
@@ -1276,7 +3259,7 @@
       "englishName": null,
       "credits": "3",
       "courseType": "THEORY",
-      "ownerUnitCode": "DUT-UNASSIGNED"
+      "ownerUnitCode": "DUT-305"
     },
     {
       "courseCode": "3050760",
@@ -1284,7 +3267,15 @@
       "englishName": null,
       "credits": "1",
       "courseType": "THEORY",
-      "ownerUnitCode": "DUT-UNASSIGNED"
+      "ownerUnitCode": "DUT-305"
+    },
+    {
+      "courseCode": "3060303",
+      "courseName": "Hoá học Đại cương",
+      "englishName": "General Chemistry",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-107"
     },
     {
       "courseCode": "3190041",
@@ -1311,6 +3302,54 @@
       "ownerUnitCode": "DUT-319"
     },
     {
+      "courseCode": "3190131",
+      "courseName": "Đại số",
+      "englishName": "Linear Algebra",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-319"
+    },
+    {
+      "courseCode": "3190141",
+      "courseName": "Xác suất thống kê",
+      "englishName": "Probability and Statistics",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-319"
+    },
+    {
+      "courseCode": "3190200",
+      "courseName": "Đại số tuyến tính",
+      "englishName": "Linear Algebra",
+      "credits": "4",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-319"
+    },
+    {
+      "courseCode": "3190210",
+      "courseName": "Phương trình vi phân",
+      "englishName": "Differential Equations",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-319"
+    },
+    {
+      "courseCode": "3190211",
+      "courseName": "Giải tích 1",
+      "englishName": "Calculus 1",
+      "credits": "5",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-319"
+    },
+    {
+      "courseCode": "3190220",
+      "courseName": "Xác xuất thống kê",
+      "englishName": "Probability and Statistics",
+      "credits": "4",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-319"
+    },
+    {
       "courseCode": "3190260",
       "courseName": "Đại số tuyến tính",
       "englishName": "Linear Algebra",
@@ -1324,7 +3363,15 @@
       "englishName": null,
       "credits": "4",
       "courseType": "THEORY",
-      "ownerUnitCode": "DUT-UNASSIGNED"
+      "ownerUnitCode": "DUT-319"
+    },
+    {
+      "courseCode": "4130020",
+      "courseName": "Anh văn CLC1",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-413"
     },
     {
       "courseCode": "4130040",
@@ -1343,10 +3390,106 @@
       "ownerUnitCode": "DUT-413"
     },
     {
+      "courseCode": "4130060",
+      "courseName": "Tiếng Anh",
+      "englishName": "English",
+      "credits": "10",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-413"
+    },
+    {
+      "courseCode": "4130080",
+      "courseName": "Anh văn A1.2",
+      "englishName": "English A1.2",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-413"
+    },
+    {
+      "courseCode": "4130090",
+      "courseName": "Anh văn A1.1 (CLC)",
+      "englishName": "English A1.1",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-413"
+    },
+    {
+      "courseCode": "41300A1",
+      "courseName": "Anh văn CLC_T450",
+      "englishName": "English CLC",
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-413"
+    },
+    {
+      "courseCode": "41300A2",
+      "courseName": "Anh văn CLC_T525",
+      "englishName": "English CLC",
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-413"
+    },
+    {
+      "courseCode": "41300A3",
+      "courseName": "Anh văn CLC_T600",
+      "englishName": "English CLC",
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-413"
+    },
+    {
+      "courseCode": "41300A4",
+      "courseName": "Anh văn CLC_T675",
+      "englishName": "English CLC",
+      "credits": "0",
+      "courseType": "CONDITIONAL",
+      "ownerUnitCode": "DUT-413"
+    },
+    {
+      "courseCode": "4130100",
+      "courseName": "Anh văn A1.2 (CLC)",
+      "englishName": "English A1.2",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-413"
+    },
+    {
+      "courseCode": "4130110",
+      "courseName": "Anh văn CLC_T700",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-413"
+    },
+    {
       "courseCode": "4130120",
       "courseName": "Anh văn B1.1",
       "englishName": "English B1.1",
       "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-413"
+    },
+    {
+      "courseCode": "4130131",
+      "courseName": "Anh văn CN Công nghệ thông tin",
+      "englishName": "English for specific purposes",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "4130241",
+      "courseName": "Anh văn 1",
+      "englishName": "English 1",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-413"
+    },
+    {
+      "courseCode": "4130280",
+      "courseName": "Anh văn A1 (dự bị)",
+      "englishName": "English A1",
+      "credits": "0",
       "courseType": "THEORY",
       "ownerUnitCode": "DUT-413"
     },
@@ -1359,12 +3502,116 @@
       "ownerUnitCode": "DUT-413"
     },
     {
+      "courseCode": "4130403",
+      "courseName": "Anh văn CN CNTT",
+      "englishName": "English for Information Technology",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "KHOA_CNTT"
+    },
+    {
+      "courseCode": "4130440",
+      "courseName": "Anh văn tăng cường 2",
+      "englishName": "Intensive English 2",
+      "credits": "4",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-413"
+    },
+    {
+      "courseCode": "4130451",
+      "courseName": "Anh văn tăng cường CLC2",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-413"
+    },
+    {
       "courseCode": "4130501",
       "courseName": "Anh văn A2.1",
       "englishName": "English A2.1",
       "credits": "3",
       "courseType": "THEORY",
       "ownerUnitCode": "DUT-413"
+    },
+    {
+      "courseCode": "4139990",
+      "courseName": "Anh văn tăng cường 1",
+      "englishName": "Intensive English 1",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-413"
+    },
+    {
+      "courseCode": "4139999",
+      "courseName": "Anh van nâng cao 1 (B1)",
+      "englishName": null,
+      "credits": "0",
+      "courseType": "LAB",
+      "ownerUnitCode": "DUT-413"
+    },
+    {
+      "courseCode": "4160112",
+      "courseName": "Pháp văn 1",
+      "englishName": "French 1",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-416"
+    },
+    {
+      "courseCode": "4160183",
+      "courseName": "Pháp văn 1 (CNTT)",
+      "englishName": "French 1",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-416"
+    },
+    {
+      "courseCode": "4160190",
+      "courseName": "Pháp văn B (CNTT)",
+      "englishName": "French B",
+      "credits": "4",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-416"
+    },
+    {
+      "courseCode": "4180011",
+      "courseName": "Tiếng Việt",
+      "englishName": "Vietnamese",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-418"
+    },
+    {
+      "courseCode": "4180041",
+      "courseName": "Tiếng Việt 1",
+      "englishName": "Vietnamese 1",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-418"
+    },
+    {
+      "courseCode": "4180051",
+      "courseName": "Tiếng Việt 2",
+      "englishName": "Vietnamese 2",
+      "credits": "3",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-418"
+    },
+    {
+      "courseCode": "4180070",
+      "courseName": "Tiếng Việt 2",
+      "englishName": "Vietnamese 2",
+      "credits": "4",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-418"
+    },
+    {
+      "courseCode": "4180080",
+      "courseName": "Tiếng Việt CN",
+      "englishName": "Professional Vietnamese",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-418"
     },
     {
       "courseCode": "5070030",
@@ -1421,41 +3668,403 @@
       "credits": "1",
       "courseType": "THEORY",
       "ownerUnitCode": "DUT-507"
+    },
+    {
+      "courseCode": "5070100",
+      "courseName": "Tiếng Nhật 1 (19CLC)",
+      "englishName": "Japanese 1",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-507"
+    },
+    {
+      "courseCode": "5070110",
+      "courseName": "Tiếng Nhật 2 (19CLC)",
+      "englishName": "Japanese 2",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-507"
+    },
+    {
+      "courseCode": "5070120",
+      "courseName": "Tiếng Nhật 3 (19CLC)",
+      "englishName": "Japanese 3",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-507"
+    },
+    {
+      "courseCode": "5070130",
+      "courseName": "Tiếng Nhật 4 (19CLC)",
+      "englishName": "Japanese 4",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-507"
+    },
+    {
+      "courseCode": "5070140",
+      "courseName": "Tiếng Nhật 5 (19CLC)",
+      "englishName": "Japanese 5",
+      "credits": "2",
+      "courseType": "THEORY",
+      "ownerUnitCode": "DUT-507"
     }
   ],
   "semesters": [
     {
+      "semesterCode": "2013-2014-1",
+      "academicYear": "2013-2014",
+      "termInYear": 1,
+      "startDate": "2013-08-12",
+      "startDateEstimated": false,
+      "legacyCode": "1310"
+    },
+    {
+      "semesterCode": "2013-2014-2",
+      "academicYear": "2013-2014",
+      "termInYear": 2,
+      "startDate": "2014-01-06",
+      "startDateEstimated": false,
+      "legacyCode": "1320"
+    },
+    {
+      "semesterCode": "2014-2015-1",
+      "academicYear": "2014-2015",
+      "termInYear": 1,
+      "startDate": "2014-08-11",
+      "startDateEstimated": false,
+      "legacyCode": "1410"
+    },
+    {
+      "semesterCode": "2014-2015-2",
+      "academicYear": "2014-2015",
+      "termInYear": 2,
+      "startDate": "2015-01-05",
+      "startDateEstimated": false,
+      "legacyCode": "1420"
+    },
+    {
+      "semesterCode": "2014-2015-3",
+      "academicYear": "2014-2015",
+      "termInYear": 3,
+      "startDate": "2015-06-08",
+      "startDateEstimated": true,
+      "legacyCode": "1421"
+    },
+    {
+      "semesterCode": "2015-2016-1",
+      "academicYear": "2015-2016",
+      "termInYear": 1,
+      "startDate": "2015-08-10",
+      "startDateEstimated": false,
+      "legacyCode": "1510"
+    },
+    {
+      "semesterCode": "2015-2016-2",
+      "academicYear": "2015-2016",
+      "termInYear": 2,
+      "startDate": "2016-01-04",
+      "startDateEstimated": false,
+      "legacyCode": "1520"
+    },
+    {
+      "semesterCode": "2015-2016-3",
+      "academicYear": "2015-2016",
+      "termInYear": 3,
+      "startDate": "2016-06-13",
+      "startDateEstimated": true,
+      "legacyCode": "1521"
+    },
+    {
+      "semesterCode": "2016-2017-1",
+      "academicYear": "2016-2017",
+      "termInYear": 1,
+      "startDate": "2016-08-08",
+      "startDateEstimated": false,
+      "legacyCode": "1610"
+    },
+    {
+      "semesterCode": "2016-2017-2",
+      "academicYear": "2016-2017",
+      "termInYear": 2,
+      "startDate": "2017-01-02",
+      "startDateEstimated": false,
+      "legacyCode": "1620"
+    },
+    {
+      "semesterCode": "2016-2017-3",
+      "academicYear": "2016-2017",
+      "termInYear": 3,
+      "startDate": "2017-06-12",
+      "startDateEstimated": true,
+      "legacyCode": "1621"
+    },
+    {
+      "semesterCode": "2017-2018-1",
+      "academicYear": "2017-2018",
+      "termInYear": 1,
+      "startDate": "2017-08-07",
+      "startDateEstimated": false,
+      "legacyCode": "1710"
+    },
+    {
+      "semesterCode": "2017-2018-2",
+      "academicYear": "2017-2018",
+      "termInYear": 2,
+      "startDate": "2018-01-01",
+      "startDateEstimated": false,
+      "legacyCode": "1720"
+    },
+    {
+      "semesterCode": "2017-2018-3",
+      "academicYear": "2017-2018",
+      "termInYear": 3,
+      "startDate": "2018-06-11",
+      "startDateEstimated": true,
+      "legacyCode": "1721"
+    },
+    {
+      "semesterCode": "2018-2019-1",
+      "academicYear": "2018-2019",
+      "termInYear": 1,
+      "startDate": "2018-08-06",
+      "startDateEstimated": false,
+      "legacyCode": "1810"
+    },
+    {
+      "semesterCode": "2018-2019-2",
+      "academicYear": "2018-2019",
+      "termInYear": 2,
+      "startDate": "2018-12-10",
+      "startDateEstimated": false,
+      "legacyCode": "1820"
+    },
+    {
+      "semesterCode": "2018-2019-3",
+      "academicYear": "2018-2019",
+      "termInYear": 3,
+      "startDate": "2019-06-10",
+      "startDateEstimated": false,
+      "legacyCode": "1821"
+    },
+    {
+      "semesterCode": "2019-2020-1",
+      "academicYear": "2019-2020",
+      "termInYear": 1,
+      "startDate": "2019-08-05",
+      "startDateEstimated": false,
+      "legacyCode": "1910"
+    },
+    {
+      "semesterCode": "2019-2020-2",
+      "academicYear": "2019-2020",
+      "termInYear": 2,
+      "startDate": "2020-01-06",
+      "startDateEstimated": false,
+      "legacyCode": "1920"
+    },
+    {
+      "semesterCode": "2019-2020-3",
+      "academicYear": "2019-2020",
+      "termInYear": 3,
+      "startDate": "2020-06-08",
+      "startDateEstimated": false,
+      "legacyCode": "1921"
+    },
+    {
+      "semesterCode": "2020-2021-1",
+      "academicYear": "2020-2021",
+      "termInYear": 1,
+      "startDate": "2020-08-03",
+      "startDateEstimated": false,
+      "legacyCode": "2010"
+    },
+    {
+      "semesterCode": "2020-2021-2",
+      "academicYear": "2020-2021",
+      "termInYear": 2,
+      "startDate": "2020-12-28",
+      "startDateEstimated": false,
+      "legacyCode": "2020"
+    },
+    {
+      "semesterCode": "2020-2021-3",
+      "academicYear": "2020-2021",
+      "termInYear": 3,
+      "startDate": "2021-06-14",
+      "startDateEstimated": true,
+      "legacyCode": "2021"
+    },
+    {
       "semesterCode": "2021-2022-1",
       "academicYear": "2021-2022",
       "termInYear": 1,
-      "startDate": "2021-08-02"
+      "startDate": "2021-08-02",
+      "startDateEstimated": false,
+      "legacyCode": "2110"
+    },
+    {
+      "semesterCode": "2021-2022-2",
+      "academicYear": "2021-2022",
+      "termInYear": 2,
+      "startDate": "2022-02-07",
+      "startDateEstimated": false,
+      "legacyCode": "2120"
+    },
+    {
+      "semesterCode": "2021-2022-3",
+      "academicYear": "2021-2022",
+      "termInYear": 3,
+      "startDate": "2022-07-04",
+      "startDateEstimated": false,
+      "legacyCode": "2121"
     },
     {
       "semesterCode": "2022-2023-1",
       "academicYear": "2022-2023",
       "termInYear": 1,
-      "startDate": "2022-08-01"
+      "startDate": "2022-08-01",
+      "startDateEstimated": false,
+      "legacyCode": "2210"
+    },
+    {
+      "semesterCode": "2022-2023-2",
+      "academicYear": "2022-2023",
+      "termInYear": 2,
+      "startDate": "2023-01-02",
+      "startDateEstimated": false,
+      "legacyCode": "2220"
+    },
+    {
+      "semesterCode": "2022-2023-3",
+      "academicYear": "2022-2023",
+      "termInYear": 3,
+      "startDate": "2023-06-19",
+      "startDateEstimated": false,
+      "legacyCode": "2221"
     },
     {
       "semesterCode": "2023-2024-1",
       "academicYear": "2023-2024",
       "termInYear": 1,
-      "startDate": "2023-07-31"
+      "startDate": "2023-07-31",
+      "startDateEstimated": false,
+      "legacyCode": "2310"
+    },
+    {
+      "semesterCode": "2023-2024-2",
+      "academicYear": "2023-2024",
+      "termInYear": 2,
+      "startDate": "2024-01-15",
+      "startDateEstimated": false,
+      "legacyCode": "2320"
+    },
+    {
+      "semesterCode": "2023-2024-3",
+      "academicYear": "2023-2024",
+      "termInYear": 3,
+      "startDate": "2024-06-17",
+      "startDateEstimated": false,
+      "legacyCode": "2321"
     },
     {
       "semesterCode": "2024-2025-1",
       "academicYear": "2024-2025",
       "termInYear": 1,
-      "startDate": "2024-07-29"
+      "startDate": "2024-07-29",
+      "startDateEstimated": false,
+      "legacyCode": "2410"
+    },
+    {
+      "semesterCode": "2024-2025-2",
+      "academicYear": "2024-2025",
+      "termInYear": 2,
+      "startDate": "2025-01-06",
+      "startDateEstimated": false,
+      "legacyCode": "2420"
+    },
+    {
+      "semesterCode": "2024-2025-3",
+      "academicYear": "2024-2025",
+      "termInYear": 3,
+      "startDate": "2025-06-16",
+      "startDateEstimated": false,
+      "legacyCode": "2421"
     },
     {
       "semesterCode": "2025-2026-1",
       "academicYear": "2025-2026",
       "termInYear": 1,
-      "startDate": "2025-08-04"
+      "startDate": "2025-08-04",
+      "startDateEstimated": false,
+      "legacyCode": "2510"
+    },
+    {
+      "semesterCode": "2025-2026-2",
+      "academicYear": "2025-2026",
+      "termInYear": 2,
+      "startDate": "2025-12-29",
+      "startDateEstimated": false,
+      "legacyCode": "2520"
+    },
+    {
+      "semesterCode": "2025-2026-3",
+      "academicYear": "2025-2026",
+      "termInYear": 3,
+      "startDate": "2026-06-15",
+      "startDateEstimated": false,
+      "legacyCode": "2521"
+    },
+    {
+      "semesterCode": "2026-2027-1",
+      "academicYear": "2026-2027",
+      "termInYear": 1,
+      "startDate": "2026-08-10",
+      "startDateEstimated": false,
+      "legacyCode": "2610"
+    },
+    {
+      "semesterCode": "2026-2027-2",
+      "academicYear": "2026-2027",
+      "termInYear": 2,
+      "startDate": "2027-01-04",
+      "startDateEstimated": false,
+      "legacyCode": "2620"
     }
   ],
   "cohorts": [
+    {
+      "cohortCode": "K2013",
+      "intakeYear": 2013
+    },
+    {
+      "cohortCode": "K2014",
+      "intakeYear": 2014
+    },
+    {
+      "cohortCode": "K2015",
+      "intakeYear": 2015
+    },
+    {
+      "cohortCode": "K2016",
+      "intakeYear": 2016
+    },
+    {
+      "cohortCode": "K2017",
+      "intakeYear": 2017
+    },
+    {
+      "cohortCode": "K2018",
+      "intakeYear": 2018
+    },
+    {
+      "cohortCode": "K2019",
+      "intakeYear": 2019
+    },
+    {
+      "cohortCode": "K2020",
+      "intakeYear": 2020
+    },
     {
       "cohortCode": "K2021",
       "intakeYear": 2021
@@ -1475,17 +4084,56 @@
     {
       "cohortCode": "K2025",
       "intakeYear": 2025
+    },
+    {
+      "cohortCode": "K2026",
+      "intakeYear": 2026
     }
   ],
   "relations": [
+    {
+      "sourceCourseCode": "1020042",
+      "targetCourseCode": "1021343",
+      "relationType": "PREREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021373",
+      "targetCourseCode": "1021413",
+      "relationType": "PREREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021803",
+      "targetCourseCode": "1021743",
+      "relationType": "PREREQUISITE"
+    },
     {
       "sourceCourseCode": "1022603",
       "targetCourseCode": "1023190",
       "relationType": "PREREQUISITE"
     },
     {
-      "sourceCourseCode": "1024430",
-      "targetCourseCode": "1024120",
+      "sourceCourseCode": "1022823",
+      "targetCourseCode": "1023623",
+      "relationType": "PREREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1022853",
+      "targetCourseCode": "1023623",
+      "relationType": "PREREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1022923",
+      "targetCourseCode": "1023623",
+      "relationType": "PREREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023230",
+      "targetCourseCode": "1023623",
+      "relationType": "PREREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023270",
+      "targetCourseCode": "1023623",
       "relationType": "PREREQUISITE"
     },
     {
@@ -1496,6 +4144,11 @@
     {
       "sourceCourseCode": "1024430",
       "targetCourseCode": "1024810",
+      "relationType": "PREREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1024430",
+      "targetCourseCode": "1024830",
       "relationType": "PREREQUISITE"
     },
     {
@@ -1534,6 +4187,11 @@
       "relationType": "PREREQUISITE"
     },
     {
+      "sourceCourseCode": "1024830",
+      "targetCourseCode": "1024840",
+      "relationType": "PREREQUISITE"
+    },
+    {
       "sourceCourseCode": "1024870",
       "targetCourseCode": "1021743",
       "relationType": "PREREQUISITE"
@@ -1564,13 +4222,103 @@
       "relationType": "PREREQUISITE"
     },
     {
+      "sourceCourseCode": "4130040",
+      "targetCourseCode": "4130050",
+      "relationType": "PREREQUISITE"
+    },
+    {
+      "sourceCourseCode": "4130241",
+      "targetCourseCode": "4130311",
+      "relationType": "PREREQUISITE"
+    },
+    {
+      "sourceCourseCode": "4130311",
+      "targetCourseCode": "4130403",
+      "relationType": "PREREQUISITE"
+    },
+    {
       "sourceCourseCode": "4130501",
       "targetCourseCode": "4130311",
       "relationType": "PREREQUISITE"
     },
     {
+      "sourceCourseCode": "1020023",
+      "targetCourseCode": "1020313",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020023",
+      "targetCourseCode": "1022093",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020042",
+      "targetCourseCode": "1020102",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020042",
+      "targetCourseCode": "1020313",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020042",
+      "targetCourseCode": "1021313",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020042",
+      "targetCourseCode": "1021473",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020042",
+      "targetCourseCode": "1022693",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020042",
+      "targetCourseCode": "1022913",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020042",
+      "targetCourseCode": "1023053",
+      "relationType": "PRIOR"
+    },
+    {
       "sourceCourseCode": "1020072",
       "targetCourseCode": "1023970",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020102",
+      "targetCourseCode": "1020141",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020102",
+      "targetCourseCode": "1020252",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020102",
+      "targetCourseCode": "1020353",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020102",
+      "targetCourseCode": "1021373",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020102",
+      "targetCourseCode": "1021773",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020102",
+      "targetCourseCode": "1022013",
       "relationType": "PRIOR"
     },
     {
@@ -1600,7 +4348,77 @@
     },
     {
       "sourceCourseCode": "1020141",
+      "targetCourseCode": "1021833",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020141",
+      "targetCourseCode": "1021843",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020141",
+      "targetCourseCode": "1022013",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020141",
+      "targetCourseCode": "1022073",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020141",
+      "targetCourseCode": "1023650",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020141",
       "targetCourseCode": "1024040",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020232",
+      "targetCourseCode": "1020141",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020232",
+      "targetCourseCode": "1020593",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020232",
+      "targetCourseCode": "1021493",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020232",
+      "targetCourseCode": "1021523",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020232",
+      "targetCourseCode": "1021583",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020232",
+      "targetCourseCode": "1021893",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020232",
+      "targetCourseCode": "1022523",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020232",
+      "targetCourseCode": "1023573",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020242",
+      "targetCourseCode": "1021553",
       "relationType": "PRIOR"
     },
     {
@@ -1610,12 +4428,57 @@
     },
     {
       "sourceCourseCode": "1020252",
+      "targetCourseCode": "1021623",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020252",
       "targetCourseCode": "1021783",
       "relationType": "PRIOR"
     },
     {
       "sourceCourseCode": "1020252",
+      "targetCourseCode": "1021793",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020252",
+      "targetCourseCode": "1021823",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020252",
+      "targetCourseCode": "1021853",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020252",
+      "targetCourseCode": "1021863",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020252",
+      "targetCourseCode": "1021873",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020252",
       "targetCourseCode": "1021883",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020252",
+      "targetCourseCode": "1022013",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020252",
+      "targetCourseCode": "1022063",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020252",
+      "targetCourseCode": "1022190",
       "relationType": "PRIOR"
     },
     {
@@ -1640,7 +4503,17 @@
     },
     {
       "sourceCourseCode": "1020292",
+      "targetCourseCode": "1021423",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020292",
       "targetCourseCode": "1021523",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020292",
+      "targetCourseCode": "1021553",
       "relationType": "PRIOR"
     },
     {
@@ -1650,7 +4523,17 @@
     },
     {
       "sourceCourseCode": "1020292",
+      "targetCourseCode": "1021923",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020292",
       "targetCourseCode": "1021983",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020292",
+      "targetCourseCode": "1022013",
       "relationType": "PRIOR"
     },
     {
@@ -1665,7 +4548,32 @@
     },
     {
       "sourceCourseCode": "1020292",
+      "targetCourseCode": "1022733",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020292",
       "targetCourseCode": "1022743",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020292",
+      "targetCourseCode": "1022763",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020292",
+      "targetCourseCode": "1022773",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020292",
+      "targetCourseCode": "1023120",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020292",
+      "targetCourseCode": "1023170",
       "relationType": "PRIOR"
     },
     {
@@ -1725,7 +4633,32 @@
     },
     {
       "sourceCourseCode": "1020313",
+      "targetCourseCode": "1021673",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020313",
+      "targetCourseCode": "1022013",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020313",
+      "targetCourseCode": "1022053",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020313",
       "targetCourseCode": "1023140",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020313",
+      "targetCourseCode": "1023673",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020313",
+      "targetCourseCode": "1023683",
       "relationType": "PRIOR"
     },
     {
@@ -1769,6 +4702,191 @@
       "relationType": "PRIOR"
     },
     {
+      "sourceCourseCode": "1020593",
+      "targetCourseCode": "1020353",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020593",
+      "targetCourseCode": "1022890",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020593",
+      "targetCourseCode": "1023583",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020593",
+      "targetCourseCode": "1023603",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020691",
+      "targetCourseCode": "1020042",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020691",
+      "targetCourseCode": "1020102",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020691",
+      "targetCourseCode": "1022923",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021252",
+      "targetCourseCode": "1021293",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021252",
+      "targetCourseCode": "1021313",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021252",
+      "targetCourseCode": "1021353",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021252",
+      "targetCourseCode": "1021403",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021252",
+      "targetCourseCode": "1022613",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021252",
+      "targetCourseCode": "1022950",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021252",
+      "targetCourseCode": "1182043",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021263",
+      "targetCourseCode": "1020313",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021263",
+      "targetCourseCode": "1021583",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021263",
+      "targetCourseCode": "1022093",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021283",
+      "targetCourseCode": "1020242",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021283",
+      "targetCourseCode": "1021543",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021283",
+      "targetCourseCode": "1021693",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021283",
+      "targetCourseCode": "1021703",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021293",
+      "targetCourseCode": "1021363",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021313",
+      "targetCourseCode": "1020141",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021313",
+      "targetCourseCode": "1021613",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021313",
+      "targetCourseCode": "1021893",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021353",
+      "targetCourseCode": "1020252",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021353",
+      "targetCourseCode": "1020292",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021353",
+      "targetCourseCode": "1021383",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021353",
+      "targetCourseCode": "1021533",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021353",
+      "targetCourseCode": "1021553",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021353",
+      "targetCourseCode": "1021603",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021353",
+      "targetCourseCode": "1021713",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021353",
+      "targetCourseCode": "1022913",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021363",
+      "targetCourseCode": "1021633",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021383",
+      "targetCourseCode": "1021573",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021383",
+      "targetCourseCode": "1021613",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021383",
+      "targetCourseCode": "1021843",
+      "relationType": "PRIOR"
+    },
+    {
       "sourceCourseCode": "1021383",
       "targetCourseCode": "1023570",
       "relationType": "PRIOR"
@@ -1779,8 +4897,188 @@
       "relationType": "PRIOR"
     },
     {
+      "sourceCourseCode": "1021413",
+      "targetCourseCode": "1021793",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021413",
+      "targetCourseCode": "1021833",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021413",
+      "targetCourseCode": "1021863",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021413",
+      "targetCourseCode": "1021893",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021413",
+      "targetCourseCode": "1022023",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021413",
+      "targetCourseCode": "1022033",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021413",
+      "targetCourseCode": "1022073",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021413",
+      "targetCourseCode": "1022083",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021413",
+      "targetCourseCode": "2070043",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021423",
+      "targetCourseCode": "1022713",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021483",
+      "targetCourseCode": "1021713",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021493",
+      "targetCourseCode": "1020353",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021493",
+      "targetCourseCode": "1023603",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021523",
+      "targetCourseCode": "1022063",
+      "relationType": "PRIOR"
+    },
+    {
       "sourceCourseCode": "1021523",
       "targetCourseCode": "1023573",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021593",
+      "targetCourseCode": "1020292",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021593",
+      "targetCourseCode": "1020593",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021593",
+      "targetCourseCode": "1021423",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021593",
+      "targetCourseCode": "1021463",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021593",
+      "targetCourseCode": "1021513",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021593",
+      "targetCourseCode": "1021553",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021593",
+      "targetCourseCode": "1022703",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1021643",
+      "targetCourseCode": "1021733",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022093",
+      "targetCourseCode": "1020113",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022103",
+      "targetCourseCode": "1021453",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022103",
+      "targetCourseCode": "1021543",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022113",
+      "targetCourseCode": "1020252",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022113",
+      "targetCourseCode": "1020313",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022113",
+      "targetCourseCode": "1020353",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022113",
+      "targetCourseCode": "1020593",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022113",
+      "targetCourseCode": "1021343",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022113",
+      "targetCourseCode": "1021473",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022113",
+      "targetCourseCode": "1021483",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022113",
+      "targetCourseCode": "1021493",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022113",
+      "targetCourseCode": "1021503",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022113",
+      "targetCourseCode": "1021533",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022113",
+      "targetCourseCode": "1021573",
       "relationType": "PRIOR"
     },
     {
@@ -1791,6 +5089,56 @@
     {
       "sourceCourseCode": "1022470",
       "targetCourseCode": "1021863",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022523",
+      "targetCourseCode": "1020353",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022523",
+      "targetCourseCode": "1023603",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022770",
+      "targetCourseCode": "1020232",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022770",
+      "targetCourseCode": "1022113",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022770",
+      "targetCourseCode": "1022830",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022770",
+      "targetCourseCode": "1022913",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022770",
+      "targetCourseCode": "1022923",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022783",
+      "targetCourseCode": "1024240",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022803",
+      "targetCourseCode": "1023220",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022803",
+      "targetCourseCode": "1023240",
       "relationType": "PRIOR"
     },
     {
@@ -1805,6 +5153,11 @@
     },
     {
       "sourceCourseCode": "1022853",
+      "targetCourseCode": "1021803",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022853",
       "targetCourseCode": "1022603",
       "relationType": "PRIOR"
     },
@@ -1815,12 +5168,27 @@
     },
     {
       "sourceCourseCode": "1022863",
+      "targetCourseCode": "1020042",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022863",
       "targetCourseCode": "1020072",
       "relationType": "PRIOR"
     },
     {
       "sourceCourseCode": "1022863",
       "targetCourseCode": "1020102",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022863",
+      "targetCourseCode": "1020113",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022863",
+      "targetCourseCode": "1020593",
       "relationType": "PRIOR"
     },
     {
@@ -1860,6 +5228,11 @@
     },
     {
       "sourceCourseCode": "1022863",
+      "targetCourseCode": "1023053",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022863",
       "targetCourseCode": "1023220",
       "relationType": "PRIOR"
     },
@@ -1894,6 +5267,11 @@
       "relationType": "PRIOR"
     },
     {
+      "sourceCourseCode": "1022923",
+      "targetCourseCode": "1022603",
+      "relationType": "PRIOR"
+    },
+    {
       "sourceCourseCode": "1022933",
       "targetCourseCode": "1021803",
       "relationType": "PRIOR"
@@ -1914,6 +5292,31 @@
       "relationType": "PRIOR"
     },
     {
+      "sourceCourseCode": "1022950",
+      "targetCourseCode": "1020292",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022950",
+      "targetCourseCode": "1021593",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022950",
+      "targetCourseCode": "1022840",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022950",
+      "targetCourseCode": "1023240",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1022950",
+      "targetCourseCode": "1023270",
+      "relationType": "PRIOR"
+    },
+    {
       "sourceCourseCode": "1022970",
       "targetCourseCode": "1021383",
       "relationType": "PRIOR"
@@ -1931,6 +5334,11 @@
     {
       "sourceCourseCode": "1022970",
       "targetCourseCode": "1024090",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1023200",
+      "targetCourseCode": "1021583",
       "relationType": "PRIOR"
     },
     {
@@ -1956,6 +5364,16 @@
     {
       "sourceCourseCode": "1023280",
       "targetCourseCode": "1020113",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1023280",
+      "targetCourseCode": "1020232",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1023280",
+      "targetCourseCode": "1021593",
       "relationType": "PRIOR"
     },
     {
@@ -1986,6 +5404,11 @@
     {
       "sourceCourseCode": "1023280",
       "targetCourseCode": "1023720",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1023290",
+      "targetCourseCode": "1021493",
       "relationType": "PRIOR"
     },
     {
@@ -2031,6 +5454,11 @@
     {
       "sourceCourseCode": "1023290",
       "targetCourseCode": "1024010",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1023690",
+      "targetCourseCode": "1021803",
       "relationType": "PRIOR"
     },
     {
@@ -2155,12 +5583,22 @@
     },
     {
       "sourceCourseCode": "1023830",
+      "targetCourseCode": "1021803",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1023830",
       "targetCourseCode": "1022603",
       "relationType": "PRIOR"
     },
     {
       "sourceCourseCode": "1023830",
       "targetCourseCode": "1024430",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1023840",
+      "targetCourseCode": "1021803",
       "relationType": "PRIOR"
     },
     {
@@ -2210,7 +5648,67 @@
     },
     {
       "sourceCourseCode": "1023960",
+      "targetCourseCode": "1023990",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1023960",
       "targetCourseCode": "1024100",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1061062",
+      "targetCourseCode": "1021283",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1061062",
+      "targetCourseCode": "1021543",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1061062",
+      "targetCourseCode": "1021573",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1061062",
+      "targetCourseCode": "1021703",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1061062",
+      "targetCourseCode": "1022103",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1061062",
+      "targetCourseCode": "1022470",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1080011",
+      "targetCourseCode": "1080401",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1080491",
+      "targetCourseCode": "1021703",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1182043",
+      "targetCourseCode": "2070043",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "2090131",
+      "targetCourseCode": "2090141",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "2090141",
+      "targetCourseCode": "1182043",
       "relationType": "PRIOR"
     },
     {
@@ -2234,8 +5732,43 @@
       "relationType": "PRIOR"
     },
     {
+      "sourceCourseCode": "2090160",
+      "targetCourseCode": "2090101",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "2100010",
+      "targetCourseCode": "1021853",
+      "relationType": "PRIOR"
+    },
+    {
       "sourceCourseCode": "2170020",
       "targetCourseCode": "1182550",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "2170020",
+      "targetCourseCode": "2090160",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "2170020",
+      "targetCourseCode": "2090170",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3050011",
+      "targetCourseCode": "1021693",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3050011",
+      "targetCourseCode": "1050931",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3050011",
+      "targetCourseCode": "3050641",
       "relationType": "PRIOR"
     },
     {
@@ -2249,8 +5782,28 @@
       "relationType": "PRIOR"
     },
     {
+      "sourceCourseCode": "3050641",
+      "targetCourseCode": "1021693",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3050641",
+      "targetCourseCode": "1061062",
+      "relationType": "PRIOR"
+    },
+    {
       "sourceCourseCode": "3190041",
       "targetCourseCode": "1020373",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3190041",
+      "targetCourseCode": "1021583",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3190041",
+      "targetCourseCode": "1021663",
       "relationType": "PRIOR"
     },
     {
@@ -2280,12 +5833,52 @@
     },
     {
       "sourceCourseCode": "3190111",
+      "targetCourseCode": "3190041",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3190111",
       "targetCourseCode": "3190121",
       "relationType": "PRIOR"
     },
     {
       "sourceCourseCode": "3190121",
+      "targetCourseCode": "1021573",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3190121",
+      "targetCourseCode": "1021683",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3190121",
+      "targetCourseCode": "1022093",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3190121",
+      "targetCourseCode": "1022103",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3190121",
       "targetCourseCode": "1022470",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3190121",
+      "targetCourseCode": "1023260",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3190121",
+      "targetCourseCode": "1040451",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3190121",
+      "targetCourseCode": "1080491",
       "relationType": "PRIOR"
     },
     {
@@ -2294,8 +5887,63 @@
       "relationType": "PRIOR"
     },
     {
+      "sourceCourseCode": "3190131",
+      "targetCourseCode": "1020213",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3190131",
+      "targetCourseCode": "1021232",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3190131",
+      "targetCourseCode": "1021263",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3190131",
+      "targetCourseCode": "1021663",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3190131",
+      "targetCourseCode": "1021683",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3190131",
+      "targetCourseCode": "1022093",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3190131",
+      "targetCourseCode": "1022103",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3190260",
+      "targetCourseCode": "1021263",
+      "relationType": "PRIOR"
+    },
+    {
       "sourceCourseCode": "3190260",
       "targetCourseCode": "1022470",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3190260",
+      "targetCourseCode": "1022783",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3190260",
+      "targetCourseCode": "1022843",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "3190260",
+      "targetCourseCode": "1023200",
       "relationType": "PRIOR"
     },
     {
@@ -2309,8 +5957,63 @@
       "relationType": "PRIOR"
     },
     {
+      "sourceCourseCode": "4160183",
+      "targetCourseCode": "4160190",
+      "relationType": "PRIOR"
+    },
+    {
+      "sourceCourseCode": "1020042",
+      "targetCourseCode": "1021273",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020042",
+      "targetCourseCode": "1022113",
+      "relationType": "COREQUISITE"
+    },
+    {
       "sourceCourseCode": "1020072",
       "targetCourseCode": "1022933",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020102",
+      "targetCourseCode": "1020593",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020102",
+      "targetCourseCode": "1021313",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020102",
+      "targetCourseCode": "1021473",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020102",
+      "targetCourseCode": "1021493",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020102",
+      "targetCourseCode": "1021523",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020102",
+      "targetCourseCode": "1021533",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020102",
+      "targetCourseCode": "1022523",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020102",
+      "targetCourseCode": "1022943",
       "relationType": "COREQUISITE"
     },
     {
@@ -2329,13 +6032,118 @@
       "relationType": "COREQUISITE"
     },
     {
+      "sourceCourseCode": "1020141",
+      "targetCourseCode": "1023110",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020232",
+      "targetCourseCode": "1022823",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020232",
+      "targetCourseCode": "1024240",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020252",
+      "targetCourseCode": "1020992",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020252",
+      "targetCourseCode": "1021813",
+      "relationType": "COREQUISITE"
+    },
+    {
       "sourceCourseCode": "1020252",
       "targetCourseCode": "1022853",
       "relationType": "COREQUISITE"
     },
     {
       "sourceCourseCode": "1020252",
+      "targetCourseCode": "1023110",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020252",
       "targetCourseCode": "1023900",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020292",
+      "targetCourseCode": "1022833",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020292",
+      "targetCourseCode": "1022880",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020292",
+      "targetCourseCode": "1023090",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020292",
+      "targetCourseCode": "1023420",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020292",
+      "targetCourseCode": "1023430",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020292",
+      "targetCourseCode": "1023440",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020292",
+      "targetCourseCode": "1023460",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020313",
+      "targetCourseCode": "1020113",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020313",
+      "targetCourseCode": "1022573",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020313",
+      "targetCourseCode": "1022833",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020313",
+      "targetCourseCode": "1022840",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020313",
+      "targetCourseCode": "1022843",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020313",
+      "targetCourseCode": "1022883",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020313",
+      "targetCourseCode": "1023090",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020313",
+      "targetCourseCode": "1023100",
       "relationType": "COREQUISITE"
     },
     {
@@ -2345,12 +6153,52 @@
     },
     {
       "sourceCourseCode": "1020313",
+      "targetCourseCode": "1023300",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020313",
       "targetCourseCode": "1023870",
       "relationType": "COREQUISITE"
     },
     {
       "sourceCourseCode": "1020353",
+      "targetCourseCode": "1021443",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020353",
+      "targetCourseCode": "1023110",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020353",
+      "targetCourseCode": "1023230",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020353",
       "targetCourseCode": "1023830",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020413",
+      "targetCourseCode": "1021783",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020413",
+      "targetCourseCode": "1023150",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020413",
+      "targetCourseCode": "1023510",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020413",
+      "targetCourseCode": "1023780",
       "relationType": "COREQUISITE"
     },
     {
@@ -2361,6 +6209,11 @@
     {
       "sourceCourseCode": "1020503",
       "targetCourseCode": "1022763",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020503",
+      "targetCourseCode": "1023410",
       "relationType": "COREQUISITE"
     },
     {
@@ -2394,13 +6247,103 @@
       "relationType": "COREQUISITE"
     },
     {
+      "sourceCourseCode": "1020543",
+      "targetCourseCode": "1023450",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020543",
+      "targetCourseCode": "1023470",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1020593",
+      "targetCourseCode": "1022943",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021182",
+      "targetCourseCode": "1022923",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021182",
+      "targetCourseCode": "1024240",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021263",
+      "targetCourseCode": "1020042",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021263",
+      "targetCourseCode": "1020102",
+      "relationType": "COREQUISITE"
+    },
+    {
       "sourceCourseCode": "1021263",
       "targetCourseCode": "1022933",
       "relationType": "COREQUISITE"
     },
     {
+      "sourceCourseCode": "1021283",
+      "targetCourseCode": "1021453",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021293",
+      "targetCourseCode": "1021303",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021293",
+      "targetCourseCode": "1021353",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021313",
+      "targetCourseCode": "1021323",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021353",
+      "targetCourseCode": "1021293",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021353",
+      "targetCourseCode": "1021593",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021363",
+      "targetCourseCode": "1021403",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021383",
+      "targetCourseCode": "1021363",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021383",
+      "targetCourseCode": "1021393",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021383",
+      "targetCourseCode": "1021403",
+      "relationType": "COREQUISITE"
+    },
+    {
       "sourceCourseCode": "1021383",
       "targetCourseCode": "1022873",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021383",
+      "targetCourseCode": "1023090",
       "relationType": "COREQUISITE"
     },
     {
@@ -2414,6 +6357,76 @@
       "relationType": "COREQUISITE"
     },
     {
+      "sourceCourseCode": "1021493",
+      "targetCourseCode": "1022853",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021513",
+      "targetCourseCode": "1021503",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021553",
+      "targetCourseCode": "1021563",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021613",
+      "targetCourseCode": "1021623",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021613",
+      "targetCourseCode": "1021633",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021613",
+      "targetCourseCode": "1021653",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021613",
+      "targetCourseCode": "1021723",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021633",
+      "targetCourseCode": "1021643",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021793",
+      "targetCourseCode": "1021803",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021793",
+      "targetCourseCode": "1021883",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021893",
+      "targetCourseCode": "1023480",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021893",
+      "targetCourseCode": "1023490",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021893",
+      "targetCourseCode": "1023500",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1021893",
+      "targetCourseCode": "1023510",
+      "relationType": "COREQUISITE"
+    },
+    {
       "sourceCourseCode": "1021893",
       "targetCourseCode": "1023640",
       "relationType": "COREQUISITE"
@@ -2424,8 +6437,28 @@
       "relationType": "COREQUISITE"
     },
     {
+      "sourceCourseCode": "1021923",
+      "targetCourseCode": "1021933",
+      "relationType": "COREQUISITE"
+    },
+    {
       "sourceCourseCode": "1022013",
       "targetCourseCode": "1021853",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1022013",
+      "targetCourseCode": "1023560",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1022013",
+      "targetCourseCode": "1023580",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1022023",
+      "targetCourseCode": "1023560",
       "relationType": "COREQUISITE"
     },
     {
@@ -2434,8 +6467,108 @@
       "relationType": "COREQUISITE"
     },
     {
+      "sourceCourseCode": "1022033",
+      "targetCourseCode": "1022043",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1022103",
+      "targetCourseCode": "1020242",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1022113",
+      "targetCourseCode": "1022943",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1022523",
+      "targetCourseCode": "1022943",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1022713",
+      "targetCourseCode": "1022723",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1022713",
+      "targetCourseCode": "1022743",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1022783",
+      "targetCourseCode": "1022923",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1022783",
+      "targetCourseCode": "1023053",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1022803",
+      "targetCourseCode": "1022770",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1022803",
+      "targetCourseCode": "1022800",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1022803",
+      "targetCourseCode": "1022813",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1022830",
+      "targetCourseCode": "1022823",
+      "relationType": "COREQUISITE"
+    },
+    {
       "sourceCourseCode": "1022830",
       "targetCourseCode": "1023740",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1022950",
+      "targetCourseCode": "1022873",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1022950",
+      "targetCourseCode": "1022890",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023120",
+      "targetCourseCode": "1020533",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023120",
+      "targetCourseCode": "1023130",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023120",
+      "targetCourseCode": "1023150",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023120",
+      "targetCourseCode": "1023160",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023140",
+      "targetCourseCode": "1023150",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023140",
+      "targetCourseCode": "1023663",
       "relationType": "COREQUISITE"
     },
     {
@@ -2449,6 +6582,81 @@
       "relationType": "COREQUISITE"
     },
     {
+      "sourceCourseCode": "1023150",
+      "targetCourseCode": "1020503",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023150",
+      "targetCourseCode": "1020533",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023150",
+      "targetCourseCode": "1020673",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023150",
+      "targetCourseCode": "1021673",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023150",
+      "targetCourseCode": "1021783",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023150",
+      "targetCourseCode": "1021853",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023150",
+      "targetCourseCode": "1021863",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023150",
+      "targetCourseCode": "1021893",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023150",
+      "targetCourseCode": "1022703",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023150",
+      "targetCourseCode": "1023160",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023150",
+      "targetCourseCode": "1023170",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023150",
+      "targetCourseCode": "1023180",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023200",
+      "targetCourseCode": "1023320",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023240",
+      "targetCourseCode": "1022873",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023240",
+      "targetCourseCode": "1023310",
+      "relationType": "COREQUISITE"
+    },
+    {
       "sourceCourseCode": "1023260",
       "targetCourseCode": "1023840",
       "relationType": "COREQUISITE"
@@ -2459,13 +6667,33 @@
       "relationType": "COREQUISITE"
     },
     {
+      "sourceCourseCode": "1023280",
+      "targetCourseCode": "1021182",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023290",
+      "targetCourseCode": "1022823",
+      "relationType": "COREQUISITE"
+    },
+    {
       "sourceCourseCode": "1023570",
       "targetCourseCode": "1023820",
       "relationType": "COREQUISITE"
     },
     {
       "sourceCourseCode": "1023643",
+      "targetCourseCode": "1023663",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023643",
       "targetCourseCode": "1023860",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023653",
+      "targetCourseCode": "1023663",
       "relationType": "COREQUISITE"
     },
     {
@@ -2506,6 +6734,11 @@
     {
       "sourceCourseCode": "1023720",
       "targetCourseCode": "1023730",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "1023780",
+      "targetCourseCode": "1021803",
       "relationType": "COREQUISITE"
     },
     {
@@ -2575,11 +6808,6 @@
     },
     {
       "sourceCourseCode": "1023960",
-      "targetCourseCode": "1023990",
-      "relationType": "COREQUISITE"
-    },
-    {
-      "sourceCourseCode": "1023960",
       "targetCourseCode": "1024020",
       "relationType": "COREQUISITE"
     },
@@ -2589,8 +6817,43 @@
       "relationType": "COREQUISITE"
     },
     {
+      "sourceCourseCode": "1050931",
+      "targetCourseCode": "1050921",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "2090170",
+      "targetCourseCode": "2090101",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "3050011",
+      "targetCourseCode": "3050651",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "3050641",
+      "targetCourseCode": "3050670",
+      "relationType": "COREQUISITE"
+    },
+    {
       "sourceCourseCode": "3190041",
       "targetCourseCode": "1022553",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "3190131",
+      "targetCourseCode": "1020072",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "3190260",
+      "targetCourseCode": "1021182",
+      "relationType": "COREQUISITE"
+    },
+    {
+      "sourceCourseCode": "3190260",
+      "targetCourseCode": "1022803",
       "relationType": "COREQUISITE"
     },
     {

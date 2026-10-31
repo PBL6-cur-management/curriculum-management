@@ -53,7 +53,6 @@ export class GraduationInputReader {
       version.status === 'DRAFT' ||
       version.sourceRequestId !== null ||
       !version.versionNumber ||
-      !version.decisionNumber ||
       !version.publishedAt ||
       !version.effectiveSemester?.startDate ||
       version.effectiveSemester.startDate > semester.startDate ||

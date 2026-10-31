@@ -1,19 +1,26 @@
-import type { CourseType } from '../../../../src/generated/prisma/client.js';
+import {
+  OrgUnitType,
+  type CourseType,
+} from '../../../../src/generated/prisma/client.js';
 import { HOME_FACULTY_CODE } from '../../../../src/shared/org-units/home-faculty.js';
 import { fromIsoDay, toIsoDay } from '../../../../src/shared/time/today.js';
 import {
   cohortFromLegacyCode,
   courseTypeFor,
+  estimateSemesterStart,
   HOME_FACULTY_LEGACY_CODE,
-  legacyDecimal,
+  LEGACY_OFFICE_GROUP,
   LEGACY_UNIT_CODE_PREFIX,
+  legacyDecimal,
+  ownerUnitLegacyCode,
   semesterFromLegacyCode,
-  UNASSIGNED_UNIT,
 } from '../legacy-mapping.js';
-import type { LegacyRow } from './legacy-tables.js';
+import type { MIRROR_TABLES, MirrorRow } from './mirror-tables.js';
+
 export interface DutUnit {
   unitCode: string;
   unitName: string;
+  unitType: OrgUnitType;
 }
 export interface DutCourse {
   courseCode: string;
@@ -28,6 +35,9 @@ export interface DutSemester {
   academicYear: string;
   termInYear: number;
   startDate: string;
+  // No official date in the school calendar: the date follows the convention in estimateSemesterStart.
+  startDateEstimated: boolean;
+  legacyCode: string;
 }
 export interface DutCohort {
   cohortCode: string;
@@ -39,17 +49,36 @@ export interface CatalogExtract {
   semesters: DutSemester[];
   cohorts: DutCohort[];
   missingCourseCodes: string[];
-  snapshotConflicts: Record<
-    'TenHP' | 'TenHP1' | 'SoTC' | 'KhoaPC' | 'LoaiHP',
-    number
-  >;
+  ownersInferredFromCode: number;
+  estimatedSemesters: string[];
 }
+
+type CourseRow = MirrorRow<typeof MIRROR_TABLES.COURSES>;
+type UnitRow = MirrorRow<typeof MIRROR_TABLES.UNITS>;
+type TermRow = MirrorRow<typeof MIRROR_TABLES.TERMS>;
+
+// tmKehoach.NgayDau is a calendar day ("2026-08-10", or an ISO timestamp at midnight).
+export function officialStartDates(
+  terms: readonly TermRow[],
+): Map<string, string> {
+  const dates = new Map<string, string>();
+  for (const row of terms) {
+    if (!row.NgayDau) continue;
+    const day = row.NgayDau.slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || toIsoDay(fromIsoDay(day)) !== day)
+      throw new Error(`Invalid start date for term code: ${row.IDCode}`);
+    dates.set(row.IDCode, day);
+  }
+  return dates;
+}
+
 export function extractCatalog(input: {
-  courses: Map<string, LegacyRow>;
-  units: Map<string, LegacyRow>;
-  terms: Map<string, LegacyRow>;
+  courses: readonly CourseRow[];
+  units: readonly UnitRow[];
+  terms: readonly TermRow[];
   usedCourseCodes: ReadonlySet<string>;
-  startTermCodes: ReadonlySet<string>;
+  termCodes: ReadonlySet<string>;
+  cohortTermCodes: ReadonlySet<string>;
 }): CatalogExtract {
   const result: CatalogExtract = {
     units: [],
@@ -57,28 +86,33 @@ export function extractCatalog(input: {
     semesters: [],
     cohorts: [],
     missingCourseCodes: [],
-    snapshotConflicts: { TenHP: 0, TenHP1: 0, SoTC: 0, KhoaPC: 0, LoaiHP: 0 },
+    ownersInferredFromCode: 0,
+    estimatedSemesters: [],
   };
+  const courses = new Map(input.courses.map((row) => [row.MaHP, row]));
+  const unitRows = new Map(input.units.map((row) => [row.MaDV, row]));
   const units = new Map<string, DutUnit>();
   for (const code of [...input.usedCourseCodes].sort()) {
-    const row = input.courses.get(code);
+    const row = courses.get(code);
     if (!row) {
       result.missingCourseCodes.push(code);
       continue;
     }
-    const owner = row.KhoaPC;
-    let ownerUnitCode: string;
-    if (owner === HOME_FACULTY_LEGACY_CODE) ownerUnitCode = HOME_FACULTY_CODE;
-    else if (!owner) {
-      ownerUnitCode = UNASSIGNED_UNIT.unitCode;
-      units.set(ownerUnitCode, { ...UNASSIGNED_UNIT });
-    } else {
-      const unit = input.units.get(owner);
-      if (!unit) throw new Error(`Unknown KhoaPC code: ${owner}`);
-      ownerUnitCode = `${LEGACY_UNIT_CODE_PREFIX}${owner}`;
+    const owner = ownerUnitLegacyCode(row);
+    if (owner.inferred) result.ownersInferredFromCode++;
+    let ownerUnitCode: string = HOME_FACULTY_CODE;
+    if (owner.code !== HOME_FACULTY_LEGACY_CODE) {
+      const unit = unitRows.get(owner.code);
+      if (!unit)
+        throw new Error(`Unknown owning unit ${owner.code} for course ${code}`);
+      ownerUnitCode = `${LEGACY_UNIT_CODE_PREFIX}${owner.code}`;
       units.set(ownerUnitCode, {
         unitCode: ownerUnitCode,
         unitName: unit.TenDV,
+        unitType:
+          unit.MaBP === LEGACY_OFFICE_GROUP
+            ? OrgUnitType.OFFICE
+            : OrgUnitType.FACULTY,
       });
     }
     result.courses.push({
@@ -99,25 +133,26 @@ export function extractCatalog(input: {
   result.units = [...units.values()].sort((left, right) =>
     left.unitCode.localeCompare(right.unitCode),
   );
-  const cohorts = new Map<string, DutCohort>();
-  for (const code of [...input.startTermCodes].sort()) {
-    const row = input.terms.get(code);
-    if (!row?.NgayDau)
-      throw new Error(`Missing start date for term code: ${code}`);
-    const day = row.NgayDau.slice(0, 10);
-    if (
-      !/^\d{4}-\d{2}-\d{2}$/.test(day) ||
-      !Number.isFinite(fromIsoDay(day).getTime()) ||
-      toIsoDay(fromIsoDay(day)) !== day
-    )
-      throw new Error(`Invalid start date for term code: ${code}`);
-    result.semesters.push({ ...semesterFromLegacyCode(code), startDate: day });
-    const cohort = cohortFromLegacyCode(code);
-    cohorts.set(cohort.cohortCode, cohort);
+
+  const official = officialStartDates(input.terms);
+  for (const code of [...input.termCodes].sort()) {
+    const day = official.get(code);
+    result.semesters.push({
+      ...semesterFromLegacyCode(code),
+      startDate: day ?? estimateSemesterStart(code),
+      startDateEstimated: !day,
+      legacyCode: code,
+    });
+    if (!day) result.estimatedSemesters.push(code);
   }
   result.semesters.sort((left, right) =>
     left.semesterCode.localeCompare(right.semesterCode),
   );
+  const cohorts = new Map<string, DutCohort>();
+  for (const code of input.cohortTermCodes) {
+    const cohort = cohortFromLegacyCode(code);
+    cohorts.set(cohort.cohortCode, cohort);
+  }
   result.cohorts = [...cohorts.values()].sort((left, right) =>
     left.cohortCode.localeCompare(right.cohortCode),
   );

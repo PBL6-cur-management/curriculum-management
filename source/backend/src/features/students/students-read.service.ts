@@ -250,7 +250,6 @@ export class StudentsReadService {
           status: { not: ProgramVersionStatus.DRAFT },
           sourceRequestId: null,
           versionNumber: { not: null },
-          decisionNumber: { not: null },
           publishedAt: { not: null },
           effectiveSemester: { startDate: { lte: semester.startDate } },
         },
