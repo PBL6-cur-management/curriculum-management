@@ -1454,4 +1454,25 @@ export const PERMISSION_TABLE: PermissionCase[] = [
     allowedRole: 'R1',
     deniedRole: 'R3',
   },
+  {
+    permission: PERMISSIONS.BACKUP_VIEW,
+    method: 'get',
+    path: '/api/operations/backups/status',
+    allowedRole: 'R1',
+    deniedRole: 'R2',
+  },
+  {
+    permission: PERMISSIONS.BACKUP_VIEW,
+    method: 'get',
+    path: '/api/operations/backups',
+    allowedRole: 'R1',
+    deniedRole: 'R2',
+  },
+  {
+    permission: PERMISSIONS.BACKUP_VIEW,
+    method: 'get',
+    path: '/api/operations/restore-drills',
+    allowedRole: 'R1',
+    deniedRole: 'R2',
+  },
 ];
