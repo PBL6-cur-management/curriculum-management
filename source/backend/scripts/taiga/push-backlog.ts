@@ -1,5 +1,5 @@
-import { existsSync, readFileSync } from 'node:fs';
-import { setTimeout as delay } from 'node:timers/promises';
+import { readFileSync } from 'node:fs';
+import { createClient, type Named, REPO, refOf } from './taiga-client.js';
 
 // Pushes the planning backlog (docs/planning) to the team's Taiga project.
 //   pnpm exec tsx scripts/taiga/push-backlog.ts --dry-run   counts and the assignee table, writes nothing
@@ -10,7 +10,6 @@ import { setTimeout as delay } from 'node:timers/promises';
 // Credentials come from TAIGA_USERNAME / TAIGA_PASSWORD (env), falling back to the gitignored
 // .mcp.json at the repo root. Nothing secret is printed.
 
-const REPO = new URL('../../../../', import.meta.url);
 const PLANNING = new URL('docs/planning/', REPO);
 const APPLY = process.argv.includes('--apply');
 if (!APPLY && !process.argv.includes('--dry-run'))
@@ -23,8 +22,6 @@ const SPRINT_DAYS = 14;
 const SIZE_POINTS = { S: 1, M: 2, L: 4 } as const; // task-breakdown.md K-3
 const TAIGA_POINT_STEPS = [1, 2, 3, 5, 8, 10, 13, 20, 40];
 const POINTS_ROLE = 'Back'; // the role whose estimate Taiga sums
-const REQUEST_GAP_MS = 400;
-const THROTTLE_RETRIES = 20;
 
 // Features with code merged on main. Each still has manual test cases outstanding, so its stories are
 // "Ready for test" and all their tasks are closed.
@@ -247,70 +244,8 @@ function parseSprints(): Sprint[] {
 
 // ---------- Taiga client ----------
 
-function credentials() {
-  let env: Record<string, string> = {};
-  const file = new URL('.mcp.json', REPO);
-  if (existsSync(file))
-    env =
-      (
-        JSON.parse(readFileSync(file, 'utf8')) as {
-          mcpServers: { taiga?: { env?: Record<string, string> } };
-        }
-      ).mcpServers.taiga?.env ?? {};
-  const pick = (key: string) => process.env[key] || env[key] || '';
-  const value = {
-    api:
-      pick('TAIGA_API_URL').replace(/\/$/, '') || 'https://api.taiga.io/api/v1',
-    username: pick('TAIGA_USERNAME'),
-    password: pick('TAIGA_PASSWORD'),
-    slug: pick('TAIGA_PROJECT_SLUG'),
-  };
-  for (const [key, v] of Object.entries(value))
-    if (!v || v.startsWith('ĐIỀN'))
-      throw new Error(`Taiga ${key} is not set (env or .mcp.json)`);
-  return value;
-}
+const { taiga, login, config } = createClient();
 
-const config = credentials();
-let token = '';
-
-async function taiga<T>(
-  method: string,
-  path: string,
-  body?: unknown,
-): Promise<T> {
-  for (let attempt = 0; ; attempt++) {
-    await delay(REQUEST_GAP_MS);
-    const response = await fetch(`${config.api}${path}`, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        'x-disable-pagination': 'True',
-      },
-      body: body === undefined ? undefined : JSON.stringify(body),
-    });
-    // Taiga throttles bursts and says how long to wait ("Expected available in N seconds").
-    if (response.status === 429 && attempt < THROTTLE_RETRIES) {
-      const seconds = Number(
-        /available in (\d+) second/.exec(await response.text())?.[1] ?? 30,
-      );
-      console.log(`Throttled by Taiga; waiting ${seconds}s`);
-      await delay((seconds + 5) * 1000);
-      continue;
-    }
-    if (!response.ok)
-      throw new Error(
-        `Taiga ${method} ${path}: HTTP ${response.status} ${(await response.text()).slice(0, 300)}`,
-      );
-    return (response.status === 204 ? undefined : await response.json()) as T;
-  }
-}
-
-interface Named {
-  id: number;
-  name: string;
-}
 interface Member {
   user: number;
   full_name_display: string;
@@ -332,13 +267,6 @@ interface Item {
   ref: number;
   version: number;
 }
-
-const refOf = (item: Item) =>
-  (item.tags as (string | [string, unknown])[])
-    .map((tag) => (Array.isArray(tag) ? tag[0] : tag))
-    .find((tag) => tag.startsWith('ref:'))
-    ?.slice(4)
-    .toUpperCase();
 
 // ---------- planning the push ----------
 
@@ -461,13 +389,7 @@ for (const task of DEV_TASKS)
     tags: ['Dev'],
   });
 
-token = (
-  await taiga<{ auth_token: string }>('POST', '/auth', {
-    type: 'normal',
-    username: config.username,
-    password: config.password,
-  })
-).auth_token;
+await login();
 const project = await taiga<Project>(
   'GET',
   `/projects/by_slug?slug=${encodeURIComponent(config.slug)}`,
