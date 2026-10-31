@@ -84,6 +84,7 @@ export function syntheticMe(
       derived: false,
     })),
     permissions,
+    canApprove: false,
   } satisfies components['schemas']['MeDto'];
 }
 export const json = (body: unknown, status = 200) =>

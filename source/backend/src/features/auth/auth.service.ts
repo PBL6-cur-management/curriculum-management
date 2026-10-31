@@ -9,6 +9,8 @@ import { PasswordService } from '../../shared/password/password.service.js';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
 import type { AccessContext } from '../../shared/authz/access-context.js';
 import { toMeDto, type MeDto } from './me.dto.js';
+import { usableGrants } from '../../shared/change-requests/delegation-authority.js';
+import { todayDate } from '../../shared/time/today.js';
 import { AUTH_ERRORS } from './auth.errors.js';
 import type { ChangePasswordDto } from './change-password.dto.js';
 import type { LoginDto } from './login.dto.js';
@@ -68,7 +70,8 @@ export class AuthService {
           select: { id: true, unitCode: true, unitName: true },
         })
       : null;
-    return toMeDto(user, orgUnit, access);
+    const grants = await usableGrants(this.prisma, user.id, todayDate());
+    return toMeDto(user, orgUnit, access, grants.length > 0);
   }
 
   async changePassword(userId: string, dto: ChangePasswordDto): Promise<void> {

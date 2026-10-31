@@ -129,6 +129,7 @@ export function AppLayout() {
               APP_MENU,
               me?.permissions ?? [],
               me?.roles.map((role) => role.roleCode) ?? [],
+              me?.canApprove ?? false,
             )}
           />
         </Layout.Sider>
