@@ -9,6 +9,7 @@ import {
 import dayjs from 'dayjs';
 import { generatePath, Link, useSearchParams } from 'react-router';
 import { ROUTES } from '../../../routes';
+import { SectionNav } from '../../../shared/layout/SectionNav';
 import {
   DEFAULT_PAGE_SIZE,
   PAGE_SIZE_OPTIONS,
@@ -100,10 +101,10 @@ export function ImportHistoryPage() {
   return (
     <ListPageLayout
       header={
-        <PageHeader
-          title="Lịch sử nhập liệu"
-          actions={<Link to={ROUTES.imports}>Nhập liệu mới</Link>}
-        />
+        <>
+          <PageHeader title="Lịch sử nhập liệu" />
+          <SectionNav section="imports" />
+        </>
       }
       filters={
         <>

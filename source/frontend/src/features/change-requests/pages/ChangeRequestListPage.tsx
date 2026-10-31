@@ -25,6 +25,7 @@ import {
   formatEmpty,
   PageHeader,
 } from '../../../shared/design-system';
+import { SectionNav } from '../../../shared/layout/SectionNav';
 
 const INITIAL_QUERY: ChangeRequestQuery = {
   page: 1,
@@ -121,6 +122,7 @@ export function ChangeRequestListPage() {
           </>
         }
       />
+      <SectionNav section="approvals" />
       <ChangeRequestFilters value={query} onChange={applyFilters} />
       <DataTable<ChangeRequestSummary>
         rowKey="id"

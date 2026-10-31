@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Alert, App, Button, Card, Flex } from 'antd';
 import { generatePath, Link, useNavigate } from 'react-router';
 import { ROUTES } from '../../../routes';
+import { SectionNav } from '../../../shared/layout/SectionNav';
 import { ApiError } from '../../../shared/api/client';
 import { useMe } from '../../../shared/auth/useMe';
 import { DEFAULT_PAGE_SIZE } from '../../../shared/api/pagination';
@@ -104,10 +105,10 @@ export function GraduationBatchesPage() {
   return (
     <ListPageLayout
       header={
-        <PageHeader
-          title="Xét tốt nghiệp hàng loạt"
-          actions={<Link to={ROUTES.graduation}>Xét từng sinh viên</Link>}
-        />
+        <>
+          <PageHeader title="Xét tốt nghiệp hàng loạt" />
+          <SectionNav section="graduation" />
+        </>
       }
       filters={
         <Card title="Phạm vi đợt xét">

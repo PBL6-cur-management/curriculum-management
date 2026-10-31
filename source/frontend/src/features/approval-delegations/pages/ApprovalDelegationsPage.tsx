@@ -10,6 +10,7 @@ import {
   PageSkeleton,
   StatusTag,
 } from '../../../shared/design-system';
+import { SectionNav } from '../../../shared/layout/SectionNav';
 import { errorMessage } from '../../../shared/forms/applyFieldErrors';
 import type {
   Delegation,
@@ -131,6 +132,7 @@ export function ApprovalDelegationsPage() {
           )
         }
       />
+      <SectionNav section="approvals" />
       <FilterBar>
         <Segmented
           options={[

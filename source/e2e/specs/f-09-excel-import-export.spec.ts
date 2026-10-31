@@ -94,7 +94,7 @@ test.describe("F-09 Nhập, xuất Excel", () => {
     ).toEqual(original.items.map((item: { id: string }) => item.id));
     await page
       .getByRole("main")
-      .getByRole("link", { name: "Lịch sử nhập liệu", exact: true })
+      .getByRole("tab", { name: "Lịch sử nhập liệu", exact: true })
       .click();
     await page.getByRole("link", { name: data.file.name, exact: true }).click();
     await expect(

@@ -1,9 +1,9 @@
 import { useRef, useState } from 'react';
 import { Alert, Button, Card, Skeleton } from 'antd';
-import { Link, useSearchParams } from 'react-router';
-import { ROUTES } from '../../../routes';
+import { useSearchParams } from 'react-router';
 import { useMe } from '../../../shared/auth/useMe';
 import { DetailPageLayout, PageHeader } from '../../../shared/design-system';
+import { SectionNav } from '../../../shared/layout/SectionNav';
 import type { GraduationLookup } from '../schema/graduation';
 import {
   graduationPollingBlocked,
@@ -77,12 +77,8 @@ export function GraduationReviewPage() {
   }
   return (
     <DetailPageLayout>
-      <PageHeader
-        title="Xét tốt nghiệp"
-        actions={
-          canSave && <Link to={ROUTES.graduationBatches}>Xét hàng loạt</Link>
-        }
-      />
+      <PageHeader title="Xét tốt nghiệp" />
+      <SectionNav section="graduation" />
       <Card title="Ngữ cảnh xét">
         <GraduationContextForm
           key={search.toString()}
