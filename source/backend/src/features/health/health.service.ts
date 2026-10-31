@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Redis } from 'ioredis';
 import type { Env } from '../../shared/config/env.validation.js';
+import { safeError } from '../../shared/logging/app-logger.js';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
 import { DependencyStatus, HealthDto, HealthStatus } from './health.dto.js';
 
@@ -23,7 +24,10 @@ export class HealthService implements OnModuleDestroy {
       commandTimeout: REDIS_PROBE_TIMEOUT_MS,
     });
     this.redis.on('error', (error: Error) =>
-      this.logger.warn(`Redis: ${error.message}`),
+      // The raw message can name the host; the code (ECONNREFUSED, ...) is enough to act on.
+      this.logger.warn(
+        `health.redis_error errorType=${safeError(error).errorType} errorCode=${safeError(error).errorCode ?? 'none'}`,
+      ),
     );
   }
 

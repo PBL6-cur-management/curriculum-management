@@ -1,4 +1,5 @@
 import { plainToInstance } from 'class-transformer';
+import { LOG_LEVELS } from '../logging/log-levels.js';
 import {
   ELIGIBILITY_DEFAULTS,
   ELIGIBILITY_LIMITS,
@@ -29,15 +30,7 @@ const CREDENTIAL_KEY_PATTERN = /^[A-Za-z0-9+/]{43}=$/;
 
 // Keep the explicit types: implicit conversion reads design:type, which is Object for an unannotated property,
 // so a numeric variable would stay a string and fail @IsInt.
-export const LOG_LEVELS = [
-  'fatal',
-  'error',
-  'warn',
-  'info',
-  'debug',
-  'trace',
-  'silent',
-] as const;
+export { LOG_LEVELS };
 
 export class Env {
   @IsIn(NODE_ENVS)
@@ -190,6 +183,18 @@ export class Env {
   LOG_LEVEL: (typeof LOG_LEVELS)[number] = 'info';
 }
 
+// Names the offending variables and rules, never their values: the bootstrap log prints only the names.
+export class EnvValidationError extends Error {
+  readonly code = 'INVALID_ENVIRONMENT';
+  constructor(
+    readonly properties: string[],
+    details: string[],
+  ) {
+    super(`Invalid environment: ${details.join('; ')}`);
+    this.name = 'EnvValidationError';
+  }
+}
+
 export function validateEnv(raw: Record<string, unknown>): Env {
   const env = plainToInstance(Env, raw, { enableImplicitConversion: true });
   const errors = validateSync(env);
@@ -197,7 +202,10 @@ export function validateEnv(raw: Record<string, unknown>): Env {
     const details = errors.flatMap((error) =>
       Object.values(error.constraints ?? {}),
     );
-    throw new Error(`Invalid environment: ${details.join('; ')}`);
+    throw new EnvValidationError(
+      errors.map((error) => error.property),
+      details,
+    );
   }
   return env;
 }

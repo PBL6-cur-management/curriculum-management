@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import type { Queue } from 'bullmq';
 import { APP_TIME_ZONE } from '../../shared/time/today.js';
+import { safeError } from '../../shared/logging/app-logger.js';
 
 export const RELEASE_ACTIVATION_QUEUE = 'release-activation';
 export const RELEASE_ACTIVATION_JOB = 'reconcile-due-versions';
@@ -62,7 +63,7 @@ export class ReleaseActivationScheduler
     } catch (error) {
       // Redis down at start-up must not stop the API: the daily schedule or the next start-up reconciles.
       this.logger.error(
-        `Could not schedule the activation job: ${String(error)}`,
+        `release.schedule_failed errorType=${safeError(error).errorType}`,
       );
     }
   }

@@ -33,9 +33,8 @@ export class AuthService {
       ? await this.passwords.verify(user.passwordHash, dto.password)
       : await this.passwords.verifyAgainstDummy(dto.password);
     if (!user || !valid) {
-      this.logger.warn(
-        `Failed login for "${dto.username}" from ${ip ?? 'unknown'}`,
-      );
+      // No supplied username or password in the log: a mistyped password often lands in the username field.
+      this.logger.warn(`auth.login_failed from ${ip ?? 'unknown'}`);
       throw new AppException(AUTH_ERRORS.INVALID_CREDENTIALS);
     }
     if (user.status !== UserStatus.ACTIVE)
