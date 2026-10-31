@@ -114,7 +114,11 @@ export function SemesterForm({ semester, onClose }: SemesterFormProps) {
         <Form.Item
           name="startDate"
           label="Ngày bắt đầu"
-          extra="Có thể để trống; chưa có ngày thì chưa chọn được để ban hành."
+          extra={
+            semester?.startDateEstimated
+              ? 'Ngày hiện tại là ngày ước lượng vì lịch của Trường không có ngày cho học kỳ này. Lưu sẽ ghi nhận ngày trong ô là ngày chính thức.'
+              : 'Có thể để trống; chưa có ngày thì chưa chọn được để ban hành.'
+          }
         >
           <DatePicker format="DD/MM/YYYY" />
         </Form.Item>

@@ -491,3 +491,15 @@ Format:
 - Bản sao cục bộ ngoài repo `D:\dut-mirror`: 98 bảng / 2.049.332 dòng, đã sao vào container Docker `dut-mirror` (SQL Server 2022) và xuất CSV, số dòng khớp; chỉ `tmDiemkyhoc` lọc theo sinh viên Khoa CNTT.
 - Kiểm chứng: backend tsc 0 lỗi, oxlint 0 cảnh báo, prettier sạch trên các script mới.
 - Việc kế: viết kế hoạch triển khai thiết kế lại schema từ báo cáo; trả lời câu hỏi mở §10.
+
+## 2026-10-31 — seed lại dữ liệu thật DUT từ bản sao CSDL Trường
+
+- Nhánh `feat/dut-real-reseed`. Kế hoạch: [dut-real-reseed-implementation-plan](../implementation/dut-real-reseed-implementation-plan.md) (lệch ở §9). Báo cáo: [dut-real-reseed-implement-report](../implement-report/dut-real-reseed-implement-report.md).
+- Migration `20261031124933_semester_start_date_estimated`: thêm `Semester.startDateEstimated` (mặc định `false`) và CHECK `Semester_estimated_needs_date`.
+- Seed đọc CSV từ `D:\dut-mirror` qua allow-list (`extract/mirror-tables.ts`); `pnpm dut:extract [gốc]` chạy một lệnh. Nhóm tự chọn dựng theo quy tắc SRS (`elective-groups.ts`), CTĐT gom khung theo `program-map.ts`.
+- Bỏ giá trị giữ chỗ: seed nền không còn tạo học kỳ/khóa giữ chỗ (4 học kỳ/4 khóa); bỏ số quyết định `DUT-<programCode>-<version>` (nay NULL, chờ số thật của Khoa) và đơn vị `DUT-UNASSIGNED`.
+- Phiên bản đã ban hành không còn bắt buộc số quyết định: sửa 4 bộ đọc (`issuedVersionFact`, `readReleasedVersionSnapshot`, `GraduationInputReader`) cùng bộ lọc phiên bản của `students-read.service`; đính chính sao nguyên `decisionNumber`/`signedDate` kể cả NULL; luồng ban hành F-15 vẫn bắt buộc nhập. FE: `SemesterStartDate` (Tag "Ngày ước lượng"), `formatDecisionNumber` ("Chưa có số quyết định").
+- Lệnh dựng lại: `pnpm db:rebuild:real --yes` (`pg_dump`, reset, seed nền, extract, seed DUT). Agent cần đồng ý của người dùng cho Prisma reset.
+- Số liệu `ctdt_real`: 42 CTĐT / 89 phiên bản, 449 học phần, 40 học kỳ (ngày thật từ `DHBK_CDS.tmKehoach`, 5 kỳ hè ước lượng), 14 khóa, 6 956 dòng khung / 329 nhóm tự chọn (0 dòng không nhóm), 554 quan hệ học phần, 332 giảng viên, 1 923 sinh viên, 75 180 kết quả. Chi tiết trong báo cáo.
+- Kiểm chứng: BE unit 1856/1856, FE 697/697. BE e2e: 131/131 trên 13 file (semesters, releases, cohort-versions, corrections, version-comparison, publication, ddut-api, students, student-version-resolution, student-portal, graduation, graduation-batches, graduation-corrections, reports).
+- Chưa làm: Playwright và smoke (thiếu `source/e2e/.env`); chưa đi tay UI với dữ liệu mới. Đóng DEBT-04 và DEBT-05; câu hỏi mở cho Khoa ghi ở báo cáo.

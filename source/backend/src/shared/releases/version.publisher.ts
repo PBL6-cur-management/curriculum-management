@@ -18,8 +18,9 @@ export interface PromoteVersionInput {
   versionId: string;
   programId: string;
   versionNumber: string;
-  decisionNumber: string;
-  signedDate: Date;
+  // Null only when a correction copies a seeded legacy version, which never had a decision.
+  decisionNumber: string | null;
+  signedDate: Date | null;
   effectiveSemesterId: string;
   effectiveStart: Date;
   publisherId: string;

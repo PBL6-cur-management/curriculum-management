@@ -1,7 +1,4 @@
-import {
-  OrgUnitType,
-  type PrismaClient,
-} from '../../../../src/generated/prisma/client.js';
+import type { PrismaClient } from '../../../../src/generated/prisma/client.js';
 import {
   CYCLE_CHECKED_TYPES,
   findRequisiteCycle,
@@ -18,7 +15,11 @@ export interface SeedCounts {
 }
 export interface CatalogSeedResult {
   courseIds: Map<string, string>;
+  // Course code → name and credits, frozen onto released curriculum rows.
+  courses: Map<string, { courseName: string; credits: string }>;
   semesterIds: Map<string, { id: string; startDate: Date | null }>;
+  // Legacy term code (2610) → semester id, for students and results.
+  semesterIdsByLegacyCode: Map<string, string>;
   cohortIds: Map<string, string>;
   semesterDateDifferences: {
     semesterCode: string;
@@ -40,7 +41,9 @@ export async function seedDutCatalog(
 ): Promise<CatalogSeedResult> {
   const result: CatalogSeedResult = {
     courseIds: new Map(),
+    courses: new Map(),
     semesterIds: new Map(),
+    semesterIdsByLegacyCode: new Map(),
     cohortIds: new Map(),
     semesterDateDifferences: [],
     relationsCreated: 0,
@@ -61,11 +64,7 @@ export async function seedDutCatalog(
     });
     const row = await prisma.orgUnit.upsert({
       where: { unitCode: unit.unitCode },
-      create: {
-        ...unit,
-        unitType: OrgUnitType.FACULTY,
-        parentUnitId: ids.universityId,
-      },
+      create: { ...unit, parentUnitId: ids.universityId },
       update: {},
     });
     unitIds.set(unit.unitCode, row.id);
@@ -83,15 +82,21 @@ export async function seedDutCatalog(
       where: { courseCode: course.courseCode },
       create: { ...course, ownerFacultyId },
       update: {},
+      select: { id: true, courseName: true, credits: true },
     });
     result.courseIds.set(course.courseCode, row.id);
+    result.courses.set(course.courseCode, {
+      courseName: row.courseName,
+      credits: row.credits.toString(),
+    });
     result.counts.courses[existing ? 'skipped' : 'created']++;
   }
-  for (const semester of catalog.semesters) {
+  for (const { legacyCode, ...semester } of catalog.semesters) {
     let row = await prisma.semester.findUnique({
       where: { semesterCode: semester.semesterCode },
     });
     if (row) {
+      // A semester already in the database keeps its date: the Phòng Đào tạo may have corrected it on MH-10.
       result.counts.semesters.skipped++;
       const existing = row.startDate ? toIsoDay(row.startDate) : null;
       if (existing !== semester.startDate)
@@ -123,6 +128,7 @@ export async function seedDutCatalog(
       id: row.id,
       startDate: row.startDate,
     });
+    result.semesterIdsByLegacyCode.set(legacyCode, row.id);
   }
   for (const cohort of catalog.cohorts) {
     const existing = await prisma.cohort.findUnique({

@@ -20,6 +20,7 @@ function snapshot(
         academicYear: 'Y',
         termInYear: 1,
         startDate: '2026-01-01',
+        startDateEstimated: false,
       },
     },
     entries,

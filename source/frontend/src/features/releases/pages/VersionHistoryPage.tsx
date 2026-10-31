@@ -21,6 +21,7 @@ import {
   PageHeader,
   PageSkeleton,
 } from '../../../shared/design-system';
+import { formatDecisionNumber } from '../../../shared/releases/decisionNumber';
 
 // MH-46: every version of a program, newest first, scoped like the program itself.
 export function VersionHistoryPage() {
@@ -110,7 +111,7 @@ export function VersionHistoryPage() {
           {
             title: 'Số quyết định',
             dataIndex: 'decisionNumber',
-            render: (value: string | null) => formatEmpty(value),
+            render: (value: string | null) => formatDecisionNumber(value),
           },
           {
             title: 'Ngày ký',

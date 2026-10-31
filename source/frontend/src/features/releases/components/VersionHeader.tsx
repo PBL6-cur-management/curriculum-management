@@ -2,8 +2,10 @@ import { Card, Descriptions, Space } from 'antd';
 import { generatePath, Link } from 'react-router';
 import { ROUTES } from '../../../routes';
 import { versionLabel } from '../../../shared/constants/versionLabels';
+import { formatDecisionNumber } from '../../../shared/releases/decisionNumber';
 import type { VersionDetail } from '../api/releases';
 import { formatDay, formatTimestamp } from '../utils/format';
+import { SemesterStartDate } from './SemesterStartDate';
 import { VersionStatusTag } from './VersionStatusTag';
 
 interface VersionHeaderProps {
@@ -29,15 +31,24 @@ export function VersionHeader({ version }: VersionHeaderProps) {
           <VersionStatusTag status={version.status} />
         </Descriptions.Item>
         <Descriptions.Item label="Số quyết định">
-          {version.decisionNumber ?? '—'}
+          {formatDecisionNumber(version.decisionNumber)}
         </Descriptions.Item>
         <Descriptions.Item label="Ngày ký">
           {formatDay(version.signedDate)}
         </Descriptions.Item>
         <Descriptions.Item label="Học kỳ hiệu lực">
-          {version.effectiveSemester
-            ? `${version.effectiveSemester.semesterCode} (từ ${formatDay(version.effectiveSemester.startDate)})`
-            : '—'}
+          {version.effectiveSemester ? (
+            <Space size={4} wrap>
+              <span>{version.effectiveSemester.semesterCode} · từ</span>
+              <SemesterStartDate
+                startDate={version.effectiveSemester.startDate}
+                estimated={version.effectiveSemester.startDateEstimated}
+                emptyLabel="chưa có ngày bắt đầu"
+              />
+            </Space>
+          ) : (
+            '—'
+          )}
         </Descriptions.Item>
         <Descriptions.Item label="Khóa áp dụng">
           {version.cohorts.length > 0

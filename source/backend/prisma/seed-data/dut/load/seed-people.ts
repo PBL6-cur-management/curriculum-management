@@ -13,17 +13,16 @@ import { PasswordService } from '../../../../src/shared/password/password.servic
 import { generateTemporaryPassword } from '../../../../src/shared/password/temporary-password.js';
 import { todayDate } from '../../../../src/shared/time/today.js';
 import type { DutProgramsFile } from '../dut-data.js';
-import {
-  cohortFromLegacyCode,
-  semesterFromLegacyCode,
-} from '../legacy-mapping.js';
+import { cohortFromLegacyCode } from '../legacy-mapping.js';
 import {
   PEOPLE_DATA_FILES,
   privateDataUrl,
   readDutResults,
   type DutLecturer,
+  type DutResult,
   type DutStudent,
 } from '../people-data.js';
+import type { CatalogSeedResult } from './seed-catalog.js';
 
 // Interim subject groups until the Khoa sends its real ones: the faculty's own staff and everyone who
 // teaches here from elsewhere. Archived staff (990) get a disabled account and no group.
@@ -39,7 +38,8 @@ export const DUT_STAFF_GROUPS = {
 } as const;
 const FACULTY_UNIT = '102';
 const ARCHIVED_UNIT = '990';
-const STAFF_EMAIL_DOMAIN = 'dut.udn.vn';
+// The school's letter scale: D and above pass, F fails. Anything else (I = incomplete, X, blank) has no outcome yet.
+const PASSING_LETTERS = new Set(['A+', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D']);
 const FAILED_LETTER = 'F';
 const RESULT_BATCH = 1000;
 
@@ -48,47 +48,22 @@ export interface PeopleSeedResult {
   students: { created: number; skipped: number };
   results: {
     created: number;
-    skippedPastWithoutScore: number;
+    exempt: number;
+    skippedWithoutOutcome: number;
     skippedUnknownCourse: number;
   };
   credentialsFile: string | null;
 }
 
-async function ensureSemester(
-  prisma: PrismaClient,
-  termCode: string,
-  cache: Map<string, string>,
-) {
-  const cached = cache.get(termCode);
-  if (cached) return cached;
-  const semester = semesterFromLegacyCode(termCode);
-  const row = await prisma.semester.upsert({
-    where: { semesterCode: semester.semesterCode },
-    create: semester,
-    update: {},
-    select: { id: true },
-  });
-  cache.set(termCode, row.id);
-  return row.id;
-}
-
-async function ensureCohort(
-  prisma: PrismaClient,
-  termCode: string,
-  cache: Map<string, string>,
-) {
-  const cohort = cohortFromLegacyCode(termCode);
-  const cached = cache.get(cohort.cohortCode);
-  if (cached) return cached;
-  const row = await prisma.cohort.upsert({
-    where: { cohortCode: cohort.cohortCode },
-    create: cohort,
-    update: {},
-    select: { id: true },
-  });
-  cache.set(cohort.cohortCode, row.id);
-  return row.id;
-}
+const required = <Value>(
+  map: ReadonlyMap<string, Value>,
+  key: string,
+  kind: string,
+) => {
+  const value = map.get(key);
+  if (value === undefined) throw new Error(`Missing ${kind}: ${key}`);
+  return value;
+};
 
 async function seedLecturers(
   prisma: PrismaClient,
@@ -121,24 +96,22 @@ async function seedLecturers(
       result.lecturers.skipped++;
       continue;
     }
-    let username = lecturer.emailLocalPart ?? lecturer.staffCode;
-    if (
-      await prisma.user.findUnique({
-        where: { username },
-        select: { id: true },
-      })
-    )
-      username = lecturer.staffCode;
+    // The staff code is the username: the school's e-mail column is empty for almost everyone.
+    const username = lecturer.staffCode;
     const archived = lecturer.unitCode === ARCHIVED_UNIT;
     const temporaryPassword = generateTemporaryPassword();
+    const emailTaken =
+      lecturer.email !== null &&
+      (await prisma.user.findFirst({
+        where: { email: lecturer.email },
+        select: { id: true },
+      })) !== null;
     const user = await prisma.user.create({
       data: {
         username,
         userCode: lecturer.staffCode,
         fullName: lecturer.fullName,
-        email: lecturer.emailLocalPart
-          ? `${lecturer.emailLocalPart}@${STAFF_EMAIL_DOMAIN}`
-          : null,
+        email: emailTaken ? null : lecturer.email,
         passwordHash: await passwords.hash(temporaryPassword),
         mustChangePassword: true,
         status: archived ? UserStatus.DISABLED : UserStatus.ACTIVE,
@@ -147,37 +120,36 @@ async function seedLecturers(
       select: { id: true },
     });
     result.lecturers.created++;
-    if (!archived) {
-      credentials.push(
-        [
-          username,
-          lecturer.staffCode,
-          `"${lecturer.fullName}"`,
-          temporaryPassword,
-        ].join(','),
-      );
-      const group =
-        lecturer.unitCode === FACULTY_UNIT
-          ? DUT_STAFF_GROUPS.FACULTY
-          : DUT_STAFF_GROUPS.VISITING;
-      await prisma.subjectGroupMember.create({
-        data: {
-          subjectGroupId: groups.get(group.groupCode)!,
-          lecturerId: user.id,
-          memberRole: SubjectGroupMemberRole.MEMBER,
-          validFrom: today,
-        },
-      });
-    }
+    if (archived) continue;
+    credentials.push(
+      [
+        username,
+        lecturer.staffCode,
+        `"${lecturer.fullName}"`,
+        temporaryPassword,
+      ].join(','),
+    );
+    const group =
+      lecturer.unitCode === FACULTY_UNIT
+        ? DUT_STAFF_GROUPS.FACULTY
+        : DUT_STAFF_GROUPS.VISITING;
+    await prisma.subjectGroupMember.create({
+      data: {
+        subjectGroupId: groups.get(group.groupCode)!,
+        lecturerId: user.id,
+        memberRole: SubjectGroupMemberRole.MEMBER,
+        validFrom: today,
+      },
+    });
   }
   if (credentials.length > 1) {
     const file = privateDataUrl(PEOPLE_DATA_FILES.CREDENTIALS);
-    writeFileSync(file, `${credentials.join('\n')}\n`, { flag: 'a' });
+    writeFileSync(file, `${credentials.join('\n')}\n`);
     result.credentialsFile = file.pathname;
   }
 }
 
-// Frame code (MaNganh/MaKhung) → program version created by seed-programs, matched on program code and name.
+// Frame code (MaNganh/MaKhung) → the program version seed-programs created from it.
 async function versionsByFrame(
   prisma: PrismaClient,
   programs: DutProgramsFile,
@@ -211,19 +183,21 @@ async function seedStudents(
   students: DutStudent[],
   programs: DutProgramsFile,
   openTermCode: string,
-  caches: { semesters: Map<string, string>; cohorts: Map<string, string> },
+  catalog: Pick<CatalogSeedResult, 'semesterIdsByLegacyCode' | 'cohortIds'>,
   result: PeopleSeedResult,
 ) {
   const versions = await versionsByFrame(prisma, programs);
-  const statusSemesterId = await ensureSemester(
-    prisma,
+  const statusSemesterId = required(
+    catalog.semesterIdsByLegacyCode,
     openTermCode,
-    caches.semesters,
+    'semester for term',
   );
   for (const student of students) {
-    const version = versions.get(student.frameCode);
-    if (!version)
-      throw new Error(`No program version for frame ${student.frameCode}`);
+    const version = required(
+      versions,
+      student.frameCode,
+      'program version for frame',
+    );
     if (
       await prisma.student.findUnique({
         where: { studentCode: student.studentCode },
@@ -233,15 +207,15 @@ async function seedStudents(
       result.students.skipped++;
       continue;
     }
-    const admissionSemesterId = await ensureSemester(
-      prisma,
+    const admissionSemesterId = required(
+      catalog.semesterIdsByLegacyCode,
       student.admissionTermCode,
-      caches.semesters,
+      'semester for term',
     );
-    const cohortId = await ensureCohort(
-      prisma,
-      student.admissionTermCode,
-      caches.cohorts,
+    const cohortId = required(
+      catalog.cohortIds,
+      cohortFromLegacyCode(student.admissionTermCode).cohortCode,
+      'cohort',
     );
     await prisma.$transaction(async (tx) => {
       const row = await tx.student.create({
@@ -275,20 +249,23 @@ async function seedStudents(
   }
 }
 
-function resultStatus(
-  letterGrade: string | null,
-  hasScore: boolean,
+export function resultStatus(
+  result: Pick<DutResult, 'letterGrade' | 'termCode' | 'exempt'>,
+  openTermCode: string,
 ): AcademicResultStatus | null {
-  if (!hasScore) return null;
-  return letterGrade?.toUpperCase() === FAILED_LETTER
-    ? AcademicResultStatus.FAILED
-    : AcademicResultStatus.PASSED;
+  if (result.exempt) return AcademicResultStatus.EXEMPT;
+  const letter = result.letterGrade?.toUpperCase() ?? '';
+  if (PASSING_LETTERS.has(letter)) return AcademicResultStatus.PASSED;
+  if (letter === FAILED_LETTER) return AcademicResultStatus.FAILED;
+  return result.termCode === openTermCode
+    ? AcademicResultStatus.IN_PROGRESS
+    : null;
 }
 
 async function seedResults(
   prisma: PrismaClient,
   openTermCode: string,
-  semesters: Map<string, string>,
+  semesters: ReadonlyMap<string, string>,
   result: PeopleSeedResult,
 ) {
   const courses = new Map(
@@ -316,24 +293,23 @@ async function seedResults(
     batch = [];
   };
   for await (const row of readDutResults()) {
-    const hasScore = Boolean(row.score10 || row.score4 || row.letterGrade);
-    const status =
-      resultStatus(row.letterGrade, hasScore) ??
-      (row.termCode === openTermCode ? AcademicResultStatus.IN_PROGRESS : null);
+    const status = resultStatus(row, openTermCode);
     if (!status) {
-      result.results.skippedPastWithoutScore++;
+      result.results.skippedWithoutOutcome++;
       continue;
     }
     const courseId = courses.get(row.courseCode);
     const studentId = students.get(row.studentCode);
+    // Courses outside every seeded frame (other faculties' electives, physical education…) are not in the catalog.
     if (!courseId || !studentId) {
       result.results.skippedUnknownCourse++;
       continue;
     }
+    if (status === AcademicResultStatus.EXEMPT) result.results.exempt++;
     batch.push({
       studentId,
       courseId,
-      semesterId: await ensureSemester(prisma, row.termCode, semesters),
+      semesterId: required(semesters, row.termCode, 'semester for term'),
       score10: row.score10,
       score4: row.score4,
       letterGrade: row.letterGrade,
@@ -352,6 +328,7 @@ export async function seedDutPeople(
     programs: DutProgramsFile;
     openTermCode: string;
     facultyId: string;
+    catalog: Pick<CatalogSeedResult, 'semesterIdsByLegacyCode' | 'cohortIds'>;
   },
 ): Promise<PeopleSeedResult> {
   const result: PeopleSeedResult = {
@@ -359,14 +336,11 @@ export async function seedDutPeople(
     students: { created: 0, skipped: 0 },
     results: {
       created: 0,
-      skippedPastWithoutScore: 0,
+      exempt: 0,
+      skippedWithoutOutcome: 0,
       skippedUnknownCourse: 0,
     },
     credentialsFile: null,
-  };
-  const caches = {
-    semesters: new Map<string, string>(),
-    cohorts: new Map<string, string>(),
   };
   await seedLecturers(prisma, input.people.lecturers, input.facultyId, result);
   await seedStudents(
@@ -374,9 +348,14 @@ export async function seedDutPeople(
     input.people.students,
     input.programs,
     input.openTermCode,
-    caches,
+    input.catalog,
     result,
   );
-  await seedResults(prisma, input.openTermCode, caches.semesters, result);
+  await seedResults(
+    prisma,
+    input.openTermCode,
+    input.catalog.semesterIdsByLegacyCode,
+    result,
+  );
   return result;
 }

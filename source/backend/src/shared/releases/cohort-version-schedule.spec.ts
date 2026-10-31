@@ -14,6 +14,7 @@ const semester = (id: string, date: string): StartedSemester => ({
   academicYear: 'not-chronological',
   termInYear: 1,
   startDate: new Date(date),
+  startDateEstimated: false,
   createdAt: new Date(date),
   updatedAt: new Date(date),
 });

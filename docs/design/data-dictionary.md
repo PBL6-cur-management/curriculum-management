@@ -386,6 +386,7 @@ Học kỳ, ví dụ HK1 2023-2024.
 | academicYear | — | Chuỗi | C | Ví dụ 2023-2024 |
 | termInYear | — | Số nguyên | C | 1, 2, hoặc học kỳ hè |
 | startDate | — | Ngày | K | Mốc để chuyển phiên bản Chờ hiệu lực → Đang hiệu lực (DEC-07) |
+| startDateEstimated | — | Logic | C | Mặc định `false`. `true` khi ngày bắt đầu là ngày **ước lượng** theo quy ước vì lịch của Trường không có ngày cho kỳ này (seed dữ liệu thật). Lưu ngày trên MH-10 đặt lại `false`. CHECK: chỉ `true` khi có `startDate`. Giao diện gắn nhãn "Ngày ước lượng" |
 
 Duy nhất: `semesterCode`; (`academicYear`, `termInYear`).
 

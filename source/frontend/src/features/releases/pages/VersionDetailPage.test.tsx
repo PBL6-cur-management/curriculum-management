@@ -62,9 +62,9 @@ describe('VersionDetailPage (MH-47)', () => {
 
     expect(await screen.findByText('QĐ-100/2026')).toBeInTheDocument();
     expect(screen.getByText('01/09/2026')).toBeInTheDocument();
-    expect(
-      screen.getByText(/2026-2027-2 \(từ 18\/01\/2027\)/),
-    ).toBeInTheDocument();
+    expect(screen.getByText('2026-2027-2 · từ')).toBeInTheDocument();
+    expect(screen.getByText('18/01/2027')).toBeInTheDocument();
+    expect(screen.queryByText('Ngày ước lượng')).not.toBeInTheDocument();
     expect(screen.getByText('K2026')).toBeInTheDocument();
     expect(screen.getByText(/Phòng Đào tạo —/)).toBeInTheDocument();
   });

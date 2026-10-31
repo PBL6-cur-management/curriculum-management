@@ -10,7 +10,8 @@ export interface IssuedVersionFact {
   programId: string;
   versionNumber: string;
   status: IssuedStatus;
-  decisionNumber: string;
+  // Legacy versions seeded from the school system carry no decision number.
+  decisionNumber: string | null;
   effectiveSemester: StartedSemester;
   publishedAt: Date;
 }

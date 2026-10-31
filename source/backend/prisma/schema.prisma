@@ -491,6 +491,9 @@ model Semester {
   academicYear           String
   termInYear             Int
   startDate              DateTime?                @db.Date
+  // The start date is a convention-based estimate (the school calendar has no date for this term), not an official one.
+  // Saving a date on MH-10 clears it. A CHECK (only with a date) is added by hand in the migration.
+  startDateEstimated     Boolean                  @default(false)
   effectiveVersions      ProgramVersion[]         @relation("EffectiveSemester")
   effectiveRequests      ChangeRequest[]          @relation("RequestEffectiveSemester")
   startingCohortVersions CohortVersion[]          @relation("CohortStartSemester")

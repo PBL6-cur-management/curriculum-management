@@ -16,5 +16,9 @@ export const fetchSemesters = () => getJson<Semester[]>('/semesters');
 export const fetchCohorts = () => getJson<Cohort[]>('/cohorts');
 
 export const NO_START_DATE_LABEL = 'Chưa có ngày bắt đầu';
+// The school calendar has no date for some terms: the seed estimates one and flags it until the Phòng Đào tạo saves its own.
+export const ESTIMATED_DATE_LABEL = 'Ngày ước lượng';
 export const semesterLabel = (semester: Semester) =>
-  `${semester.semesterCode} · ${semester.startDate ?? NO_START_DATE_LABEL}`;
+  `${semester.semesterCode} · ${semester.startDate ?? NO_START_DATE_LABEL}${
+    semester.startDate && semester.startDateEstimated ? ' (ước lượng)' : ''
+  }`;

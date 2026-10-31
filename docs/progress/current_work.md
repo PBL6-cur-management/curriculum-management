@@ -2,6 +2,10 @@
 
 **Start here**: đọc [bàn giao 2026-10-31 (tối)](handoff.md). Việc kế tiếp: người dùng tạo `source/e2e/.env`, rồi chạy Playwright, đi luồng phê duyệt R5→R4→R3→R1 trên UI, chạy [smoke checklist](../testing/smoke-checklist.md) vòng 1 (29 kịch bản, thay 413 ca thủ công) và chụp màn hình cho impeccable polish. Main: BE unit 1797/1797, BE e2e 679/679, FE 693/693.
 
+## Seed lại dữ liệu thật DUT — 2026-10-31
+
+- Nhánh `feat/dut-real-reseed`: `ctdt_real` dựng lại từ bản sao CSDL Trường, bỏ giá trị giữ chỗ, số quyết định NULL, học kỳ có ngày thật. Kế hoạch: [dut-real-reseed-implementation-plan](../implementation/dut-real-reseed-implementation-plan.md); báo cáo: [dut-real-reseed-implement-report](../implement-report/dut-real-reseed-implement-report.md). Lệnh: `pnpm db:rebuild:real --yes`.
+
 ## Khám phá CSDL đào tạo của Trường — 2026-10-31
 
 - Đã khám phá chỉ đọc SQL Server của Trường; báo cáo [dut-school-db-discovery](../reference/dut-school-db-discovery.md). `tmProxDUT` mới hơn dump `DHBK_CDS` mà seed DUT dùng; không có PLO/CLO; bản sao cục bộ 98 bảng ở `D:\dut-mirror` (ngoài repo, không commit).
@@ -80,7 +84,7 @@ Các mục trên **chưa được Khoa trả lời**. Người dùng cho phép b
 ## Up Next
 
 1. Tạo `source/e2e/.env`, chạy Playwright, smoke vòng 1, duyệt luồng R5→R4→R3→R1 và chụp màn hình cho `/impeccable polish`.
-2. Người dùng viết kế hoạch triển khai thiết kế lại schema từ báo cáo khám phá và trả lời câu hỏi mở §10 của báo cáo.
+2. Seed lại dữ liệu thật đã xong (xem phần đầu). Còn chờ Khoa: trạng thái GRADUATED/WITHDRAWN không suy ra được từ nguồn, văn bằng khóa K2026, số quyết định thật, 37 khung lệch tín chỉ.
 3. Xử lý nợ DEBT-01..07 trong [todo](todo.md); đầu vào Khoa C1..C10 vẫn chờ trả lời.
 4. Nợ vận hành F-26/F-27: 7 đêm sao lưu, diễn tập B5/B6, sao chép ngoài máy, fixture 300 học phần/500 sinh viên rồi k6 canonical, uptime dài hạn.
 

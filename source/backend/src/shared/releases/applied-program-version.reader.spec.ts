@@ -92,6 +92,15 @@ describe('AppliedProgramVersionReader', () => {
       isolationLevel: 'RepeatableRead',
     });
   });
+  it('resolves a released version that has no decision number yet (seeded from the school data)', async () => {
+    const { reader, version } = setup();
+    Object.assign(version, { decisionNumber: null });
+    const result = await reader.forCohorts(lookup);
+    expect(result[1].assignment?.version).toMatchObject({
+      id: 'v1',
+      decisionNumber: null,
+    });
+  });
   it('exclusively uses an explicitly supplied transaction and performs no writes', async () => {
     const { reader, transaction, db, tx, cohort } = setup();
     tx.cohort.findMany.mockResolvedValue([cohort]);
@@ -167,7 +176,6 @@ describe('AppliedProgramVersionReader', () => {
   );
   it.each([
     { status: 'DRAFT' },
-    { decisionNumber: null },
     { sourceRequestId: 'request' },
     { effectiveSemester: null },
   ])('rejects malformed issued timeline %j', async (patch) => {

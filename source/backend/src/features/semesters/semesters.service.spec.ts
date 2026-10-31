@@ -158,6 +158,9 @@ describe('SemestersService', () => {
       R1,
     );
     expect(semester.create.mock.calls[1][0].data.startDate).toBeNull();
+    expect(
+      semester.create.mock.calls.map((call) => call[0].data.startDateEstimated),
+    ).toEqual([false, false]);
   });
 
   it('maps a duplicate code or year-term to SEMESTER_EXISTS and a duplicate cohort to COHORT_EXISTS', async () => {
@@ -231,6 +234,18 @@ describe('SemestersService', () => {
       await service.updateSemester('s1', { academicYear: '2026-2027' }, R1);
       expect(programEnrollment.count).not.toHaveBeenCalled();
       expect(semester.update).toHaveBeenCalledTimes(2);
+    });
+
+    it('clears the estimated flag when a start date is saved, and keeps it on metadata-only edits', async () => {
+      await service.updateSemester('s1', { startDate: '2027-01-18' }, R1);
+      await service.updateSemester('s1', { academicYear: '2026-2027' }, R1);
+
+      expect(semester.update.mock.calls[0][0].data.startDateEstimated).toBe(
+        false,
+      );
+      expect(
+        semester.update.mock.calls[1][0].data.startDateEstimated,
+      ).toBeUndefined();
     });
 
     it('moves the date of a semester only Pending versions wait on, and activates those it has now reached', async () => {

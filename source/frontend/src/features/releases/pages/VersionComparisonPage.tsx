@@ -17,6 +17,7 @@ import { VersionStatusTag } from '../components/VersionStatusTag';
 import { useVersionComparison, useVersionHistory } from '../hooks/useReleases';
 import { comparisonPath } from '../utils/versionComparison';
 import { BackLink } from '../../../shared/design-system';
+import { formatDecisionNumber } from '../../../shared/releases/decisionNumber';
 
 export function VersionComparisonPage() {
   const { programId = '' } = useParams();
@@ -77,7 +78,7 @@ export function VersionComparisonPage() {
                       {version.versionNumber}
                     </Typography.Text>{' '}
                     <VersionStatusTag status={version.status} />
-                    <div>{version.decisionNumber}</div>
+                    <div>{formatDecisionNumber(version.decisionNumber)}</div>
                     <div>
                       {version.effectiveSemester.semesterCode} ·{' '}
                       {version.effectiveSemester.startDate ??

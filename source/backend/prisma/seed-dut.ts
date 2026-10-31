@@ -66,7 +66,7 @@ try {
     );
   }
   console.log(
-    `programs: created ${programs.created.length}; skipped ${programs.skippedExisting.length}; placeholder decision numbers filled ${programs.backfilledDecisions}`,
+    `programs: created ${programs.created.length}; skipped ${programs.skippedExisting.length}`,
   );
   for (const difference of catalog.semesterDateDifferences) {
     console.log(
@@ -76,15 +76,16 @@ try {
   const people = readDutPeople();
   if (!people)
     console.log(
-      'people: skipped (run `pnpm dut:extract` with the school dump first)',
+      'people: skipped (run `pnpm dut:extract` on the school mirror first)',
     );
   else {
     const seeded = await seedDutPeople(prisma, {
       people,
       programs: data.programs,
       // The latest term with results is the open one (tmKehoach.Hientai is set on several terms).
-      openTermCode: peopleReport.resultTerms.at(-1)!,
+      openTermCode: peopleReport.openTermCode,
       facultyId: faculty.id,
+      catalog,
     });
     console.log(
       `lecturers: created ${seeded.lecturers.created}; skipped ${seeded.lecturers.skipped}`,
@@ -93,7 +94,7 @@ try {
       `students: created ${seeded.students.created}; skipped ${seeded.students.skipped}`,
     );
     console.log(
-      `results: created ${seeded.results.created}; past term without score ${seeded.results.skippedPastWithoutScore}; unknown course ${seeded.results.skippedUnknownCourse}`,
+      `results: created ${seeded.results.created} (exempt ${seeded.results.exempt}); past term without outcome ${seeded.results.skippedWithoutOutcome}; course outside the catalog ${seeded.results.skippedUnknownCourse}`,
     );
     if (seeded.credentialsFile)
       console.log(`lecturer temporary passwords: ${seeded.credentialsFile}`);

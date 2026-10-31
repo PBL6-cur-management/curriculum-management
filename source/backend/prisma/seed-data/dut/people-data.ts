@@ -1,7 +1,7 @@
 import { createReadStream, existsSync, readFileSync } from 'node:fs';
 import { createInterface } from 'node:readline';
 
-// Personal data extracted from the school dump. People and results live in data/private/ (gitignored);
+// Personal data extracted from the mirror. People and results live in data/private/ (gitignored);
 // the report holds counts only and is committed.
 export const PEOPLE_DATA_FILES = {
   PEOPLE: 'people.json',
@@ -15,13 +15,16 @@ export interface DutLecturer {
   fullName: string;
   // MaBP: 102 = Khoa CNTT, 999/998 = thỉnh giảng, 990 = lưu trữ, others = another unit.
   unitCode: string;
-  emailLocalPart: string | null;
+  // The school's own value, only when it is a full address; never built from a guessed domain.
+  email: string | null;
 }
 export interface DutStudent {
   studentCode: string;
   fullName: string;
   frameCode: string;
   admissionTermCode: string;
+  // IDCodeVao was empty: the term comes from the student code (admissionTermFromStudentCode).
+  admissionTermInferred: boolean;
   onLeave: boolean;
 }
 export interface DutResult {
@@ -31,18 +34,31 @@ export interface DutResult {
   score10: string | null;
   score4: string | null;
   letterGrade: string | null;
+  // tmDiemMien: the course was exempted (miễn học), not taken.
+  exempt: boolean;
 }
 export interface DutPeopleReport {
   malformedLines: Record<string, number>;
   lecturers: number;
+  lecturersFromFaculty: number;
+  lecturersTeachingOnly: number;
   lecturersByUnit: Record<string, number>;
   lecturersWithEmail: number;
   students: number;
+  studentsByAdmissionTerm: Record<string, number>;
+  studentsAdmissionInferred: number;
   studentsOnLeave: number;
+  // tmHoSoSV.Tinhtrang1 = 1: meaning not confirmed (graduated or left); the seed keeps these students STUDYING.
+  studentsFlaggedTinhtrang1: number;
+  studentsExcludedByLevel: Record<string, number>;
   resultRowsRead: number;
   resultsKept: number;
   resultsWithoutScore: number;
+  resultsByLetter: Record<string, number>;
+  exemptionsKept: number;
+  exemptionsShadowedByResult: number;
   resultTerms: string[];
+  openTermCode: string;
 }
 
 export const privateDataUrl = (file: string) =>

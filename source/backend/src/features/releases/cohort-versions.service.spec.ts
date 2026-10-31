@@ -70,6 +70,7 @@ function setup() {
     academicYear: 'Y',
     termInYear: 1,
     startDate: date,
+    startDateEstimated: false,
     createdAt: date,
     updatedAt: date,
   };
@@ -201,7 +202,6 @@ describe('CohortVersionsService', () => {
     { status: 'DRAFT' },
     { sourceRequestId: 'request' },
     { publishedAt: null },
-    { decisionNumber: null },
   ])('rejects unissued target %j', async (patch) => {
     const { service, version, tx } = setup();
     Object.assign(version, patch);
@@ -209,6 +209,12 @@ describe('CohortVersionsService', () => {
       code: 'VERSION_NOT_ISSUED',
     });
     expect(tx.cohortVersion.createMany).not.toHaveBeenCalled();
+  });
+  it('assigns a released version that has no decision number yet (seeded from the school data)', async () => {
+    const { service, version, tx } = setup();
+    Object.assign(version, { decisionNumber: null });
+    await service.assign('p', dto, access());
+    expect(tx.cohortVersion.createMany).toHaveBeenCalledOnce();
   });
   it('rejects missing cohorts atomically and does not insert a valid subset', async () => {
     const { service, tx } = setup();

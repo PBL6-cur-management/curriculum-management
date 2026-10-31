@@ -37,6 +37,7 @@ import {
   useUpdateCohortVersion,
 } from '../hooks/useReleases';
 import { isIssuedVersion } from '../utils/versionComparison';
+import { formatDecisionNumber } from '../../../shared/releases/decisionNumber';
 
 interface CohortVersionAssignmentFormProps {
   assignments: CohortVersionList;
@@ -155,7 +156,7 @@ export function CohortVersionAssignmentForm({
         <>
           <Typography.Paragraph>
             Phiên bản {version.versionNumber} · Quyết định{' '}
-            {version.decisionNumber}
+            {formatDecisionNumber(version.decisionNumber)}
           </Typography.Paragraph>
           <Typography.Paragraph>
             Khóa: {selectedCohorts.map((row) => row.cohortCode).join(', ')}
@@ -262,7 +263,8 @@ export function CohortVersionAssignmentForm({
         {current ? (
           <Typography.Paragraph>
             Khóa {current.cohort.cohortCode} · Phiên bản{' '}
-            {current.version.versionNumber} · {current.version.decisionNumber}
+            {current.version.versionNumber} ·{' '}
+            {formatDecisionNumber(current.version.decisionNumber)}
           </Typography.Paragraph>
         ) : (
           <>
@@ -278,7 +280,7 @@ export function CohortVersionAssignmentForm({
                 optionFilterProp="label"
                 options={versions.filter(isIssuedVersion).map((row) => ({
                   value: row.id,
-                  label: `${row.versionNumber} · ${row.decisionNumber}`,
+                  label: `${row.versionNumber} · ${formatDecisionNumber(row.decisionNumber)}`,
                 }))}
               />
             </Form.Item>

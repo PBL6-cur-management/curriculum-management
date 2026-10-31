@@ -4,8 +4,12 @@ import {
   CourseType,
 } from '../../../src/generated/prisma/client.js';
 import {
+  admissionTermFromStudentCode,
   cohortFromLegacyCode,
   courseTypeFor,
+  estimateSemesterStart,
+  nextTermCode,
+  ownerUnitLegacyCode,
   legacyDecimal,
   parseElectiveNote,
   pickRelationType,
@@ -64,7 +68,9 @@ describe('legacy mappings', () => {
     });
   });
   it.each([
-    ['Chọn 2 trong 5', { minCourses: 2 }],
+    ['Chọn 2 trong 5', { minCourses: 2, listSize: 5 }],
+    ['Chọn 1/3', { minCourses: 1, listSize: 3 }],
+    ['chọn 3 tín chỉ', { minCredits: '3' }],
     ['chọn 6 TC', { minCredits: '6' }],
     ['Chọn 2,5 TC', { minCredits: '2.5' }],
     ['Chọn 2.5 TC', { minCredits: '2.5' }],
@@ -144,5 +150,36 @@ describe('legacy mappings', () => {
   });
   it.each(['NaN', '2x', '-1', 'Infinity'])('rejects decimal %s', (value) => {
     expect(() => legacyDecimal(value)).toThrow();
+  });
+  it.each([
+    // First Monday on/after 1 August; first Monday on/after 1 January; second Monday of June.
+    ['2610', '2026-08-03'],
+    ['2620', '2027-01-04'],
+    ['1421', '2015-06-08'],
+    ['2021', '2021-06-14'],
+    ['1921', '2020-06-08'],
+  ])('estimates the start of term %s', (code, day) => {
+    expect(estimateSemesterStart(code)).toBe(day);
+  });
+  it.each([
+    ['2610', '2620'],
+    ['2620', '2621'],
+    ['2621', '2710'],
+    ['0921', '1010'],
+  ])('finds the term after %s', (code, next) => {
+    expect(nextTermCode(code)).toBe(next);
+  });
+  it('takes the owner from KhoaPC, else from the course code', () => {
+    expect(ownerUnitLegacyCode({ MaHP: '1020013', KhoaPC: '109' })).toEqual({
+      code: '109',
+      inferred: false,
+    });
+    expect(ownerUnitLegacyCode({ MaHP: '3190111', KhoaPC: '' })).toEqual({
+      code: '319',
+      inferred: true,
+    });
+  });
+  it('infers the intake from the student code', () => {
+    expect(admissionTermFromStudentCode('102260001')).toBe('2610');
   });
 });
