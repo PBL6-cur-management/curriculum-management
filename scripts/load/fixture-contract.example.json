@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "_comment": "Ví dụ cấu trúc. Bản thật nằm ngoài repository, không chứa mật khẩu (mật khẩu ở tệp credentials riêng). contractVerified chỉ được đặt true sau khi đối chiếu từng điểm cuối với mã nguồn.",
+  "contractVerified": false,
+  "contractSources": [
+    { "name": "catalog", "source": "source/backend/src/features/courses/courses.controller.ts:LINE" }
+  ],
+  "dataset": {
+    "synthetic": true,
+    "environment": "isolated-load-test",
+    "fixtureId": "f27-2026-10",
+    "sourceRevision": "GIT_SHA",
+    "courseCount": 300,
+    "studentCount": 500,
+    "curriculumRows": 60
+  },
+  "students": [
+    {
+      "fixtureKey": "student-001",
+      "userId": "UUID",
+      "roleCode": "R6",
+      "reads": [
+        { "name": "curriculum", "kind": "lookup", "path": "/api/PATH_DA_XAC_MINH", "arrays": [{ "pointer": "/items", "minimumLength": 1 }] },
+        { "name": "progress", "kind": "lookup", "path": "/api/PATH_DA_XAC_MINH", "arrays": [{ "pointer": "/items", "minimumLength": 1 }] },
+        { "name": "eligibility", "kind": "eligibility", "path": "/api/PATH_DA_XAC_MINH", "equals": [{ "pointer": "/eligible", "value": true }] }
+      ]
+    }
+  ],
+  "staff": [
+    {
+      "fixtureKey": "staff-001",
+      "userId": "UUID",
+      "roleCode": "R1",
+      "reads": [
+        { "name": "catalog", "kind": "lookup", "path": "/api/PATH_DA_XAC_MINH?limit=20", "arrays": [{ "pointer": "/items", "minimumLength": 1 }] },
+        { "name": "curriculum", "kind": "lookup", "path": "/api/PATH_DA_XAC_MINH?limit=20", "arrays": [{ "pointer": "/items", "minimumLength": 1 }] }
+      ]
+    }
+  ]
+}
