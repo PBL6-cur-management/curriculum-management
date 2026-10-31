@@ -97,3 +97,14 @@ Format:
 **Possible cause**: `seed-programs.ts` (`pnpm prisma:seed:dut`) tạo phiên bản đã ban hành mà không đặt `decisionNumber`, vì nguồn DUT không có số quyết định. `issuedVersionFact` coi phiên bản thiếu số quyết định là chưa ban hành, nên `normalizeAssignment` từ chối mọi bản gán khóa vào phiên bản đó. Các số `QĐ-EP…` hiện có thuộc thế giới e2e, không phải dữ liệu DUT.
 **Resolution**: Seed DUT ghi số giữ chỗ `DUT-<mã CTĐT>-<phiên bản>` cho phiên bản đã ban hành (`dutDecisionPlaceholder`). Khi chạy lại trên DB cũ, seed điền các số còn trống của chương trình đã có, không đổi số đã nhập tay. Chạy lại `pnpm prisma:seed:dut` trên `ctdt_real`: đã điền 41 số, còn 0 bản gán khóa trỏ tới phiên bản thiếu số. Spec mới: `prisma/seed-data/dut/load/seed-programs.spec.ts`.
 **How to avoid**: Dữ liệu nhập từ nguồn ngoài phải thỏa cùng điều kiện "đã ban hành" mà luồng phát hành dùng (`issuedVersionFact`): số phiên bản, số quyết định, ngày ban hành, học kỳ hiệu lực. Số giữ chỗ chờ Khoa thay bằng số quyết định thật (nợ C9/C10).
+
+## [2026-10-31] Giảng viên (R5) và sinh viên thấy "Chờ tôi duyệt" và nhóm "Quản trị"
+**Symptom**: Đăng nhập R5 vẫn thấy mục "Chờ tôi duyệt" và nhóm menu "Quản trị". Sinh viên R6 cũng thấy nhóm "Quản trị".
+**Possible cause**:
+- "Chờ tôi duyệt" chỉ kiểm `changeRequest.view`, quyền mà R5 cũng có (để xem đề xuất của mình). Quyền duyệt không phải một mã quyền: người duyệt là R4 và R3 (suy ra từ phân công điều phối nhóm và chủ nhiệm CTĐT), R1 ở cấp 3, cộng người đang nhận ủy quyền.
+- Mục "Trạng thái hệ thống" không yêu cầu quyền nào, nên nhóm "Quản trị" luôn có ít nhất một mục hiển thị với mọi vai.
+**Resolution**:
+- `MeDto.canApprove` = có vai R1/R3/R4 hoặc có ủy quyền còn hiệu lực hôm nay (`usableGrants`). Menu ẩn "Chờ tôi duyệt" khi `canApprove` là false.
+- "Trạng thái hệ thống" chỉ hiện cho người có `user.manage`, `permission.view` hoặc `backup.view`.
+- Kiểm chứng: spec `me.dto.spec.ts` (3 ca), `menuItems.test.tsx` (2 ca mới); FE 693/693; BE e2e auth 9/9.
+**How to avoid**: Mục menu nào cũng phải có điều kiện hiển thị, vì một mục không điều kiện làm cả nhóm hiện ra. Khi một khả năng được quyết định bằng dữ liệu (phân công, ủy quyền) chứ không bằng mã quyền, đưa cờ đã tính sẵn vào `/api/auth/me` thay vì suy từ mã quyền gần giống.

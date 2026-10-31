@@ -173,6 +173,37 @@ describe('app menu', () => {
     expect(keys(['backup.view'])).toContain(ROUTES.backups);
     expect(keys(['course.view'])).not.toContain(ROUTES.backups);
   });
+
+  it('hides "Chờ tôi duyệt" from a lecturer who cannot approve but keeps the proposals list', () => {
+    const lecturer = toMenuItems(
+      APP_MENU,
+      ['changeRequest.view', 'changeRequest.create', 'course.view'],
+      ['R5'],
+      false,
+    );
+    expect(childKeys(lecturer, APPROVALS)).toEqual([ROUTES.changeRequests]);
+    const delegate = toMenuItems(
+      APP_MENU,
+      ['changeRequest.view'],
+      ['R5'],
+      true,
+    );
+    expect(childKeys(delegate, APPROVALS)).toContain(ROUTES.approvalQueue);
+  });
+
+  it('keeps the Quản trị group from a lecturer or a student', () => {
+    const groups = (permissions: string[], roles: string[]) =>
+      toMenuItems(APP_MENU, permissions as never, roles, false).map(
+        (item) => item.key,
+      );
+    expect(groups(['changeRequest.view', 'course.view'], ['R5'])).not.toContain(
+      ADMIN,
+    );
+    expect(groups(['student.viewProgress'], ['R6'])).not.toContain(ADMIN);
+    expect(childKeys(toMenuItems(APP_MENU, ['backup.view']), ADMIN)).toContain(
+      ROUTES.health,
+    );
+  });
 });
 
 describe('section tabs', () => {

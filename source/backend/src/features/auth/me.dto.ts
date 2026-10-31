@@ -33,12 +33,18 @@ export class MeDto {
     enumName: 'PermissionCode',
   })
   permissions: PermissionCode[];
+  // "Chờ tôi duyệt" applies: an approver role (R1, or R3/R4 derived from assignments) or a usable delegation today.
+  @ApiProperty() canApprove: boolean;
 }
+
+// Roles whose holders are named on approval steps (R4 level 1, R3 level 2) or act on level 3 (R1).
+export const APPROVER_ROLE_CODES: readonly string[] = ['R1', 'R3', 'R4'];
 
 export function toMeDto(
   user: AuthenticatedUser,
   orgUnit: OrgUnitRefDto | null,
   access: AccessContext,
+  hasDelegatedApproval: boolean,
 ): MeDto {
   return {
     id: user.id,
@@ -56,5 +62,10 @@ export function toMeDto(
       derived: assignment.assignmentId === null,
     })),
     permissions: access.heldPermissions(),
+    canApprove:
+      hasDelegatedApproval ||
+      access.assignments.some((assignment) =>
+        APPROVER_ROLE_CODES.includes(assignment.roleCode),
+      ),
   };
 }

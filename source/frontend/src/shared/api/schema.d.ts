@@ -3343,6 +3343,7 @@ export interface components {
       orgUnit: components['schemas']['OrgUnitRefDto'] | null;
       roles: components['schemas']['MeRoleDto'][];
       permissions: components['schemas']['PermissionCode'][];
+      canApprove: boolean;
     };
     FieldErrorDto: {
       field: string;

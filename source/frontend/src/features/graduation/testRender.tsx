@@ -260,6 +260,7 @@ export function renderGraduationPage(options: GraduationRenderOptions) {
       derived: false,
     })),
     permissions: options.permissions ?? ['graduation.view', 'graduation.audit'],
+    canApprove: false,
   } satisfies components['schemas']['MeDto'];
   const emptyPage = { items: [], total: 0, page: 1, pageSize: 20 };
   const reads: Record<string, unknown> = {

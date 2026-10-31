@@ -22,6 +22,8 @@ export interface AppMenuItem {
   anyPermissions?: readonly PermissionCode[];
   // Hidden when every role the caller holds is listed (display only; the server refuses anyway).
   hideForRoles?: readonly string[];
+  // Shown only to someone who can approve: an approver role or a usable delegation (MeDto.canApprove).
+  requiresApprover?: boolean;
   // Other pages that belong to this leaf (its section tabs), selected with it.
   also?: readonly string[];
   // A group open on arrival whatever the page: the two core jobs stay one click away.
@@ -76,6 +78,7 @@ export const APP_MENU: readonly AppMenuItem[] = [
         path: ROUTES.approvalQueue,
         label: 'Chờ tôi duyệt',
         permission: PERMISSIONS.changeRequestView,
+        requiresApprover: true,
       },
       {
         path: ROUTES.changeRequests,
@@ -188,7 +191,16 @@ export const APP_MENU: readonly AppMenuItem[] = [
         label: 'Sao lưu và phục hồi',
         permission: PERMISSIONS.backupView,
       },
-      { path: ROUTES.health, label: 'Trạng thái hệ thống' },
+      {
+        path: ROUTES.health,
+        label: 'Trạng thái hệ thống',
+        // Operators only; without a permission every signed-in role saw the whole Quản trị group.
+        anyPermissions: [
+          PERMISSIONS.userManage,
+          PERMISSIONS.permissionView,
+          PERMISSIONS.backupView,
+        ],
+      },
     ],
   },
 ];
@@ -214,15 +226,19 @@ function isVisible(
   item: AppMenuItem,
   permissions: readonly PermissionCode[],
   roleCodes: readonly string[],
+  canApprove: boolean,
 ): boolean {
   if (isHiddenForRoles(item, roleCodes)) return false;
+  if (item.requiresApprover && !canApprove) return false;
   if (
     item.anyPermissions &&
     !item.anyPermissions.some((code) => permissions.includes(code))
   )
     return false;
   return item.children
-    ? item.children.some((child) => isVisible(child, permissions, roleCodes))
+    ? item.children.some((child) =>
+        isVisible(child, permissions, roleCodes, canApprove),
+      )
     : !item.permission || permissions.includes(item.permission);
 }
 
@@ -230,16 +246,22 @@ export function toMenuItems(
   items: readonly AppMenuItem[],
   permissions: readonly PermissionCode[],
   roleCodes: readonly string[] = [],
+  canApprove = true,
 ): MenuEntry[] {
   return items
-    .filter((item) => isVisible(item, permissions, roleCodes))
+    .filter((item) => isVisible(item, permissions, roleCodes, canApprove))
     .map((item) =>
       item.children
         ? {
             key: groupKey(item),
             label: item.label,
             icon: item.icon,
-            children: toMenuItems(item.children, permissions, roleCodes),
+            children: toMenuItems(
+              item.children,
+              permissions,
+              roleCodes,
+              canApprove,
+            ),
           }
         : {
             key: item.path ?? item.label,
@@ -300,12 +322,13 @@ export function visibleLeaves(
   items: readonly AppMenuItem[],
   permissions: readonly PermissionCode[],
   roleCodes: readonly string[] = [],
+  canApprove = true,
 ): AppMenuItem[] {
   return items
-    .filter((item) => isVisible(item, permissions, roleCodes))
+    .filter((item) => isVisible(item, permissions, roleCodes, canApprove))
     .flatMap((item) =>
       item.children
-        ? visibleLeaves(item.children, permissions, roleCodes)
+        ? visibleLeaves(item.children, permissions, roleCodes, canApprove)
         : [item],
     );
 }

@@ -47,6 +47,7 @@ export function HomePage() {
     APP_MENU,
     me?.permissions ?? [],
     me?.roles.map((role) => role.roleCode) ?? [],
+    me?.canApprove ?? false,
   );
   const roles = me?.roles.map((role) => role.roleName).join(', ');
   return (
