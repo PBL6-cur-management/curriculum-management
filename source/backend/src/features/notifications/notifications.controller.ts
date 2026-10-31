@@ -3,7 +3,9 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Body,
   Param,
+  Patch,
   Post,
   Query,
 } from '@nestjs/common';
@@ -15,7 +17,9 @@ import { PassiveRequest } from '../../shared/session/passive-request.decorator.j
 import {
   NotificationDto,
   NotificationPageDto,
+  NotificationPreferenceDto,
   NotificationQueryDto,
+  UpdateNotificationPreferenceDto,
   UnreadCountDto,
 } from './notification.dto.js';
 import { NotificationsService } from './notifications.service.js';
@@ -42,6 +46,21 @@ export class NotificationsController {
   @ApiOkResponse({ type: UnreadCountDto })
   unreadCount(@CurrentUser() user: AuthenticatedUser) {
     return this.notifications.unreadCount(user.id);
+  }
+
+  @Get('preferences')
+  @ApiOkResponse({ type: NotificationPreferenceDto })
+  preferences(@CurrentUser() user: AuthenticatedUser) {
+    return this.notifications.preferences(user.id);
+  }
+
+  @Patch('preferences')
+  @ApiOkResponse({ type: NotificationPreferenceDto })
+  updatePreferences(
+    @Body() dto: UpdateNotificationPreferenceDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.notifications.updatePreferences(user.id, dto.emailEnabled);
   }
 
   @Post('read-all')

@@ -8,6 +8,7 @@ export const STEP_KIND_LABELS: Record<ApprovalStepKind, string> = {
   NORMAL: '',
   SKIPPED: 'Bỏ qua',
   OVERRIDE: 'Phòng Đào tạo duyệt thay',
+  DELEGATED: 'Được ủy quyền',
 };
 
 export const OVERRIDE_ACTION_LABELS: Record<OverrideAction, string> = {

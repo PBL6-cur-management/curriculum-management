@@ -123,6 +123,7 @@ describe('FinalApprovalService', () => {
     previews = { read: vi.fn().mockResolvedValue({ requestId: 'r1' }) };
     details = { read: vi.fn().mockResolvedValue({ id: 'r1' }) };
     const prisma = {
+      approvalDelegation: { findMany: vi.fn().mockResolvedValue([]) },
       ...db,
       $transaction: vi.fn((run: (tx: unknown) => unknown) => run(db)),
     };

@@ -150,6 +150,9 @@ export const STEP_INCLUDE = {
     select: { id: true, groupCode: true, groupName: true },
   },
   forProgram: { select: { id: true, programCode: true } },
+  delegation: {
+    select: { id: true, delegator: { select: USER_REF_SELECT } },
+  },
 } as const satisfies Prisma.ApprovalStepInclude;
 export type StepRow = Prisma.ApprovalStepGetPayload<{
   include: typeof STEP_INCLUDE;
@@ -171,6 +174,7 @@ export function toStepDto(row: StepRow): ApprovalStepDto {
     performedBy: row.performedBy,
     isOverride: row.isOverride,
     kind: stepKind(row),
+    delegation: row.delegation,
   };
 }
 

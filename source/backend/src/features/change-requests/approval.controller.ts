@@ -16,6 +16,7 @@ import {
 import type { AccessContext } from '../../shared/authz/access-context.js';
 import { CurrentAccess } from '../../shared/authz/current-access.decorator.js';
 import { PERMISSIONS } from '../../shared/authz/permission-codes.js';
+import { AllowDelegate } from '../../shared/authz/allow-delegate.decorator.js';
 import { RequirePermission } from '../../shared/authz/require-permission.decorator.js';
 import { ApprovalHistoryDto } from './approval-history.dto.js';
 import { ApprovalHistoryReader } from './approval-history.reader.js';
@@ -47,6 +48,7 @@ export class ApprovalController {
     private readonly history: ApprovalHistoryReader,
   ) {}
 
+  @AllowDelegate()
   @Post(':id/approve')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ChangeRequestDetailDto })
@@ -79,6 +81,7 @@ export class ApprovalController {
     return this.finalApprovals.approve(id, dto, access);
   }
 
+  @AllowDelegate()
   @Post(':id/return')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ChangeRequestDetailDto })
@@ -90,6 +93,7 @@ export class ApprovalController {
     return this.approvals.returnToDraft(id, dto, access);
   }
 
+  @AllowDelegate()
   @Post(':id/reject')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: ChangeRequestDetailDto })
@@ -114,12 +118,14 @@ export class ApprovalController {
     return this.approvals.override(id, dto, access);
   }
 
+  @AllowDelegate()
   @Get(':id/history')
   @ApiOkResponse({ type: ApprovalHistoryDto })
   readHistory(@Param('id') id: string, @CurrentAccess() access: AccessContext) {
     return this.history.read(id, access);
   }
 
+  @AllowDelegate()
   @Get(':id/comments')
   @ApiOkResponse({ type: [CommentDto] })
   listComments(

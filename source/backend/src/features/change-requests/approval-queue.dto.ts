@@ -16,6 +16,11 @@ export class ApprovalQueueQueryDto {
   requestType?: ChangeRequestType;
 }
 
+export class DelegatedQueueRefDto {
+  @ApiProperty() delegationId!: string;
+  @ApiProperty({ type: UserRefDto }) delegator!: UserRefDto;
+}
+
 export class ApprovalQueueItemDto {
   @ApiProperty() requestId!: string;
   @ApiProperty() requestCode!: string;
@@ -39,4 +44,10 @@ export class ApprovalQueueItemDto {
     description: 'Whole days since the request entered its level',
   })
   daysWaiting!: number;
+  @ApiProperty({
+    type: [DelegatedQueueRefDto],
+    description:
+      'F-25: whose rows the caller decides here by delegation; empty for own work',
+  })
+  delegatedFor!: DelegatedQueueRefDto[];
 }

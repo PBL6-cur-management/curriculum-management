@@ -113,6 +113,7 @@ describe('ChangeRequestsService', () => {
     changeRequestDocument: { findMany: vi.fn(), deleteMany: vi.fn() },
   };
   const prisma = {
+    approvalDelegation: { findMany: vi.fn().mockResolvedValue([]) },
     $transaction: vi.fn((run: (client: unknown) => unknown) => run(tx)),
     changeRequest: { findFirst: vi.fn(), updateMany: vi.fn() },
   };

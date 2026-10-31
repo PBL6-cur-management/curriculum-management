@@ -9,16 +9,19 @@ import {
   NOTIFICATION_QUERY_ROOT,
 } from './notificationConstants';
 import {
+  getNotificationPreferences,
   getUnreadCount,
   listNotifications,
   markAllNotificationsRead,
   markNotificationRead,
+  updateNotificationPreferences,
 } from './notificationsApi';
 import type { NotificationQuery } from './types';
 
 export const NOTIFICATION_QUERY_KEYS = {
   all: NOTIFICATION_QUERY_ROOT,
   unreadCount: [...NOTIFICATION_QUERY_ROOT, 'unread-count'] as const,
+  preferences: [...NOTIFICATION_QUERY_ROOT, 'preferences'] as const,
   list: (query: NotificationQuery) =>
     [...NOTIFICATION_QUERY_ROOT, 'list', query] as const,
 };
@@ -54,5 +57,15 @@ function useNotificationMutation<TVariables, TResult>(
 
 export const useMarkNotificationRead = () =>
   useNotificationMutation(markNotificationRead);
+// F-25 US-115 AC3: the personal email switch; in-app notifications are never turned off.
+export function useNotificationPreferences() {
+  return useQuery({
+    queryKey: NOTIFICATION_QUERY_KEYS.preferences,
+    queryFn: getNotificationPreferences,
+  });
+}
+
+export const useUpdateNotificationPreferences = () =>
+  useNotificationMutation(updateNotificationPreferences);
 export const useMarkAllNotificationsRead = () =>
   useNotificationMutation(markAllNotificationsRead);

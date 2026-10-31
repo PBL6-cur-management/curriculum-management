@@ -177,6 +177,11 @@ const ApprovalQueuePage = lazy(() =>
     (module) => ({ default: module.ApprovalQueuePage }),
   ),
 );
+const ApprovalDelegationsPage = lazy(() =>
+  import('./features/approval-delegations/pages/ApprovalDelegationsPage').then(
+    (module) => ({ default: module.ApprovalDelegationsPage }),
+  ),
+);
 const NotificationsPage = lazy(() =>
   import('./features/notifications/pages/NotificationsPage').then((module) => ({
     default: module.NotificationsPage,
@@ -793,6 +798,11 @@ export const router = createBrowserRouter([
             ),
           },
           { path: ROUTES.notifications, element: <NotificationsPage /> },
+          // Anyone signed in may read the grants they gave or received; creating needs delegation.manage (server-checked).
+          {
+            path: ROUTES.approvalDelegations,
+            element: <ApprovalDelegationsPage />,
+          },
           {
             path: ROUTES.equivalenceGroups,
             element: (

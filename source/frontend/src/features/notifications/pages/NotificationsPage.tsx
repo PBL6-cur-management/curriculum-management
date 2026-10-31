@@ -1,4 +1,4 @@
-import { Button, Flex, List, Result, Segmented } from 'antd';
+import { App, Button, Flex, List, Result, Segmented, Switch } from 'antd';
 import { useState } from 'react';
 import {
   DEFAULT_PAGE_SIZE,
@@ -8,7 +8,9 @@ import { NotificationItem } from '../../../shared/notifications/NotificationItem
 import type { NotificationQuery } from '../../../shared/notifications/types';
 import {
   useMarkAllNotificationsRead,
+  useNotificationPreferences,
   useNotifications,
+  useUpdateNotificationPreferences,
 } from '../../../shared/notifications/useNotifications';
 import { PageHeader } from '../../../shared/design-system';
 
@@ -23,6 +25,9 @@ export function NotificationsPage() {
   const [query, setQuery] = useState<NotificationQuery>(INITIAL_QUERY);
   const { data, isFetching, isError } = useNotifications(query);
   const markAll = useMarkAllNotificationsRead();
+  const preferences = useNotificationPreferences();
+  const updatePreferences = useUpdateNotificationPreferences();
+  const { message } = App.useApp();
   if (isError) return <Result status="error" title="Không thể tải thông báo" />;
   return (
     <Flex vertical gap="middle">
@@ -35,6 +40,22 @@ export function NotificationsPage() {
         }
         actions={
           <>
+            {preferences.data?.emailAvailable && (
+              <Flex gap="small" align="center">
+                <Switch
+                  id="notification-email"
+                  checked={preferences.data.emailEnabled}
+                  loading={updatePreferences.isPending}
+                  onChange={(emailEnabled) =>
+                    updatePreferences.mutate(emailEnabled, {
+                      onError: () =>
+                        message.error('Không lưu được tùy chọn email'),
+                    })
+                  }
+                />
+                <label htmlFor="notification-email">Nhận email</label>
+              </Flex>
+            )}
             <Button
               onClick={() => markAll.mutate()}
               loading={markAll.isPending}
@@ -63,7 +84,7 @@ export function NotificationsPage() {
         dataSource={data?.items ?? []}
         locale={{ emptyText: 'Không có thông báo.' }}
         renderItem={(notification) => (
-          <NotificationItem notification={notification} />
+          <NotificationItem notification={notification} showEmail />
         )}
         pagination={{
           current: query.page,

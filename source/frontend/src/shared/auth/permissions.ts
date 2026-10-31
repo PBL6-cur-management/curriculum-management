@@ -43,6 +43,7 @@ export const PERMISSIONS = {
   reportExportAccreditation: 'report.exportAccreditation',
   changeRequestStatistics: 'changeRequest.statistics',
   syncConfigure: 'sync.configure',
+  delegationManage: 'delegation.manage',
 } as const satisfies Record<string, PermissionCode>;
 
 export function hasPermission(

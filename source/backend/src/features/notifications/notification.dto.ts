@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsBoolean, IsOptional, Max } from 'class-validator';
 import {
+  EmailDeliveryStatus,
   NotificationReadStatus,
   NotificationType,
   type Notification,
@@ -36,7 +37,42 @@ export class NotificationDto {
   readStatus!: NotificationReadStatus;
   @ApiProperty() createdAt!: string;
   @ApiProperty({ nullable: true, type: String }) readAt!: string | null;
+  @ApiProperty({ description: 'F-25: true only when SMTP accepted the email' })
+  emailSent!: boolean;
+  @ApiProperty({
+    enum: [...Object.values(EmailDeliveryStatus), 'NOT_REQUESTED'],
+    enumName: 'NotificationEmailStatus',
+    description: 'NOT_REQUESTED: email was off or the event is in-app only',
+  })
+  emailStatus!: NotificationEmailStatus;
+  @ApiProperty({
+    nullable: true,
+    type: String,
+    description: 'Path in the web app this notification opens',
+  })
+  link!: string | null;
 }
+
+export type NotificationEmailStatus = EmailDeliveryStatus | 'NOT_REQUESTED';
+
+export class NotificationPreferenceDto {
+  @ApiProperty() emailEnabled!: boolean;
+  @ApiProperty({
+    description:
+      'Email is switched on for the system and the account has an address; not an SMTP probe',
+  })
+  emailAvailable!: boolean;
+}
+
+export class UpdateNotificationPreferenceDto {
+  @ApiProperty()
+  @IsBoolean()
+  emailEnabled!: boolean;
+}
+
+export const NOTIFICATION_DELIVERY_INCLUDE = {
+  emailDelivery: { select: { status: true } },
+} as const;
 
 export class NotificationPageDto {
   @ApiProperty({ type: [NotificationDto] }) items!: NotificationDto[];
@@ -49,7 +85,20 @@ export class UnreadCountDto {
   @ApiProperty() count!: number;
 }
 
-export function toNotificationDto(row: Notification): NotificationDto {
+export function notificationLink(row: Notification): string | null {
+  if (row.notificationType === NotificationType.DELEGATION_RECEIVED)
+    return '/approval-delegations';
+  return row.changeRequestId
+    ? `/change-requests/${encodeURIComponent(row.changeRequestId)}`
+    : null;
+}
+
+export function toNotificationDto(
+  row: Notification & {
+    emailDelivery?: { status: EmailDeliveryStatus } | null;
+  },
+): NotificationDto {
+  const emailStatus = row.emailDelivery?.status ?? 'NOT_REQUESTED';
   return {
     id: row.id,
     notificationType: row.notificationType,
@@ -58,5 +107,8 @@ export function toNotificationDto(row: Notification): NotificationDto {
     readStatus: row.readStatus,
     createdAt: row.createdAt.toISOString(),
     readAt: row.readAt?.toISOString() ?? null,
+    emailSent: emailStatus === EmailDeliveryStatus.SENT,
+    emailStatus,
+    link: notificationLink(row),
   };
 }

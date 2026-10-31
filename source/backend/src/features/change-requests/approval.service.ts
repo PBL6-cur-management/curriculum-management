@@ -3,12 +3,12 @@ import {
   ApprovalAction,
   ChangeRequestStatus,
   ChangeRequestType,
-  type ApprovalStep,
   type Prisma,
 } from '../../generated/prisma/client.js';
 import type { AccessContext } from '../../shared/authz/access-context.js';
 import {
   ApprovalRecorder,
+  type ActionableRow,
   type ClosingAction,
   type Decision,
 } from '../../shared/change-requests/approval-recorder.js';
@@ -67,9 +67,9 @@ export class ApprovalService {
         }
         await this.applier.apply(tx, request, access.userId);
       }
-      await this.recorder.record(
+      await this.recorder.recordRows(
         tx,
-        rows.map((row) => row.id),
+        rows,
         decision(ApprovalAction.APPROVE, dto.remark ?? null, access),
       );
       const result = await this.recorder.advance(tx, request);
@@ -197,9 +197,9 @@ export class ApprovalService {
     const request = await this.decidable(id, access);
     await this.prisma.$transaction(async (tx) => {
       const rows = await this.ownRows(tx, request, access);
-      await this.recorder.record(
+      await this.recorder.recordRows(
         tx,
-        rows.map((row) => row.id),
+        rows,
         decision(action, remark, access),
       );
       await this.closeRequest(tx, request, action, remark, access);
@@ -251,7 +251,7 @@ export class ApprovalService {
     tx: Prisma.TransactionClient,
     request: RequestCore,
     access: AccessContext,
-  ): Promise<ApprovalStep[]> {
+  ): Promise<ActionableRow[]> {
     await this.recorder.claim(tx, request);
     const rows = await this.recorder.actionableRows(
       tx,

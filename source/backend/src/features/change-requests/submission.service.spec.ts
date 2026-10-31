@@ -76,6 +76,7 @@ describe('SubmissionService', () => {
     $queryRaw: vi.fn().mockResolvedValue([]),
   };
   const prisma = {
+    approvalDelegation: { findMany: vi.fn().mockResolvedValue([]) },
     $transaction: vi.fn((run: (client: unknown) => unknown) => run(tx)),
     changeRequest: { findFirst: vi.fn() },
     programVersion: { findUnique: vi.fn() },

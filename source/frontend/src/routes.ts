@@ -57,6 +57,7 @@ export const ROUTES = {
   changeRequestEdit: '/change-requests/:requestId/edit',
   approvalQueue: '/approval-queue',
   notifications: '/notifications',
+  approvalDelegations: '/approval-delegations',
   imports: '/imports',
   importHistory: '/imports/history',
   importDetail: '/imports/history/:batchId',

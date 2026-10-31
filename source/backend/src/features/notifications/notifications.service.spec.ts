@@ -4,6 +4,7 @@ import {
 } from '../../generated/prisma/client.js';
 import type { PrismaService } from '../../shared/prisma/prisma.service.js';
 import type { NotificationQueryDto } from './notification.dto.js';
+import { NotificationService } from '../../shared/notifications/notification.service.js';
 import { NotificationsService } from './notifications.service.js';
 
 const row = (patch: object = {}) => ({
@@ -28,7 +29,10 @@ describe('NotificationsService', () => {
     notification: { findMany, count, findFirst, update, updateMany },
     $transaction: vi.fn((queries: Promise<unknown>[]) => Promise.all(queries)),
   };
-  const service = new NotificationsService(prisma as unknown as PrismaService);
+  const service = new NotificationsService(
+    prisma as unknown as PrismaService,
+    new NotificationService(),
+  );
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -65,6 +69,7 @@ describe('NotificationsService', () => {
     });
     expect(findFirst).toHaveBeenCalledWith({
       where: { id: 'n1', recipientId: 'u1' },
+      include: { emailDelivery: { select: { status: true } } },
     });
   });
 

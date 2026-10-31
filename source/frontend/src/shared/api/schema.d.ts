@@ -1716,6 +1716,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/notifications/preferences': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['NotificationsController_preferences'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch: operations['NotificationsController_updatePreferences'];
+    trace?: never;
+  };
   '/api/notifications/read-all': {
     parameters: {
       query?: never;
@@ -3092,6 +3108,102 @@ export interface paths {
     get: operations['PublicationController_pdfFile'];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/approval-delegations': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['ApprovalDelegationsController_list'];
+    put?: never;
+    post: operations['ApprovalDelegationsController_create'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/approval-delegations/access': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['ApprovalDelegationsController_access'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/approval-delegations/recipients': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['ApprovalDelegationsController_recipients'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/approval-delegations/delegators': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['ApprovalDelegationsController_delegators'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/approval-delegations/levels': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['ApprovalDelegationsController_levels'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/approval-delegations/{id}/revoke': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['ApprovalDelegationsController_revoke'];
     delete?: never;
     options?: never;
     head?: never;
@@ -4582,7 +4694,11 @@ export interface components {
     /** @enum {string} */
     ApprovalAction: 'PENDING' | 'APPROVE' | 'RETURN' | 'REJECT';
     /** @enum {string} */
-    ApprovalStepKind: 'NORMAL' | 'SKIPPED' | 'OVERRIDE';
+    ApprovalStepKind: 'NORMAL' | 'SKIPPED' | 'OVERRIDE' | 'DELEGATED';
+    StepDelegationRefDto: {
+      id: string;
+      delegator: components['schemas']['UserRefDto'];
+    };
     ApprovalStepDto: {
       id: string;
       /** @enum {number} */
@@ -4600,6 +4716,8 @@ export interface components {
       performedBy: components['schemas']['UserRefDto'] | null;
       isOverride: boolean;
       kind: components['schemas']['ApprovalStepKind'];
+      /** @description F-25: the grant a delegate decided this row under; kept after it expires or is revoked */
+      delegation: components['schemas']['StepDelegationRefDto'] | null;
     };
     RequestActionsDto: {
       canEdit: boolean;
@@ -4825,6 +4943,10 @@ export interface components {
     CreateCommentDto: {
       content: string;
     };
+    DelegatedQueueRefDto: {
+      delegationId: string;
+      delegator: components['schemas']['UserRefDto'];
+    };
     ApprovalQueueItemDto: {
       requestId: string;
       requestCode: string;
@@ -4840,6 +4962,8 @@ export interface components {
       submittedAt: string;
       /** @description Whole days since the request entered its level */
       daysWaiting: number;
+      /** @description F-25: whose rows the caller decides here by delegation; empty for own work */
+      delegatedFor: components['schemas']['DelegatedQueueRefDto'][];
     };
     /** @enum {string} */
     NotificationType:
@@ -4851,9 +4975,23 @@ export interface components {
       | 'REQUEST_COMMENTED'
       | 'REQUEST_EFFECTIVE'
       | 'GRADUATION_CONCLUSION_CHANGED'
-      | 'SCHOOL_SYNC_FAILED';
+      | 'SCHOOL_SYNC_FAILED'
+      | 'DELEGATION_RECEIVED'
+      | 'REQUEST_DEADLINE_REMINDER';
     /** @enum {string} */
     NotificationReadStatus: 'UNREAD' | 'READ';
+    /**
+     * @description NOT_REQUESTED: email was off or the event is in-app only
+     * @enum {string}
+     */
+    NotificationEmailStatus:
+      | 'PENDING'
+      | 'SENDING'
+      | 'SENT'
+      | 'FAILED'
+      | 'SKIPPED'
+      | 'UNKNOWN'
+      | 'NOT_REQUESTED';
     NotificationDto: {
       id: string;
       notificationType: components['schemas']['NotificationType'];
@@ -4862,6 +5000,12 @@ export interface components {
       readStatus: components['schemas']['NotificationReadStatus'];
       createdAt: string;
       readAt: string | null;
+      /** @description F-25: true only when SMTP accepted the email */
+      emailSent: boolean;
+      /** @description NOT_REQUESTED: email was off or the event is in-app only */
+      emailStatus: components['schemas']['NotificationEmailStatus'];
+      /** @description Path in the web app this notification opens */
+      link: string | null;
     };
     NotificationPageDto: {
       items: components['schemas']['NotificationDto'][];
@@ -4871,6 +5015,14 @@ export interface components {
     };
     UnreadCountDto: {
       count: number;
+    };
+    NotificationPreferenceDto: {
+      emailEnabled: boolean;
+      /** @description Email is switched on for the system and the account has an address; not an SMTP probe */
+      emailAvailable: boolean;
+    };
+    UpdateNotificationPreferenceDto: {
+      emailEnabled: boolean;
     };
     CreateSemesterDto: {
       /** @example 2026-2027-1 */
@@ -6440,6 +6592,66 @@ export interface components {
       /** Format: date-time */
       expiresAt: string | null;
       failure: string | null;
+    };
+    /** @enum {string} */
+    ApprovalDelegationStatus: 'ACTIVE' | 'EXPIRED' | 'REVOKED';
+    DelegationUserOptionDto: {
+      id: string;
+      userCode: string;
+      fullName: string;
+    };
+    DelegationLevelDto: {
+      /** @enum {number} */
+      approvalLevel: 1 | 2;
+      levelName: string;
+    };
+    DelegationDto: {
+      id: string;
+      delegator: components['schemas']['DelegationUserOptionDto'];
+      delegate: components['schemas']['DelegationUserOptionDto'];
+      /** @description Null = every named level the delegator holds */
+      scope: components['schemas']['DelegationLevelDto'] | null;
+      /** @description YYYY-MM-DD, inclusive */
+      validFrom: string;
+      /** @description YYYY-MM-DD, inclusive */
+      validTo: string;
+      status: components['schemas']['ApprovalDelegationStatus'];
+      /** @description Usable today: active, inside its days, both accounts active */
+      isEffectiveNow: boolean;
+      createdAt: string;
+      revokedAt: string | null;
+      createdBy: components['schemas']['DelegationUserOptionDto'] | null;
+      canRevoke: boolean;
+    };
+    DelegationPageDto: {
+      items: components['schemas']['DelegationDto'][];
+      total: number;
+      page: number;
+      pageSize: number;
+    };
+    DelegationAccessDto: {
+      canManage: boolean;
+      /** @description May act for other people (R1) */
+      canManageOthers: boolean;
+      /** @description A grant to the caller is usable today */
+      hasIncomingDelegation: boolean;
+    };
+    CreateDelegationDto: {
+      delegateId: string;
+      /** @description R1 only; defaults to the caller */
+      delegatorId?: string;
+      /**
+       * @description Null or absent = every named level the delegator holds
+       * @enum {number|null}
+       */
+      scopeLevel?: 1 | 2 | null;
+      /** @example 2026-11-01 */
+      validFrom: string;
+      /** @example 2026-11-15 */
+      validTo: string;
+    };
+    RevokeDelegationDto: {
+      reason?: string;
     };
   };
   responses: never;
@@ -9561,6 +9773,48 @@ export interface operations {
       };
     };
   };
+  NotificationsController_preferences: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['NotificationPreferenceDto'];
+        };
+      };
+    };
+  };
+  NotificationsController_updatePreferences: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateNotificationPreferenceDto'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['NotificationPreferenceDto'];
+        };
+      };
+    };
+  };
   NotificationsController_markAllRead: {
     parameters: {
       query?: never;
@@ -10072,8 +10326,7 @@ export interface operations {
       query?: never;
       header?: never;
       path: {
-        importType:
-          'COURSE_CATALOG' | 'CURRICULUM' | 'STUDENT_LIST' | 'ACADEMIC_RESULT';
+        importType: string;
       };
       cookie?: never;
     };
@@ -11740,6 +11993,161 @@ export interface operations {
         };
         content: {
           'application/pdf': string;
+        };
+      };
+    };
+  };
+  ApprovalDelegationsController_list: {
+    parameters: {
+      query?: {
+        page?: number;
+        pageSize?: number;
+        status?: components['schemas']['ApprovalDelegationStatus'];
+        direction?: 'OUTGOING' | 'INCOMING';
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['DelegationPageDto'];
+        };
+      };
+    };
+  };
+  ApprovalDelegationsController_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateDelegationDto'];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['DelegationDto'];
+        };
+      };
+    };
+  };
+  ApprovalDelegationsController_access: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['DelegationAccessDto'];
+        };
+      };
+    };
+  };
+  ApprovalDelegationsController_recipients: {
+    parameters: {
+      query?: {
+        q?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['DelegationUserOptionDto'][];
+        };
+      };
+    };
+  };
+  ApprovalDelegationsController_delegators: {
+    parameters: {
+      query?: {
+        q?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['DelegationUserOptionDto'][];
+        };
+      };
+    };
+  };
+  ApprovalDelegationsController_levels: {
+    parameters: {
+      query?: {
+        /** @description R1 only; defaults to the caller */
+        delegatorId?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['DelegationLevelDto'][];
+        };
+      };
+    };
+  };
+  ApprovalDelegationsController_revoke: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RevokeDelegationDto'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['DelegationDto'];
         };
       };
     };
