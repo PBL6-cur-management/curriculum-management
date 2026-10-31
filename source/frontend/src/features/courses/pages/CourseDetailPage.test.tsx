@@ -297,12 +297,10 @@ describe('CourseDetailPage', () => {
     expect(screen.getAllByText(/IT002 — Toán rời rạc/)).toHaveLength(3);
     expect(screen.getByText('2')).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: 'Xóa' })).toHaveLength(2);
+    // The request path is the page's own "Tạo đề xuất"; rows carry no request button.
     expect(
-      screen.getByRole('button', { name: 'Tạo đề xuất' }).closest('a'),
-    ).toHaveAttribute(
-      'href',
-      '/change-requests/new?type=COURSE_RELATION&targetType=COURSE&targetId=c1',
-    );
+      screen.queryByRole('button', { name: /đề xuất/i }),
+    ).not.toBeInTheDocument();
   });
 
   it('edits a threshold in place, refusing a value above 4 on the client', async () => {

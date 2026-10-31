@@ -8,7 +8,6 @@ import { useCan } from '../../../shared/auth/useCan';
 import { errorMessage } from '../../../shared/forms/applyFieldErrors';
 import type { CourseRelation, RelatedCourse } from '../api/courseRelations';
 import type { CourseDetail } from '../api/courses';
-import { CreateRequestButton } from '../../../shared/change-requests/CreateRequestButton';
 import { relationLabel, type RelationSide } from '../constants/relationLabels';
 import {
   useCourseRelations,
@@ -56,6 +55,12 @@ export function CourseRelationsSection({
   const remove = useDeleteCourseRelation();
   const rows = relations.map((relation) => toRelationRow(relation, course.id));
 
+  // An edit that must go through a request uses the page's "Tạo đề xuất" (already prefilled for
+  // relations); rows only carry the direct delete.
+  const anyDirect = relations.some(
+    (relation) =>
+      relation.editPath !== null && relation.editPath !== 'VIA_REQUEST',
+  );
   const columns: TableColumnsType<RelationRow> = [
     { title: 'Quan hệ', dataIndex: 'label' },
     {
@@ -64,8 +69,14 @@ export function CourseRelationsSection({
         <>
           <Link to={generatePath(ROUTES.courseDetail, { courseId: other.id })}>
             {other.courseCode} — {other.courseName}
-          </Link>{' '}
-          <CourseStatusTag status={other.status} />
+          </Link>
+          {/* Only a course no longer in use is worth flagging. */}
+          {other.status !== 'ACTIVE' && (
+            <>
+              {' '}
+              <CourseStatusTag status={other.status} />
+            </>
+          )}
         </>
       ),
     },
@@ -76,18 +87,8 @@ export function CourseRelationsSection({
     {
       title: 'Thao tác',
       render: (_value, { relation }) => {
-        if (relation.editPath === 'VIA_REQUEST')
-          return (
-            <CreateRequestButton
-              size="small"
-              prefill={{
-                type: 'COURSE_RELATION',
-                targetType: 'COURSE',
-                targetId: course.id,
-              }}
-            />
-          );
-        if (relation.editPath === null) return null;
+        if (relation.editPath === null || relation.editPath === 'VIA_REQUEST')
+          return null;
         return (
           <Popconfirm
             title="Xóa quan hệ này?"
@@ -128,7 +129,7 @@ export function CourseRelationsSection({
         <Table
           rowKey={(row) => row.relation.id}
           loading={isPending}
-          columns={columns}
+          columns={anyDirect ? columns : columns.slice(0, -1)}
           dataSource={rows}
           pagination={false}
           locale={{ emptyText: 'Chưa có quan hệ nào' }}
