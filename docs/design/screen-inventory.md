@@ -781,3 +781,11 @@ Mỗi điểm là một chỗ tài liệu nguồn bỏ trống hoặc không kh�
 | G-6 | Xem lại một phiên bản đã ban hành (FR-73) có thể là một màn hình riêng hoặc là các màn hình soạn thảo ở chế độ khóa | Ghi thành một màn hình riêng MH-47 để việc "không có nút sửa" kiểm được. Khi hiện thực, MH-47 được phép dùng lại các phần hiển thị của MH-22, MH-25, MH-31, MH-32 | MH-47, MH-46; số màn hình của nhóm G | Không cần hỏi |
 | G-7 | NFR-24 yêu cầu tham số nghiệp vụ nằm trong cấu hình, nhưng không nói có màn hình để sửa hay không; từ điển dữ liệu cũng không có thực thể cấu hình (E-7) | Không có màn hình sửa tham số nghiệp vụ: người triển khai sửa trong tệp cấu hình (K-5). Riêng kết nối và lịch đồng bộ có màn hình MH-12 vì FR-98 nêu rõ Phòng Đào tạo cấu hình | MH-12; mọi màn hình dùng tham số (MH-33, MH-37, MH-42) | E-7 |
 | G-8 | Ma trận SRS cho R6 xem danh mục học phần và đề cương không giới hạn, nhưng cho xem chương trình chỉ trong phạm vi (ô P) | Sinh viên vào được MH-16, MH-17, MH-36 cho mọi học phần, nhưng chỉ thấy bản đề cương đã ban hành. Khung và PLO thì chỉ của phiên bản áp dụng cho mình; không có đường vào MH-21 | MH-16, MH-17, MH-36, MH-20 | Thầy hướng dẫn |
+
+## Bổ sung sau B6: màn hình vận hành sao lưu (F-26)
+
+| Mã | Màn hình | Vai trò | Mục đích | Dữ liệu | Hành động | Truy vết | Bậc |
+|---|---|---|---|---|---|---|---|
+| MH-63 | Sao lưu và phục hồi | R1 X | Xem trạng thái sao lưu hằng ngày, các bộ đang giữ và biên bản diễn tập phục hồi | Danh mục sao lưu trên đĩa (không có bảng) | Chỉ xem; không phục hồi, không tải, không chạy hay xóa | NFR-12, NFR-13 | B6 |
+
+Đường dẫn `/operations/backups`, quyền `backup.view`, mặc định chỉ R1. Phục hồi thật chạy bằng CLI `pnpm backup:drill`, không qua màn hình này.
