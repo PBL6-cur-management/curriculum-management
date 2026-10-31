@@ -14,3 +14,7 @@ source/backend/scripts/local/
 .mcp.json
 # Uploaded files (FILES_ROOT in local .env)
 source/backend/storage/
+
+# Local-only tool data
+.codegraph/
+appendonlydir/

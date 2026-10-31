@@ -6,6 +6,10 @@ Một ứng dụng NestJS (TypeScript, ESM), Prisma trên PostgreSQL, hàng đ�
 
 Cần Node.js 22 (≥ 22.22), pnpm 10, Docker.
 
+**Một lệnh (khuyên dùng):** `pnpm dev:setup` trong `source/backend` (chạy được cả trước `pnpm install`). Script `scripts/dev-setup.mjs` tạo `.env` từ `.env.example` (sinh `SESSION_SECRET`), dựng PostgreSQL 18 + Redis 8 + Mailpit bằng Docker, cài thư viện backend/frontend/e2e, áp migration, seed vai trò/admin và danh mục DUT công khai. Chạy lại an toàn. Hạ tầng chạy trong Docker; ứng dụng chạy trên máy bằng `pnpm dev`. Dữ liệu cá nhân (`prisma/seed-data/dut/data/private/`) không có trong git — thiếu thì seed bỏ qua phần giảng viên/sinh viên.
+
+Làm tay từng bước:
+
 1. `pnpm install` — tự chạy `prisma generate`.
 2. `pnpm services:up` — dựng PostgreSQL 18 và Redis 8 từ `compose.yaml`, chờ đến khi cả hai sẵn sàng.
 3. Tạo tệp `.env` cạnh `package.json` với các biến ở bảng dưới (giá trị mẫu khớp `compose.yaml`).
@@ -42,7 +46,7 @@ Biến sai kiểu hoặc thiếu giá trị bắt buộc thì ứng dụng dừn
 | `pnpm lint`                               | oxlint, có kiểm theo kiểu (lời hứa bị bỏ quên là lỗi)                                                                                                                                                                                                                               |
 | `pnpm format` · `pnpm format:check`       | Prettier                                                                                                                                                                                                                                                                            |
 | `pnpm prisma:migrate`                     | Tạo và áp migration từ `prisma/schema.prisma`                                                                                                                                                                                                                                       |
-| `pnpm prisma:seed`                        | Nạp tài khoản R1, đơn vị, vai trò, quyền, học kỳ và khóa (chạy lại an toàn)                                                                                                                                                                                       |
+| `pnpm prisma:seed`                        | Nạp tài khoản R1, đơn vị, vai trò, quyền, học kỳ và khóa (chạy lại an toàn)                                                                                                                                                                                                         |
 | `pnpm services:up` · `pnpm services:down` | Bật · tắt PostgreSQL và Redis                                                                                                                                                                                                                                                       |
 
 ## Dữ liệu thật

@@ -10,6 +10,7 @@
   "scripts": {
     "services:up": "docker compose up -d --wait",
     "services:down": "docker compose down",
+    "dev:setup": "node scripts/dev-setup.mjs",
     "mail:start": "docker compose --profile mail up -d mailpit",
     "school-db:sim:start": "docker compose --profile school-db-sim up -d school-db-sim",
     "school-db:sim:seed": "tsx scripts/school-db-sim/seed.ts",
