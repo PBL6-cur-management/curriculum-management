@@ -39,6 +39,16 @@ describe('validateEnv', () => {
     ).toThrow(/STUDENT_CREDENTIAL_ENCRYPTION_KEY/);
   });
 
+  it('defaults the log level to info and accepts only the named levels', () => {
+    expect(validateEnv(REQUIRED).LOG_LEVEL).toBe('info');
+    expect(validateEnv({ ...REQUIRED, LOG_LEVEL: 'warn' }).LOG_LEVEL).toBe(
+      'warn',
+    );
+    expect(() => validateEnv({ ...REQUIRED, LOG_LEVEL: 'verbose' })).toThrow(
+      /LOG_LEVEL/,
+    );
+  });
+
   it('still converts numeric variables', () => {
     expect(validateEnv({ ...REQUIRED, REDIS_PORT: '6380' }).REDIS_PORT).toBe(
       6380,

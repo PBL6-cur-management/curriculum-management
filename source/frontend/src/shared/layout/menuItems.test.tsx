@@ -166,6 +166,13 @@ describe('app menu', () => {
     expect(keys(['semester.manage'])).toContain(ROUTES.semesters);
     expect(keys(['course.view'])).not.toContain(ROUTES.semesters);
   });
+
+  it('shows the backup page only to someone granted backup.view', () => {
+    const keys = (permissions: string[]) =>
+      leafKeys(toMenuItems(APP_MENU, permissions as never));
+    expect(keys(['backup.view'])).toContain(ROUTES.backups);
+    expect(keys(['course.view'])).not.toContain(ROUTES.backups);
+  });
 });
 
 describe('section tabs', () => {

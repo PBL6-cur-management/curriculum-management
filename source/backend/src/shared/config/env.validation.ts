@@ -1,4 +1,5 @@
 import { plainToInstance } from 'class-transformer';
+import { LOG_LEVELS } from '../logging/log-levels.js';
 import {
   ELIGIBILITY_DEFAULTS,
   ELIGIBILITY_LIMITS,
@@ -18,6 +19,8 @@ import {
 
 const NODE_ENVS = ['development', 'test', 'production'] as const;
 const MAX_PORT = 65535;
+// Redis ships 16 logical databases: 0..15.
+const MAX_REDIS_DB = 15;
 const SESSION_SECRET_MIN_LENGTH = 32;
 const DEFAULT_SESSION_IDLE_MINUTES = 60;
 const DEFAULT_FILES_ROOT = 'files';
@@ -27,6 +30,8 @@ const CREDENTIAL_KEY_PATTERN = /^[A-Za-z0-9+/]{43}=$/;
 
 // Keep the explicit types: implicit conversion reads design:type, which is Object for an unannotated property,
 // so a numeric variable would stay a string and fail @IsInt.
+export { LOG_LEVELS };
+
 export class Env {
   @IsIn(NODE_ENVS)
   NODE_ENV: (typeof NODE_ENVS)[number] = 'development';
@@ -48,6 +53,12 @@ export class Env {
   @Min(1)
   @Max(MAX_PORT)
   REDIS_PORT: number = 6379;
+
+  // Logical Redis database. The e2e run takes its own so it never meets the dev app's keys.
+  @IsInt()
+  @Min(0)
+  @Max(MAX_REDIS_DB)
+  REDIS_DB: number = 0;
 
   @IsString()
   @MinLength(SESSION_SECRET_MIN_LENGTH)
@@ -145,10 +156,43 @@ export class Env {
   @IsString()
   SCHOOL_SYNC_EXTERNAL_HOSTS?: string;
 
+  // F-26: daily database + attachment backups. Off until an operator names a root on another disk.
+  @IsIn(['true', 'false'])
+  BACKUP_ENABLED: 'true' | 'false' = 'false';
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  BACKUP_ROOT?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  PG_DUMP_PATH: string = 'pg_dump';
+
+  @IsString()
+  @IsNotEmpty()
+  PG_RESTORE_PATH: string = 'pg_restore';
+
   @IsInt()
   @Min(ELIGIBILITY_LIMITS.MIN_DEPTH)
   @Max(ELIGIBILITY_LIMITS.MAX_DEPTH)
   ELIGIBILITY_MAX_DEPTH: number = ELIGIBILITY_DEFAULTS.MAX_DEPTH;
+
+  // F-27: structured log verbosity in production.
+  @IsIn(LOG_LEVELS)
+  LOG_LEVEL: (typeof LOG_LEVELS)[number] = 'info';
+}
+
+// Names the offending variables and rules, never their values: the bootstrap log prints only the names.
+export class EnvValidationError extends Error {
+  readonly code = 'INVALID_ENVIRONMENT';
+  constructor(
+    readonly properties: string[],
+    details: string[],
+  ) {
+    super(`Invalid environment: ${details.join('; ')}`);
+    this.name = 'EnvValidationError';
+  }
 }
 
 export function validateEnv(raw: Record<string, unknown>): Env {
@@ -158,7 +202,10 @@ export function validateEnv(raw: Record<string, unknown>): Env {
     const details = errors.flatMap((error) =>
       Object.values(error.constraints ?? {}),
     );
-    throw new Error(`Invalid environment: ${details.join('; ')}`);
+    throw new EnvValidationError(
+      errors.map((error) => error.property),
+      details,
+    );
   }
   return env;
 }

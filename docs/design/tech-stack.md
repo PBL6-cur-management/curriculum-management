@@ -47,7 +47,7 @@
 | Thư điện tử | Nodemailer qua SMTP của Trường | Thông báo (B6) |
 | Tệp đính kèm | Thư mục trên đĩa máy chủ, gắn vào container của máy chủ ứng dụng, nằm trong phạm vi sao lưu | K-6 |
 | Giao diện — dữ liệu và điều hướng | TanStack Query, React Router; `ConfigProvider` của Ant Design đặt ngôn ngữ `vi_VN` | NFR-16, NFR-17, NFR-18, NFR-20 |
-| Kiểm thử máy chủ | Vitest, Supertest, Testcontainers (PostgreSQL và Redis thật trong container). Không dùng Jest: NestJS bản ESM chỉ chạy được Jest với cờ thử nghiệm `--experimental-vm-modules` của Node; mẫu ESM chính thức của NestJS dùng Vitest | `docs/planning/test-plan.md` |
+| Kiểm thử máy chủ | Vitest, Supertest; e2e chạy trên PostgreSQL và Redis thật của `compose.yaml` (cơ sở dữ liệu `ctdt_e2e_*` riêng, Redis database 1). Bỏ Testcontainers ngày 2026-10-31 để bớt container và RAM trên máy nhóm. Không dùng Jest: NestJS bản ESM chỉ chạy được Jest với cờ thử nghiệm `--experimental-vm-modules` của Node; mẫu ESM chính thức của NestJS dùng Vitest | `docs/planning/test-plan.md` |
 | Kiểm thử giao diện | Vitest, React Testing Library | như trên |
 | Kiểm tra mã | oxlint (máy chủ bật kiểm theo kiểu, lời hứa bị bỏ quên là lỗi), Prettier | — |
 | Môi trường phát triển | `source/backend/compose.yaml` chỉ dựng PostgreSQL và Redis; máy chủ ứng dụng và giao diện chạy trên máy. Vite chuyển `/api` sang máy chủ ứng dụng, cùng một nguồn như khi Caddy phục vụ | — |

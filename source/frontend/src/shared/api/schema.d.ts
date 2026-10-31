@@ -3210,6 +3210,54 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/operations/backups/status': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['BackupsController_status'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/operations/backups': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['BackupsController_list'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/operations/restore-drills': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['BackupsController_drills'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -3250,6 +3298,7 @@ export interface components {
       | 'delegation.manage'
       | 'integrationClient.manage'
       | 'sync.configure'
+      | 'backup.view'
       | 'auditLog.view'
       | 'course.view'
       | 'course.edit'
@@ -6652,6 +6701,111 @@ export interface components {
     };
     RevokeDelegationDto: {
       reason?: string;
+    };
+    /** @enum {string} */
+    BackupState: 'DISABLED' | 'READY' | 'RUNNING' | 'OVERDUE' | 'FAILED';
+    /** @enum {string} */
+    DeliveryTier: 'B1' | 'B2' | 'B3' | 'B4' | 'B5' | 'B6';
+    OperationFailureDto: {
+      /** @description Stable BACKUP_/DRILL_ code */
+      code: string;
+      /** @description Vietnamese cause and next action */
+      message: string;
+    };
+    BackupStatusDto: {
+      state: components['schemas']['BackupState'];
+      /** @example 0 2 * * * */
+      schedule: string;
+      /** @example Asia/Ho_Chi_Minh */
+      timeZone: string;
+      /** @description Fixed policy: complete sets kept */
+      retentionCount: number;
+      /** @description Complete published sets now on disk */
+      retainedCount: number;
+      /** @description Latest due day (YYYY-MM-DD) */
+      dueSlot: string;
+      /** Format: date-time */
+      lastSuccessfulAt: string | null;
+      /** @description Machine recovery time of the latest accepted drill */
+      lastRecoveryMs: number | null;
+      lastAcceptedTier: components['schemas']['DeliveryTier'] | null;
+      currentRunId: string | null;
+      lastFailure: components['schemas']['OperationFailureDto'] | null;
+    };
+    /** @enum {string} */
+    BackupRunStatus:
+      'RUNNING' | 'SUCCEEDED' | 'FAILED' | 'INTERRUPTED' | 'EXPIRED';
+    BackupRunDto: {
+      /** @example daily-2026-10-31 */
+      id: string;
+      /** @description Due day, not the snapshot day */
+      scheduledFor: string;
+      status: components['schemas']['BackupRunStatus'];
+      /** Format: date-time */
+      startedAt: string;
+      /** Format: date-time */
+      completedAt: string | null;
+      attempt: number;
+      /** Format: date-time */
+      snapshotAt: string | null;
+      /** @description Decimal byte count */
+      databaseBytes: string | null;
+      /** @description Decimal byte count */
+      fileBytes: string | null;
+      fileCount: number | null;
+      releasedVersionCount: number | null;
+      durationMs: number | null;
+      failure: components['schemas']['OperationFailureDto'] | null;
+    };
+    BackupRunPageDto: {
+      items: components['schemas']['BackupRunDto'][];
+      total: number;
+      page: number;
+      pageSize: number;
+    };
+    /** @enum {string} */
+    DrillStatus:
+      'RUNNING' | 'RESTORED' | 'SUCCEEDED' | 'FAILED' | 'INTERRUPTED';
+    /** @enum {string} */
+    DrillCheckCode:
+      | 'DUMP_HASH'
+      | 'DB_RESTORE'
+      | 'FILE_HASHES'
+      | 'DB_FILE_REFERENCES'
+      | 'RELEASED_CONTENT'
+      | 'LOCALE'
+      | 'MIGRATIONS';
+    DrillCheckDto: {
+      code: components['schemas']['DrillCheckCode'];
+      passed: boolean;
+      message: string;
+    };
+    RestoreDrillDto: {
+      id: string;
+      backupId: string;
+      tier: components['schemas']['DeliveryTier'];
+      operator: string;
+      status: components['schemas']['DrillStatus'];
+      /** Format: date-time */
+      startedAt: string;
+      /** Format: date-time */
+      completedAt: string | null;
+      recoveryMs: number | null;
+      databaseRestoreMs: number | null;
+      filesRestoreMs: number | null;
+      verificationMs: number | null;
+      releasedVersionCount: number | null;
+      checks: components['schemas']['DrillCheckDto'][];
+      /** Format: date-time */
+      acceptedAt: string | null;
+      acceptanceNote: string | null;
+      failure: components['schemas']['OperationFailureDto'] | null;
+    };
+    RestoreDrillPageDto: {
+      items: components['schemas']['RestoreDrillDto'][];
+      total: number;
+      page: number;
+      pageSize: number;
     };
   };
   responses: never;
@@ -10326,7 +10480,8 @@ export interface operations {
       query?: never;
       header?: never;
       path: {
-        importType: string;
+        importType:
+          'COURSE_CATALOG' | 'CURRICULUM' | 'STUDENT_LIST' | 'ACADEMIC_RESULT';
       };
       cookie?: never;
     };
@@ -12148,6 +12303,76 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['DelegationDto'];
+        };
+      };
+    };
+  };
+  BackupsController_status: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['BackupStatusDto'];
+        };
+      };
+    };
+  };
+  BackupsController_list: {
+    parameters: {
+      query?: {
+        page?: number;
+        pageSize?: number;
+        q?: string;
+        sort?: 'newest' | 'oldest';
+        status?: components['schemas']['BackupRunStatus'];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['BackupRunPageDto'];
+        };
+      };
+    };
+  };
+  BackupsController_drills: {
+    parameters: {
+      query?: {
+        page?: number;
+        pageSize?: number;
+        q?: string;
+        sort?: 'newest' | 'oldest';
+        tier?: components['schemas']['DeliveryTier'];
+        status?: components['schemas']['DrillStatus'];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['RestoreDrillPageDto'];
         };
       };
     };

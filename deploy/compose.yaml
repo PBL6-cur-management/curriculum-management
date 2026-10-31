@@ -1,0 +1,141 @@
+# F-27 production installation. Separate project from source/backend/compose.yaml (development): own name, own volumes.
+# Every image is pinned by the operator; nothing here falls back to `latest` or to a development password.
+# Never run `down -v`, volume prune or reset against this project: the volumes hold the production data.
+name: ctdt-production
+
+x-logging: &rotated-logging
+  driver: json-file
+  options:
+    max-size: '${DOCKER_LOG_MAX_SIZE:-10m}'
+    max-file: '${DOCKER_LOG_MAX_FILE:-5}'
+
+x-healthcheck: &health-timing
+  interval: '${HEALTH_INTERVAL:-10s}'
+  timeout: '${HEALTH_TIMEOUT:-7s}'
+  retries: ${HEALTH_RETRIES:-6}
+  start_period: '${HEALTH_START_PERIOD:-30s}'
+
+services:
+  postgres:
+    image: '${POSTGRES_IMAGE:?Set pinned PostgreSQL image}'
+    environment:
+      POSTGRES_USER: '${POSTGRES_USER:?Set database user}'
+      POSTGRES_DB: '${POSTGRES_DB:?Set database name}'
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD:?Set database password}'
+      # Vietnamese ordering comes from ICU; the backend refuses to start without it.
+      POSTGRES_INITDB_ARGS: --locale-provider=icu --icu-locale=vi-VN --locale=C.UTF-8
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      <<: *health-timing
+    restart: unless-stopped
+    logging: *rotated-logging
+
+  redis:
+    image: '${REDIS_IMAGE:?Set pinned Redis image}'
+    # BullMQ needs keys never evicted; AOF keeps queued jobs across a restart.
+    command:
+      ['redis-server', '--appendonly', 'yes', '--maxmemory-policy', 'noeviction']
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      <<: *health-timing
+    restart: unless-stopped
+    logging: *rotated-logging
+
+  # One-shot. Compose does not re-run an already successful migration on every upgrade:
+  # the upgrade runbook recreates it explicitly before the API is replaced.
+  migrate:
+    image: 'ctdt/backend-migrations:${RELEASE_TAG:?Set release tag}'
+    build:
+      context: ../source/backend
+      target: migration
+      args:
+        NODE_IMAGE: '${NODE_IMAGE:?Set pinned Node image}'
+    environment:
+      DATABASE_URL: '${DATABASE_URL:?Set database URL}'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+    logging: *rotated-logging
+
+  # The API process also runs the BullMQ worker: exactly one instance, never scaled.
+  api:
+    image: 'ctdt/backend:${RELEASE_TAG:?Set release tag}'
+    build:
+      context: ../source/backend
+      target: runtime
+      args:
+        NODE_IMAGE: '${NODE_IMAGE:?Set pinned Node image}'
+    environment:
+      NODE_ENV: production
+      PORT: '3000'
+      DATABASE_URL: '${DATABASE_URL:?Set database URL}'
+      SESSION_SECRET: '${SESSION_SECRET:?Set session secret}'
+      SESSION_IDLE_MINUTES: '60'
+      REDIS_HOST: redis
+      REDIS_PORT: '6379'
+      FILES_ROOT: /var/lib/ctdt/files
+      LOG_LEVEL: '${LOG_LEVEL:-info}'
+    volumes:
+      - type: bind
+        source: '${FILES_PATH:?Set absolute files path}'
+        target: /var/lib/ctdt/files
+        bind:
+          create_host_path: false
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      # Fails on a non-200 or a body that is not ok, so a degraded dependency is never reported healthy.
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/api/health',{signal:AbortSignal.timeout(5000)}).then(async r=>{const b=await r.json();process.exit(r.status===200&&b.status==='ok'?0:1)}).catch(()=>process.exit(1))"
+      <<: *health-timing
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt: ['no-new-privileges:true']
+    # Longer than the 10-second processor grace so an in-flight activation job can finish.
+    stop_grace_period: 30s
+    restart: unless-stopped
+    logging: *rotated-logging
+
+  # Caddy serves the built SPA and proxies /api. It is the only service with published ports.
+  caddy:
+    image: 'ctdt/frontend:${RELEASE_TAG:?Set release tag}'
+    build:
+      context: ../source/frontend
+      target: runtime
+      args:
+        NODE_IMAGE: '${NODE_IMAGE:?Set pinned Node image}'
+        CADDY_IMAGE: '${CADDY_IMAGE:?Set pinned Caddy image}'
+    environment:
+      PUBLIC_HOST: '${PUBLIC_HOST:?Set public hostname}'
+    ports: ['80:80', '443:443']
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+    logging: *rotated-logging
+
+volumes:
+  postgres-data:
+  redis-data:
+  caddy-data:
+  caddy-config:

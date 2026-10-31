@@ -100,6 +100,13 @@ export const PERMISSION_CATALOG: readonly PermissionSeed[] = [
     cells: { R1: X },
   },
   {
+    code: PERMISSIONS.BACKUP_VIEW,
+    name: 'Xem sao lưu và diễn tập phục hồi',
+    group: FunctionGroup.SYSTEM_ADMIN,
+    source: 'NFR-12, NFR-13, NFR-14, F26-01..03',
+    cells: { R1: X },
+  },
+  {
     code: PERMISSIONS.AUDIT_LOG_VIEW,
     name: 'Xem nhật ký hệ thống',
     group: FunctionGroup.SYSTEM_ADMIN,

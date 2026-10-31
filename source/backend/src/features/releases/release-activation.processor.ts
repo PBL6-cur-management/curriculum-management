@@ -8,6 +8,7 @@ import {
   RELEASE_ACTIVATION_JOB,
   RELEASE_ACTIVATION_QUEUE,
 } from './release-activation.scheduler.js';
+import { safeError } from '../../shared/logging/app-logger.js';
 
 const SHUTDOWN_GRACE_MS = 10_000;
 
@@ -57,7 +58,9 @@ export class ReleaseActivationProcessor
         }
       } catch (error) {
         failed.push(version.id);
-        this.logger.error(`Activating ${version.id} failed: ${String(error)}`);
+        this.logger.error(
+          `release.activation_failed version=${version.id} errorType=${safeError(error).errorType}`,
+        );
       }
     }
     if (failed.length > 0) {

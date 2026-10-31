@@ -36,6 +36,7 @@ import { SchoolSyncModule } from './features/school-db-sync/school-sync.module.j
 import { DdutApiModule } from './features/ddut-api/ddut-api.module.js';
 import { IntegrationClientsModule } from './features/integration-clients/integration-clients.module.js';
 import { ApprovalDelegationsModule } from './features/approval-delegations/approval-delegations.module.js';
+import { BackupsModule } from './features/backups/backups.module.js';
 import { NotificationDeliveryModule } from './features/notification-delivery/notification-delivery.module.js';
 import { PublicationModule } from './features/publication/publication.module.js';
 import { ReportsModule } from './features/reports/reports.module.js';
@@ -79,6 +80,7 @@ import { StudentPortalModule } from './features/student-portal/student-portal.mo
     PublicationModule,
     ApprovalDelegationsModule,
     NotificationDeliveryModule,
+    BackupsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: CsrfGuard },

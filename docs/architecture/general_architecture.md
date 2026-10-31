@@ -118,7 +118,7 @@ prisma/
 ├── migrations/            migration của Prisma
 ├── seed-data/             đơn vị, vai trò, danh mục 43 quyền (41 từ F-02, F-15 thêm 2) + ma trận ban đầu, ba cấp duyệt (approval-levels.ts), chương trình mẫu 1024034 kèm khung mẫu (programs.ts), khối kiến thức, học kỳ và khóa giữ chỗ
 └── seed.ts                tài khoản R1 đầu tiên, quyền và vai trò (`pnpm prisma:seed`)
-test/                      đầu-cuối: global-setup.ts dựng một PostgreSQL + một Redis (Testcontainers) cho cả lượt, migrate cơ sở dữ liệu mẫu một lần, mỗi spec một bản chép; test-app.ts, test-env.ts, fixtures/, permission-table.ts
+test/                      đầu-cuối: global-setup.ts dùng PostgreSQL/Redis của compose.yaml, migrate cơ sở dữ liệu mẫu ctdt_e2e_template một lần, mỗi spec một bản chép ctdt_e2e_*, Redis database 1; test-app.ts, test-env.ts, fixtures/, permission-table.ts
 ```
 
 ### Quy tắc đang áp dụng
@@ -254,3 +254,12 @@ Trình duyệt ──/api/...──► (Vite proxy | Caddy) ──► NestJS
 - Queue có bốn job: `run-batch`, `scan-result-changes` (lặp mỗi 5 giây), `run-reaudit`, `recover-graduation`; 3 lần thử, exponential backoff 5 giây. Batch và task xét lại giữ lease 60 giây trong DB, gia hạn/rào bằng `clock_timestamp()`; bộ phục hồi đọc trạng thái DB để chạy tiếp, không dựa vào job còn trong Redis.
 - Xung đột serialization 40001/40P01 được thử tối đa 4 lần trong job (1 lần đầu + `GRADUATION_LIMITS.TRANSACTION_RETRIES` = 3), hết lượt thì hoãn ở mức WARN; `Error` không phân loại mang mã `UNCLASSIFIED_EXECUTION`, log đã khử dữ liệu sinh viên.
 - Producer F-17 không đổi: scanner đọc `AcademicResultChange`, ghi `GraduationResultChangeReceipt` bền rồi tạo task cho các context đã có audit.
+
+## Sao lưu và diễn tập phục hồi (F-26) — wiring
+
+- `AppModule` nạp `BackupsModule` (`src/features/backups/`: controller chỉ đọc, service tính trạng thái, scheduler, processor BullMQ). Phần lõi nằm ở `src/shared/backups/`: `backup-engine` (dump + sao tệp + chụp nội dung đã ban hành), `backup-store` (danh mục trên đĩa), `backup-retention` (giữ 30 bộ), `restore-drill`, `restore-verifier`, `upgrade-verifier`. Không import feature module khác.
+- Hàng đợi BullMQ của F-26 (`BACKUP_QUEUE`) dùng job scheduler của BullMQ, cron `0 2 * * *` múi giờ `Asia/Ho_Chi_Minh`; tối đa 6 lần thử, backoff mũ bắt đầu 60 giây. Khi khởi động chỉ bù **một** lần hẹn gần nhất đã đến hạn. Mọi thao tác chạy dưới một khóa cố định (`OPERATION_LOCK_KEY`) và giới hạn an toàn 30 phút.
+- Nguồn sự thật là **danh mục JSON trên đĩa dưới `BACKUP_ROOT`**, không có bảng hay migration mới. Một bộ gồm `database.dump`, `files/`, `released-content.json`, `manifest.json`; ghi vào thư mục tạm rồi công bố bằng đổi tên. Bộ hỏng không bao giờ đẩy bộ tốt ra khỏi 30 bộ.
+- API chỉ đọc dưới `/api/operations/` (`backups/status`, `backups`, `restore-drills`), quyền `backup.view` (mặc định R1). Trang không phục hồi, không tải bản sao, không chạy hay xóa.
+- Phục hồi là CLI `pnpm backup:drill` (`scripts/backup-restore-drill.ts`) chạy ngoài tiến trình ứng dụng: chỉ ghi vào cơ sở dữ liệu có tên khớp `ctdt_restore_drill_*` và thư mục mới, không `DROP`, `--clean` hay xóa đệ quy trên đường dẫn do người vận hành đưa vào. Lệnh `inspect` kiểm một bộ đã tách chỉ bằng Node.
+- Cần PostgreSQL client **18** (`PG_DUMP_PATH`, `PG_RESTORE_PATH`) trên máy chạy backend. Quy trình đầy đủ: `docs/technical/backup-restore-runbook.md`.

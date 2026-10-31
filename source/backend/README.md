@@ -23,6 +23,7 @@ Làm tay từng bước:
 | `DATABASE_URL`         | `postgresql://ctdt:ctdt@localhost:5432/ctdt` | Có                                  |
 | `REDIS_HOST`           | `localhost`                                  | Không, mặc định `localhost`         |
 | `REDIS_PORT`           | `6379`                                       | Không, mặc định `6379`              |
+| `REDIS_DB`             | `0`                                          | Không, mặc định `0`; e2e dùng `1`   |
 | `SESSION_SECRET`       | chuỗi ngẫu nhiên ≥ 32 ký tự                  | Có                                  |
 | `SESSION_IDLE_MINUTES` | `60`                                         | Không, mặc định `60`                |
 | `FILES_ROOT`           | `files` (thư mục tệp đính kèm; cần sao lưu)  | Không, mặc định `files`             |
@@ -42,7 +43,7 @@ Biến sai kiểu hoặc thiếu giá trị bắt buộc thì ứng dụng dừn
 | `pnpm dev:tsc`                            | Như `pnpm dev` nhưng biên dịch bằng `tsc` có kiểm kiểu (chậm, 20 s – vài phút)                                                                                                                                                                                                      |
 | `pnpm build` · `pnpm start`               | Biên dịch ra `dist/` · chạy bản đã biên dịch                                                                                                                                                                                                                                        |
 | `pnpm test`                               | Kiểm thử đơn vị (`src/**/*.spec.ts`), không cần Docker                                                                                                                                                                                                                              |
-| `pnpm test:e2e`                           | Kiểm thử đầu-cuối (`test/**/*.e2e-spec.ts`), tự dựng PostgreSQL và Redis bằng Testcontainers — cần Docker đang chạy. Một PostgreSQL + một Redis cho cả lượt chạy (`test/global-setup.ts`): migrate một lần vào cơ sở dữ liệu mẫu, mỗi tệp spec dùng cơ sở dữ liệu riêng chép từ mẫu |
+| `pnpm test:e2e`                           | Kiểm thử đầu-cuối (`test/**/*.e2e-spec.ts`), dùng chung PostgreSQL và Redis của `compose.yaml` — chạy `pnpm services:up` trước. `test/global-setup.ts` migrate một lần vào cơ sở dữ liệu mẫu `ctdt_e2e_template`, mỗi tệp spec dùng cơ sở dữ liệu `ctdt_e2e_*` chép từ mẫu; Redis dùng database 1 riêng. Trước và sau lượt chạy xóa hết `ctdt_e2e_*` và database Redis 1; không đụng `ctdt_real`. Mặc định 2 tệp song song (`E2E_WORKERS` để tăng). Ghi đè nơi kết nối: `E2E_POSTGRES_ADMIN_URL`, `E2E_REDIS_HOST`, `E2E_REDIS_PORT` |
 | `pnpm lint`                               | oxlint, có kiểm theo kiểu (lời hứa bị bỏ quên là lỗi)                                                                                                                                                                                                                               |
 | `pnpm format` · `pnpm format:check`       | Prettier                                                                                                                                                                                                                                                                            |
 | `pnpm prisma:migrate`                     | Tạo và áp migration từ `prisma/schema.prisma`                                                                                                                                                                                                                                       |
@@ -55,7 +56,7 @@ Chỉ có một database: `ctdt_real`, dùng ICU `vi-VN` như mục dưới. Th�
 
 ## Cơ sở dữ liệu phải dùng quy tắc so sánh tiếng Việt
 
-Lúc khởi động, `PrismaService` kiểm cơ sở dữ liệu được tạo với ICU `vi-VN`; sai thì **dừng hẳn**. `compose.yaml` và Testcontainers đã tạo đúng. Tự tạo cơ sở dữ liệu ở nơi khác thì dùng:
+Lúc khởi động, `PrismaService` kiểm cơ sở dữ liệu được tạo với ICU `vi-VN`; sai thì **dừng hẳn**. `compose.yaml` đã tạo đúng; e2e tạo cơ sở dữ liệu mẫu cũng với ICU `vi-VN`. Tự tạo cơ sở dữ liệu ở nơi khác thì dùng:
 
 ```sql
 CREATE DATABASE ctdt LOCALE_PROVIDER icu ICU_LOCALE 'vi-VN' LOCALE 'C.UTF-8' TEMPLATE template0;

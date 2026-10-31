@@ -8,6 +8,7 @@ export const PERMISSIONS = {
   DELEGATION_MANAGE: 'delegation.manage',
   INTEGRATION_CLIENT_MANAGE: 'integrationClient.manage',
   SYNC_CONFIGURE: 'sync.configure',
+  BACKUP_VIEW: 'backup.view',
   AUDIT_LOG_VIEW: 'auditLog.view',
   COURSE_VIEW: 'course.view',
   COURSE_EDIT: 'course.edit',

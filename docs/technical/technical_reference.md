@@ -143,7 +143,7 @@ Người dùng tự sao chép `.env.real.example` thành `.env.real`: `DATABASE_
 
 ### Configuration
 
-`QueueModule`: `BullModule.forRootAsync` lấy `REDIS_HOST`, `REDIS_PORT`. Redis chạy `noeviction` và AOF (`compose.yaml`).
+`QueueModule`: `BullModule.forRootAsync` lấy `REDIS_HOST`, `REDIS_PORT`, `REDIS_DB` (mặc định 0; e2e dùng database 1 riêng). Redis chạy `noeviction` và AOF (`compose.yaml`).
 
 ### Usage Pattern
 
@@ -183,11 +183,11 @@ Người dùng tự sao chép `.env.real.example` thành `.env.real`: `DATABASE_
 | Dự án                     | Công cụ                                                                               | Lệnh                                                                                                                |
 | ------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | backend, đơn vị           | Vitest                                                                                | `pnpm test`                                                                                                         |
-| backend, đầu-cuối         | Vitest + Supertest + Testcontainers (`postgres:18`, `redis:8`)                        | `pnpm test:e2e` — cần Docker                                                                                        |
+| backend, đầu-cuối         | Vitest + Supertest, PostgreSQL/Redis của `compose.yaml`                        | `pnpm services:up` rồi `pnpm test:e2e`                                                                                      |
 | frontend                  | Vitest + React Testing Library, jsdom                                                 | `pnpm test`                                                                                                         |
 | `source/e2e`, trình duyệt | Playwright; dự án pnpm độc lập thứ ba, `package.json`, lockfile, `node_modules` riêng | Tại `source/e2e`: `pnpm typecheck`; chạy một spec: `pnpm exec playwright test specs/<file>.spec.ts --reporter=list` |
 
-Playwright chạy trên app dev đang hoạt động, có demo seed: backend `http://localhost:3000/api`, frontend `http://localhost:5173`; không thay thế kiểm thử Testcontainers. Auth setup một lần cho mỗi vai R1..R6 (+R3b, R4b, R5b), lưu phiên qua `storageState`. Chỉ mục ca kiểm thử: `docs/testing/test-cases/README.md`; cài đặt và cách chạy: `docs/testing/playwright-guide.md`.
+Playwright chạy trên app dev đang hoạt động, có demo seed: backend `http://localhost:3000/api`, frontend `http://localhost:5173`; không thay thế kiểm thử e2e backend. Auth setup một lần cho mỗi vai R1..R6 (+R3b, R4b, R5b), lưu phiên qua `storageState`. Chỉ mục ca kiểm thử: `docs/testing/test-cases/README.md`; cài đặt và cách chạy: `docs/testing/playwright-guide.md`.
 
 ### Usage Pattern
 

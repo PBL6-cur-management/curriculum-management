@@ -75,6 +75,7 @@ export const ROUTES = {
   schoolSync: '/school-db-sync',
   schoolSyncRuns: '/school-db-sync/runs',
   schoolSyncRunDetail: '/school-db-sync/runs/:runId',
+  backups: '/operations/backups',
 } as const;
 
 // Row or group to scroll to and highlight on arrival; set by the consistency result list.

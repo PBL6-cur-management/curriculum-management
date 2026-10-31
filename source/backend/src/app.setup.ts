@@ -9,6 +9,8 @@ import { INTEGRATION } from './shared/integration-access/integration.constants.j
 import { AllExceptionsFilter } from './shared/filter/all-exceptions.filter.js';
 import { validationExceptionFactory } from './shared/exception/validation-exception.factory.js';
 import type { Env } from './shared/config/env.validation.js';
+import type { AppLogger } from './shared/logging/app-logger.js';
+import { createHttpLogger } from './shared/logging/http-logger.js';
 import { SessionStoreService } from './shared/session/session-store.service.js';
 import {
   SESSION_COOKIE_NAME,
@@ -22,11 +24,17 @@ export const API_PREFIX = 'api';
 // The frontend generates its types from `${API_DOCS_PATH}-json`.
 export const API_DOCS_PATH = `${API_PREFIX}/docs`;
 
-// Shared by main.ts and the e2e tests so both serve the same routes.
-export function configureApp(app: NestExpressApplication): void {
+// Shared by main.ts and the e2e tests so both serve the same routes. main.ts passes its JSON logger, which also
+// records one line per request; tests pass none unless they assert on the log.
+export function configureApp(
+  app: NestExpressApplication,
+  logger?: AppLogger,
+): void {
   const config: ConfigService<Env, true> = app.get(ConfigService);
   if (config.get('NODE_ENV', { infer: true }) === 'production')
     app.set('trust proxy', TRUSTED_PROXY_HOPS);
+  // Before sessions, so a request the session layer rejects is still recorded.
+  if (logger) app.use(createHttpLogger(logger));
   const sessions = app.get(SessionStoreService).handler;
   // The dDUT API (F-21) authenticates by key only: no browser session is read, renewed or created under /api/v1.
   app.use((request: Request, response: Response, next: NextFunction) =>

@@ -505,3 +505,16 @@ Quyền `graduation.view` (xem) và `graduation.audit` (lưu lần xét, đợt 
 - Routes lazy-load bọc `RequireGraduationStaff` (R1/R3, kể cả tài khoản mixed): `/graduation` (MH-53), `/graduation/audits/:auditId`, `/graduation/batches` (MH-54), `/graduation/batches/:batchId`. Menu trong `shared/layout/menuItems.tsx`; MH-52 (`StudentDetailPage`) có entry chỉ điều hướng với context hiện tại, không lưu/đánh giá.
 - MH-53 xem trực tiếp rồi lưu rõ ràng, hiển thị đúng kết quả POST trả về; retry giữ requestKey. Chi tiết audit chỉ đọc; R1 thấy panel tác vụ xét lại và retry, R3 chỉ thấy trạng thái freshness. MH-54 tách preview khỏi tạo, theo dõi tiến độ bền (mẫu số enrollmentCount), lọc phía server và xuất XLSX; export tắt khi batch chưa terminal hoặc FAILED. Lỗi xác nhận batch hiển thị qua state của trang, `onOk` không reject.
 - Frontend chỉ trình bày credit/shortfall/conclusion của backend, không tính lại. View kết quả (`GraduationResultView`) giữ trong feature; tách sang shared để F-20 dùng còn hoãn.
+
+## 20. Sao lưu và diễn tập phục hồi (F-26)
+
+### Backend — `src/features/backups/`, `src/shared/backups/`
+
+- `GET /api/operations/backups/status`, `GET /api/operations/backups`, `GET /api/operations/restore-drills`: chỉ đọc, `@ApiCookieAuth` + `@ApiOkResponse`, quyền `backup.view`. `BackupsService.computeStatus` là hàm thuần suy ra `DISABLED | READY | RUNNING | OVERDUE | FAILED` từ cấu hình, các lần chạy và giờ hiện tại (quá hạn sau 2 giờ kể từ giờ hẹn).
+- `shared/backups/`: `backup-engine` (BE-04), `backup-retention` (BE-05, giữ 30 bộ hoàn tất, bộ lỗi không tính), `restore-drill` + `restore-verifier` (BE-06, bảy kiểm tra: `DUMP_HASH`, `DB_RESTORE`, `FILE_HASHES`, `DB_FILE_REFERENCES`, `RELEASED_CONTENT`, `LOCALE`, `MIGRATIONS`), `upgrade-verifier` (BE-07, chụp và so sánh trước/sau nâng cấp).
+- Lỗi bền vững trên bản ghi là `{code, message}`; chỉ lỗi danh mục mới thành HTTP 503.
+- Spec: `backups.service.spec.ts`, `backup-files.spec.ts`, `backup-retention.spec.ts`, `restore-verifier.spec.ts`, `scripts/backup-restore-drill.spec.ts`; e2e `test/backups.e2e-spec.ts` (9 ca). Engine và phục hồi thật cần PostgreSQL client 18 native nên chưa có e2e.
+
+### Frontend — `src/features/backups/`
+
+- `BackupsPage` (`/operations/backups`, menu "Quản trị → Sao lưu và phục hồi"): trạng thái, danh sách bộ sao lưu, biên bản diễn tập. Hooks TanStack Query tải ba route trên; không có hành động ghi.

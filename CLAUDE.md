@@ -4,7 +4,7 @@ Quản lý chương trình đào tạo, đề cương, PLO/CLO, đề xuất tha
 
 ## Stack
 
-- `source/backend` — NestJS 12 (ESM), Prisma 7 trên PostgreSQL 18 (ICU `vi-VN`), BullMQ trên Redis 8, Vitest + Testcontainers
+- `source/backend` — NestJS 12 (ESM), Prisma 7 trên PostgreSQL 18 (ICU `vi-VN`), BullMQ trên Redis 8, Vitest (e2e dùng chung PostgreSQL/Redis của `compose.yaml`)
 - `source/frontend` — React 19 + Vite 8, Ant Design 6 (`vi_VN`), TanStack Query, React Router, kiểu API sinh bằng `openapi-typescript`
 - Two **independent** pnpm projects: each has its own `package.json`, lockfile and `node_modules`. No workspace. Run every command from inside the project.
 - Node.js 22 (≥ 22.22). Versions and reasons: `docs/design/tech-stack.md` §6.
@@ -29,7 +29,7 @@ These override the stack rule files. Reviewers check against the deviation, not 
 | Stack rule | This project | Source |
 |---|---|---|
 | npm, `npm run typecheck`, Biome | pnpm; type check `pnpm exec tsc --noEmit -p tsconfig.json` (backend) / `pnpm exec tsc -b` (frontend); oxlint + Prettier | `tech-stack.md` §2 |
-| Jest | Vitest; backend end-to-end with Testcontainers | `tech-stack.md` §2 |
+| Jest | Vitest; backend end-to-end against the dev PostgreSQL/Redis from `compose.yaml` (no Testcontainers since 2026-10-31) | `tech-stack.md` §2 |
 | react-vite §4 Tailwind, `cn()`, shadcn | Ant Design 6 components and theme tokens; no Tailwind, no shadcn | `tech-stack.md` §1 |
 | nestjs §5 JWT guard | Server session: HttpOnly cookie, session rows in PostgreSQL, 60-minute idle expiry | `tech-stack.md` §2, NFR-08 |
 | nestjs §8 Joi/Zod config schema | `class-validator` env class (`src/config/env.validation.ts`) | skeleton |
