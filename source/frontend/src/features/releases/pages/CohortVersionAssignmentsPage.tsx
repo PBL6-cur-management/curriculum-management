@@ -1,7 +1,6 @@
 import { Alert, Button, Skeleton, Typography } from 'antd';
 import { useState } from 'react';
-import { generatePath, useParams, useSearchParams } from 'react-router';
-import { ROUTES } from '../../../routes';
+import { useParams, useSearchParams } from 'react-router';
 import { DetailPageLayout } from '../../../shared/design-system/DetailPageLayout';
 import { PageHeader } from '../../../shared/design-system/PageHeader';
 import { AppliedCohortVersionPanel } from '../components/AppliedCohortVersionPanel';
@@ -14,7 +13,6 @@ import {
   STUDENT_ASSIGNMENT_NOTE,
 } from '../constants/releaseLabels';
 import { useCohortVersions, useVersionHistory } from '../hooks/useReleases';
-import { BackLink } from '../../../shared/design-system';
 
 function ProgramCohortAssignments({ programId }: { programId: string }) {
   const schedule = useCohortVersions(programId);
@@ -24,9 +22,6 @@ function ProgramCohortAssignments({ programId }: { programId: string }) {
   const [dialog, setDialog] = useState<{ assignmentId?: string } | null>(null);
   return (
     <DetailPageLayout>
-      <BackLink to={generatePath(ROUTES.programDetail, { programId })}>
-        Chương trình
-      </BackLink>
       <PageHeader
         title="Gán phiên bản cho khóa"
         actions={

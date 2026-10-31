@@ -1,6 +1,7 @@
 import { Button, Flex, Result } from 'antd';
 import type { TableColumnsType } from 'antd';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
+import { useUrlQuery } from '../../../shared/hooks/useUrlQuery';
 import { generatePath, Link } from 'react-router';
 import { ROUTES } from '../../../routes';
 import { DEFAULT_PAGE_SIZE } from '../../../shared/api/pagination';
@@ -25,12 +26,17 @@ import {
   formatEmpty,
   PageHeader,
 } from '../../../shared/design-system';
-import { SectionNav } from '../../../shared/layout/SectionNav';
 
 const INITIAL_QUERY: ChangeRequestQuery = {
   page: 1,
   pageSize: DEFAULT_PAGE_SIZE,
 };
+const QUERY_KINDS = {
+  page: 'number',
+  pageSize: 'number',
+  mine: 'boolean',
+  minDaysWaiting: 'number',
+} as const;
 
 const NOT_WAITING = 'Không chờ';
 
@@ -90,7 +96,10 @@ const COLUMNS: TableColumnsType<ChangeRequestSummary> = [
 
 // MH-38: the requests of the caller and the submitted ones inside their scope (D9).
 export function ChangeRequestListPage() {
-  const [query, setQuery] = useState<ChangeRequestQuery>(INITIAL_QUERY);
+  const [query, setQuery] = useUrlQuery<ChangeRequestQuery>(
+    INITIAL_QUERY,
+    QUERY_KINDS,
+  );
   const { data, isFetching, isError } = useChangeRequests(query);
   const canCreate = useCan(PERMISSIONS.changeRequestCreate);
   const canCreateOrganizational = useCan(
@@ -99,7 +108,7 @@ export function ChangeRequestListPage() {
   const applyFilters = useCallback(
     (filters: Partial<ChangeRequestQuery>) =>
       setQuery((current) => ({ ...current, ...filters, page: 1 })),
-    [],
+    [setQuery],
   );
   if (isError)
     return <Result status="error" title="Không thể tải danh sách đề xuất" />;
@@ -122,7 +131,6 @@ export function ChangeRequestListPage() {
           </>
         }
       />
-      <SectionNav section="approvals" />
       <ChangeRequestFilters value={query} onChange={applyFilters} />
       <DataTable<ChangeRequestSummary>
         rowKey="id"

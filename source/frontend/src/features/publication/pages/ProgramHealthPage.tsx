@@ -11,9 +11,7 @@ import {
 import { useState } from 'react';
 import { generatePath, Link, useParams } from 'react-router';
 import { ROUTES } from '../../../routes';
-import { versionLabel } from '../../../shared/constants/versionLabels';
 import {
-  BackLink,
   PageHeader,
   PageSkeleton,
   SummaryStrip,
@@ -160,14 +158,8 @@ export default function ProgramHealthPage() {
 
   return (
     <Flex vertical gap="middle">
-      <BackLink
-        to={generatePath(ROUTES.versionDetail, { programId, versionId })}
-      >
-        Phiên bản {versionLabel(data.version)}
-      </BackLink>
       <PageHeader
         title="Sức khỏe chương trình"
-        subtitle={`${data.version.programCode} — ${data.version.programName} · phiên bản ${versionLabel(data.version)}`}
         actions={
           <PdfExportButton programId={programId} versionId={versionId} />
         }

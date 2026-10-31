@@ -17,7 +17,6 @@ import { NO_VERSIONS } from '../constants/releaseLabels';
 import { useVersionHistory } from '../hooks/useReleases';
 import { formatDay } from '../utils/format';
 import {
-  BackLink,
   formatEmpty,
   PageHeader,
   PageSkeleton,
@@ -43,9 +42,6 @@ export function VersionHistoryPage() {
   }
   return (
     <Flex vertical gap="middle">
-      <BackLink to={generatePath(ROUTES.programDetail, { programId })}>
-        Chương trình
-      </BackLink>
       <PageHeader title="Lịch sử phiên bản" />
       {canCompare && (
         <Button

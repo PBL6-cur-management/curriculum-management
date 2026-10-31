@@ -1,4 +1,5 @@
 import { Card, Descriptions, Tag } from 'antd';
+import type { ReactNode } from 'react';
 import { Link, generatePath } from 'react-router';
 import { ROUTES } from '../../../routes';
 import type { ProgramDetail } from '../api/programs';
@@ -10,16 +11,18 @@ import {
 
 interface ProgramInfoCardProps {
   program: ProgramDetail;
+  // Program-level commands (edit, clone, stop) shown in the card header.
+  actions?: ReactNode;
 }
 
 const EMPTY = '—';
 
 // Shows the working version: the Draft when there is one, else the current version.
-export function ProgramInfoCard({ program }: ProgramInfoCardProps) {
+export function ProgramInfoCard({ program, actions }: ProgramInfoCardProps) {
   const info = program.draftVersion ?? program.currentVersionInfo;
   const source = program.clonedFrom;
   return (
-    <Card title="Thông tin chương trình">
+    <Card title="Thông tin chương trình" extra={actions}>
       <Descriptions column={{ xs: 1, md: 2 }}>
         <Descriptions.Item label="Mã chương trình">
           {program.programCode}

@@ -6,7 +6,6 @@ import { ApiError } from '../../../shared/api/client';
 import { RequestDraftBanner } from '../../../shared/change-requests/RequestDraftBanner';
 import { versionLabel } from '../../../shared/constants/versionLabels';
 import type { CloRef, ProgramCloPloMatrix } from '../api/outcomes';
-import { OutcomeNav } from '../components/OutcomeNav';
 import { ProgramCloPloFilters } from '../components/ProgramCloPloFilters';
 import {
   NO_CLOS_IN_REVISION,
@@ -111,7 +110,6 @@ export function ProgramCloPloPage() {
   const { version } = data;
   return (
     <Flex vertical gap="middle">
-      <OutcomeNav programId={programId} versionId={versionId} />
       <PageHeader
         title={
           <>

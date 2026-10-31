@@ -9,16 +9,13 @@ import {
   Typography,
 } from 'antd';
 import { lazy, Suspense, useMemo, useState } from 'react';
-import { generatePath, useParams } from 'react-router';
-import { ROUTES } from '../../../routes';
+import { useParams } from 'react-router';
 import {
-  BackLink,
   EmptyState,
   PageHeader,
   PageSkeleton,
 } from '../../../shared/design-system';
 import { errorMessage } from '../../../shared/forms/applyFieldErrors';
-import { versionLabel } from '../../../shared/constants/versionLabels';
 import type { GraphNode } from '../api/publication';
 import { PdfExportButton } from '../components/PdfExportButton';
 import {
@@ -94,19 +91,12 @@ export default function CourseGraphPage() {
         title={errorMessage(graph.error, 'Không đọc được đồ thị học phần.')}
       />
     );
-  const { version } = graph.data;
   const external = graph.data.nodes.filter((node) => node.external).length;
 
   return (
     <Flex vertical gap="middle">
-      <BackLink
-        to={generatePath(ROUTES.versionDetail, { programId, versionId })}
-      >
-        Phiên bản {versionLabel(version)}
-      </BackLink>
       <PageHeader
         title="Đồ thị học phần"
-        subtitle={`${version.programCode} — ${version.programName} · phiên bản ${versionLabel(version)}`}
         actions={
           <PdfExportButton programId={programId} versionId={versionId} />
         }

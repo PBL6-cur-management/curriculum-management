@@ -7,7 +7,9 @@ import {
   within,
 } from '@testing-library/react';
 import { App } from 'antd';
-import { createMemoryRouter, RouterProvider } from 'react-router';
+import { createMemoryRouter, RouterProvider, useLocation } from 'react-router';
+import { ROUTES } from '../../../routes';
+import { ProgramWorkspaceLayout } from '../components/ProgramWorkspaceLayout';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ProgramOverviewPage } from './ProgramOverviewPage';
 
@@ -70,6 +72,31 @@ const ME = {
   permissions: ['outcome.view', 'program.view'],
 };
 
+const WORKSPACE_VIEWS = [
+  ROUTES.curriculum,
+  ROUTES.electiveGroups,
+  ROUTES.consistency,
+  ROUTES.plos,
+  ROUTES.coursePloMatrix,
+  ROUTES.cloPloMatrix,
+  ROUTES.outcomeCoverage,
+  ROUTES.courseGraph,
+  ROUTES.programHealth,
+  ROUTES.versionHistory,
+  ROUTES.versionCompare,
+  ROUTES.versionTimeline,
+  ROUTES.cohortVersionAssignments,
+];
+
+function Here() {
+  return <output aria-label="Đang ở">{useLocation().pathname}</output>;
+}
+
+const openTab = async (name: string) =>
+  fireEvent.click(await screen.findByRole('tab', { name }, { timeout: 3000 }));
+const here = async () =>
+  (await screen.findByRole('status', { name: 'Đang ở' })).textContent;
+
 function renderPage(
   program: Record<string, unknown> = PROGRAM,
   directors: unknown[] = [],
@@ -91,8 +118,17 @@ function renderPage(
       return Promise.resolve(json({}, 404));
     }),
   );
+  // The overview inside its real workspace; every other workspace view just prints its URL.
   const router = createMemoryRouter(
-    [{ path: '/programs/:programId', element: <ProgramOverviewPage /> }],
+    [
+      {
+        element: <ProgramWorkspaceLayout />,
+        children: [
+          { path: ROUTES.programDetail, element: <ProgramOverviewPage /> },
+          ...WORKSPACE_VIEWS.map((path) => ({ path, element: <Here /> })),
+        ],
+      },
+    ],
     { initialEntries: ['/programs/p1'] },
   );
   render(
@@ -117,24 +153,21 @@ function renderPage(
 afterEach(() => vi.unstubAllGlobals());
 
 describe('ProgramOverviewPage', () => {
-  it('offers the program-specific cohort assignment route only with its permission', async () => {
+  it('offers the program-specific cohort assignment view only with its permission', async () => {
     renderPage(PROGRAM, [], {
       ...ME,
       permissions: [...ME.permissions, 'version.assignCohort'],
     });
-    expect(
-      await screen.findByRole(
-        'link',
-        { name: 'Gán phiên bản cho khóa' },
-        { timeout: 3000 },
-      ),
-    ).toHaveAttribute('href', '/programs/p1/cohort-versions');
+    await openTab('Phiên bản');
+    await openTab('Gán cho khóa');
+    expect(await here()).toBe('/programs/p1/cohort-versions');
   });
   it('hides cohort assignment without permission', async () => {
     renderPage(PROGRAM, [], ME);
-    await screen.findByRole('heading', { name: /1024034 — Kỹ thuật máy tính/ });
+    await openTab('Phiên bản');
+    expect(await here()).toBe('/programs/p1/versions');
     expect(
-      screen.queryByRole('link', { name: 'Gán phiên bản cho khóa' }),
+      screen.queryByRole('tab', { name: 'Gán cho khóa' }),
     ).not.toBeInTheDocument();
   });
   it('shows the Draft info, the status and the way to the later sections', async () => {
@@ -144,58 +177,64 @@ describe('ProgramOverviewPage', () => {
         name: /1024034 — Kỹ thuật máy tính/,
       }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Danh sách chương trình' }),
+    ).toHaveAttribute('href', '/programs');
     expect(screen.getByText('Tổng tín chỉ')).toBeInTheDocument();
     expect(screen.getByText('150')).toBeInTheDocument();
-    expect(screen.getByText('Khung chương trình')).toBeInTheDocument();
-    expect(screen.getByText('Kiểm tra nhất quán')).toBeInTheDocument();
+    for (const name of ['Tổng quan', 'Khung chương trình', 'Phiên bản'])
+      expect(screen.getByRole('tab', { name })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Tổng quan' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
     expect(screen.getByRole('button', { name: 'Sửa thông tin' })).toBeEnabled();
     expect(
       screen.getByRole('button', { name: 'Nhân bản' }),
     ).toBeInTheDocument();
   });
 
-  it('links the curriculum and elective groups to the Draft version (F-07)', async () => {
+  it('opens the curriculum views of the Draft version (F-07)', async () => {
     renderPage();
-    const curriculum = await screen.findByRole('link', {
-      name: 'Khung chương trình',
-    });
-    expect(curriculum).toHaveAttribute(
-      'href',
-      '/programs/p1/versions/v1/curriculum',
-    );
-    expect(screen.getByRole('link', { name: 'Nhóm tự chọn' })).toHaveAttribute(
-      'href',
-      '/programs/p1/versions/v1/elective-groups',
-    );
-    expect(
-      screen.getByRole('link', { name: 'Kiểm tra nhất quán' }),
-    ).toHaveAttribute('href', '/programs/p1/versions/v1/consistency');
+    await openTab('Khung chương trình');
+    expect(await here()).toBe('/programs/p1/versions/v1/curriculum');
+    await openTab('Nhóm tự chọn');
+    expect(await here()).toBe('/programs/p1/versions/v1/elective-groups');
+    await openTab('Kiểm tra nhất quán');
+    expect(await here()).toBe('/programs/p1/versions/v1/consistency');
   });
 
-  it('links the outcome screens of the working version to staff and only the PLO list to a student (F-11)', async () => {
+  it('opens the outcome views of the working version to staff (F-11)', async () => {
     renderPage(PROGRAM, [], ME);
-    expect(await screen.findByRole('link', { name: 'PLO' })).toHaveAttribute(
-      'href',
-      '/programs/p1/versions/v1/plos',
-    );
-    expect(
-      screen.getByRole('link', { name: 'Ma trận học phần–PLO' }),
-    ).toHaveAttribute('href', '/programs/p1/versions/v1/course-plo-matrix');
-    expect(
-      screen.getByRole('link', { name: 'Ma trận CLO–PLO' }),
-    ).toHaveAttribute('href', '/programs/p1/versions/v1/clo-plo-matrix');
-    expect(
-      screen.getByRole('link', { name: 'Kiểm tra phủ chuẩn đầu ra' }),
-    ).toHaveAttribute('href', '/programs/p1/versions/v1/outcome-coverage');
+    await openTab('Chuẩn đầu ra');
+    expect(await here()).toBe('/programs/p1/versions/v1/plos');
+    for (const [name, path] of [
+      ['Ma trận học phần–PLO', 'course-plo-matrix'],
+      ['Ma trận CLO–PLO', 'clo-plo-matrix'],
+      ['Kiểm tra phủ', 'outcome-coverage'],
+    ]) {
+      await openTab(name);
+      expect(await here()).toBe(`/programs/p1/versions/v1/${path}`);
+    }
   });
 
-  it('shows a student the PLO card only', async () => {
+  it('opens the course graph and the program health from one analysis tab', async () => {
+    renderPage(PROGRAM, [], ME);
+    await openTab('Phân tích');
+    expect(await here()).toBe('/programs/p1/versions/v1/course-graph');
+    await openTab('Sức khỏe chương trình');
+    expect(await here()).toBe('/programs/p1/versions/v1/health');
+  });
+
+  it('shows a student the PLO list only', async () => {
     renderPage(PROGRAM, [], { ...ME, roles: [{ roleCode: 'R6' }] });
+    await openTab('Chuẩn đầu ra');
+    expect(await here()).toBe('/programs/p1/versions/v1/plos');
     expect(
-      await screen.findByRole('link', { name: 'PLO' }),
-    ).toBeInTheDocument();
+      screen.queryByRole('tab', { name: 'Ma trận học phần–PLO' }),
+    ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('link', { name: 'Ma trận học phần–PLO' }),
+      screen.queryByRole('tab', { name: 'Phân tích' }),
     ).not.toBeInTheDocument();
   });
 
@@ -204,10 +243,10 @@ describe('ProgramOverviewPage', () => {
       ...PROGRAM,
       draftVersion: null,
       currentVersion: { id: 'v9', versionNumber: '1.0', status: 'ACTIVE' },
+      versions: [{ id: 'v9', versionNumber: '1.0', status: 'ACTIVE' }],
     });
-    expect(
-      await screen.findByRole('link', { name: 'Khung chương trình' }),
-    ).toHaveAttribute('href', '/programs/p1/versions/v9/curriculum');
+    await openTab('Khung chương trình');
+    expect(await here()).toBe('/programs/p1/versions/v9/curriculum');
   });
 
   it('links to the request form when the edit must go through a request', async () => {

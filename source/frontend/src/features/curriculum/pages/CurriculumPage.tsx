@@ -331,12 +331,9 @@ export function CurriculumPage() {
   const { version } = curriculum;
   return (
     <Flex vertical gap="middle">
-      <Link to={generatePath(ROUTES.programDetail, { programId })}>
-        ← Chương trình {version.programCode}
-      </Link>
       <RequestDraftBanner request={version.sourceRequest} />
       <PageHeader
-        title={`Khung chương trình — ${version.programCode} (${versionLabel(version)})`}
+        title="Khung chương trình"
         actions={
           <Space wrap>
             {canImportExport && (
@@ -361,19 +358,6 @@ export function CurriculumPage() {
               value={view}
               onChange={setView}
             />
-            <Link
-              to={generatePath(ROUTES.electiveGroups, {
-                programId,
-                versionId,
-              })}
-            >
-              <Button>Nhóm tự chọn</Button>
-            </Link>
-            <Link
-              to={generatePath(ROUTES.consistency, { programId, versionId })}
-            >
-              <Button>Kiểm tra nhất quán</Button>
-            </Link>
             {!studentMode && (
               <CurriculumAddButton
                 curriculum={curriculum}

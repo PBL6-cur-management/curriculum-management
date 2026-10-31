@@ -5,12 +5,11 @@ import { RequestDraftBanner } from '../../../shared/change-requests/RequestDraft
 import { versionLabel } from '../../../shared/constants/versionLabels';
 import { CoursePloGrid } from '../components/CoursePloGrid';
 import { OutcomeEditNotice } from '../components/OutcomeEditNotice';
-import { OutcomeNav } from '../components/OutcomeNav';
 import { useCoursePloMatrix } from '../hooks/useOutcomes';
 import { PageHeader, PageSkeleton } from '../../../shared/design-system';
 
 export function CoursePloMatrixPage() {
-  const { programId = '', versionId = '' } = useParams();
+  const { versionId = '' } = useParams();
   const { data, isPending, error } = useCoursePloMatrix(versionId);
   if (isPending) return <PageSkeleton />;
   if (!data) {
@@ -23,7 +22,6 @@ export function CoursePloMatrixPage() {
   const { version } = data;
   return (
     <Flex vertical gap="middle">
-      <OutcomeNav programId={programId} versionId={versionId} />
       <PageHeader
         title={
           <>

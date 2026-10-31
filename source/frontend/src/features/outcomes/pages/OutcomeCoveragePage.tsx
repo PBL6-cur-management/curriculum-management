@@ -6,7 +6,6 @@ import { ApiError } from '../../../shared/api/client';
 import { versionLabel } from '../../../shared/constants/versionLabels';
 import type { components } from '../../../shared/api/schema';
 import { CoverageSection } from '../components/CoverageSection';
-import { OutcomeNav } from '../components/OutcomeNav';
 import { GROUP_FILTER_NOTE } from '../constants/outcomeLabels';
 import { useOutcomeCoverage } from '../hooks/useOutcomes';
 import {
@@ -73,7 +72,6 @@ export function OutcomeCoveragePage() {
   ];
   return (
     <Flex vertical gap="large">
-      <OutcomeNav programId={programId} versionId={versionId} />
       <PageHeader
         title={
           <>

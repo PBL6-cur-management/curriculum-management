@@ -1,12 +1,11 @@
 import { Alert, Button, Flex, Result, Skeleton } from 'antd';
 import { PageHeader } from '../../../shared/design-system';
 import { useEffect, useState } from 'react';
-import { generatePath, Link, useParams, useSearchParams } from 'react-router';
-import { FOCUS_PARAM, ROUTES } from '../../../routes';
+import { useParams, useSearchParams } from 'react-router';
+import { FOCUS_PARAM } from '../../../routes';
 import { ApiError } from '../../../shared/api/client';
 import { CreateRequestButton } from '../../../shared/change-requests/CreateRequestButton';
 import { RequestDraftBanner } from '../../../shared/change-requests/RequestDraftBanner';
-import { versionLabel } from '../../../shared/constants/versionLabels';
 import type { ElectiveGroup } from '../api/curriculum';
 import { AssignItemsModal } from '../components/AssignItemsModal';
 import { ElectiveGroupFormModal } from '../components/ElectiveGroupFormModal';
@@ -17,7 +16,7 @@ import {
 import { useCurriculum } from '../hooks/useCurriculum';
 
 export function ElectiveGroupsPage() {
-  const { programId = '', versionId = '' } = useParams();
+  const { versionId = '' } = useParams();
   const { data: curriculum, isPending, error } = useCurriculum(versionId);
   const [editing, setEditing] = useState<ElectiveGroup | 'new' | null>(null);
   const [assigning, setAssigning] = useState<ElectiveGroup | null>(null);
@@ -48,12 +47,9 @@ export function ElectiveGroupsPage() {
   );
   return (
     <Flex vertical gap="middle">
-      <Link to={generatePath(ROUTES.curriculum, { programId, versionId })}>
-        ← Khung chương trình {version.programCode}
-      </Link>
       <RequestDraftBanner request={version.sourceRequest} />
       <PageHeader
-        title={`Nhóm tự chọn — ${version.programCode} (${versionLabel(version)})`}
+        title="Nhóm tự chọn"
         actions={
           <>
             {curriculum.canEditStructure && (

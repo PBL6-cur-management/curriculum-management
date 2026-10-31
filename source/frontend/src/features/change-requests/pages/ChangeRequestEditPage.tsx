@@ -13,7 +13,11 @@ import { RequestHeaderCard } from '../components/RequestHeaderCard';
 import { SubmitConfirmModal } from '../components/SubmitConfirmModal';
 import { WorkspaceCard } from '../components/WorkspaceCard';
 import { useChangeRequest } from '../hooks/useChangeRequests';
-import { PageHeader, PageSkeleton } from '../../../shared/design-system';
+import {
+  BackLink,
+  PageHeader,
+  PageSkeleton,
+} from '../../../shared/design-system';
 
 // The creator's workbench for one Draft: header, the copy or the items, documents, the diff, and "Gửi duyệt".
 export function ChangeRequestEditPage() {
@@ -32,6 +36,12 @@ export function ChangeRequestEditPage() {
     );
   return (
     <Flex vertical gap="middle">
+      <BackLink
+        to={generatePath(ROUTES.changeRequestDetail, { requestId: request.id })}
+        preferHistory
+      >
+        Quay lại đề xuất
+      </BackLink>
       <Flex justify="space-between" align="center" wrap gap="small">
         <Flex gap="small" align="center" wrap>
           <PageHeader

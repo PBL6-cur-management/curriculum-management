@@ -9,7 +9,6 @@ import { errorMessage } from '../../../shared/forms/applyFieldErrors';
 import type { ItemCloPloMatrix } from '../api/outcomes';
 import { CloPloGrid } from '../components/CloPloGrid';
 import { OutcomeEditNotice } from '../components/OutcomeEditNotice';
-import { OutcomeNav } from '../components/OutcomeNav';
 import {
   fromLinks,
   isDirty,
@@ -24,7 +23,11 @@ import {
   SAVED,
 } from '../constants/outcomeLabels';
 import { useItemCloPlo, useReplaceCloPloLinks } from '../hooks/useOutcomes';
-import { PageHeader, PageSkeleton } from '../../../shared/design-system';
+import {
+  BackLink,
+  PageHeader,
+  PageSkeleton,
+} from '../../../shared/design-system';
 
 interface ItemCloPloEditorProps {
   itemId: string;
@@ -88,7 +91,11 @@ export function ItemCloPloPage() {
   const { version, item, revision } = data;
   return (
     <Flex vertical gap="middle">
-      <OutcomeNav programId={programId} versionId={versionId} />
+      <BackLink
+        to={generatePath(ROUTES.cloPloMatrix, { programId, versionId })}
+      >
+        Ma trận CLO–PLO
+      </BackLink>
       <PageHeader
         title={
           <>

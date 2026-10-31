@@ -1,6 +1,6 @@
 import { Flex, Result, Select, Table, Tag } from 'antd';
 import type { TableColumnsType } from 'antd';
-import { useState } from 'react';
+import { useUrlQuery } from '../../../shared/hooks/useUrlQuery';
 import { generatePath, Link } from 'react-router';
 import { ROUTES } from '../../../routes';
 import { RequestStatusTag } from '../../../shared/change-requests/RequestStatusTag';
@@ -19,7 +19,6 @@ import {
   SummaryStrip,
   type SummaryItem,
 } from '../../../shared/design-system';
-import { SectionNav } from '../../../shared/layout/SectionNav';
 import { REQUEST_STATUS_LABELS } from '../../../shared/change-requests/requestStatus';
 
 const COLUMNS: TableColumnsType<ApprovalQueueItem> = [
@@ -103,16 +102,17 @@ function QueueSummary({ items }: { items: ApprovalQueueItem[] }) {
   return <SummaryStrip label="Tóm tắt hàng chờ" items={summary} />;
 }
 
+const NO_FILTERS: ApprovalQueueQuery = {};
+
 // MH-42: what waits for the caller, longest first (US-061).
 export function ApprovalQueuePage() {
-  const [query, setQuery] = useState<ApprovalQueueQuery>({});
+  const [query, setQuery] = useUrlQuery<ApprovalQueueQuery>(NO_FILTERS);
   const { data, isLoading, isError } = useApprovalQueue(query);
   if (isError)
     return <Result status="error" title="Không thể tải hàng chờ duyệt" />;
   return (
     <Flex vertical gap="middle">
       <PageHeader title="Chờ tôi duyệt" />
-      <SectionNav section="approvals" />
       {data && data.length > 0 && <QueueSummary items={data} />}
       <FilterBar>
         <Select

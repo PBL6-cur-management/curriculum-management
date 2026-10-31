@@ -252,7 +252,7 @@ describe('CurriculumPage', () => {
     renderPage();
     expect(
       await screen.findByRole('heading', {
-        name: /Khung chương trình — 1024034 \(Nháp\)/,
+        name: 'Khung chương trình',
       }),
     ).toBeInTheDocument();
     const table = screen.getAllByRole('table')[1];
@@ -444,15 +444,6 @@ describe('CurriculumPage', () => {
     expect(screen.getAllByText('Chưa có học phần')).toHaveLength(2);
   });
 
-  it('links to the consistency check, which is open for every status', async () => {
-    renderPage();
-    expect(
-      (
-        await screen.findByRole('button', { name: 'Kiểm tra nhất quán' })
-      ).closest('a'),
-    ).toHaveAttribute('href', '/programs/p1/versions/v1/consistency');
-  });
-
   it('highlights the row named by ?focus and shows errors before warnings', async () => {
     renderPage(
       fixture({
@@ -484,16 +475,6 @@ describe('CurriculumPage', () => {
       screen.getByRole('list', { name: 'Cảnh báo của khung' }),
     ).getAllByRole('listitem');
     expect(entries[0]).toHaveTextContent('Vòng điều kiện');
-  });
-
-  it('links to the elective groups and back to the program', async () => {
-    renderPage();
-    expect(
-      await screen.findByRole('link', { name: 'Nhóm tự chọn' }),
-    ).toHaveAttribute('href', '/programs/p1/versions/v1/elective-groups');
-    expect(
-      screen.getByRole('link', { name: /Chương trình 1024034/ }),
-    ).toHaveAttribute('href', '/programs/p1');
   });
 
   it('says so when the version cannot be found', async () => {

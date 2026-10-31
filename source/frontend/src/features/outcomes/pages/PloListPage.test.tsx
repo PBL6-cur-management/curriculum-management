@@ -121,6 +121,5 @@ describe('PloListPage', () => {
     });
     await screen.findByText('PLO1');
     expect(screen.queryByRole('link', { name: 'Ma trận CLO–PLO' })).toBeNull();
-    expect(screen.getByRole('link', { name: 'PLO' })).toBeInTheDocument();
   });
 });
