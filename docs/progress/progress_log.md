@@ -482,3 +482,12 @@ Format:
 - **Kiểm chứng trên main**: BE unit 1797/1797; BE e2e 679/679 (4 skip), 43 file, khoảng 302 giây; FE 693/693, tsc 0, lint 0 lỗi.
 - Dọn nhánh: `refactor/program-workspace-tabs` (PR #35 đã thay thế), các nhánh tính năng đã gộp, worktree `cm-f26-leftovers`.
 - **Nợ**: Playwright và duyệt luồng R5→R4→R3→R1 trên trình duyệt chưa chạy (thiếu `source/e2e/.env`); `REDIS_DB=0` chưa có trong `.env.example`; `ctdt_real` từ chối sao lưu `BACKUP_FILE_MISSING`; 213 dòng tự chọn chưa thuộc nhóm (C10); nợ vận hành (7 đêm sao lưu, B5/B6, ngoài máy, k6 canonical, uptime, NFR-02, bản 1.1); flake `chooseOption`; Taiga MCP không kết nối.
+
+## 2026-10-31 — khám phá CSDL đào tạo của Trường (chỉ đọc)
+
+- Khám phá chỉ đọc SQL Server đào tạo của Trường qua đường hầm SSH, dùng hai tài khoản chỉ đọc (tài khoản A/B). Báo cáo: [dut-school-db-discovery](../reference/dut-school-db-discovery.md).
+- Kết luận chính: `tmProxDUT` là DB chính, mới hơn bản dump `DHBK_CDS` mà seed DUT đang dùng; không có bảng PLO/CLO; nhóm tự chọn dựng lại được từ `tmKhungCT.Note` + `Hocky` + `tmKhungTC` (có nguồn dữ liệu cho C10); `tmKehoach` cũ (dừng ở 2020); `MalopHP` = `MaHP` + `IDCode` + hậu tố; hậu tố học kỳ `11` và `30` tồn tại nhưng `semesterFromLegacyCode` từ chối; cột mật khẩu bị DENY ở mức cột.
+- Mã mới (độc lập, không đụng `src/`, không migration): `source/backend/scripts/school-discovery/{connection,catalog,classify,mirror,export-csv,profile}.ts`, cấu hình từ `D:\dut-mirror\.env` (ngoài repo).
+- Bản sao cục bộ ngoài repo `D:\dut-mirror`: 98 bảng / 2.049.332 dòng, đã sao vào container Docker `dut-mirror` (SQL Server 2022) và xuất CSV, số dòng khớp; chỉ `tmDiemkyhoc` lọc theo sinh viên Khoa CNTT.
+- Kiểm chứng: backend tsc 0 lỗi, oxlint 0 cảnh báo, prettier sạch trên các script mới.
+- Việc kế: viết kế hoạch triển khai thiết kế lại schema từ báo cáo; trả lời câu hỏi mở §10.

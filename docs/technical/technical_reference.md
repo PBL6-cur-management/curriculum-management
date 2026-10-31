@@ -238,3 +238,13 @@ oxlint (`pnpm lint`; máy chủ bật `--type-aware`, lời hứa bị bỏ quê
 - Bản đã tải trả `CREDENTIALS_ALREADY_DOWNLOADED`; hết hạn hoặc thiếu thành phần payload trả `CREDENTIALS_EXPIRED`. Thiếu khóa lúc giải mã vẫn trả `STUDENT_CREDENTIALS_UNAVAILABLE`; khóa khác nhưng hợp lệ, AAD sai hoặc bản mã bị sửa trả `CREDENTIALS_UNREADABLE`. Không có vòng khóa cũ để giải mã sau xoay khóa. API trạng thái chỉ xét payload, hạn và dấu tải, không thử giải mã để bảo đảm khóa hiện tại dùng được.
 - Quét `imports-sweep` gọi `purgeExpired`, chỉ xóa payload mã hóa và giữ metadata bàn giao. Không dùng tệp XLSX mật khẩu rõ làm báo cáo import hay lưu dưới `FILES_ROOT`.
 - Ghi quá trình học dùng khóa chương trình/sinh viên/quá trình học cùng token thời gian; `EnrollmentReconciler` chạy transaction `Serializable`, còn bộ đọc kết quả dùng `RepeatableRead` khi không nhận transaction từ caller. Điểm nguồn gửi Decimal dạng chuỗi; miễn học và đang học giữ nguyên trạng thái, không tự chuyển thành điểm hoặc trượt.
+
+## 13. Script khám phá CSDL Trường (school-discovery)
+
+**Library**: `mssql` (dependency sẵn có), `bcp` CLI, Docker (container `dut-mirror`, SQL Server 2022, volume `dut-mirror-mssql`).
+
+### Usage Pattern
+
+- Mục đích: khám phá chỉ đọc SQL Server đào tạo của Trường, sao lưu cục bộ để thiết kế lại schema. Script độc lập tại `source/backend/scripts/school-discovery/` (`connection`, `catalog`, `classify`, `mirror`, `export-csv`, `profile`), không thuộc `src/`.
+- Chạy từ `source/backend`: `pnpm exec tsx scripts/school-discovery/<tên>.ts`. Cấu hình (kết nối, tài khoản A/B) đọc từ `D:\dut-mirror\.env` ngoài repo; không ghi thông tin kết nối vào repo hay tài liệu.
+- Cần `bcp` CLI và Docker. Dữ liệu (bản sao, CSV) chỉ nằm ở `D:\dut-mirror`, không bao giờ commit. Chỉ `tmDiemkyhoc` được lọc theo sinh viên Khoa CNTT. Kết quả: [dut-school-db-discovery](../reference/dut-school-db-discovery.md).
