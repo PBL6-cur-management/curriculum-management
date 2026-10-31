@@ -145,6 +145,23 @@ export class Env {
   @IsString()
   SCHOOL_SYNC_EXTERNAL_HOSTS?: string;
 
+  // F-26: daily database + attachment backups. Off until an operator names a root on another disk.
+  @IsIn(['true', 'false'])
+  BACKUP_ENABLED: 'true' | 'false' = 'false';
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  BACKUP_ROOT?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  PG_DUMP_PATH: string = 'pg_dump';
+
+  @IsString()
+  @IsNotEmpty()
+  PG_RESTORE_PATH: string = 'pg_restore';
+
   @IsInt()
   @Min(ELIGIBILITY_LIMITS.MIN_DEPTH)
   @Max(ELIGIBILITY_LIMITS.MAX_DEPTH)

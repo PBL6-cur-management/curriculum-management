@@ -9,7 +9,7 @@ describe('permission catalog', () => {
   it('contains each of the 43 permissions exactly once and in canonical order', () => {
     const codes = PERMISSION_CATALOG.map((entry) => entry.code);
 
-    expect(codes).toHaveLength(43);
+    expect(codes).toHaveLength(44);
     expect(new Set(codes).size).toBe(codes.length);
     expect(codes).toEqual(PERMISSION_CODES);
   });
