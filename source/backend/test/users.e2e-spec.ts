@@ -124,6 +124,13 @@ describe('user account management', () => {
       '/api/health',
       '/api/auth/login',
       '/api/auth/logout',
+      // dDUT API (F-21): authenticated by integration key, not by session.
+      '/api/v1/sinh-vien/:mssv/chuong-trinh',
+      '/api/v1/chuong-trinh/:maCT/phien-ban/:soPB',
+      '/api/v1/hoc-phan/:maHP/de-cuong',
+      '/api/v1/sinh-vien/:mssv/tien-do',
+      '/api/v1/sinh-vien/:mssv/hoc-phan-du-dieu-kien',
+      '/api/v1/sinh-vien/:mssv/xet-tot-nghiep',
     ]);
     const authenticatedRoutes = new Set([
       '/api/auth/me',
@@ -131,6 +138,9 @@ describe('user account management', () => {
       '/api/org-units',
       '/api/notifications',
       '/api/notifications/unread-count',
+      '/api/notifications/preferences',
+      '/api/approval-delegations',
+      '/api/approval-delegations/access',
       '/api/notifications/read-all',
       '/api/notifications/:id/read',
       // Selectors of the release forms: names and dates, no personal data (F-15).
