@@ -57,6 +57,7 @@ function nodeData(node: PlacedNode): NodeData {
       fill: node.external ? COLOR.external : COLOR.surface,
       stroke: COLOR.border,
       lineWidth: 1,
+      opacity: 1,
       lineDash: node.external ? [4, 3] : undefined,
       labelText: `${node.courseCode}\n${truncate(node.courseName)}`,
       labelPlacement: 'center',
@@ -77,6 +78,7 @@ function edgeData(edge: GraphEdge): EdgeData {
     style: {
       stroke: COLOR.muted,
       lineWidth: 1,
+      opacity: 1,
       endArrow: edge.relationType !== 'COREQUISITE',
       lineDash: edge.relationType === 'COREQUISITE' ? [4, 4] : undefined,
     },
@@ -112,16 +114,18 @@ export function CourseGraphCanvas({
       node: {
         type: 'rect',
         state: {
-          selected: { stroke: COLOR.brand, lineWidth: 3 },
-          ancestor: { stroke: COLOR.ancestor, lineWidth: 2 },
-          descendant: { stroke: COLOR.descendant, lineWidth: 2 },
+          // Every lit state names its opacity: G6 keeps a state-only attribute after the state is
+          // cleared, so a node dimmed by one selection would stay faded when the next one lights it.
+          selected: { stroke: COLOR.brand, lineWidth: 3, opacity: 1 },
+          ancestor: { stroke: COLOR.ancestor, lineWidth: 2, opacity: 1 },
+          descendant: { stroke: COLOR.descendant, lineWidth: 2, opacity: 1 },
           dimmed: { opacity: 0.35 },
         },
       },
       edge: {
         type: 'cubic-horizontal',
         state: {
-          active: { stroke: COLOR.brand, lineWidth: 2 },
+          active: { stroke: COLOR.brand, lineWidth: 2, opacity: 1 },
           dimmed: { opacity: 0.15 },
         },
       },
