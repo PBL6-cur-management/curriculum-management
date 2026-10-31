@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Flex, Input, Result, Select, Typography } from 'antd';
 import type { TableColumnsType } from 'antd';
 import { Link, generatePath, useNavigate } from 'react-router';
@@ -7,6 +7,7 @@ import { DEFAULT_PAGE_SIZE } from '../../../shared/api/pagination';
 import { PERMISSIONS } from '../../../shared/auth/permissions';
 import { useCanEditSchoolWide } from '../../../shared/auth/useCan';
 import { useDebouncedValue } from '../../../shared/hooks/useDebouncedValue';
+import { useUrlQuery } from '../../../shared/hooks/useUrlQuery';
 import type {
   DegreeLevel,
   ProgramQuery,
@@ -38,24 +39,31 @@ const statusOptions = [
   })),
 ];
 
+const INITIAL_QUERY: ProgramQuery = {
+  page: 1,
+  pageSize: DEFAULT_PAGE_SIZE,
+  status: 'ACTIVE',
+};
+const QUERY_KINDS = { page: 'number', pageSize: 'number' } as const;
+
 export function ProgramListPage() {
-  const [filters, setFilters] = useState<
-    Pick<ProgramQuery, 'degreeLevel' | 'status'>
-  >({ status: 'ACTIVE' });
-  const [search, setSearch] = useState('');
-  const [paging, setPaging] = useState({
-    page: 1,
-    pageSize: DEFAULT_PAGE_SIZE,
-  });
+  // Filters and page live in the URL so the back link from a program returns here unchanged.
+  const [query, setQuery] = useUrlQuery(INITIAL_QUERY, QUERY_KINDS);
+  const filters = { degreeLevel: query.degreeLevel, status: query.status };
+  const [search, setSearch] = useState(query.q ?? '');
   const q = useDebouncedValue(search.trim(), PROGRAM_SEARCH_DEBOUNCE_MS);
-  const query: ProgramQuery = { ...paging, ...filters, q: q || undefined };
+  useEffect(() => {
+    setQuery((current) =>
+      (current.q ?? '') === q
+        ? current
+        : { ...current, q: q || undefined, page: 1 },
+    );
+  }, [q, setQuery]);
   const { data, isFetching, isError } = useProgramList(query);
   const canCreate = useCanEditSchoolWide(PERMISSIONS.programEditInfo);
   const navigate = useNavigate();
-  const applyFilters = (next: typeof filters) => {
-    setFilters(next);
-    setPaging((current) => ({ ...current, page: 1 }));
-  };
+  const applyFilters = (next: typeof filters) =>
+    setQuery((current) => ({ ...current, ...next, page: 1 }));
   const columns: TableColumnsType<ProgramSummary> = [
     {
       title: 'Chương trình',
@@ -122,10 +130,7 @@ export function ProgramListPage() {
           allowClear
           placeholder="Tìm theo mã hoặc tên chương trình"
           value={search}
-          onChange={(event) => {
-            setSearch(event.target.value);
-            setPaging((current) => ({ ...current, page: 1 }));
-          }}
+          onChange={(event) => setSearch(event.target.value)}
           style={{ width: 280 }}
         />
         <Select
@@ -157,11 +162,13 @@ export function ProgramListPage() {
         columns={columns}
         dataSource={data?.items ?? []}
         total={data?.total ?? 0}
-        page={paging.page}
-        pageSize={paging.pageSize}
+        page={query.page ?? 1}
+        pageSize={query.pageSize}
         loading={isFetching}
         emptyText="Không có chương trình khớp bộ lọc"
-        onPageChange={(page, pageSize) => setPaging({ page, pageSize })}
+        onPageChange={(page, pageSize) =>
+          setQuery((current) => ({ ...current, page, pageSize }))
+        }
       />
     </Flex>
   );

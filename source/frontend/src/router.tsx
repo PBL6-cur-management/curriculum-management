@@ -86,6 +86,8 @@ const EquivalenceGroupsPage = lazy(() =>
     (module) => ({ default: module.EquivalenceGroupsPage }),
   ),
 );
+import { ProgramWorkspaceLayout } from './features/programs/components/ProgramWorkspaceLayout';
+
 const ProgramListPage = lazy(() =>
   import('./features/programs/pages/ProgramListPage').then((module) => ({
     default: module.ProgramListPage,
@@ -668,54 +670,6 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: ROUTES.versionCompare,
-            element: (
-              <RequirePermission code={PERMISSIONS.versionCompare}>
-                <VersionComparisonPage />
-              </RequirePermission>
-            ),
-          },
-          {
-            path: ROUTES.pinnedSyllabusCompare,
-            element: (
-              <RequirePermission code={PERMISSIONS.versionCompare}>
-                <PinnedSyllabusComparisonPage />
-              </RequirePermission>
-            ),
-          },
-          {
-            path: ROUTES.cohortVersionAssignmentStart,
-            element: (
-              <RequirePermission code={PERMISSIONS.versionAssignCohort}>
-                <CohortVersionAssignmentsPage />
-              </RequirePermission>
-            ),
-          },
-          {
-            path: ROUTES.cohortVersionAssignments,
-            element: (
-              <RequirePermission code={PERMISSIONS.versionAssignCohort}>
-                <CohortVersionAssignmentsPage />
-              </RequirePermission>
-            ),
-          },
-          {
-            path: ROUTES.versionHistory,
-            element: (
-              <RequirePermission code={PERMISSIONS.programView}>
-                <VersionHistoryPage />
-              </RequirePermission>
-            ),
-          },
-          {
-            path: ROUTES.versionDetail,
-            element: (
-              <RequirePermission code={PERMISSIONS.programView}>
-                <VersionDetailPage />
-              </RequirePermission>
-            ),
-          },
-          {
             path: ROUTES.versionRelease,
             element: (
               <RequirePermission code={PERMISSIONS.versionPublish}>
@@ -736,14 +690,6 @@ export const router = createBrowserRouter([
             element: (
               <RequirePermission code={PERMISSIONS.changeRequestView}>
                 <FinalApprovalPage />
-              </RequirePermission>
-            ),
-          },
-          {
-            path: ROUTES.programVersionInfo,
-            element: (
-              <RequirePermission code={PERMISSIONS.programView}>
-                <VersionInfoEditPage />
               </RequirePermission>
             ),
           },
@@ -812,6 +758,164 @@ export const router = createBrowserRouter([
             ),
           },
           {
+            // Every view inside one program shares its header, menu and version choice.
+            element: <ProgramWorkspaceLayout />,
+            children: [
+              {
+                path: ROUTES.programDetail,
+                element: (
+                  <RequirePermission code={PERMISSIONS.programView}>
+                    <ProgramOverviewPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: ROUTES.programVersionInfo,
+                element: (
+                  <RequirePermission code={PERMISSIONS.programView}>
+                    <VersionInfoEditPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: ROUTES.curriculum,
+                element: (
+                  <RequirePermission code={PERMISSIONS.programView}>
+                    <CurriculumPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: ROUTES.electiveGroups,
+                element: (
+                  <RequirePermission code={PERMISSIONS.programView}>
+                    <ElectiveGroupsPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: ROUTES.consistency,
+                element: (
+                  <RequirePermission code={PERMISSIONS.programView}>
+                    <ConsistencyPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: ROUTES.plos,
+                element: (
+                  <RequirePermission code={PERMISSIONS.outcomeView}>
+                    <PloListPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: ROUTES.coursePloMatrix,
+                element: (
+                  <RequirePermission code={PERMISSIONS.outcomeView}>
+                    <CoursePloMatrixPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: ROUTES.cloPloMatrix,
+                element: (
+                  <RequirePermission code={PERMISSIONS.outcomeView}>
+                    <ProgramCloPloPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: ROUTES.itemCloPlo,
+                element: (
+                  <RequirePermission code={PERMISSIONS.outcomeView}>
+                    <ItemCloPloPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: ROUTES.outcomeCoverage,
+                element: (
+                  <RequirePermission code={PERMISSIONS.outcomeView}>
+                    <OutcomeCoveragePage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: ROUTES.courseGraph,
+                element: (
+                  <RequirePermission code={PERMISSIONS.programView}>
+                    <CourseGraphPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: ROUTES.programHealth,
+                element: (
+                  <RequirePermission code={PERMISSIONS.programView}>
+                    <ProgramHealthPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: ROUTES.versionTimeline,
+                element: (
+                  <RequirePermission code={PERMISSIONS.versionViewHistory}>
+                    <VersionTimelinePage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: ROUTES.versionHistory,
+                element: (
+                  <RequirePermission code={PERMISSIONS.programView}>
+                    <VersionHistoryPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: ROUTES.versionDetail,
+                element: (
+                  <RequirePermission code={PERMISSIONS.programView}>
+                    <VersionDetailPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: ROUTES.versionCompare,
+                element: (
+                  <RequirePermission code={PERMISSIONS.versionCompare}>
+                    <VersionComparisonPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: ROUTES.pinnedSyllabusCompare,
+                element: (
+                  <RequirePermission code={PERMISSIONS.versionCompare}>
+                    <PinnedSyllabusComparisonPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: ROUTES.cohortVersionAssignments,
+                element: (
+                  <RequirePermission code={PERMISSIONS.versionAssignCohort}>
+                    <CohortVersionAssignmentsPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: ROUTES.cohortVersionAssignmentStart,
+                element: (
+                  <RequirePermission code={PERMISSIONS.versionAssignCohort}>
+                    <CohortVersionAssignmentsPage />
+                  </RequirePermission>
+                ),
+              },
+            ],
+          },
+          {
             path: ROUTES.programs,
             element: (
               <RequirePermission code={PERMISSIONS.programView}>
@@ -828,106 +932,10 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: ROUTES.programDetail,
-            element: (
-              <RequirePermission code={PERMISSIONS.programView}>
-                <ProgramOverviewPage />
-              </RequirePermission>
-            ),
-          },
-          {
             path: ROUTES.programEdit,
             element: (
               <RequirePermission code={PERMISSIONS.programEditInfo}>
                 <ProgramFormPage />
-              </RequirePermission>
-            ),
-          },
-          {
-            path: ROUTES.curriculum,
-            element: (
-              <RequirePermission code={PERMISSIONS.programView}>
-                <CurriculumPage />
-              </RequirePermission>
-            ),
-          },
-          {
-            path: ROUTES.electiveGroups,
-            element: (
-              <RequirePermission code={PERMISSIONS.programView}>
-                <ElectiveGroupsPage />
-              </RequirePermission>
-            ),
-          },
-          {
-            path: ROUTES.courseGraph,
-            element: (
-              <RequirePermission code={PERMISSIONS.programView}>
-                <CourseGraphPage />
-              </RequirePermission>
-            ),
-          },
-          {
-            path: ROUTES.programHealth,
-            element: (
-              <RequirePermission code={PERMISSIONS.programView}>
-                <ProgramHealthPage />
-              </RequirePermission>
-            ),
-          },
-          {
-            path: ROUTES.versionTimeline,
-            element: (
-              <RequirePermission code={PERMISSIONS.versionViewHistory}>
-                <VersionTimelinePage />
-              </RequirePermission>
-            ),
-          },
-          {
-            path: ROUTES.consistency,
-            element: (
-              <RequirePermission code={PERMISSIONS.programView}>
-                <ConsistencyPage />
-              </RequirePermission>
-            ),
-          },
-          {
-            path: ROUTES.plos,
-            element: (
-              <RequirePermission code={PERMISSIONS.outcomeView}>
-                <PloListPage />
-              </RequirePermission>
-            ),
-          },
-          {
-            path: ROUTES.coursePloMatrix,
-            element: (
-              <RequirePermission code={PERMISSIONS.outcomeView}>
-                <CoursePloMatrixPage />
-              </RequirePermission>
-            ),
-          },
-          {
-            path: ROUTES.cloPloMatrix,
-            element: (
-              <RequirePermission code={PERMISSIONS.outcomeView}>
-                <ProgramCloPloPage />
-              </RequirePermission>
-            ),
-          },
-          {
-            path: ROUTES.itemCloPlo,
-            element: (
-              <RequirePermission code={PERMISSIONS.outcomeView}>
-                <ItemCloPloPage />
-              </RequirePermission>
-            ),
-          },
-          {
-            path: ROUTES.outcomeCoverage,
-            element: (
-              <RequirePermission code={PERMISSIONS.outcomeView}>
-                <OutcomeCoveragePage />
               </RequirePermission>
             ),
           },

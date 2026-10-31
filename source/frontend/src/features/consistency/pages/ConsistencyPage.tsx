@@ -1,12 +1,10 @@
 import { ReloadOutlined } from '@ant-design/icons';
-import { Alert, Button, Flex, Result, Skeleton, Typography } from 'antd';
+import { Alert, Button, Flex, Result, Skeleton } from 'antd';
 import { PageHeader } from '../../../shared/design-system';
 import dayjs from 'dayjs';
 import { useState } from 'react';
-import { generatePath, Link, useParams } from 'react-router';
-import { ROUTES } from '../../../routes';
+import { useParams } from 'react-router';
 import { ApiError } from '../../../shared/api/client';
-import { versionLabel } from '../../../shared/constants/versionLabels';
 import { AcceptMismatchModal } from '../components/AcceptMismatchModal';
 import { CreditSummaryCard } from '../components/CreditSummaryCard';
 import { IssueList } from '../components/IssueList';
@@ -37,14 +35,11 @@ export function ConsistencyPage() {
       <Result status="404" title="Không tìm thấy phiên bản chương trình" />
     );
   }
-  const { version } = report;
   return (
     <Flex vertical gap="middle">
-      <Link to={generatePath(ROUTES.curriculum, { programId, versionId })}>
-        ← Khung chương trình {version.programCode}
-      </Link>
       <PageHeader
-        title={`Kiểm tra nhất quán — ${version.programCode} (${versionLabel(version)})`}
+        title="Kiểm tra nhất quán"
+        subtitle={`Kiểm tra lúc ${dayjs(report.checkedAt).format('DD/MM/YYYY HH:mm:ss')}`}
         actions={
           <Button
             icon={<ReloadOutlined />}
@@ -55,9 +50,6 @@ export function ConsistencyPage() {
           </Button>
         }
       />
-      <Typography.Text type="secondary">
-        Kiểm tra lúc {dayjs(report.checkedAt).format('DD/MM/YYYY HH:mm:ss')}
-      </Typography.Text>
       {!report.passes && (
         <Alert
           type="error"

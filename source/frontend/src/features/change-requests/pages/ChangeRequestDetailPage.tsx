@@ -64,7 +64,9 @@ export function ChangeRequestDetailPage() {
   const link = targetLink(request);
   return (
     <Flex vertical gap="middle">
-      <BackLink to={ROUTES.changeRequests}>Về danh sách</BackLink>
+      <BackLink to={ROUTES.changeRequests} preferHistory>
+        Quay lại
+      </BackLink>
       <PageHeader
         title={
           <>

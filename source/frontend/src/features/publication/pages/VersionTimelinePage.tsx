@@ -7,7 +7,6 @@ import {
   versionLabel,
 } from '../../../shared/constants/versionLabels';
 import {
-  BackLink,
   EmptyState,
   PageHeader,
   PageSkeleton,
@@ -94,9 +93,6 @@ export default function VersionTimelinePage() {
   const { data } = timeline;
   return (
     <Flex vertical gap="middle">
-      <BackLink to={generatePath(ROUTES.programDetail, { programId })}>
-        {data.programCode}
-      </BackLink>
       <PageHeader
         title="Dòng thời gian phiên bản"
         subtitle={`${data.programCode} — ${data.programName}. Chỉ các phiên bản đã ban hành; khóa tuyển sinh là lịch gán đã lưu, không phải số sinh viên.`}

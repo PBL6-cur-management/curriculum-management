@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Tabs } from 'antd';
 import { useLocation, useNavigate } from 'react-router';
 import { ROUTES } from '../../routes';
-import { PERMISSIONS, type PermissionCode } from '../auth/permissions';
+import type { PermissionCode } from '../auth/permissions';
 import { fetchMe, meQueryKey } from '../auth/me';
 
 interface SectionPage {
@@ -32,23 +32,6 @@ export const SECTIONS = {
       path: ROUTES.graduationBatches,
       label: 'Xét hàng loạt',
       anyPermissions: ['graduation.audit'],
-    },
-  ],
-  approvals: [
-    {
-      path: ROUTES.approvalQueue,
-      label: 'Chờ tôi duyệt',
-      anyPermissions: [PERMISSIONS.changeRequestView],
-    },
-    {
-      path: ROUTES.changeRequests,
-      label: 'Tất cả đề xuất',
-      anyPermissions: [PERMISSIONS.changeRequestView],
-    },
-    {
-      path: ROUTES.approvalDelegations,
-      label: 'Ủy quyền duyệt',
-      anyPermissions: [PERMISSIONS.delegationManage],
     },
   ],
 } as const satisfies Record<string, readonly SectionPage[]>;

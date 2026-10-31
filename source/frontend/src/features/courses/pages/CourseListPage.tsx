@@ -1,4 +1,5 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
+import { useUrlQuery } from '../../../shared/hooks/useUrlQuery';
 import { Button, Flex, Result, Table, Tag } from 'antd';
 import type { TableColumnsType, TableProps } from 'antd';
 import { Link, generatePath, useNavigate } from 'react-router';
@@ -31,6 +32,12 @@ const INITIAL_QUERY: CourseQuery = {
   sort: 'courseCode',
   order: 'asc',
 };
+const QUERY_KINDS = {
+  page: 'number',
+  pageSize: 'number',
+  status: 'list',
+  foreign: 'boolean',
+} as const;
 const SORT_KEYS = ['courseCode', 'courseName', 'credits', 'updatedAt'] as const;
 
 type CourseSorter = Parameters<
@@ -62,14 +69,17 @@ function sortOrderOf(query: CourseQuery, key: (typeof SORT_KEYS)[number]) {
 }
 
 export function CourseListPage() {
-  const [query, setQuery] = useState<CourseQuery>(INITIAL_QUERY);
+  const [query, setQuery] = useUrlQuery<CourseQuery>(
+    INITIAL_QUERY,
+    QUERY_KINDS,
+  );
   const { data, isFetching, isError } = useCourseList(query);
   const canEdit = useCan(PERMISSIONS.courseEdit);
   const navigate = useNavigate();
   const applyFilters = useCallback(
     (filters: Partial<CourseQuery>) =>
       setQuery((current) => ({ ...current, ...filters, page: 1 })),
-    [],
+    [setQuery],
   );
   const columns: TableColumnsType<CourseSummary> = [
     {

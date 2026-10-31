@@ -19,7 +19,6 @@ export function ProgramVersionsSection({
   program,
 }: ProgramVersionsSectionProps) {
   const canPublish = useCan(PERMISSIONS.versionPublish);
-  const canAssign = useCan(PERMISSIONS.versionAssignCohort);
   const neverReleased = program.versions.every(
     (version) => version.status === 'DRAFT',
   );
@@ -39,20 +38,6 @@ export function ProgramVersionsSection({
               <Button type="primary">Ban hành phiên bản đầu tiên</Button>
             </Link>
           )}
-          {canAssign && (
-            <Link
-              to={generatePath(ROUTES.cohortVersionAssignments, {
-                programId: program.id,
-              })}
-            >
-              Gán phiên bản cho khóa
-            </Link>
-          )}
-          <Link
-            to={generatePath(ROUTES.versionHistory, { programId: program.id })}
-          >
-            Lịch sử phiên bản
-          </Link>
         </Flex>
       }
     >

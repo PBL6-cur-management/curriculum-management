@@ -25,10 +25,3 @@ export const SAVED = 'Đã lưu.';
 export const NOTHING_CHANGED = 'Chưa có thay đổi để lưu.';
 export const GROUP_FILTER_NOTE = 'Chỉ hiện học phần thuộc nhóm của bạn';
 export const NO_GAPS = 'Không có thiếu sót';
-
-export const OUTCOME_PAGE_LINKS = {
-  plos: 'PLO',
-  coursePloMatrix: 'Ma trận học phần–PLO',
-  cloPloMatrix: 'Ma trận CLO–PLO',
-  outcomeCoverage: 'Kiểm tra phủ',
-} as const;

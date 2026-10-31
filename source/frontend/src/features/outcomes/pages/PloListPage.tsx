@@ -6,7 +6,6 @@ import { RequestDraftBanner } from '../../../shared/change-requests/RequestDraft
 import { versionLabel } from '../../../shared/constants/versionLabels';
 import type { Plo } from '../api/outcomes';
 import { OutcomeEditNotice } from '../components/OutcomeEditNotice';
-import { OutcomeNav } from '../components/OutcomeNav';
 import { PloFormModal } from '../components/PloFormModal';
 import { PloTable } from '../components/PloTable';
 import { ADD_PLO } from '../constants/outcomeLabels';
@@ -14,7 +13,7 @@ import { usePlos } from '../hooks/useOutcomes';
 import { PageHeader, PageSkeleton } from '../../../shared/design-system';
 
 export function PloListPage() {
-  const { programId = '', versionId = '' } = useParams();
+  const { versionId = '' } = useParams();
   const { data, isPending, error } = usePlos(versionId);
   const [editing, setEditing] = useState<Plo | 'new' | null>(null);
   if (isPending) return <PageSkeleton />;
@@ -28,7 +27,6 @@ export function PloListPage() {
   const { version } = data;
   return (
     <Flex vertical gap="middle">
-      <OutcomeNav programId={programId} versionId={versionId} />
       <PageHeader
         title={
           <>

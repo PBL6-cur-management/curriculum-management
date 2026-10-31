@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { DownOutlined, UserOutlined } from '@ant-design/icons';
 import {
   Button,
@@ -16,6 +16,7 @@ import { useLogout } from '../auth/useLogout';
 import { NotificationBell } from '../notifications/NotificationBell';
 import { palette } from '../design-system/tokens';
 import { ROUTES } from '../../routes';
+import { rememberLocation } from './navigationMemory';
 import {
   APP_MENU,
   openMenuGroups,
@@ -26,7 +27,9 @@ import {
 const HEADER_BACKGROUND = `linear-gradient(to right, ${palette.headerFrom}, ${palette.headerTo})`;
 
 export function AppLayout() {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
+  // Back links return to the list as the user left it (filters, page).
+  useEffect(() => rememberLocation(pathname, search), [pathname, search]);
   const { data: me } = useMe();
   const logoutMutation = useLogout();
   const selectedPath = selectedMenuPath(APP_MENU, pathname);

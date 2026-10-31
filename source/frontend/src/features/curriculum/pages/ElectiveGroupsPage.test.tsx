@@ -69,7 +69,7 @@ describe('ElectiveGroupsPage', () => {
   it('lists the groups with the minimum and the credits listed', async () => {
     renderPage();
     expect(
-      await screen.findByRole('heading', { name: /Nhóm tự chọn — 1024034/ }),
+      await screen.findByRole('heading', { name: 'Nhóm tự chọn' }),
     ).toBeInTheDocument();
     const row = screen.getByText('TC1').closest('tr')!;
     expect(row).toHaveTextContent('Tự chọn chuyên ngành');
