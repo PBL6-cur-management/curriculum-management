@@ -86,6 +86,17 @@ describe('copyFiles / verifyTree', () => {
     }
   });
 
+  it('creates the target for an empty source, so an empty set still verifies', async () => {
+    const parent = await mkdtemp(path.join(tmpdir(), 'f26-empty-'));
+    try {
+      const target = path.join(parent, 'files');
+      expect(await copyFiles(root, target, signal())).toEqual([]);
+      expect(await verifyTree(target, [], signal())).toBe(true);
+    } finally {
+      await rm(parent, { recursive: true, force: true });
+    }
+  });
+
   it('verifyTree rejects a changed, missing or extra file', async () => {
     await put('one.txt', 'abc');
     const evidence = [await evidenceOf(path.join(root, 'one.txt'), 'one.txt')];
@@ -128,10 +139,7 @@ describe('assertReferenceCoverage', () => {
 
   it('accepts references that were copied at their recorded size, extra files allowed', () => {
     expect(() =>
-      assertReferenceCoverage(
-        [reference],
-        [file, { ...file, path: 'extra' }],
-      ),
+      assertReferenceCoverage([reference], [file, { ...file, path: 'extra' }]),
     ).not.toThrow();
   });
 

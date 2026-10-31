@@ -65,6 +65,9 @@ export async function copyFiles(
   signal: AbortSignal,
 ): Promise<FileEvidence[]> {
   const evidence: FileEvidence[] = [];
+  // The target exists even when there is nothing to copy: an empty FILES_ROOT still makes a set with `files/`,
+  // which the restore checks then read as an empty tree instead of a missing one.
+  await mkdir(target, { recursive: true });
   for (const relative of await listFiles(source)) {
     signal.throwIfAborted();
     const from = path.join(source, ...relative.split('/'));

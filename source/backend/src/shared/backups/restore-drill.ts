@@ -292,10 +292,10 @@ export class RestoreDrill {
       ) {
         return drill;
       }
-      throw new BackupFailure(BACKUP_ERRORS.DRILL_ACCEPTANCE_FAILED);
+      throw new BackupFailure(BACKUP_ERRORS.DRILL_ALREADY_DECIDED);
     }
     if (drill.status !== 'RESTORED' || !drill.checks.every((c) => c.passed)) {
-      throw new BackupFailure(BACKUP_ERRORS.DRILL_ACCEPTANCE_FAILED);
+      throw new BackupFailure(BACKUP_ERRORS.DRILL_NOT_ACCEPTABLE);
     }
     const accepted: RestoreDrillRecord = {
       ...drill,

@@ -161,3 +161,28 @@ Dừng ghi và dừng worker của ứng dụng trước khi chụp.
 - Mỗi bậc đã giao (B1…B6) cần **một biên bản diễn tập đã nghiệm thu** của chính bậc đó. Bắt đầu bằng B4 hiện tại, lặp lại ở B5 và B6.
 - Không điền ngược biên bản B1/B2/B3 chỉ vì các tính năng đó đã có. Bậc chưa diễn tập ghi vào **nợ phát hành** kèm người chịu trách nhiệm.
 - Bảng *Diễn tập phục hồi* hiển thị bậc, người thực hiện, trạng thái, `recoveryMs` (kèm nhãn "Thời gian phục hồi dữ liệu và kiểm tra tự động"), các giai đoạn, kết quả kiểm tra và thông tin nghiệm thu. Hệ thống không có bảng nhật ký kiểm toán riêng cho tính năng này; bằng chứng là các bản ghi JSON trong `BACKUP_ROOT` và nhật ký ứng dụng đã lọc.
+
+### Lượt diễn tập cục bộ đầu tiên — 2026-10-31 (máy phát triển, không phải nghiệm thu vận hành)
+
+| Mục | Giá trị |
+|---|---|
+| Nguồn | `ctdt_drill_source`: dữ liệu demo seed (`prisma migrate deploy` + `pnpm prisma:seed`), không phải `ctdt_real` |
+| Công cụ | PostgreSQL client 18.6 (`C:\Program Files\PostgreSQL\18\bin`), cài qua `winget install PostgreSQL.PostgreSQL.18` |
+| Sao lưu | `daily-2026-10-31`, tạo bởi lần chạy bù lúc khởi động với `BACKUP_ENABLED=true` |
+| Đích | `ctdt_restore_drill_b4` (trống, ICU `vi-VN`), thư mục tệp `D:\ctdt-drill\restored-files` |
+| Kết quả | `RESTORED`, 7/7 kiểm tra đạt. `recoveryMs` 482 ms (cơ sở dữ liệu 463 ms, tệp 0 ms, kiểm tra 14 ms). `verify` chạy lại đạt 5/5. Nghiệm thu `SUCCEEDED`. |
+| Số phiên bản đã ban hành | 0: demo seed chưa ban hành phiên bản nào, nên `RELEASED_CONTENT` mới kiểm trên tập rỗng |
+
+Lượt này phát hiện và sửa hai lỗi:
+
+- **FILES_ROOT trống:** bộ sao lưu không có thư mục `files/`, nên mọi lần phục hồi đều báo `BACKUP_CHECKSUM_MISMATCH`. Đã sửa: `copyFiles` luôn tạo thư mục đích.
+- **Thông báo chấp nhận gây hiểu nhầm:** chấp nhận lần hai với ghi chú khác, hoặc chấp nhận một diễn tập chưa `RESTORED`, đều báo "không đạt nghiệm thu". Nay tách thành hai mã: `DRILL_ALREADY_DECIDED` và `DRILL_NOT_ACCEPTABLE`.
+
+Phát hiện trên `ctdt_real` của máy này: sao lưu bị từ chối với `BACKUP_FILE_MISSING`. Bảng `ChangeRequestDocument` có 1 bản ghi trỏ tới tệp không còn trong `storage/`, nhiều khả năng do dữ liệu được chép từ máy khác mà không kèm thư mục tệp. Hệ thống từ chối là đúng thiết kế. Trước khi bật sao lưu trên dữ liệu thật, cần khôi phục tệp đó hoặc gỡ tài liệu qua giao diện.
+
+Còn nợ:
+
+- Một lượt diễn tập trên dữ liệu có phiên bản đã ban hành và tệp đính kèm thật.
+- 7 đêm sao lưu liên tiếp.
+- Sao chép ra ngoài máy.
+- Diễn tập B5/B6.

@@ -104,6 +104,20 @@ export const BACKUP_ERRORS = {
     message:
       'Dữ liệu phục hồi không khớp bản sao lưu. Xem các mục kiểm tra không đạt.',
   },
+  // Accept refused: the drill is not RESTORED with every check passed (D7: nothing else can be accepted).
+  DRILL_NOT_ACCEPTABLE: {
+    status: HttpStatus.CONFLICT,
+    code: 'DRILL_NOT_ACCEPTABLE',
+    message:
+      'Chỉ nghiệm thu được diễn tập ở trạng thái Đã phục hồi và đạt mọi mục kiểm tra. Chạy lại diễn tập hoặc kiểm tra lại.',
+  },
+  // A second accept with a different result, operator or note: the first decision stands.
+  DRILL_ALREADY_DECIDED: {
+    status: HttpStatus.CONFLICT,
+    code: 'DRILL_ALREADY_DECIDED',
+    message:
+      'Diễn tập này đã được ghi nhận nghiệm thu với kết quả hoặc ghi chú khác; không ghi đè. Chạy diễn tập mới nếu cần nghiệm thu lại.',
+  },
   DRILL_ACCEPTANCE_FAILED: {
     status: HttpStatus.CONFLICT,
     code: 'DRILL_ACCEPTANCE_FAILED',
