@@ -1,9 +1,13 @@
 {
   "schemaVersion": 1,
-  "_comment": "Ví dụ cấu trúc. Bản thật nằm ngoài repository, không chứa mật khẩu (mật khẩu ở tệp credentials riêng). contractVerified chỉ được đặt true sau khi đối chiếu từng điểm cuối với mã nguồn.",
+  "_comment": "Ví dụ cấu trúc. Bản thật nằm ngoài repository, không chứa mật khẩu (mật khẩu ở tệp credentials riêng). Đường dẫn dưới đây đã đối chiếu với mã nguồn ngày 2026-10-31; STUDENT_ID, PROGRAM_ID, SEMESTER_ID, VERSION_ID lấy từ fixture thật của từng tài khoản. contractVerified chỉ đặt true trên manifest thật sau khi fixture cung cấp đủ ID.",
   "contractVerified": false,
   "contractSources": [
-    { "name": "catalog", "source": "source/backend/src/features/courses/courses.controller.ts:LINE" }
+    { "name": "catalog", "source": "source/backend/src/features/courses/courses.controller.ts:36" },
+    { "name": "staff-curriculum", "source": "source/backend/src/features/curriculum/program-versions-curriculum.controller.ts:43" },
+    { "name": "student-curriculum", "source": "source/backend/src/features/student-portal/student-portal.controller.ts:43" },
+    { "name": "student-progress", "source": "source/backend/src/features/student-portal/student-portal.controller.ts:54" },
+    { "name": "eligibility", "source": "source/backend/src/features/registration-eligibility/registration-eligibility.controller.ts:17" }
   ],
   "dataset": {
     "synthetic": true,
@@ -17,23 +21,23 @@
   "students": [
     {
       "fixtureKey": "student-001",
-      "userId": "UUID",
+      "userId": "USER_ID",
       "roleCode": "R6",
       "reads": [
-        { "name": "curriculum", "kind": "lookup", "path": "/api/PATH_DA_XAC_MINH", "arrays": [{ "pointer": "/items", "minimumLength": 1 }] },
-        { "name": "progress", "kind": "lookup", "path": "/api/PATH_DA_XAC_MINH", "arrays": [{ "pointer": "/items", "minimumLength": 1 }] },
-        { "name": "eligibility", "kind": "eligibility", "path": "/api/PATH_DA_XAC_MINH", "equals": [{ "pointer": "/eligible", "value": true }] }
+        { "name": "curriculum", "kind": "lookup", "path": "/api/portal/curriculum", "arrays": [{ "pointer": "/terms", "minimumLength": 1 }] },
+        { "name": "progress", "kind": "lookup", "path": "/api/portal/plos", "arrays": [{ "pointer": "", "minimumLength": 1 }] },
+        { "name": "eligibility", "kind": "eligibility", "path": "/api/students/STUDENT_ID/registration-eligibility?programId=PROGRAM_ID&semesterId=SEMESTER_ID", "equals": [{ "pointer": "/contractVersion", "value": 1 }], "arrays": [{ "pointer": "/items", "minimumLength": 1 }] }
       ]
     }
   ],
   "staff": [
     {
       "fixtureKey": "staff-001",
-      "userId": "UUID",
+      "userId": "USER_ID",
       "roleCode": "R1",
       "reads": [
-        { "name": "catalog", "kind": "lookup", "path": "/api/PATH_DA_XAC_MINH?limit=20", "arrays": [{ "pointer": "/items", "minimumLength": 1 }] },
-        { "name": "curriculum", "kind": "lookup", "path": "/api/PATH_DA_XAC_MINH?limit=20", "arrays": [{ "pointer": "/items", "minimumLength": 1 }] }
+        { "name": "catalog", "kind": "lookup", "path": "/api/courses?page=1&pageSize=20&sort=courseCode&order=asc", "arrays": [{ "pointer": "/items", "minimumLength": 1 }] },
+        { "name": "curriculum", "kind": "lookup", "path": "/api/program-versions/VERSION_ID/curriculum", "arrays": [{ "pointer": "/items", "minimumLength": 1 }] }
       ]
     }
   ]
