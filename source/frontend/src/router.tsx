@@ -351,6 +351,11 @@ const SchoolSyncSettingsPage = lazy(() =>
     }),
   ),
 );
+const BackupsPage = lazy(() =>
+  import('./features/backups/pages/BackupsPage').then((module) => ({
+    default: module.BackupsPage,
+  })),
+);
 const SchoolSyncRunsPage = lazy(() =>
   import('./features/school-db-sync/pages/SchoolSyncRunsPage').then(
     (module) => ({
@@ -512,6 +517,14 @@ export const router = createBrowserRouter([
             element: (
               <RequirePermission code={PERMISSIONS.syncConfigure}>
                 <SchoolSyncSettingsPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: ROUTES.backups,
+            element: (
+              <RequirePermission code={PERMISSIONS.backupView}>
+                <BackupsPage />
               </RequirePermission>
             ),
           },

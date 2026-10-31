@@ -183,6 +183,11 @@ export const APP_MENU: readonly AppMenuItem[] = [
         label: 'Nhóm chuyên môn',
         permission: PERMISSIONS.subjectGroupView,
       },
+      {
+        path: ROUTES.backups,
+        label: 'Sao lưu và phục hồi',
+        permission: PERMISSIONS.backupView,
+      },
       { path: ROUTES.health, label: 'Trạng thái hệ thống' },
     ],
   },
