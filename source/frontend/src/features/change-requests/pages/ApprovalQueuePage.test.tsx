@@ -91,7 +91,7 @@ describe('ApprovalQueuePage', () => {
   it('says so when nothing waits', async () => {
     renderQueue({ '/api/approval-queue': [] });
     expect(
-      await screen.findByText('Không có đề xuất nào chờ bạn duyệt.'),
+      await screen.findByText(/Không có đề xuất nào chờ bạn duyệt/),
     ).toBeInTheDocument();
   });
 });

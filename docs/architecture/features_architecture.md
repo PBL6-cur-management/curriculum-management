@@ -234,7 +234,7 @@ Kế hoạch: `docs/implementation/f-06-programs-directors-implementation-plan.m
 
 #### `ProgramOverviewPage` — MH-22 (`/programs/:programId`)
 
-- `ProgramInfoCard` (mô tả của bản Nháp nếu có, không thì bản hiện hành; "Nhân bản từ" liên kết chương trình nguồn), `ProgramDirectorsSection` (bảng cả lịch sử, dòng đang hiệu lực lên trước; chỉ khi `canManage`: "Phân công" qua `AssignDirectorModal` = `UserSelect` + hai `DatePicker`, "Kết thúc" qua `EndDirectorModal` chỉ cho dòng `ACTIVE`/`SCHEDULED`, "Thu hồi" kèm xác nhận "Chỉ dùng khi phân công nhập nhầm"), `ProgramSectionLinks` (thẻ khung, nhóm tự chọn, kiểm tra nhất quán, PLO và ba ma trận — ẩn thẻ ma trận với người chỉ có R6; F-15 thêm `ReleaseCard`, `ProgramVersionsSection`).
+- `ProgramInfoCard` (mô tả của bản Nháp nếu có, không thì bản hiện hành; "Nhân bản từ" liên kết chương trình nguồn), `ProgramDirectorsSection` (bảng cả lịch sử, dòng đang hiệu lực lên trước; chỉ khi `canManage`: "Phân công" qua `AssignDirectorModal` = `UserSelect` + hai `DatePicker`, "Kết thúc" qua `EndDirectorModal` chỉ cho dòng `ACTIVE`/`SCHEDULED`, "Thu hồi" kèm xác nhận "Chỉ dùng khi phân công nhập nhầm"), (`ProgramSectionLinks` đã xóa 2026-10-31: điều hướng nay ở `ProgramWorkspaceLayout`, xem `general_architecture.md`; F-15 thêm `ReleaseCard`, `ProgramVersionsSection`).
 - `ProgramEditButton` theo `editPath` (`DIRECT` → "Sửa thông tin"; `VIA_REQUEST` → "Tạo đề xuất" (từ F-13 là liên kết tới MH-39); `null` → ẩn), `CloneProgramButton` khi `canClone`, `ProgramStatusActions` ("Ngừng sử dụng"/"Dùng lại", hộp xác nhận `App.useApp().modal`) khi `canManage`.
 
 #### `ProgramFormPage` — MH-23 (`/programs/new`, `/programs/:programId/edit`)
@@ -262,7 +262,7 @@ Kế hoạch: `docs/implementation/f-07-curriculum-elective-groups-implementatio
 
 ### Frontend — `src/features/curriculum/`
 
-- Tuyến `ROUTES.curriculum`, `ROUTES.electiveGroups` (`/programs/:programId/versions/:versionId/…`, quyền `program.view`); không có mục menu — vào từ thẻ ở tổng quan chương trình.
+- Tuyến `ROUTES.curriculum`, `ROUTES.electiveGroups` (`/programs/:programId/versions/:versionId/…`, quyền `program.view`); không có mục menu — vào từ tab "Khung chương trình" của `ProgramWorkspaceLayout`.
 - `CurriculumPage` (MH-25): chuyển "Dạng dòng" / "Theo học kỳ", lọc phía máy khách (`applyCurriculumFilters`), cảnh báo, tổng theo học kỳ và khối (tổng chung cộng bằng `shared/decimal`), kéo thả trong học kỳ (`@dnd-kit`, tắt khi đang lọc hoặc không có quyền cấu trúc; tay cầm mang thuộc tính `role` của dnd-kit để hàng bảng giữ vai trò `row`), `CurriculumItemModal`, `RequisitesModal` (lỗi vòng hiện trong hộp thoại).
 - `ElectiveGroupsPage` (MH-26): bảng nhóm, thẻ "Ít hơn yêu cầu" (so sánh thập phân), `ElectiveGroupFormModal`, `AssignItemsModal` (`Transfer`: chỉ dòng tự chọn chưa nhóm hoặc của nhóm này).
 - Dùng chung mới: `shared/decimal`, `shared/courses/{gradePoint,courseQueryKeys}`, `shared/constants/versionLabels`, `CourseSelect` nhận `statuses`, `initialLabels`; `withQuery` nhận mảng (khóa lặp lại). `ProgramsUsingList` có liên kết, học kỳ và câu "chưa được chương trình nào sử dụng".

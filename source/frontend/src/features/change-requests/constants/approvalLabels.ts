@@ -33,7 +33,8 @@ export const APPROVE_CONFIRM = 'Đồng ý đề xuất này?';
 export const OVERRIDE_NOTE =
   'Phòng Đào tạo quyết định thay cho người duyệt của cấp hiện tại; lịch sử ghi rõ người được thay.';
 export const DEAD_STEP_LABEL = 'không còn hiệu lực';
-export const NO_QUEUE = 'Không có đề xuất nào chờ bạn duyệt.';
+export const NO_QUEUE =
+  'Không có đề xuất nào chờ bạn duyệt. Đề xuất mới gửi tới bạn sẽ hiện ở đây và trong Thông báo.';
 
 export const FINAL_APPROVAL_BUTTON = 'Phê duyệt cuối';
 export const FINAL_APPROVAL_TITLE = 'Phê duyệt cuối và ban hành';

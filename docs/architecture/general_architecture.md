@@ -165,7 +165,7 @@ Bộ đọc phạm vi suy ra cho sinh viên (`OWN_ENROLLMENT`, F-17) đã nối 
 ```
 src/
 ├── main.tsx               ConfigProvider (vi_VN) → AntApp → QueryClientProvider → RouterProvider
-├── router.tsx             createBrowserRouter; /login ngoài khung; RequireAuth → AppLayout → các trang (lazy, trừ Login)
+├── router.tsx             createBrowserRouter; /login ngoài khung; RequireAuth → AppLayout → các trang (lazy, trừ Login); mọi `/programs/:programId/...` là route con của `ProgramWorkspaceLayout` (features/programs/components: link về danh sách, tên + trạng thái, Select phiên bản, 5 nhóm tab: Tổng quan / Khung chương trình / Chuẩn đầu ra / Phân tích / Phiên bản, kèm hàng tab thứ hai)
 ├── routes.ts              ROUTES — mọi đường dẫn
 ├── features/<f>/
 │   ├── api/               hàm gọi + khóa truy vấn của tài nguyên
@@ -182,7 +182,7 @@ src/
 │   ├── forms/             applyFieldErrors.ts — đặt lỗi nghiệp vụ của máy chủ dưới ô theo `details.field`; errorMessage; credits.ts — `CREDITS_PATTERN`, `CREDITS_MESSAGE` cho mọi biểu mẫu nhập tín chỉ
 │   ├── users/             userOptions.ts, UserSelect — ô tìm tài khoản đang hoạt động
 │   ├── courses/           courseSearch.ts, CourseSelect, CourseMultiSelect — ô tìm học phần đang sử dụng (F-05; F-07 dùng lại)
-│   ├── hooks/             useDebouncedValue — trễ giá trị cho ô tìm kiếm từ xa
+│   ├── hooks/             useDebouncedValue — trễ giá trị cho ô tìm kiếm từ xa; useUrlQuery — giữ bộ lọc/trang danh sách trên URL (ProgramListPage, CourseListPage, ChangeRequestListPage, ApprovalQueuePage)
 │   ├── components/        SortableRow (@dnd-kit, dùng cho khung, tuần, CLO, PLO); rich-text/ — trình soạn Tiptap (F-10)
 │   ├── decimal/           cộng, so sánh số thập phân dạng chuỗi (F-07)
 │   ├── curriculum/, outcomes/  gốc khóa truy vấn dùng chung; useSeesMatrices (ẩn thẻ ma trận với người chỉ có R6)
@@ -190,7 +190,7 @@ src/
 │   ├── notifications/     NotificationBell ở Header, useNotifications (F-14)
 │   ├── releases/          SemesterSelect, CohortSelect, useReleaseOptions (F-15)
 │   ├── validity/          nhãn, màu và định dạng ngày của trạng thái hiệu lực
-│   └── layout/            AppLayout.tsx (Header, Sider, Content), menuItems.tsx (mục menu kèm quyền cần; mục có `children` thành nhóm, ví dụ "Học phần" › Danh mục học phần, Nhóm tương đương; mục có `hideForRoles` ẩn khi mọi vai trò người gọi nằm trong danh sách — "Chương trình đào tạo" ẩn với người chỉ có R6, chỉ để hiển thị)
+│   └── layout/            navigationMemory.ts (AppLayout ghi pathname+search; BackLink về URL cuối của đích; `preferHistory` dùng navigate(-1)); AppLayout.tsx (Header, Sider, Content), menuItems.tsx (mục menu kèm quyền cần; mục có `children` thành nhóm, ví dụ "Học phần" › Danh mục học phần, Nhóm tương đương; mục có `hideForRoles` ẩn khi mọi vai trò người gọi nằm trong danh sách — "Chương trình đào tạo" ẩn với người chỉ có R6, chỉ để hiển thị)
 └── test/setup.ts          jest-dom, bản giả ResizeObserver cho Vitest
 ```
 

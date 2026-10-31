@@ -432,3 +432,12 @@ Format:
 - Chưa chạy: bộ test đầy đủ BE/FE/Playwright sau PR #6 (người dùng yêu cầu tắt chạy test).
 - Chờ người dùng: Taiga (biến môi trường `TAIGA_USERNAME`/`TAIGA_PASSWORD`, slug dự án, duyệt bảng phân công).
 - Start here: Phase 4 thiết kế lại màn hình, cụm D (CTĐT) → E → F → G → C → H → B; sau đó F-22 → F-20 → F-21.
+
+## 2026-10-31 — Điều hướng CTĐT, dev:setup, Taiga, F-20..F-25 đã merge
+
+- F-20..F-25 đã merge vào main (PR #26–#31); `todo.md` được sửa theo. Còn lại chưa build: F-26, F-27 (hoãn). Người dùng ưu tiên rà soát nghiệp vụ và UI CTĐT / học phần / phê duyệt, test để sau cùng.
+- PR #34 `chore(dev)`: `pnpm dev:setup` (trong `source/backend`) kiểm Node/pnpm/Docker, tạo `.env` từ `.env.example`, `docker compose --profile mail up -d --wait`, cài backend/frontend/e2e, `prisma migrate deploy` + seed + `seed:dut`; cờ `--skip-seed`. Docker chỉ chạy hạ tầng (PostgreSQL, Redis, Mailpit), mã chạy trên máy.
+- PR #35 `refactor(nav)`: `features/programs/components/ProgramWorkspaceLayout.tsx` là route layout lồng bọc mọi `/programs/:programId/...` (router.tsx): link về danh sách, tên + trạng thái CTĐT, một Select phiên bản, 5 tab nhóm (Tổng quan; Khung chương trình; Chuẩn đầu ra; Phân tích; Phiên bản) kèm hàng tab thứ hai cho nhóm đang mở. Xóa `ProgramSectionLinks.tsx` và `outcomes/components/OutcomeNav.tsx`; trang con bỏ link quay lại, nút điều hướng chéo, phụ đề. `CurriculumWarningsPanel` gộp cảnh báo thành một Alert (mở rộng khi > 3). Thêm `shared/hooks/useUrlQuery.ts` (bộ lọc/trang trên URL cho ProgramListPage, CourseListPage, ChangeRequestListPage, ApprovalQueuePage) và `shared/layout/navigationMemory.ts` (AppLayout ghi pathname+search; BackLink về URL cuối của đích). `BackLink` có `preferHistory` (navigate(-1) nếu có mục trước) dùng ở tạo/sửa/chi tiết đề xuất và trang yêu cầu tổ chức. Bỏ SectionNav của Approvals (sidebar đã có).
+- PR #36 `chore(taiga)`: `source/backend/scripts/taiga/{taiga-client.ts,reschedule-backlog.ts}`; Taiga 13 sprint hai tuần 15/06–15/12/2026, người phụ trách Hieu Nguyen / Manh Kien / Tien (180/180/188 điểm); `sprint-plan.md` §0 đã cập nhật.
+- PR #37 `refactor(courses)`: dòng quan hệ học phần bỏ nút "Tạo đề xuất" từng dòng; thẻ trạng thái chỉ cho học phần liên quan không ACTIVE; `ProgramsUsingList` bỏ AntD `List` đã deprecated.
+- Chưa chạy lại bộ test đầy đủ. Start here: đi luồng phê duyệt theo vai trò R5→R4→R3→R1 trên UI, tiếp tục chỉnh UI.
