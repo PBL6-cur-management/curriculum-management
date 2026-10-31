@@ -17,7 +17,7 @@ Một dòng cho mỗi tính năng; việc chi tiết (CV-xxx) ở `docs/planning
 | F-00 | Khung backend + frontend, trạng thái hệ thống | ✅     | `GET /api/health`, `HealthPage`; kiểm thử đơn vị và đầu-cuối                                                                                                                                                                    |
 | C-01 | Thiết lập Claude Code + tài liệu dự án        | ✅     | `.claude/`, `CLAUDE.md`, `docs/architecture`, `docs/progress`                                                                                                                                                                   |
 | C-02 | Câu hỏi theo tính năng                        | ✅     | Trả lời 2026-10-18; câu trống nhận A; bốn trả lời khác A đã sửa vào tài liệu nguồn                                                                                                                                              |
-| C-04 | Kế hoạch triển khai tính năng | ✅ | F-09/F-12/F-16/F-17/F-18 đã build theo kế hoạch; F-18 BE/FE/docs hoàn tất 2026-10-30; F-19 BE/FE có mã và xanh 2026-10-30, tiếp theo F-22 → F-20 → F-21; full suites chưa chạy lại; F-23/F-24/F-25/F-26/F-27 hoãn |
+| C-04 | Kế hoạch triển khai tính năng | ✅ | F-09/F-12/F-16/F-17/F-18 đã build theo kế hoạch; F-18 BE/FE/docs hoàn tất 2026-10-30; F-19..F-25 đã merge (PR #26–#31); full suites chưa chạy lại; còn F-26/F-27 |
 | C-03 | Sửa lỗi mẫu `claude-code-templates`           | ❌     | Bốn lỗi; sửa ở mẫu và bản đang dùng cùng lúc; cần đồng ý                                                                                                                                                                        |
 
 ## Kiểm tra chức năng MVP, F-09, F-12, F-16 và F-17
@@ -88,15 +88,20 @@ Một dòng cho mỗi tính năng; việc chi tiết (CV-xxx) ở `docs/planning
 | F-17 | Hồ sơ sinh viên, kết quả học tập | ✅ | BE-01..BE-10, FE-01..FE-06 và docs hoàn tất 2026-10-29; 28 Automated Passed + 4 Manual Not run. Playwright 14/14 gồm auth setup; còn matrix gaps BE-10, NFR-05/ngân sách test 100 giây, cấu hình khóa cục bộ và full suites chưa chạy lại — [Kế hoạch](../implementation/f-17-student-records-results-import-implementation-plan.md); [Báo cáo](../implement-report/f-17-student-records-results-import-implement-report.md) |
 | F-18 | Điều kiện đăng ký học phần       | ✅     | [Kế hoạch](../implementation/f-18-course-registration-eligibility-implementation-plan.md); được người dùng chấp nhận với mặc định 2026-10-26; BE/FE/docs hoàn tất 2026-10-30 — [báo cáo](../implement-report/f-18-course-registration-eligibility-implement-report.md); còn Manual TC_015/016, C3 |
 | F-19 | Xét tốt nghiệp                   | ✅     | Xét hàng loạt trong worker — [Kế hoạch](../implementation/f-19-graduation-review-implementation-plan.md); BE+FE có mã 2026-10-30: BE unit 363/363, BE e2e graduation 19/19 + batches 8/8 + corrections 10/10 + permission-table 185/185, FE 85/85; docs + test case F19 (35 = 19 Passed + 16 Manual) đồng bộ 2026-10-30; còn 16 ca Manual, đầu vào Khoa C4 — [Báo cáo](../implement-report/f-19-graduation-review-implement-report.md) |
-| F-20 | Cổng sinh viên                   | ❌     | [Kế hoạch](../implementation/f-20-student-portal-implementation-plan.md); được người dùng chấp nhận với mặc định 2026-10-26; chưa triển khai                                 |
-| F-21 | API cho dDUT                     | ❌     | Khóa API, nhật ký từng lời gọi — [Kế hoạch](../implementation/f-21-ddut-api-implementation-plan.md); được người dùng chấp nhận với mặc định 2026-10-26; chưa triển khai      |
+| UI-01 | Điều hướng không gian làm việc CTĐT (`ProgramWorkspaceLayout`, `useUrlQuery`, `navigationMemory`) | ✅ | PR #35, 2026-10-31 |
+| UI-02 | Dọn quan hệ học phần và `ProgramsUsingList` | ✅ | PR #37, 2026-10-31 |
+| UI-03 | Rà soát nghiệp vụ và UI CTĐT / học phần / phê duyệt theo vai trò R5→R4→R3→R1 | 🔄 | Đang làm; test để sau cùng |
+| DEV-01 | `pnpm dev:setup` dựng hạ tầng Docker một lệnh | ✅ | PR #34, 2026-10-31 |
+| TAIGA-01 | Lập lại backlog Taiga: 13 sprint 15/06–15/12/2026 | ✅ | PR #36, 2026-10-31 |
+| F-20 | Cổng sinh viên                   | ✅     | Cổng sinh viên đã merge (PR #26–#31) vào main; còn Manual và đầu vào Khoa C4 (cập nhật 2026-10-31) |
+| F-21 | API cho dDUT                     | ✅     | API dDUT đã merge (PR #26–#31) vào main; còn đầu vào Khoa C6 (cập nhật 2026-10-31) |
 
 ## B6 — Tích hợp, báo cáo, hoàn thiện
 
 | #    | Item                                       | Status | Notes                                                                                                                                                                                    |
 | ---- | ------------------------------------------ | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| F-22 | Đồng bộ cơ sở dữ liệu Trường               | ❌     | `mssql`, chỉ đọc, theo lịch — [Kế hoạch](../implementation/f-22-school-db-sync-implementation-plan.md); được người dùng chấp nhận với mặc định 2026-10-26; chưa triển khai               |
-| F-23 | Báo cáo kiểm định                          | ⏸️     | [Kế hoạch](../implementation/f-23-accreditation-reports-implementation-plan.md); hoãn theo người dùng 2026-10-29 (vượt phạm vi cần lúc này), không xếp lịch; kế hoạch giữ nguyên        |
-| F-24 | Đồ thị, PDF, dòng thời gian, bảng sức khỏe | ⏸️     | Puppeteer — [Kế hoạch](../implementation/f-24-graphs-pdf-timeline-health-implementation-plan.md); hoãn theo người dùng 2026-10-29, không xếp lịch; kế hoạch giữ nguyên                     |
-| F-25 | Ủy quyền, email, nhắc hạn                  | ⏸️     | Nodemailer — [Kế hoạch](../implementation/f-25-delegation-email-reminders-implementation-plan.md); hoãn theo người dùng 2026-10-29, không xếp lịch; kế hoạch giữ nguyên                    |
+| F-22 | Đồng bộ cơ sở dữ liệu Trường               | ✅     | Đồng bộ DB Trường đã merge (PR #26–#31) vào main; còn đầu vào Khoa C5 (cập nhật 2026-10-31) |
+| F-23 | Báo cáo kiểm định | ✅ | [Kế hoạch](../implementation/f-23-accreditation-reports-implementation-plan.md); đã merge PR #29 (2026-10-31 xác nhận trong `git log`), còn ca thủ công |
+| F-24 | Đồ thị, PDF, dòng thời gian, bảng sức khỏe | ✅     | Đã merge (PR #26–#31) vào main; còn đầu vào Khoa C7 (cập nhật 2026-10-31) |
+| F-25 | Ủy quyền, email, nhắc hạn                  | ✅     | Đã merge (PR #26–#31) vào main; còn đầu vào Khoa C8 (cập nhật 2026-10-31) |
 | F-27 | Triển khai, thử tải, theo dõi hoạt động    | ⏸️     | Docker Compose + Caddy — [Kế hoạch](../implementation/f-27-deployment-load-test-monitoring-implementation-plan.md); hoãn theo người dùng 2026-10-26, không xếp lịch; kế hoạch giữ nguyên |

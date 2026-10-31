@@ -15,6 +15,7 @@ import type {
 import { ChangeRequestFilters } from '../components/ChangeRequestFilters';
 import { TargetCell } from '../components/TargetCell';
 import {
+  NO_MATCHING_REQUESTS,
   NO_REQUESTS,
   ORIGIN_LABELS,
   REQUEST_TYPE_LABELS,
@@ -31,6 +32,14 @@ const INITIAL_QUERY: ChangeRequestQuery = {
   page: 1,
   pageSize: DEFAULT_PAGE_SIZE,
 };
+const FILTER_KEYS = [
+  'status',
+  'requestType',
+  'origin',
+  'createdById',
+  'mine',
+  'minDaysWaiting',
+] as const;
 const QUERY_KINDS = {
   page: 'number',
   pageSize: 'number',
@@ -140,7 +149,11 @@ export function ChangeRequestListPage() {
         page={query.page ?? 1}
         pageSize={query.pageSize}
         loading={isFetching}
-        emptyText={NO_REQUESTS}
+        emptyText={
+          FILTER_KEYS.some((key) => query[key] !== undefined)
+            ? NO_MATCHING_REQUESTS
+            : NO_REQUESTS
+        }
         onPageChange={(page, pageSize) =>
           setQuery((current) => ({ ...current, page, pageSize }))
         }

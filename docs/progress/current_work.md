@@ -1,6 +1,11 @@
-# Current Work — Dữ liệu thật DUT đã nạp; tiếp theo Phase 4 (thiết kế lại màn hình)
+# Current Work — F-20..F-25 đã merge; rà soát nghiệp vụ và UI CTĐT/học phần/phê duyệt
 
-**Start here**: Phase 4 cụm **D (CTĐT)** theo kế hoạch `l-n-k-ho-ch-cho-buzzing-naur.md`: brief `docs/design/briefs/d-programs.md` → dựng lại → polish/detector/audit. Sau Phase 4: **F-22 → F-20 → F-21**. Taiga (Phase 6) chờ người dùng đặt `TAIGA_USERNAME`/`TAIGA_PASSWORD` và gửi slug.
+**Start here**: đi luồng phê duyệt theo vai trò R5→R4→R3→R1 trên UI, rà nghiệp vụ và tiếp tục chỉnh UI CTĐT / học phần / phê duyệt; test để sau cùng. Chưa build: F-26, F-27 (hoãn). Taiga (Phase 6) đã lập lại 13 sprint (PR #36).
+
+## Việc đã merge 2026-10-31
+
+- F-20..F-25 đã có trên main (PR #26–#31); các mục "Up Next" bên dưới về F-22 → F-20 → F-21 và việc hoãn F-23/24/25 là lịch sử, không còn đúng.
+- PR #34 `pnpm dev:setup` (hạ tầng Docker PostgreSQL/Redis/Mailpit, mã chạy trên máy); PR #35 `ProgramWorkspaceLayout` lồng mọi route `/programs/:programId/...` + `useUrlQuery` + `navigationMemory`/`BackLink preferHistory`; PR #36 Taiga 13 sprint; PR #37 dọn quan hệ học phần. Chi tiết: progress_log 2026-10-31.
 
 ## Dữ liệu thật DUT và cải tổ UI — 2026-10-30
 
@@ -28,7 +33,7 @@
 
 ## Session Context
 
-- **Last updated**: 2026-10-29.
+- **Last updated**: 2026-10-31.
 - 18 tính năng đã có mã hoàn tất: F-01..F-18 (13 MVP + F-09 + F-12 + F-16 + F-17 + F-18). Kế hoạch sau MVP được chấp nhận với giới hạn §8; không còn gate quyết định A1..A12/B1/B2. Hoàn tất mã không thay thế các ca thủ công hoặc nghiệm thu Khoa còn nợ.
 - F-15 `createdByAcademicOffice` đã chốt; đính chính là thay thế hành chính hồi tố và lịch học kỳ theo chính sách hiện tại. Không hứa lịch sử bất biến trước đính chính, không lên kế hoạch history/freeze; mỗi lần xét F-19 chụp đúng đầu vào.
 - Công thức điểm không có ngoại lệ học kỳ đã bắt đầu (E1, người dùng chốt 2026-10-26); GRADING_FORMULA đi hết ba cấp duyệt như các loại đề cương khác.

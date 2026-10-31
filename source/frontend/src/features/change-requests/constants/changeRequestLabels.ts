@@ -62,6 +62,9 @@ export const LIVE_DIFF_NOTE =
 export const NO_CHANGES_YET = 'Chưa có thay đổi nào so với bản đang áp dụng.';
 export const CONFLICT_TITLE =
   'Đối tượng này đang có đề xuất khác chưa kết thúc';
-export const NO_REQUESTS = 'Chưa có đề xuất';
+export const NO_REQUESTS =
+  'Chưa có đề xuất nào. Mở học phần, đề cương hoặc chương trình cần sửa rồi bấm “Tạo đề xuất”.';
+export const NO_MATCHING_REQUESTS =
+  'Không có đề xuất khớp bộ lọc. Bỏ bớt điều kiện lọc để xem thêm.';
 export const NO_DOCUMENTS = 'Chưa có hồ sơ đính kèm';
 export const TARGET_FIELD_HINT = 'Chọn đối tượng cần thay đổi.';

@@ -16,7 +16,7 @@ Import từ `src/shared/design-system` (index.ts).
 | ------------------ | -------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | `StatusTag`        | Molecule | Hiển thị enum trạng thái có màu                                             | `status`, `colorMap`, `labelMap`                                                                |
 | `PageHeader`       | Molecule | Tiêu đề mọi trang (`Title level={2}` + nút bên phải)                        | `title`, `subtitle?`, `actions?`                                                                |
-| `BackLink`         | Atom     | Quay lại trang cha, đặt ngay trên `PageHeader`, dạng `← nhãn`               | `to`, `children`                                                                                |
+| `BackLink`         | Atom     | Quay lại trang cha, đặt ngay trên `PageHeader`, dạng `← nhãn`               | `to`, `children`, `preferHistory`                                                               |
 | `FilterBar`        | Molecule | Hàng bộ lọc trang danh sách, tự xuống dòng                                  | `children`, `extra?`                                                                            |
 | `SummaryStrip`     | Molecule | Dải số liệu: tổng tín chỉ, số theo trạng thái, số chờ duyệt                 | `items[{label, value, tone?}]`, `label?`                                                        |
 | `PageSkeleton`     | Molecule | Khung chờ cả trang thay cho `<Skeleton active />`                           | `blocks?`                                                                                       |
@@ -94,7 +94,7 @@ Phân trang hiển thị "N kết quả". Bảng không phân trang phía server
 ## Checklist trước khi lưu UI
 
 - Không hardcode hex; dùng `palette` hoặc token AntD.
-- Trạng thái dùng `StatusTag`; trang danh sách dùng `DataTable` + `FilterBar`; tiêu đề dùng `PageHeader`, quay lại dùng `BackLink`; chờ tải dùng `PageSkeleton`; ô trống dùng `formatEmpty`.
+- Trạng thái dùng `StatusTag`; trang danh sách dùng `DataTable` + `FilterBar`; tiêu đề dùng `PageHeader`, quay lại dùng `BackLink` (`preferHistory` gọi navigate(-1) khi có mục lịch sử trước, dùng ở tạo/sửa/chi tiết đề xuất; mặc định về URL cuối của đích qua `shared/layout/navigationMemory.ts`); bộ lọc/trang danh sách giữ trên URL bằng `shared/hooks/useUrlQuery.ts`; chờ tải dùng `PageSkeleton`; ô trống dùng `formatEmpty`.
 - Nội dung cần hành động đặt trước thông tin phụ; nhiều cảnh báo gộp thành một `Alert` có danh sách.
 - `Alert` dùng `title=`, không dùng `message=` (đã bỏ trong AntD 6).
 - Chữ giao diện tiếng Việt, cụ thể (xem Do's and Don'ts trong DESIGN.md).
