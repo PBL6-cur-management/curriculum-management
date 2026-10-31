@@ -2,6 +2,11 @@
 
 **Start here**: đọc [bàn giao 2026-10-31 (tối)](handoff.md). Việc kế tiếp: người dùng tạo `source/e2e/.env`, rồi chạy Playwright, đi luồng phê duyệt R5→R4→R3→R1 trên UI, chạy [smoke checklist](../testing/smoke-checklist.md) vòng 1 (29 kịch bản, thay 413 ca thủ công) và chụp màn hình cho impeccable polish. Main: BE unit 1797/1797, BE e2e 679/679, FE 693/693.
 
+## Khám phá CSDL đào tạo của Trường — 2026-10-31
+
+- Đã khám phá chỉ đọc SQL Server của Trường; báo cáo [dut-school-db-discovery](../reference/dut-school-db-discovery.md). `tmProxDUT` mới hơn dump `DHBK_CDS` mà seed DUT dùng; không có PLO/CLO; bản sao cục bộ 98 bảng ở `D:\dut-mirror` (ngoài repo, không commit).
+- C10 nay có nguồn dữ liệu: nhóm tự chọn dựng lại từ `tmKhungCT.Note` + `Hocky` + `tmKhungTC`. Chưa có thay đổi `src/` hay migration.
+
 ## Việc đã merge 2026-10-31 (tối)
 
 - PR #39 F-26 + F-27; #40 spec BackupStore; #41 số quyết định giữ chỗ DUT (`DUT-<programCode>-<version>`, phải thay bằng số thật của Khoa); #42 `MeDto.canApprove` và quyền menu "Quản trị"; #43 smoke checklist và audit UI. Chi tiết: progress_log 2026-10-31.
@@ -75,7 +80,8 @@ Các mục trên **chưa được Khoa trả lời**. Người dùng cho phép b
 ## Up Next
 
 1. Tạo `source/e2e/.env`, chạy Playwright, smoke vòng 1, duyệt luồng R5→R4→R3→R1 và chụp màn hình cho `/impeccable polish`.
-2. Xử lý nợ DEBT-01..07 trong [todo](todo.md); đầu vào Khoa C1..C10 vẫn chờ trả lời.
-3. Nợ vận hành F-26/F-27: 7 đêm sao lưu, diễn tập B5/B6, sao chép ngoài máy, fixture 300 học phần/500 sinh viên rồi k6 canonical, uptime dài hạn.
+2. Người dùng viết kế hoạch triển khai thiết kế lại schema từ báo cáo khám phá và trả lời câu hỏi mở §10 của báo cáo.
+3. Xử lý nợ DEBT-01..07 trong [todo](todo.md); đầu vào Khoa C1..C10 vẫn chờ trả lời.
+4. Nợ vận hành F-26/F-27: 7 đêm sao lưu, diễn tập B5/B6, sao chép ngoài máy, fixture 300 học phần/500 sinh viên rồi k6 canonical, uptime dài hạn.
 
 Lịch sử (không còn đúng): thứ tự F-22 → F-20 → F-21 và việc hoãn F-23/F-24/F-25/F-26/F-27; tất cả F-01..F-27 đã merge.

@@ -43,6 +43,9 @@ Một dòng cho mỗi tính năng; việc chi tiết (CV-xxx) ở `docs/planning
 | Xác nhận course-type mapping             | ❌         | Default: `LoaiHP = 1` → `CONDITIONAL`, `LoaiHP = 3` → `LAB`, `DATN = 1` → `CAPSTONE`; không có giờ lý thuyết thì `ThucTap > 0` → `INTERNSHIP`, tiếp đến `DoAn > 0` → `PROJECT`; còn lại `THEORY`                                                                                                                                   |
 | Xác nhận synthetic program codes         | ❌         | Default `CNTT-*` theo program map; chờ mã chính thức của Khoa                                                                                                                                                                                                                                                                      |
 | Xác nhận chính sách ngày semester legacy | ❌         | Default không ghi đè ngày hiện hữu; conflict `2025-2026-1` đã giữ `2025-09-08` thay vì legacy `2025-08-04`                                                                                                                                                                                                                         |
+| Chuyển nguồn seed DUT sang bản sao `tmProxDUT` | ❌ | Mới hơn dump `DHBK_CDS`; xem [báo cáo khám phá](../reference/dut-school-db-discovery.md) |
+| Mở rộng ánh xạ học kỳ cho hậu tố `11` và `30` | ❌ | `semesterFromLegacyCode` hiện từ chối |
+| Phân tích ghi chú tự chọn thành nhóm | ❌ | Từ `tmKhungCT.Note` + `Hocky` + `tmKhungTC`; liên quan DEBT-05 (C10) |
 
 ## B1 — Nền tảng và danh mục học phần
 
