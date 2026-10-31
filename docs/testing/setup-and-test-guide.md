@@ -16,6 +16,10 @@ Một chỗ để bắt đầu: dựng hệ thống trên máy, chạy kiểm th
 
 **Cần có:** Node.js 22 (≥ 22.22), pnpm 10, Docker.
 
+### 1.0. Một lệnh cho máy mới
+
+Trong `source/backend`: `pnpm dev:setup`. Script `scripts/dev-setup.mjs` kiểm Node/pnpm/Docker, tạo `source/backend/.env` và `source/e2e/.env` từ mẫu nếu chưa có, dựng PostgreSQL 18 (ICU `vi-VN`) + Redis 8 + Mailpit (`compose.yaml`, profile `mail`), cài thư viện ba project, `prisma migrate deploy`, `prisma:seed` rồi `prisma:seed:dut`. Chạy lại không sinh trùng. Sau đó `pnpm dev` ở `source/backend` và `source/frontend`; email cục bộ xem ở `http://127.0.0.1:8025`. Thêm `--skip-seed` (`node scripts/dev-setup.mjs --skip-seed`) nếu chỉ cần hạ tầng. Dữ liệu cá nhân DUT không có trong git; thiếu thì chỉ nạp chương trình và học phần. Các bước dưới đây là bản làm tay.
+
 ### 1.1. Backend — `source/backend`
 
 1. `pnpm install` (tự chạy `prisma generate`).
