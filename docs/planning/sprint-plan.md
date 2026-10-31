@@ -12,6 +12,48 @@
 
 > **Đọc trước:** mọi con số tuần và số sprint trong tài liệu này là kết quả tính từ bốn giả định GĐ-1..GĐ-4. Chưa giả định nào được người dùng xác nhận. Đổi giả định thì tính lại theo mục 7.
 
+## 0. Lịch thực tế trên Taiga — chốt 2026-10-31
+
+Người dùng chốt ngày 2026-10-31. Mục này **thay thế** số sprint, ngày và người làm ở mục 3–4. Mục 3–4 chỉ còn giá trị lịch sử: đó là cách xếp việc ban đầu, tính theo giả định.
+
+- **Đội thật:** 3 người: Hieu Nguyen (`ens-hieu-nguyen`), Manh Kien (`4ut15t1ck`), Tien (`vantien8105`).
+- **Lịch:** 13 sprint × 2 tuần, từ 15/06/2026 đến 15/12/2026. Sprint cuối kéo tới hết 15/12.
+- **Giao việc:** theo mảng chuyên môn và cân tải. Mỗi user story có một chủ, người đó nhận cả 4 task (phân tích, thiết kế, lập trình, kiểm thử).
+- **Trạng thái:** theo thực tế ngày 31/10.
+  - SP-01..SP-09 đã đóng.
+  - Story F-01..F-25: "Ready for test", vì còn ca kiểm thử thủ công.
+  - Task AR/SD/DEV: "Closed". Task ST: "In progress".
+
+| Sprint | Ngày | Nội dung | Hieu | Kien | Tien |
+|---|---|---|---|---|---|
+| SP-01 | 15/06–28/06 | Nền tảng, tài khoản và quyền | 0 | 20 | 16 |
+| SP-02 | 29/06–12/07 | Tổ chức, học phần và quan hệ học phần | 20 | 18 | 15 |
+| SP-03 | 13/07–26/07 | Chương trình đào tạo và khung chương trình | 24 | 25 | 0 |
+| SP-04 | 27/07–09/08 | Kiểm tra nhất quán, nhập xuất Excel | 13 | 0 | 28 |
+| SP-05 | 10/08–23/08 | Đề cương, chuẩn đầu ra, công thức điểm | 33 | 33 | 0 |
+| SP-06 | 24/08–06/09 | Đề xuất thay đổi và phê duyệt ba cấp | 47 | 0 | 43 |
+| SP-07 | 07/09–20/09 | Ban hành, so sánh phiên bản, gán khóa | 0 | 15 | 37 |
+| SP-08 | 21/09–04/10 | Sinh viên, điều kiện đăng ký, xét tốt nghiệp | 26 | 10 | 20 |
+| SP-09 | 05/10–18/10 | Cổng sinh viên, API dDUT, đồng bộ DB Trường | 0 | 41 | 15 |
+| SP-10 | 19/10–01/11 | Báo cáo, xuất bản, tiện ích duyệt, giao diện và dữ liệu thật (**đang chạy**) | 17 | 18 | 14 |
+| SP-11 | 02/11–15/11 | Rà nghiệp vụ module chính, sao lưu (F-26), triển khai (F-27) | | | |
+| SP-12 | 16/11–29/11 | Kiểm thử theo vai trò và nghiệm thu từng bậc | | | |
+| SP-13 | 30/11–15/12 | Ca thủ công, nghiệm thu Khoa (C1..C10), bàn giao | | | |
+| **Tổng** | | | **180** | **180** | **188** |
+
+Điểm ở bảng trên là điểm story. SP-11..SP-13 chỉ có task không gắn story (DEV-xx, REV-xx, E2E-xx, MAN-01, ACC-01, HND-01), nên không có điểm.
+
+Người làm theo epic:
+- **Hieu:** EP-04, EP-06, EP-08, EP-11, EP-13, EP-19, EP-24.
+- **Kien:** EP-02, EP-03, EP-07, EP-10, EP-12, EP-16, EP-18, EP-20, EP-22, EP-23.
+- **Tien:** EP-01, EP-05, EP-09, EP-14, EP-15, EP-17, EP-21, EP-25.
+
+Đồng bộ lại bằng `source/backend/scripts/taiga/reschedule-backlog.ts`:
+- `--dry-run` để xem khác biệt;
+- `--apply` để ghi lên Taiga.
+
+Script idempotent: chạy lại sau khi ghi xong phải báo 0 thay đổi.
+
 ---
 
 ## 1. Quy ước
