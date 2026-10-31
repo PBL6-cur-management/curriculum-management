@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { COURSE_QUERY_ROOT } from '../../../shared/courses/courseQueryKeys';
 import { CURRICULUM_QUERY_ROOT } from '../../../shared/curriculum/curriculumQueryRoot';
 import { OUTCOME_QUERY_ROOT } from '../../../shared/outcomes/outcomeQueryRoot';
@@ -101,5 +106,7 @@ export function useApprovalQueue(query: ApprovalQueueQuery) {
   return useQuery({
     queryKey: CHANGE_REQUEST_QUERY_KEYS.queue(query),
     queryFn: () => getApprovalQueue(query),
+    // Changing the request-type filter keeps the previous rows instead of blanking the table.
+    placeholderData: keepPreviousData,
   });
 }
