@@ -1,0 +1,28 @@
+# Allowlist: exclude everything, then re-include only the build inputs.
+**
+!package.json
+!pnpm-lock.yaml
+!prisma.config.ts
+!nest-cli.json
+!tsconfig.json
+!tsconfig.build.json
+!prisma/schema.prisma
+!prisma/migrations/**
+!prisma/seed.ts
+!prisma/seed-data/approval-levels.ts
+!prisma/seed-data/knowledge-blocks.ts
+!prisma/seed-data/org-units.ts
+!prisma/seed-data/permission-catalog.ts
+!prisma/seed-data/programs.ts
+!prisma/seed-data/roles.ts
+!prisma/seed-data/seed-access-control.ts
+!prisma/seed-data/semesters.ts
+!src/**
+# Never in an image: secrets, host-built output, tests, generated client, local data.
+**/.env
+**/.env.*
+**/node_modules
+**/dist
+**/*.spec.ts
+src/generated/**
+storage/**

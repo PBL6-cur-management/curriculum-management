@@ -27,6 +27,16 @@ const CREDENTIAL_KEY_PATTERN = /^[A-Za-z0-9+/]{43}=$/;
 
 // Keep the explicit types: implicit conversion reads design:type, which is Object for an unannotated property,
 // so a numeric variable would stay a string and fail @IsInt.
+export const LOG_LEVELS = [
+  'fatal',
+  'error',
+  'warn',
+  'info',
+  'debug',
+  'trace',
+  'silent',
+] as const;
+
 export class Env {
   @IsIn(NODE_ENVS)
   NODE_ENV: (typeof NODE_ENVS)[number] = 'development';
@@ -166,7 +176,12 @@ export class Env {
   @Min(ELIGIBILITY_LIMITS.MIN_DEPTH)
   @Max(ELIGIBILITY_LIMITS.MAX_DEPTH)
   ELIGIBILITY_MAX_DEPTH: number = ELIGIBILITY_DEFAULTS.MAX_DEPTH;
+
+  // F-27: structured log verbosity in production.
+  @IsIn(LOG_LEVELS)
+  LOG_LEVEL: (typeof LOG_LEVELS)[number] = 'info';
 }
+
 
 export function validateEnv(raw: Record<string, unknown>): Env {
   const env = plainToInstance(Env, raw, { enableImplicitConversion: true });
