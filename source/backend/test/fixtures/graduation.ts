@@ -387,6 +387,7 @@ export async function pauseGraduation(harness: GraduationHarness) {
 }
 
 export async function resumeGraduation(harness: GraduationHarness) {
-  harness.app.get(GraduationProcessor).worker.resume();
+  // Worker.resume() is synchronous at runtime but typed loosely; void keeps the lint rule satisfied.
+  void harness.app.get(GraduationProcessor).worker.resume();
   await harness.queue.resume();
 }

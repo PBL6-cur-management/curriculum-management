@@ -22,6 +22,7 @@ import { startPostgres, startRedis } from './containers.js';
 import type { TestPostgres, TestRedis } from './containers.js';
 import { createTestApp } from './test-app.js';
 import { setAppEnv } from './test-env.js';
+import { E2E_QUEUE_PREFIX, E2E_REDIS_DB } from './containers.js';
 
 const POLL_MS = 100;
 const WAIT_MS = 15_000;
@@ -118,7 +119,7 @@ describe('scheduled activation on BullMQ (US-073, PB-06, PB-07, KB-057)', () => 
 
   it('keeps its queue under the prefix of this run and registers the daily schedule at start-up', async () => {
     const prefix = process.env.BULLMQ_PREFIX!;
-    expect(prefix).toMatch(/^test-/);
+    expect(prefix.startsWith(E2E_QUEUE_PREFIX)).toBe(true);
     expect(queue.opts.prefix).toBe(prefix);
     const schedulers = await queue.getJobSchedulers();
     expect(schedulers).toEqual([
@@ -131,7 +132,11 @@ describe('scheduled activation on BullMQ (US-073, PB-06, PB-07, KB-057)', () => 
     expect(queue.toKey('id')).toBe(`${prefix}:${RELEASE_ACTIVATION_QUEUE}:id`);
     // The default prefix of the shared Redis holds none of this run's schedule.
     const unprefixed = new Queue(RELEASE_ACTIVATION_QUEUE, {
-      connection: { host: redis.getHost(), port: redis.getPort() },
+      connection: {
+        host: redis.getHost(),
+        port: redis.getPort(),
+        db: E2E_REDIS_DB,
+      },
     });
     try {
       expect(await unprefixed.getJobSchedulers()).toEqual([]);

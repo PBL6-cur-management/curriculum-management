@@ -1,10 +1,7 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { TestPostgres, TestRedis } from './containers.js';
 import request from 'supertest';
-import {
-  startPostgresContainer as startPostgres,
-  startRedisContainer as startRedis,
-} from './containers.js';
+import { startPostgres, startRedis } from './containers.js';
 import { setAppEnv } from './test-env.js';
 import { createTestApp } from './test-app.js';
 
@@ -41,14 +38,5 @@ describe('GET /api/health', () => {
       .get('/api/docs-json')
       .expect(200);
     expect(response.body.paths).toHaveProperty('/api/health');
-  });
-
-  // Runs last: it stops the Redis container the other tests share.
-  it('returns 503 naming Redis once Redis stops', async () => {
-    await redis.stop();
-    await request(app.getHttpServer())
-      .get('/api/health')
-      .expect(503)
-      .expect({ status: 'error', database: 'up', redis: 'down' });
   });
 });

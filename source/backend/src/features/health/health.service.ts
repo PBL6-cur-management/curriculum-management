@@ -19,6 +19,7 @@ export class HealthService implements OnModuleDestroy {
     this.redis = new Redis({
       host: config.get('REDIS_HOST', { infer: true }),
       port: config.get('REDIS_PORT', { infer: true }),
+      db: config.get('REDIS_DB', { infer: true }),
       commandTimeout: REDIS_PROBE_TIMEOUT_MS,
     });
     this.redis.on('error', (error: Error) =>

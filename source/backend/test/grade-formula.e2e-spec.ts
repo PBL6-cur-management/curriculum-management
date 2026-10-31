@@ -910,7 +910,8 @@ describe('grade formula and assessment-CLO mapping (F-12)', () => {
 
       expect([200, 409]).toContain(submitted.status);
       expect([200, 409]).toContain(cleared.status);
-      const status = (await readRequest(admin, requestId)).status;
+      // A request that lost the race stays a Draft, which only its creator can read.
+      const status = (await readRequest(memberA, requestId)).status;
       if (status !== 'DRAFT') {
         const rows = await prisma.assessmentCLOMapping.count({
           where: { cloId: added.body.id },

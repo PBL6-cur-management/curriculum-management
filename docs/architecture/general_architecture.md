@@ -118,7 +118,7 @@ prisma/
 ├── migrations/            migration của Prisma
 ├── seed-data/             đơn vị, vai trò, danh mục 43 quyền (41 từ F-02, F-15 thêm 2) + ma trận ban đầu, ba cấp duyệt (approval-levels.ts), chương trình mẫu 1024034 kèm khung mẫu (programs.ts), khối kiến thức, học kỳ và khóa giữ chỗ
 └── seed.ts                tài khoản R1 đầu tiên, quyền và vai trò (`pnpm prisma:seed`)
-test/                      đầu-cuối: global-setup.ts dựng một PostgreSQL + một Redis (Testcontainers) cho cả lượt, migrate cơ sở dữ liệu mẫu một lần, mỗi spec một bản chép; test-app.ts, test-env.ts, fixtures/, permission-table.ts
+test/                      đầu-cuối: global-setup.ts dùng PostgreSQL/Redis của compose.yaml, migrate cơ sở dữ liệu mẫu ctdt_e2e_template một lần, mỗi spec một bản chép ctdt_e2e_*, Redis database 1; test-app.ts, test-env.ts, fixtures/, permission-table.ts
 ```
 
 ### Quy tắc đang áp dụng

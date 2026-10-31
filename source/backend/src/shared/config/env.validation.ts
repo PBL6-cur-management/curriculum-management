@@ -18,6 +18,8 @@ import {
 
 const NODE_ENVS = ['development', 'test', 'production'] as const;
 const MAX_PORT = 65535;
+// Redis ships 16 logical databases: 0..15.
+const MAX_REDIS_DB = 15;
 const SESSION_SECRET_MIN_LENGTH = 32;
 const DEFAULT_SESSION_IDLE_MINUTES = 60;
 const DEFAULT_FILES_ROOT = 'files';
@@ -58,6 +60,12 @@ export class Env {
   @Min(1)
   @Max(MAX_PORT)
   REDIS_PORT: number = 6379;
+
+  // Logical Redis database. The e2e run takes its own so it never meets the dev app's keys.
+  @IsInt()
+  @Min(0)
+  @Max(MAX_REDIS_DB)
+  REDIS_DB: number = 0;
 
   @IsString()
   @MinLength(SESSION_SECRET_MIN_LENGTH)
@@ -181,7 +189,6 @@ export class Env {
   @IsIn(LOG_LEVELS)
   LOG_LEVEL: (typeof LOG_LEVELS)[number] = 'info';
 }
-
 
 export function validateEnv(raw: Record<string, unknown>): Env {
   const env = plainToInstance(Env, raw, { enableImplicitConversion: true });
