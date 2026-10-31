@@ -134,19 +134,8 @@ services:
     restart: unless-stopped
     logging: *rotated-logging
 
-  # Optional: `docker compose --profile monitoring up -d uptime-kuma`. Loopback only; reach it through a tunnel.
-  uptime-kuma:
-    profiles: [monitoring]
-    image: '${KUMA_IMAGE:?Set approved pinned Kuma image}'
-    ports: ['127.0.0.1:3001:3001']
-    volumes:
-      - kuma-data:/app/data
-    restart: unless-stopped
-    logging: *rotated-logging
-
 volumes:
   postgres-data:
   redis-data:
   caddy-data:
   caddy-config:
-  kuma-data:

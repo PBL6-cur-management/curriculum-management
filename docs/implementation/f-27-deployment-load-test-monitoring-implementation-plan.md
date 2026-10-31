@@ -6,6 +6,12 @@ Build a reproducible production installation of the backend and frontend with Do
 
 **Status:** Not started — plan only, source verified on 2026-10-25. Approvals and Faculty-specific information remain in §8; operational acceptance is not claimed.
 
+> **Quyết định của chủ dự án, 2026-10-31 (ghi đè D3, BE-02, BE-05 và hàng E1 bên dưới):**
+> - Không thêm `pino` và Uptime Kuma.
+> - BE-02 làm bằng logger JSON tự viết (`source/backend/src/shared/logging/app-logger.ts`, `http-logger.ts`). Bề mặt giữ như §BE-02 nhưng không có `DestinationStream`, và chỉ bật khi `NODE_ENV=production`.
+> - BE-05 bỏ hẳn: `scripts/monitoring/collect-health.mjs` là nguồn bằng chứng uptime duy nhất, và `deploy/compose.yaml` không còn service `uptime-kuma`.
+> - Bốn chỗ ghi log không an toàn đã đổi thành bản ghi an toàn: `auth.login_failed`, `health.redis_error`, `release.activation_failed`, `release.schedule_failed`.
+
 ## 0. Plan at a glance
 
 Everything below in one table. Read this; the rest is detail for whoever builds it.

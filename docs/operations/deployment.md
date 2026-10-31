@@ -34,7 +34,7 @@ scripts\load\Invoke-LoadTest.ps1 -Profile canonical -BaseUrl https://host -Manif
 |---|---|
 | Cài đặt, nâng cấp, sao lưu | Quản trị hệ thống (R1 + quyền máy chủ) |
 | Xem sao lưu trong giao diện | R1 |
-| Duyệt Uptime Kuma, pino, lịch giờ làm việc | Chủ dự án / nhà trường |
+| Xác nhận lịch giờ làm việc cho số đo sẵn sàng | Chủ dự án / nhà trường |
 
 ## Ma trận hồi quy F-27
 
