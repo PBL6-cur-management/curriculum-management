@@ -12,6 +12,7 @@ import type { Response } from 'express';
 import type { AccessContext } from '../../shared/authz/access-context.js';
 import { CurrentAccess } from '../../shared/authz/current-access.decorator.js';
 import { PERMISSIONS } from '../../shared/authz/permission-codes.js';
+import { AllowDelegate } from '../../shared/authz/allow-delegate.decorator.js';
 import { RequirePermission } from '../../shared/authz/require-permission.decorator.js';
 import { ATTACHMENT_MIMES } from '../../shared/files/attachment-types.js';
 import { sendFile } from '../../shared/files/send-file.js';
@@ -24,6 +25,7 @@ import { ChangeRequestDocumentsService } from './change-request-documents.servic
 export class ChangeRequestDocumentsController {
   constructor(private readonly documents: ChangeRequestDocumentsService) {}
 
+  @AllowDelegate()
   @Get(':documentId/file')
   @ApiProduces(...ATTACHMENT_MIMES)
   async download(

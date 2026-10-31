@@ -34,6 +34,7 @@ const base = {
 describe('ApprovalService', () => {
   const tx = { approvalStep: { findMany: vi.fn() } };
   const prisma = {
+    approvalDelegation: { findMany: vi.fn().mockResolvedValue([]) },
     changeRequest: { findFirst: vi.fn() },
     $transaction: vi.fn((run: (client: unknown) => unknown) => run(tx)),
   };
@@ -41,6 +42,15 @@ describe('ApprovalService', () => {
     claim: vi.fn(),
     actionableRows: vi.fn(),
     record: vi.fn(),
+    // The grouping by grant is covered in the recorder's spec; here own rows go straight to record.
+    recordRows: vi.fn(
+      (client: unknown, rows: { id: string }[], decision: unknown) =>
+        recorder.record(
+          client,
+          rows.map((row) => row.id),
+          decision,
+        ),
+    ),
     advance: vi.fn(),
     close: vi.fn(),
   };

@@ -16,6 +16,7 @@ import {
   type ApprovalLevel,
 } from './approval.constants.js';
 import { APPROVAL_ERRORS } from './approval.errors.js';
+import { grantFor, usableGrants } from './delegation-authority.js';
 
 type Db = PrismaService | Prisma.TransactionClient;
 
@@ -34,6 +35,9 @@ export interface Decision {
   performedById: string;
   isOverride: boolean;
 }
+
+// A row the user may decide, with the grant behind it when it is someone else's row (F-25 evidence).
+export type ActionableRow = ApprovalStep & { viaDelegationId: string | null };
 
 export type AdvanceResult =
   | { kind: 'WAITING' }
@@ -62,34 +66,65 @@ export class ApprovalRecorder {
   }
 
   // Rows the user may decide now. Level 3 has no named approver: any active academic-office holder acts (D11).
+  // At levels 1-2 the user's own rows come with the rows of anyone who delegated that level to them today (F-25);
+  // the actual creator is refused before either, so a grant never lets someone approve their own request.
   async actionableRows(
     db: Db,
     request: DecisionSubject,
     userId: string,
     today: Date,
-  ): Promise<ApprovalStep[]> {
+  ): Promise<ActionableRow[]> {
     const level = levelOfStatus(request.status);
     if (level === null || userId === request.createdById) return [];
     const isFinalLevel = level === APPROVAL_LEVEL.ACADEMIC_OFFICE;
     if (isFinalLevel && !(await isAcademicOfficeHolder(db, userId, today))) {
       return [];
     }
-    return db.approvalStep.findMany({
+    const grants = isFinalLevel ? [] : await usableGrants(db, userId, today);
+    const delegators = grants.map((grant) => grant.delegatorId);
+    const rows = await db.approvalStep.findMany({
       where: {
         changeRequestId: request.id,
         submissionRound: request.submissionRound,
         approvalLevel: level,
         action: ApprovalAction.PENDING,
-        ...(!isFinalLevel && { approverId: userId }),
+        ...(!isFinalLevel && {
+          approverId: { in: [userId, ...delegators] },
+        }),
       },
       orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
     });
+    return rows.flatMap((row): ActionableRow[] => {
+      if (isFinalLevel || row.approverId === userId) {
+        return [{ ...row, viaDelegationId: null }];
+      }
+      const grant = grantFor(grants, row.approverId, level);
+      return grant ? [{ ...row, viaDelegationId: grant.id }] : [];
+    });
+  }
+
+  // Records one decision over the user's rows: own rows plain, delegated rows with their grant as evidence.
+  async recordRows(
+    tx: Prisma.TransactionClient,
+    rows: readonly ActionableRow[],
+    decision: Decision,
+  ): Promise<void> {
+    const byGrant = new Map<string | null, string[]>();
+    for (const row of rows) {
+      byGrant.set(row.viaDelegationId, [
+        ...(byGrant.get(row.viaDelegationId) ?? []),
+        row.id,
+      ]);
+    }
+    for (const [delegationId, ids] of byGrant) {
+      await this.record(tx, ids, { ...decision, delegationId });
+    }
   }
 
   async record(
     tx: Prisma.TransactionClient,
     rowIds: readonly string[],
-    decision: Decision,
+    decision: Decision & { delegationId?: string | null },
   ): Promise<void> {
     const { count } = await tx.approvalStep.updateMany({
       where: { id: { in: [...rowIds] }, action: ApprovalAction.PENDING },

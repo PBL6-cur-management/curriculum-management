@@ -25,6 +25,7 @@ import {
 import type { AccessContext } from '../../shared/authz/access-context.js';
 import { CurrentAccess } from '../../shared/authz/current-access.decorator.js';
 import { PERMISSIONS } from '../../shared/authz/permission-codes.js';
+import { AllowDelegate } from '../../shared/authz/allow-delegate.decorator.js';
 import { RequirePermission } from '../../shared/authz/require-permission.decorator.js';
 import { ChangeDiffDto } from '../../shared/change-requests/diff/change-diff.dto.js';
 import {
@@ -107,6 +108,7 @@ export class ChangeRequestsController {
     return this.requests.create(dto, access);
   }
 
+  @AllowDelegate()
   @Get(':id')
   @ApiOkResponse({ type: ChangeRequestDetailDto })
   read(@Param('id') id: string, @CurrentAccess() access: AccessContext) {
@@ -146,6 +148,7 @@ export class ChangeRequestsController {
     return this.authoredItems.replace(id, dto, access);
   }
 
+  @AllowDelegate()
   @Get(':id/diff')
   @ApiOkResponse({ type: ChangeDiffDto })
   diff(@Param('id') id: string, @CurrentAccess() access: AccessContext) {

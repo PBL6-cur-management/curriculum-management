@@ -3,6 +3,7 @@ import { ApiCookieAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import type { AccessContext } from '../../shared/authz/access-context.js';
 import { CurrentAccess } from '../../shared/authz/current-access.decorator.js';
 import { PERMISSIONS } from '../../shared/authz/permission-codes.js';
+import { AllowDelegate } from '../../shared/authz/allow-delegate.decorator.js';
 import { RequirePermission } from '../../shared/authz/require-permission.decorator.js';
 import {
   ApprovalQueueItemDto,
@@ -18,6 +19,7 @@ import { ApprovalQueueReader } from './approval-queue.reader.js';
 export class ApprovalQueueController {
   constructor(private readonly queue: ApprovalQueueReader) {}
 
+  @AllowDelegate()
   @Get()
   @ApiOkResponse({ type: [ApprovalQueueItemDto] })
   read(

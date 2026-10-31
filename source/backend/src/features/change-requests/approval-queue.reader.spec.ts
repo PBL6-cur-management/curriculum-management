@@ -19,6 +19,7 @@ const request = (patch: object = {}) => ({
   ...patch,
 });
 const step = (patch: object = {}, req: object = {}) => ({
+  approverId: 'me',
   submissionRound: 1,
   approvalLevel: 1,
   action: ApprovalAction.PENDING,
@@ -34,6 +35,7 @@ describe('ApprovalQueueReader', () => {
   const requestsFindMany = vi.fn();
   const roleFindFirst = vi.fn();
   const prisma = {
+    approvalDelegation: { findMany: vi.fn().mockResolvedValue([]) },
     approvalStep: { findMany: stepsFindMany },
     changeRequest: { findMany: requestsFindMany },
     roleAssignment: { findFirst: roleFindFirst },

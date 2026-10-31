@@ -6,6 +6,8 @@ const LOADERS: Record<string, () => Promise<unknown>> = {
     import('../../features/notifications/pages/NotificationsPage'),
   [ROUTES.approvalQueue]: () =>
     import('../../features/change-requests/pages/ApprovalQueuePage'),
+  [ROUTES.approvalDelegations]: () =>
+    import('../../features/approval-delegations/pages/ApprovalDelegationsPage'),
   [ROUTES.changeRequests]: () =>
     import('../../features/change-requests/pages/ChangeRequestListPage'),
   [ROUTES.programs]: () =>

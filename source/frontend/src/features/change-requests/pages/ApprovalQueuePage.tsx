@@ -1,4 +1,4 @@
-import { Flex, Result, Select, Table } from 'antd';
+import { Flex, Result, Select, Table, Tag } from 'antd';
 import type { TableColumnsType } from 'antd';
 import { useState } from 'react';
 import { generatePath, Link } from 'react-router';
@@ -52,7 +52,17 @@ const COLUMNS: TableColumnsType<ApprovalQueueItem> = [
   {
     title: 'Thay mặt',
     dataIndex: 'standsFor',
-    render: (standsFor: string | null) => formatEmpty(standsFor, SELF_LABEL),
+    // F-25: a row reached through a grant names whose level it is.
+    render: (standsFor: string | null, item) => (
+      <Flex gap={4} wrap align="center">
+        {formatEmpty(standsFor, SELF_LABEL)}
+        {item.delegatedFor.map((ref) => (
+          <Tag key={ref.delegationId} color="purple">
+            Duyệt thay {ref.delegator.fullName}
+          </Tag>
+        ))}
+      </Flex>
+    ),
   },
   { title: 'Người tạo', dataIndex: ['createdBy', 'fullName'] },
   {

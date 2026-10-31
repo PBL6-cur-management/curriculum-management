@@ -72,6 +72,52 @@ export class Env {
   @IsNotEmpty()
   PDF_BROWSER_PATH?: string;
 
+  // F-25 email (US-115): off until the Faculty approves an SMTP sender (E-1). Development uses Mailpit on 1025.
+  // 'true'/'false' strings: implicit conversion would turn the text "false" into true.
+  @IsIn(['true', 'false'])
+  EMAIL_ENABLED: 'true' | 'false' = 'false';
+
+  @IsString()
+  @IsNotEmpty()
+  SMTP_HOST: string = 'localhost';
+
+  @IsInt()
+  @Min(1)
+  @Max(MAX_PORT)
+  SMTP_PORT: number = 1025;
+
+  @IsIn(['true', 'false'])
+  SMTP_SECURE: 'true' | 'false' = 'false';
+
+  @IsOptional()
+  @IsString()
+  SMTP_USER?: string;
+
+  @IsOptional()
+  @IsString()
+  SMTP_PASSWORD?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  MAIL_FROM: string = 'CTĐT Khoa CNTT <no-reply@localhost>';
+
+  // Where links in emails point (the web app, not the API).
+  @IsString()
+  @IsNotEmpty()
+  APP_BASE_URL: string = 'http://localhost:5173';
+
+  // F-25 deadline reminders (US-116): off by default; the numbers are examples, not Faculty policy.
+  @IsIn(['true', 'false'])
+  REMINDERS_ENABLED: 'true' | 'false' = 'false';
+
+  @IsInt()
+  @Min(1)
+  REMINDER_MAX_DAYS: number = 7;
+
+  @IsInt()
+  @Min(1)
+  REMINDER_REPEAT_DAYS: number = 3;
+
   // Redis key prefix of every queue. Unset means BullMQ's own default ("bull"); the e2e specs share one Redis and set a unique one each.
   @IsOptional()
   @IsString()

@@ -2,6 +2,7 @@ import { getJson, sendJson, withQuery } from '../api/client';
 import type {
   Notification,
   NotificationPage,
+  NotificationPreference,
   NotificationQuery,
   UnreadCount,
 } from './types';
@@ -17,5 +18,11 @@ export const markNotificationRead = (id: string) =>
     'POST',
     `${NOTIFICATIONS}/${encodeURIComponent(id)}/read`,
   );
+export const getNotificationPreferences = () =>
+  getJson<NotificationPreference>(`${NOTIFICATIONS}/preferences`);
+export const updateNotificationPreferences = (emailEnabled: boolean) =>
+  sendJson<NotificationPreference>('PATCH', `${NOTIFICATIONS}/preferences`, {
+    emailEnabled,
+  });
 export const markAllNotificationsRead = () =>
   sendJson<UnreadCount>('POST', `${NOTIFICATIONS}/read-all`);

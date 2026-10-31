@@ -30,8 +30,8 @@ export function StepLine({ step }: { step: ApprovalStep }) {
             {ACTION_LABELS[step.action]}
           </Tag>
         )}
-        {step.kind === 'OVERRIDE' && (
-          <Tag color="purple">{STEP_KIND_LABELS.OVERRIDE}</Tag>
+        {(step.kind === 'OVERRIDE' || step.kind === 'DELEGATED') && (
+          <Tag color="purple">{STEP_KIND_LABELS[step.kind]}</Tag>
         )}
         {!step.isSkipped && step.recordedAt && (
           <Typography.Text type="secondary">
@@ -42,6 +42,11 @@ export function StepLine({ step }: { step: ApprovalStep }) {
       {step.kind === 'OVERRIDE' && step.performedBy && (
         <Typography.Text type="secondary">
           Người duyệt: {who} · Thực hiện: {step.performedBy.fullName}
+        </Typography.Text>
+      )}
+      {step.kind === 'DELEGATED' && step.performedBy && (
+        <Typography.Text type="secondary">
+          {step.performedBy.fullName} duyệt thay {who} (ủy quyền)
         </Typography.Text>
       )}
       {step.isSkipped && step.skipReason && (

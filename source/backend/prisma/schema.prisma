@@ -167,6 +167,8 @@ enum NotificationType {
   REQUEST_EFFECTIVE
   GRADUATION_CONCLUSION_CHANGED
   SCHOOL_SYNC_FAILED
+  DELEGATION_RECEIVED
+  REQUEST_DEADLINE_REMINDER
 }
 
 enum NotificationReadStatus {
@@ -239,6 +241,12 @@ model User {
   changeRequestDocuments    ChangeRequestDocument[]     @relation("ChangeRequestDocumentUploader")
   comments                  Comment[]                   @relation("CommentAuthor")
   notifications             Notification[]              @relation("NotificationRecipient")
+  delegationsGranted        ApprovalDelegation[]        @relation("DelegationGrantor")
+  delegationsReceived       ApprovalDelegation[]        @relation("DelegationRecipient")
+  delegationsCreated        ApprovalDelegation[]        @relation("DelegationCreator")
+  delegationsRevoked        ApprovalDelegation[]        @relation("DelegationRevoker")
+  reminderDispatches        ApprovalReminderDispatch[]
+  notificationPreference    NotificationPreference?
   createdAt                 DateTime                    @default(now())
   updatedAt                 DateTime                    @updatedAt
 
@@ -863,27 +871,27 @@ model CLOPLOMapping {
 // A request of one of seven types; workspace types own a working copy (ProgramVersion / Syllabus with sourceRequestId).
 // CHECKs (exactly one target key, basis number for UNIVERSITY origin, round >= 0) and the code sequence are added by hand in the migration.
 model ChangeRequest {
-  id                      String                  @id @default(cuid(2))
-  requestCode             String                  @unique
+  id                      String                     @id @default(cuid(2))
+  requestCode             String                     @unique
   requestType             ChangeRequestType
   targetType              ChangeTargetType
   targetCode              String
   courseId                String?
-  course                  Course?                 @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  course                  Course?                    @relation(fields: [courseId], references: [id], onDelete: Restrict)
   programId               String?
-  program                 Program?                @relation(fields: [programId], references: [id], onDelete: Restrict)
+  program                 Program?                   @relation(fields: [programId], references: [id], onDelete: Restrict)
   subjectGroupId          String?
-  subjectGroup            SubjectGroup?           @relation(fields: [subjectGroupId], references: [id], onDelete: Restrict)
+  subjectGroup            SubjectGroup?              @relation(fields: [subjectGroupId], references: [id], onDelete: Restrict)
   createdById             String
-  createdBy               User                    @relation("ChangeRequestCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  createdBy               User                       @relation("ChangeRequestCreator", fields: [createdById], references: [id], onDelete: Restrict)
   title                   String
   reason                  String
-  status                  ChangeRequestStatus     @default(DRAFT)
+  status                  ChangeRequestStatus        @default(DRAFT)
   origin                  RequestOrigin
   basisDocumentNumber     String?
-  submissionRound         Int                     @default(0)
+  submissionRound         Int                        @default(0)
   // Whether the creator held the academic-office role on the day of creation (F-15 reads it for past-semester releases).
-  createdByAcademicOffice Boolean                 @default(false)
+  createdByAcademicOffice Boolean                    @default(false)
   // When the request entered its current PENDING_* level; null outside PENDING_* (days waiting, backlog filter).
   levelEnteredAt          DateTime?
   items                   ChangeItem[]
@@ -891,18 +899,19 @@ model ChangeRequest {
   documents               ChangeRequestDocument[]
   comments                Comment[]
   notifications           Notification[]
-  programCopy             ProgramVersion?         @relation("ProgramVersionRequestCopy")
-  syllabusCopy            Syllabus?               @relation("SyllabusRequestCopy")
+  reminderDispatches      ApprovalReminderDispatch[]
+  programCopy             ProgramVersion?            @relation("ProgramVersionRequestCopy")
+  syllabusCopy            Syllabus?                  @relation("SyllabusRequestCopy")
   // Set by the final approval (F-15).
   decisionNumber          String?
-  signedDate              DateTime?               @db.Date
+  signedDate              DateTime?                  @db.Date
   effectiveSemesterId     String?
-  effectiveSemester       Semester?               @relation("RequestEffectiveSemester", fields: [effectiveSemesterId], references: [id], onDelete: Restrict)
-  pastSemesterAllowed     Boolean                 @default(false)
-  originatedVersions      ProgramVersion[]        @relation("ProgramVersionOrigin")
-  originatedSyllabi       Syllabus[]              @relation("SyllabusOrigin")
-  createdAt               DateTime                @default(now())
-  updatedAt               DateTime                @updatedAt
+  effectiveSemester       Semester?                  @relation("RequestEffectiveSemester", fields: [effectiveSemesterId], references: [id], onDelete: Restrict)
+  pastSemesterAllowed     Boolean                    @default(false)
+  originatedVersions      ProgramVersion[]           @relation("ProgramVersionOrigin")
+  originatedSyllabi       Syllabus[]                 @relation("SyllabusOrigin")
+  createdAt               DateTime                   @default(now())
+  updatedAt               DateTime                   @updatedAt
 
   @@index([status])
   @@index([createdById])
@@ -942,29 +951,115 @@ model ApprovalLevelConfig {
 // One row per approver per level per submission round; level 3 has no approver (any other academic-office user acts).
 // CHECKs (level 1..3, a skipped row has a reason) are added by hand in the migration.
 model ApprovalStep {
-  id                String         @id @default(cuid(2))
+  id                String              @id @default(cuid(2))
   changeRequestId   String
-  changeRequest     ChangeRequest  @relation(fields: [changeRequestId], references: [id], onDelete: Cascade)
+  changeRequest     ChangeRequest       @relation(fields: [changeRequestId], references: [id], onDelete: Cascade)
   submissionRound   Int
   approvalLevel     Int
   approverId        String?
-  approver          User?          @relation("ApprovalStepApprover", fields: [approverId], references: [id], onDelete: Restrict)
+  approver          User?               @relation("ApprovalStepApprover", fields: [approverId], references: [id], onDelete: Restrict)
   forSubjectGroupId String?
-  forSubjectGroup   SubjectGroup?  @relation(fields: [forSubjectGroupId], references: [id], onDelete: Restrict)
+  forSubjectGroup   SubjectGroup?       @relation(fields: [forSubjectGroupId], references: [id], onDelete: Restrict)
   forProgramId      String?
-  forProgram        Program?       @relation(fields: [forProgramId], references: [id], onDelete: Restrict)
-  action            ApprovalAction @default(PENDING)
+  forProgram        Program?            @relation(fields: [forProgramId], references: [id], onDelete: Restrict)
+  action            ApprovalAction      @default(PENDING)
   remark            String?
   recordedAt        DateTime?
-  isSkipped         Boolean        @default(false)
+  isSkipped         Boolean             @default(false)
   skipReason        String?
   performedById     String?
-  performedBy       User?          @relation("ApprovalStepPerformer", fields: [performedById], references: [id], onDelete: Restrict)
-  isOverride        Boolean        @default(false)
-  createdAt         DateTime       @default(now())
+  performedBy       User?               @relation("ApprovalStepPerformer", fields: [performedById], references: [id], onDelete: Restrict)
+  isOverride        Boolean             @default(false)
+  // F-25: set only when a delegate decided this row on the approver's behalf; approverId stays the original reviewer.
+  delegationId      String?
+  delegation        ApprovalDelegation? @relation(fields: [delegationId], references: [id], onDelete: Restrict)
+  createdAt         DateTime            @default(now())
 
   @@index([changeRequestId, submissionRound, approvalLevel])
   @@index([approverId, action])
+  @@index([delegationId])
+}
+
+enum ApprovalDelegationStatus {
+  ACTIVE
+  EXPIRED
+  REVOKED
+}
+
+// F-25 (US-114): a dated grant to decide the delegator's named level-1/2 rows. It never copies a role.
+// scopeLevel null = every named level the delegator holds; validFrom/validTo are inclusive Viet Nam days.
+model ApprovalDelegation {
+  id           String                   @id @default(cuid(2))
+  delegatorId  String
+  delegator    User                     @relation("DelegationGrantor", fields: [delegatorId], references: [id], onDelete: Restrict)
+  delegateId   String
+  delegate     User                     @relation("DelegationRecipient", fields: [delegateId], references: [id], onDelete: Restrict)
+  scopeLevel   Int?
+  validFrom    DateTime                 @db.Date
+  validTo      DateTime                 @db.Date
+  status       ApprovalDelegationStatus @default(ACTIVE)
+  createdById  String
+  createdBy    User                     @relation("DelegationCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  revokedAt    DateTime?
+  revokedById  String?
+  revokedBy    User?                    @relation("DelegationRevoker", fields: [revokedById], references: [id], onDelete: Restrict)
+  revokeReason String?
+  steps        ApprovalStep[]
+  createdAt    DateTime                 @default(now())
+  updatedAt    DateTime                 @updatedAt
+
+  @@index([delegateId, status, validFrom, validTo])
+  @@index([delegatorId, status])
+  @@index([status, validTo])
+}
+
+// F-25 (US-115): absent row = email on.
+model NotificationPreference {
+  userId       String   @id
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailEnabled Boolean  @default(true)
+  updatedAt    DateTime @updatedAt
+}
+
+enum EmailDeliveryStatus {
+  PENDING
+  SENDING
+  SENT
+  FAILED
+  SKIPPED
+  UNKNOWN
+}
+
+// F-25 outbox: written with the notification, sent at most once by the email pump.
+model NotificationEmailDelivery {
+  notificationId String              @id
+  notification   Notification        @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  status         EmailDeliveryStatus @default(PENDING)
+  attemptedAt    DateTime?
+  sentAt         DateTime?
+  finishedAt     DateTime?
+  failureCode    String?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  @@index([status, createdAt])
+}
+
+// F-25 (US-116): one row per reminder sent, so a cycle reaches each recipient once.
+model ApprovalReminderDispatch {
+  id              String        @id @default(cuid(2))
+  changeRequestId String
+  changeRequest   ChangeRequest @relation(fields: [changeRequestId], references: [id], onDelete: Cascade)
+  submissionRound Int
+  approvalLevel   Int
+  levelEnteredAt  DateTime
+  cycleIndex      Int
+  recipientId     String
+  recipient       User          @relation(fields: [recipientId], references: [id], onDelete: Restrict)
+  createdAt       DateTime      @default(now())
+
+  @@unique([changeRequestId, submissionRound, approvalLevel, levelEnteredAt, cycleIndex, recipientId], map: "ApprovalReminderDispatch_cycle_recipient_key")
+  @@index([recipientId, createdAt])
 }
 
 // No updatedAt on purpose: comments are never edited or deleted (US-067 AC3).
@@ -982,16 +1077,17 @@ model Comment {
 
 // In-app only; content is the Vietnamese sentence rendered when the event happened.
 model Notification {
-  id               String                 @id @default(cuid(2))
+  id               String                     @id @default(cuid(2))
   recipientId      String
-  recipient        User                   @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  recipient        User                       @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
   notificationType NotificationType
   content          String
   changeRequestId  String?
-  changeRequest    ChangeRequest?         @relation(fields: [changeRequestId], references: [id], onDelete: Cascade)
-  readStatus       NotificationReadStatus @default(UNREAD)
+  changeRequest    ChangeRequest?             @relation(fields: [changeRequestId], references: [id], onDelete: Cascade)
+  readStatus       NotificationReadStatus     @default(UNREAD)
   readAt           DateTime?
-  createdAt        DateTime               @default(now())
+  createdAt        DateTime                   @default(now())
+  emailDelivery    NotificationEmailDelivery?
 
   @@index([recipientId, readStatus, createdAt])
   @@index([changeRequestId])

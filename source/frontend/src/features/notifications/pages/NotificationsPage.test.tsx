@@ -71,4 +71,45 @@ describe('NotificationsPage', () => {
       ).toBe(true),
     );
   });
+
+  it('shows the email outcome and saves the personal email switch (F-25 US-115)', async () => {
+    const { calls } = renderWithNotifications({
+      element: <NotificationsPage />,
+      reads: {
+        '/api/notifications?page=1&pageSize=20': {
+          items: [
+            { ...note('n1', 'UNREAD'), emailStatus: 'SENT', emailSent: true },
+            { ...note('n2', 'READ'), emailStatus: 'FAILED', emailSent: false },
+          ],
+          total: 2,
+          page: 1,
+          pageSize: 20,
+        },
+        '/api/notifications/preferences': {
+          emailEnabled: true,
+          emailAvailable: true,
+        },
+      },
+      writes: {
+        '/api/notifications/preferences': {
+          emailEnabled: false,
+          emailAvailable: true,
+        },
+      },
+    });
+    expect(await screen.findByText('Đã gửi email')).toBeInTheDocument();
+    expect(screen.getByText('Gửi email lỗi')).toBeInTheDocument();
+    const toggle = await screen.findByRole('switch', { name: 'Nhận email' });
+    expect(toggle).toBeChecked();
+    fireEvent.click(toggle);
+    await waitFor(() =>
+      expect(
+        calls.some(
+          (call) =>
+            call.method === 'PATCH' &&
+            call.url === '/api/notifications/preferences',
+        ),
+      ).toBe(true),
+    );
+  });
 });

@@ -9,6 +9,7 @@ const ACCESS = new AccessContext('author', []);
 describe('CommentsService', () => {
   const tx = { comment: { create: vi.fn() } };
   const prisma = {
+    approvalDelegation: { findMany: vi.fn().mockResolvedValue([]) },
     changeRequest: { findFirst: vi.fn() },
     comment: { findMany: vi.fn() },
     $transaction: vi.fn((run: (client: unknown) => unknown) => run(tx)),

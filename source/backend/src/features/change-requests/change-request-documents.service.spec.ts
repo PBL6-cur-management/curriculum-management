@@ -29,6 +29,7 @@ const request = (patch: object = {}) => ({
 
 describe('ChangeRequestDocumentsService', () => {
   const prisma = {
+    approvalDelegation: { findMany: vi.fn().mockResolvedValue([]) },
     changeRequest: { findFirst: vi.fn() },
     changeRequestDocument: {
       count: vi.fn(),

@@ -24,6 +24,7 @@ const step = (patch: object) => ({
 describe('ApprovalHistoryReader', () => {
   const findMany = vi.fn();
   const prisma = {
+    approvalDelegation: { findMany: vi.fn().mockResolvedValue([]) },
     changeRequest: { findFirst: vi.fn().mockResolvedValue({ id: 'r1' }) },
     approvalStep: { findMany },
   };

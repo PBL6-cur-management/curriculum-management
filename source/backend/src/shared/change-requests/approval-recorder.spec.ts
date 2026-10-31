@@ -27,6 +27,7 @@ function client() {
       findMany: vi.fn().mockResolvedValue([]),
     },
     roleAssignment: { findFirst: vi.fn().mockResolvedValue(null) },
+    approvalDelegation: { findMany: vi.fn().mockResolvedValue([]) },
   };
 }
 const asTx = (db: ReturnType<typeof client>) =>
@@ -118,10 +119,58 @@ describe('ApprovalRecorder', () => {
       const db = client();
       await recorder.actionableRows(asTx(db), request, 'coordinator', TODAY);
       expect(db.approvalStep.findMany.mock.calls[0][0].where).toMatchObject({
-        approverId: 'coordinator',
+        approverId: { in: ['coordinator'] },
         approvalLevel: 1,
         submissionRound: 1,
       });
+    });
+
+    it('adds the rows of a usable grant, marked with that grant (F-25)', async () => {
+      const db = client();
+      db.approvalDelegation.findMany.mockResolvedValue([
+        { id: 'g-level2', delegatorId: 'boss', scopeLevel: 2 },
+        { id: 'g-any', delegatorId: 'boss', scopeLevel: null },
+      ]);
+      db.approvalStep.findMany.mockResolvedValue([
+        { id: 'own', approverId: 'deputy' },
+        { id: 'theirs', approverId: 'boss' },
+        { id: 'stranger', approverId: 'other' },
+      ]);
+      const rows = await recorder.actionableRows(
+        asTx(db),
+        request,
+        'deputy',
+        TODAY,
+      );
+      expect(rows.map((row) => [row.id, row.viaDelegationId])).toEqual([
+        ['own', null],
+        ['theirs', 'g-any'],
+      ]);
+    });
+
+    it('records delegated rows with their grant and own rows without', async () => {
+      const db = client();
+      await recorder.recordRows(
+        asTx(db),
+        [
+          { id: 'own', viaDelegationId: null },
+          { id: 'theirs', viaDelegationId: 'g1' },
+        ] as never,
+        {
+          action: ApprovalAction.APPROVE,
+          remark: null,
+          performedById: 'deputy',
+          isOverride: false,
+        },
+      );
+      const calls = db.approvalStep.updateMany.mock.calls.map((call) => [
+        call[0].where.id.in,
+        call[0].data.delegationId,
+      ]);
+      expect(calls).toEqual([
+        [['own'], null],
+        [['theirs'], 'g1'],
+      ]);
     });
 
     it('lets only an academic-office holder act at level 3, on any row', async () => {

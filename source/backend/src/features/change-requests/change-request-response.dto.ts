@@ -116,6 +116,11 @@ export class StepProgramRefDto {
   @ApiProperty() programCode!: string;
 }
 
+export class StepDelegationRefDto {
+  @ApiProperty() id!: string;
+  @ApiProperty({ type: UserRefDto }) delegator!: UserRefDto;
+}
+
 export class ApprovalStepDto {
   @ApiProperty() id!: string;
   @ApiProperty({ enum: [1, 2, 3] }) approvalLevel!: number;
@@ -141,6 +146,13 @@ export class ApprovalStepDto {
   @ApiProperty() isOverride!: boolean;
   @ApiProperty({ enum: APPROVAL_STEP_KINDS, enumName: 'ApprovalStepKind' })
   kind!: ApprovalStepKind;
+  @ApiProperty({
+    type: StepDelegationRefDto,
+    nullable: true,
+    description:
+      'F-25: the grant a delegate decided this row under; kept after it expires or is revoked',
+  })
+  delegation!: StepDelegationRefDto | null;
 }
 
 export class ConflictDto {

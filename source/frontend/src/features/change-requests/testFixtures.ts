@@ -108,6 +108,7 @@ export function step(
     performedBy: null,
     isOverride: false,
     kind: 'NORMAL',
+    delegation: null,
     ...patch,
   };
 }

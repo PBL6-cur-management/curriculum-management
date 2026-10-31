@@ -54,6 +54,15 @@ services:
     ports:
       - '127.0.0.1:${SCHOOL_DB_SIM_PORT:-14330}:1433'
 
+  # F-25 only: catches every email locally (SMTP 1025, web UI http://127.0.0.1:8025). Opt-in (pnpm mail:start).
+  mailpit:
+    image: axllent/mailpit:v1.27
+    profiles: ['mail']
+    mem_limit: 128m
+    ports:
+      - '127.0.0.1:${MAILPIT_SMTP_PORT:-1025}:1025'
+      - '127.0.0.1:${MAILPIT_UI_PORT:-8025}:8025'
+
 volumes:
   postgres-data:
   redis-data:

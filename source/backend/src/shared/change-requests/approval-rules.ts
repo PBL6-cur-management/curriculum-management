@@ -37,9 +37,11 @@ export function isActionable(
 export function stepKind(step: {
   isSkipped: boolean;
   isOverride: boolean;
+  delegationId?: string | null;
 }): ApprovalStepKind {
   if (step.isSkipped) return APPROVAL_STEP_KIND.SKIPPED;
-  return step.isOverride
-    ? APPROVAL_STEP_KIND.OVERRIDE
+  if (step.isOverride) return APPROVAL_STEP_KIND.OVERRIDE;
+  return step.delegationId
+    ? APPROVAL_STEP_KIND.DELEGATED
     : APPROVAL_STEP_KIND.NORMAL;
 }

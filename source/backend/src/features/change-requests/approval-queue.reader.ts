@@ -8,6 +8,10 @@ import type { AccessContext } from '../../shared/authz/access-context.js';
 import { isAcademicOfficeHolder } from '../../shared/change-requests/academic-office.js';
 import { isActionable } from '../../shared/change-requests/approval-rules.js';
 import { APPROVAL_LEVEL } from '../../shared/change-requests/approval.constants.js';
+import {
+  grantFor,
+  usableGrants,
+} from '../../shared/change-requests/delegation-authority.js';
 import { groupBy } from '../../shared/collections/group-by.js';
 import { USER_REF_SELECT } from '../../shared/dtos/ref.dto.js';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
@@ -30,6 +34,8 @@ const QUEUE_REQUEST_FIELDS = {
 } as const satisfies Prisma.ChangeRequestSelect;
 
 const QUEUE_STEP_SELECT = {
+  approverId: true,
+  approver: { select: USER_REF_SELECT },
   submissionRound: true,
   approvalLevel: true,
   action: true,
@@ -38,9 +44,11 @@ const QUEUE_STEP_SELECT = {
   forProgram: { select: { programCode: true } },
   changeRequest: { select: QUEUE_REQUEST_FIELDS },
 } as const satisfies Prisma.ApprovalStepSelect;
-type QueueStep = Prisma.ApprovalStepGetPayload<{
+type QueueStepRow = Prisma.ApprovalStepGetPayload<{
   select: typeof QUEUE_STEP_SELECT;
 }>;
+// A row in the queue, with the grant behind it when the caller decides it for someone else (F-25).
+type QueueStep = QueueStepRow & { delegationId: string | null };
 
 const QUEUE_FINAL_SELECT = {
   ...QUEUE_REQUEST_FIELDS,
@@ -67,9 +75,12 @@ export class ApprovalQueueReader {
       ? { requestType: query.requestType }
       : {};
     // Candidates by SQL; "same round, request at this row's level" compares two tables, so it is checked in code.
+    const grants = await usableGrants(this.prisma, access.userId, today);
     const named = await this.prisma.approvalStep.findMany({
       where: {
-        approverId: access.userId,
+        approverId: {
+          in: [access.userId, ...grants.map((grant) => grant.delegatorId)],
+        },
         action: ApprovalAction.PENDING,
         changeRequest: {
           status: {
@@ -84,7 +95,13 @@ export class ApprovalQueueReader {
       },
       select: QUEUE_STEP_SELECT,
     });
-    const rows = named.filter((step) => isActionable(step, step.changeRequest));
+    const rows = named.flatMap((step): QueueStep[] => {
+      if (!isActionable(step, step.changeRequest)) return [];
+      if (step.approverId === access.userId)
+        return [{ ...step, delegationId: null }];
+      const grant = grantFor(grants, step.approverId, step.approvalLevel);
+      return grant ? [{ ...step, delegationId: grant.id }] : [];
+    });
     const finals = (await isAcademicOfficeHolder(
       this.prisma,
       access.userId,
@@ -139,6 +156,20 @@ function toQueueItem(group: QueueStep[], today: Date): ApprovalQueueItemDto {
     approvalLevel: first.approvalLevel,
     standsFor: codes.length > 0 ? [...new Set(codes)].sort().join(', ') : null,
     submittedAt: first.createdAt.toISOString(),
+    delegatedFor: [
+      ...new Map(
+        group.flatMap((step) =>
+          step.delegationId && step.approver
+            ? [
+                [
+                  step.delegationId,
+                  { delegationId: step.delegationId, delegator: step.approver },
+                ] as const,
+              ]
+            : [],
+        ),
+      ).values(),
+    ],
   };
 }
 
@@ -157,5 +188,6 @@ function toFinalQueueItem(
     approvalLevel: APPROVAL_LEVEL.ACADEMIC_OFFICE,
     standsFor: null,
     submittedAt: step.createdAt.toISOString(),
+    delegatedFor: [],
   };
 }

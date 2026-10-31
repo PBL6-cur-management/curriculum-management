@@ -43,7 +43,7 @@ import type {
 import { UPLOAD_STATUSES } from './change-request.constants.js';
 import { ConflictFinder } from './conflict-finder.js';
 import { targetKey } from './request-target.resolver.js';
-import { visibleWhere } from './request-visibility.js';
+import { visibleOrDelegatedWhere } from './request-visibility.js';
 
 const NO_NUMBER = 'chưa đánh số';
 // These end at level 3 with the plain Đồng ý; every other type is released on MH-43.
@@ -67,7 +67,7 @@ export class ChangeRequestDetailReader {
     access: AccessContext,
   ): Promise<ChangeRequestDetailDto> {
     const row = await this.prisma.changeRequest.findFirst({
-      where: { id, ...visibleWhere(access) },
+      where: { id, ...(await visibleOrDelegatedWhere(this.prisma, access)) },
       select: {
         ...REQUEST_SUMMARY_SELECT,
         documents: {

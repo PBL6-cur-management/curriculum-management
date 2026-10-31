@@ -14,6 +14,7 @@ const item = (patch: object) => ({
   createdBy: { id: 'u2', fullName: 'Giảng viên B' },
   submittedAt: '2026-10-15T03:00:00.000Z',
   daysWaiting: 4,
+  delegatedFor: [],
   ...patch,
 });
 
@@ -51,6 +52,24 @@ describe('ApprovalQueuePage', () => {
     expect(within(rows[0]).getByText('Chính mình')).toBeInTheDocument();
     expect(within(rows[1]).getByText('G1')).toBeInTheDocument();
     expect(within(rows[1]).getByText('Giảng viên B')).toBeInTheDocument();
+  });
+
+  it('names whose level a delegated row belongs to (F-25 US-114)', async () => {
+    renderQueue({
+      '/api/approval-queue': [
+        item({
+          delegatedFor: [
+            {
+              delegationId: 'd1',
+              delegator: { id: 'u9', fullName: 'Trưởng nhóm A' },
+            },
+          ],
+        }),
+      ],
+    });
+    expect(
+      await screen.findByText('Duyệt thay Trưởng nhóm A'),
+    ).toBeInTheDocument();
   });
 
   it('asks the server for the chosen type', async () => {

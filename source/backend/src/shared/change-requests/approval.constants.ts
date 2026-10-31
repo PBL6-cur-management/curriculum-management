@@ -45,6 +45,7 @@ export const APPROVAL_STEP_KIND = {
   NORMAL: 'NORMAL',
   SKIPPED: 'SKIPPED',
   OVERRIDE: 'OVERRIDE',
+  DELEGATED: 'DELEGATED',
 } as const;
 export type ApprovalStepKind =
   (typeof APPROVAL_STEP_KIND)[keyof typeof APPROVAL_STEP_KIND];

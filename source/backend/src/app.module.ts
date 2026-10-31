@@ -35,6 +35,8 @@ import { GraduationModule } from './features/graduation/graduation.module.js';
 import { SchoolSyncModule } from './features/school-db-sync/school-sync.module.js';
 import { DdutApiModule } from './features/ddut-api/ddut-api.module.js';
 import { IntegrationClientsModule } from './features/integration-clients/integration-clients.module.js';
+import { ApprovalDelegationsModule } from './features/approval-delegations/approval-delegations.module.js';
+import { NotificationDeliveryModule } from './features/notification-delivery/notification-delivery.module.js';
 import { PublicationModule } from './features/publication/publication.module.js';
 import { ReportsModule } from './features/reports/reports.module.js';
 import { StudentPortalModule } from './features/student-portal/student-portal.module.js';
@@ -75,6 +77,8 @@ import { StudentPortalModule } from './features/student-portal/student-portal.mo
     DdutApiModule,
     ReportsModule,
     PublicationModule,
+    ApprovalDelegationsModule,
+    NotificationDeliveryModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: CsrfGuard },
