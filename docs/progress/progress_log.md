@@ -450,3 +450,25 @@ Format:
 - Docs: `docs/technical/backup-restore-runbook.md`, `docs/testing/feature__f-26-backup-restore-drill.md`.
 - **Chưa làm / bị chặn**: e2e engine và phục hồi thật (máy chưa cài PostgreSQL client 18 native), spec cho restore-drill/restore-verifier/upgrade-verifier/backup-store, cập nhật architecture docs, nghiệm thu vận hành thật.
 - Ghi chú: `todo.md`/`current_work.md` cũ cho F-20..F-25; git log cho thấy F-20..F-25 đã merge vào main.
+
+## 2026-10-31 — F-26/F-27 hoàn tất mã, đổi chiến lược e2e
+
+- Rebase `feat/f-27-deployment-monitoring` (chứa cả F-26) lên main, cherry-pick 3 commit `feat/f-26-leftovers`, gộp stash các dòng bảng quyền F-20..F-25. Sửa 6 dòng `program.view` sang `NO_ROLE`, vì R6 có `program.view`.
+- **E2E backend bỏ Testcontainers** theo yêu cầu người dùng (tốn RAM/ổ đĩa).
+  - Nay dùng PostgreSQL/Redis của `compose.yaml`: DB tên `ctdt_e2e_*` sao từ template ICU `ctdt_e2e_template`; Redis logical DB 1, dọn trước và sau mỗi lượt; mặc định 2 worker (`E2E_WORKERS`).
+  - Thêm biến `REDIS_DB` (mặc định 0).
+  - Kết quả: 42 file, 677/677 (4 skip), khoảng 266 giây.
+- **F-27 BE-02 không dùng pino** (người dùng chốt): `src/shared/logging/{app-logger,http-logger,log-levels}.ts`.
+  - Ghi JSON một dòng cho mỗi request, chỉ gồm method, route template, status, thời gian và ID do server tạo. Route không khớp ghi `unmatched`.
+  - Chỉ bật khi `NODE_ENV=production`.
+  - Bỏ Uptime Kuma khỏi `deploy/compose.yaml` và docs; bộ thu health là nguồn bằng chứng uptime.
+- **F-26 diễn tập cục bộ** bằng pg_dump/pg_restore 18.6 trên DB demo seed `ctdt_drill_source`: B4 RESTORED 7/7, `verify` 5/5, nghiệm thu SUCCEEDED (runbook §8).
+  - Sửa: `copyFiles` luôn tạo `files/`. Trước đó `FILES_ROOT` trống làm mọi lần phục hồi báo `BACKUP_CHECKSUM_MISMATCH`.
+  - Sửa: tách mã `DRILL_ALREADY_DECIDED` và `DRILL_NOT_ACCEPTABLE` khỏi `DRILL_ACCEPTANCE_FAILED`.
+  - Thêm `restore-drill.spec.ts` (8 ca).
+  - `ctdt_real` trên máy này bị từ chối sao lưu với `BACKUP_FILE_MISSING`: 1 `ChangeRequestDocument` trỏ tới tệp không có.
+- F-27 BE-06: điền đường dẫn đọc sinh viên/nhân sự đã xác minh vào `scripts/load/fixture-contract.example.json` và bảng §2a của kế hoạch.
+- Nợ:
+  - Fixture tổng hợp 300 học phần/500 sinh viên.
+  - k6 canonical trên stack `deploy/` thật.
+  - 7 đêm sao lưu, diễn tập B5/B6, sao chép ngoài máy, uptime dài hạn.
