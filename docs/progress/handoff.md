@@ -1,5 +1,40 @@
 # Bàn giao
 
+## Bàn giao 2026-10-31 (tối)
+
+**Nhánh**: `main` sau PR #43. Cây làm việc sạch; nhánh cũ (`refactor/program-workspace-tabs`, các nhánh tính năng đã gộp, worktree `cm-f26-leftovers`) đã dọn.
+
+### 1. Trạng thái
+
+- **Tính năng:** F-01..F-27 đều có mã trên `main`.
+- **Kiểm thử trên main:** BE unit 1797/1797; BE e2e 679/679 (4 skip), 43 file, khoảng 302 giây trên compose; FE 693/693, tsc 0, lint 0 lỗi.
+- **Kiểm thử thủ công:** người dùng chốt giảm tối thiểu; 413 ca được thay bằng `docs/testing/smoke-checklist.md` (29 kịch bản theo vai).
+
+### 2. Đã gộp
+
+| PR | Nội dung |
+|---|---|
+| #39 | F-26 + F-27: engine sao lưu, diễn tập phục hồi, CLI `pnpm backup:drill` (B4 cục bộ 7/7, nghiệm thu SUCCEEDED); logger JSON không pino, bỏ Uptime Kuma; k6 chỉ-đọc với đường dẫn sinh viên đã xác minh; e2e chuyển từ Testcontainers sang PostgreSQL/Redis compose (`ctdt_e2e_*`, Redis DB 1, 2 worker), biến mới `REDIS_DB`. |
+| #40 | Spec BackupStore (14 ca). |
+| #41 | `fix(seed)`: bản ban hành DUT có số quyết định giữ chỗ `DUT-<programCode>-<version>`; thiếu số này 38 phân khóa báo `INVALID_COHORT_ASSIGNMENT` khi đối soát. Chạy lại `pnpm prisma:seed:dut` điền 41 số trên `ctdt_real`; còn 0 phân khóa sai. |
+| #42 | `fix(menu)`: `MeDto.canApprove` (vai R1/R3/R4 hoặc ủy quyền còn dùng được hôm nay) quyết định hiện "Chờ tôi duyệt"; "Trạng thái hệ thống" cần quyền vận hành nên R5/R6 không còn thấy nhóm "Quản trị". |
+| #43 | Smoke checklist 29 kịch bản; audit Impeccable tĩnh cho CTĐT, học phần, đề xuất, sao lưu: detector sạch. Sửa hàng chờ duyệt dùng `keepPreviousData` và `CourseItemsEditor` hex → `token.colorErrorBg`. |
+
+### 3. Việc người dùng cần làm trước
+
+1. Tạo `source/e2e/.env` với `E2E_ADMIN_PASSWORD`, `E2E_PASSWORD` (máy MSI chưa có). Sau đó: chạy Playwright, đi luồng phê duyệt R5→R4→R3→R1 trên trình duyệt, chạy smoke vòng 1, chụp màn hình cho impeccable polish.
+2. Thêm `REDIS_DB=0` vào `source/backend/.env.example`.
+3. `ctdt_real` trên máy này: sao lưu bị từ chối `BACKUP_FILE_MISSING` vì 1 `ChangeRequestDocument` trỏ tới tệp mất; khôi phục tệp hoặc xóa tài liệu trước khi bật sao lưu.
+
+### 4. Nợ còn lại
+
+- Số quyết định giữ chỗ `DUT-...` cần thay bằng số thật của Khoa.
+- 213 dòng tự chọn ở 27/46 phiên bản chưa thuộc nhóm nào; ghi chú là hướng chuyên ngành (ATTT, KTMT, Công nghệ PM, HTTT, Mạng) hoặc trống. Nguồn không có tối thiểu mà DB bắt buộc; quy tắc "chọn 1 trong N hướng" chưa được mô hình. Cảnh báo giữ nguyên; nợ Khoa (C10).
+- Vận hành: 7 đêm sao lưu, diễn tập B5/B6, sao chép ngoài máy, fixture 300 học phần/500 sinh viên rồi k6 canonical trên stack deploy, uptime dài hạn, NFR-02 trên phần cứng thật, bản 1.1 PENDING→ACTIVE ngày đầu học kỳ thật, C1..C10.
+- Flake `chooseOption` chưa sửa. Taiga MCP không kết nối được trong phiên này.
+
+---
+
 ## Bàn giao 2026-10-31
 
 **Nhánh**: `main` @ `819f4f8` (PR #34–#38 đã gộp). Cây làm việc sạch.
