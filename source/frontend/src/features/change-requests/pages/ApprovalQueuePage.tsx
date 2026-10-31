@@ -19,6 +19,7 @@ import {
   SummaryStrip,
   type SummaryItem,
 } from '../../../shared/design-system';
+import { SectionNav } from '../../../shared/layout/SectionNav';
 import { REQUEST_STATUS_LABELS } from '../../../shared/change-requests/requestStatus';
 
 const COLUMNS: TableColumnsType<ApprovalQueueItem> = [
@@ -111,6 +112,7 @@ export function ApprovalQueuePage() {
   return (
     <Flex vertical gap="middle">
       <PageHeader title="Chờ tôi duyệt" />
+      <SectionNav section="approvals" />
       {data && data.length > 0 && <QueueSummary items={data} />}
       <FilterBar>
         <Select

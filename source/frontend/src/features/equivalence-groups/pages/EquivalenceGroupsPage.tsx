@@ -13,6 +13,8 @@ import type { TableColumnsType } from 'antd';
 import { useState } from 'react';
 import { Link, generatePath, useSearchParams } from 'react-router';
 import { ROUTES } from '../../../routes';
+import { PageHeader } from '../../../shared/design-system';
+import { SectionNav } from '../../../shared/layout/SectionNav';
 import {
   DEFAULT_PAGE_SIZE,
   PAGE_SIZE_OPTIONS,
@@ -172,16 +174,18 @@ export function EquivalenceGroupsPage() {
     );
   return (
     <>
-      <Card
+      <PageHeader
         title="Nhóm học phần tương đương"
-        extra={
+        actions={
           canEdit && (
             <Button type="primary" onClick={() => setDialog({ kind: 'form' })}>
               Tạo nhóm
             </Button>
           )
         }
-      >
+      />
+      <SectionNav section="courses" />
+      <Card>
         <Input.Search
           allowClear
           defaultValue={query.q}

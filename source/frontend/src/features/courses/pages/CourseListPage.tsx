@@ -23,6 +23,7 @@ import {
 } from '../constants/courseLabels';
 import { useCourseList } from '../hooks/useCourses';
 import { formatEmpty, PageHeader } from '../../../shared/design-system';
+import { SectionNav } from '../../../shared/layout/SectionNav';
 
 const INITIAL_QUERY: CourseQuery = {
   page: 1,
@@ -140,6 +141,7 @@ export function CourseListPage() {
           </>
         }
       />
+      <SectionNav section="courses" />
       <CourseFilters value={query} onChange={applyFilters} />
       <Table<CourseSummary>
         rowKey="id"

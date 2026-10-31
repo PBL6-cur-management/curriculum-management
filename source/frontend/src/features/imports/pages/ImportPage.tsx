@@ -1,12 +1,9 @@
 import { useState } from 'react';
 import { Alert, Button, Skeleton } from 'antd';
-import { Link, useSearchParams } from 'react-router';
-import {
-  IMPORT_TYPE_PARAM,
-  IMPORT_VERSION_PARAM,
-  ROUTES,
-} from '../../../routes';
+import { useSearchParams } from 'react-router';
+import { IMPORT_TYPE_PARAM, IMPORT_VERSION_PARAM } from '../../../routes';
 import { DetailPageLayout, PageHeader } from '../../../shared/design-system';
+import { SectionNav } from '../../../shared/layout/SectionNav';
 import { errorMessage } from '../../../shared/forms/applyFieldErrors';
 import { CommitImportButton } from '../components/CommitImportButton';
 import { ImportReport } from '../components/ImportReport';
@@ -29,10 +26,8 @@ export function ImportPage() {
   )?.importType;
   return (
     <DetailPageLayout>
-      <PageHeader
-        title="Nhập liệu Excel"
-        actions={<Link to={ROUTES.importHistory}>Lịch sử nhập liệu</Link>}
-      />
+      <PageHeader title="Nhập liệu Excel" />
+      <SectionNav section="imports" />
       <Alert
         type="info"
         showIcon
