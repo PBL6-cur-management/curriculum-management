@@ -1,8 +1,13 @@
-# Current Work — F-20..F-25 đã merge; rà soát nghiệp vụ và UI CTĐT/học phần/phê duyệt
+# Current Work — F-01..F-27 đã merge; chờ môi trường e2e để duyệt luồng phê duyệt và smoke
 
-**Start here**: đọc [bàn giao 2026-10-31](handoff.md), rồi đi luồng phê duyệt theo vai trò R5→R4→R3→R1 trên UI, rà nghiệp vụ và tiếp tục chỉnh UI CTĐT / học phần / phê duyệt; test để sau cùng. Chưa build: F-26, F-27 (hoãn). Taiga (Phase 6) đã lập lại 13 sprint (PR #36).
+**Start here**: đọc [bàn giao 2026-10-31 (tối)](handoff.md). Việc kế tiếp: người dùng tạo `source/e2e/.env`, rồi chạy Playwright, đi luồng phê duyệt R5→R4→R3→R1 trên UI, chạy [smoke checklist](../testing/smoke-checklist.md) vòng 1 (29 kịch bản, thay 413 ca thủ công) và chụp màn hình cho impeccable polish. Main: BE unit 1797/1797, BE e2e 679/679, FE 693/693.
 
-## Việc đã merge 2026-10-31
+## Việc đã merge 2026-10-31 (tối)
+
+- PR #39 F-26 + F-27; #40 spec BackupStore; #41 số quyết định giữ chỗ DUT (`DUT-<programCode>-<version>`, phải thay bằng số thật của Khoa); #42 `MeDto.canApprove` và quyền menu "Quản trị"; #43 smoke checklist và audit UI. Chi tiết: progress_log 2026-10-31.
+- Nợ mở: thiếu `source/e2e/.env`; `REDIS_DB=0` chưa có trong `.env.example`; `ctdt_real` từ chối sao lưu `BACKUP_FILE_MISSING`; 213 dòng tự chọn chưa thuộc nhóm (C10); nợ vận hành; flake `chooseOption`. Xem [todo](todo.md) DEBT-01..07.
+
+## Việc đã merge 2026-10-31 (sáng)
 
 - F-20..F-25 đã có trên main (PR #26–#31); các mục "Up Next" bên dưới về F-22 → F-20 → F-21 và việc hoãn F-23/24/25 là lịch sử, không còn đúng.
 - PR #34 `pnpm dev:setup` (hạ tầng Docker PostgreSQL/Redis/Mailpit, mã chạy trên máy); PR #35 `ProgramWorkspaceLayout` lồng mọi route `/programs/:programId/...` + `useUrlQuery` + `navigationMemory`/`BackLink preferHistory`; PR #36 Taiga 13 sprint; PR #37 dọn quan hệ học phần. Chi tiết: progress_log 2026-10-31.
@@ -34,14 +39,14 @@
 ## Session Context
 
 - **Last updated**: 2026-10-31.
-- 18 tính năng đã có mã hoàn tất: F-01..F-18 (13 MVP + F-09 + F-12 + F-16 + F-17 + F-18). Kế hoạch sau MVP được chấp nhận với giới hạn §8; không còn gate quyết định A1..A12/B1/B2. Hoàn tất mã không thay thế các ca thủ công hoặc nghiệm thu Khoa còn nợ.
+- 27 tính năng đã có mã hoàn tất và đã merge: F-01..F-27. Kế hoạch sau MVP được chấp nhận với giới hạn §8; không còn gate quyết định A1..A12/B1/B2. Hoàn tất mã không thay thế các ca thủ công hoặc nghiệm thu Khoa còn nợ.
 - F-15 `createdByAcademicOffice` đã chốt; đính chính là thay thế hành chính hồi tố và lịch học kỳ theo chính sách hiện tại. Không hứa lịch sử bất biến trước đính chính, không lên kế hoạch history/freeze; mỗi lần xét F-19 chụp đúng đầu vào.
 - Công thức điểm không có ngoại lệ học kỳ đã bắt đầu (E1, người dùng chốt 2026-10-26); GRADING_FORMULA đi hết ba cấp duyệt như các loại đề cương khác.
 - F-21 dùng `PortalProgressReader` của F-20, không có engine tiến độ thứ hai. SCHOOL_DB dùng actor hệ thống nullable và ghi nguồn; hồ sơ mới không tự tạo tài khoản.
 
 ## Còn nợ MVP, F-09, F-12, F-16, F-17 và F-18
 
-- **413 ca thủ công** chưa chạy, đếm lại từng dòng trong 19 file từ [chỉ mục kiểm thử](../testing/test-cases/README.md): 925 ca = 512 tự động Passed + 413 thủ công (MVP 378 + F-09 3: F09-TC_015/016/025 + F-16 5: F16-TC_023..027 + F-12 5: F12-TC_022..026 + F-17 4: F17-TC_029..032 + F-18 2: F18-TC_015/016 + F-19 16: F19-TC_020..035). [Bàn giao](handoff.md) giữ kết quả MVP lịch sử; không cộng auth setup hoặc đếm trùng 5 ca xuyên tính năng.
+- Từ 2026-10-31, cổng thủ công là [smoke checklist](../testing/smoke-checklist.md) (29 kịch bản); 413 ca Manual chỉ còn là tài liệu tham chiếu, không chạy lần lượt. Số lịch sử: 413 ca thủ công chưa chạy, đếm lại từng dòng trong 19 file từ [chỉ mục kiểm thử](../testing/test-cases/README.md): 925 ca = 512 tự động Passed + 413 thủ công (MVP 378 + F-09 3: F09-TC_015/016/025 + F-16 5: F16-TC_023..027 + F-12 5: F12-TC_022..026 + F-17 4: F17-TC_029..032 + F-18 2: F18-TC_015/016 + F-19 16: F19-TC_020..035). [Bàn giao](handoff.md) giữ kết quả MVP lịch sử; không cộng auth setup hoặc đếm trùng 5 ca xuyên tính năng.
 - Luồng MVP-TC_001..005 đã Passed ở lần 3 và 4 ngày 2026-10-25 (14 Passed gồm 9 setup + 5 ca nghiệp vụ, 1.7 phút/lần); không cộng setup vào số ca nghiệp vụ.
 - Chưa kiểm chứng đúng bản **1.1 từ PENDING → ACTIVE** vào ngày đầu học kỳ với worker thật đang chạy, cùng thay đổi bản đang áp dụng; không đổi ngày seed hay dùng endpoint test để thay bằng chứng này.
 - **Flake `chooseOption` chưa sửa**: lần 2/4 tại `fixtures/select.ts:22`, qua `fixtures/curriculum.ts:27`, combobox `plannedSemester` còn `aria-expanded=true` sau 10 giây. Ngày 10/26/26 cũng gặp ở F09-TC_001 qua `specs/f-09-excel-import-export.spec.ts:22`: Loại dữ liệu vẫn aria-expanded=true, value rỗng sau 10 giây (Failed 1/2 lần, TC giữ Passed theo lượt thành công). Đã xuất hiện ở spec thứ hai; các lượt Passed không chứng minh hết flake. Không sửa fixture.
@@ -69,10 +74,8 @@ Các mục trên **chưa được Khoa trả lời**. Người dùng cho phép b
 
 ## Up Next
 
-**F-22 → F-20 → F-21**. Các tính năng này chưa build; kiểm lại source/hợp đồng dependency khi bắt đầu. Full suites BE e2e/frontend/Playwright chưa chạy lại; đây là nợ kiểm chứng, không tự chạy hoặc đặt làm gate chọn feature trong lượt docs. BE e2e giữ cấu hình max_connections=300 hiện hữu khi có lượt chạy được giao.
+1. Tạo `source/e2e/.env`, chạy Playwright, smoke vòng 1, duyệt luồng R5→R4→R3→R1 và chụp màn hình cho `/impeccable polish`.
+2. Xử lý nợ DEBT-01..07 trong [todo](todo.md); đầu vào Khoa C1..C10 vẫn chờ trả lời.
+3. Nợ vận hành F-26/F-27: 7 đêm sao lưu, diễn tập B5/B6, sao chép ngoài máy, fixture 300 học phần/500 sinh viên rồi k6 canonical, uptime dài hạn.
 
-**F-26/F-27: hoãn theo người dùng ngày 2026-10-26, không xếp lịch; giữ nguyên kế hoạch.**
-
-**F-23: hoãn theo người dùng ngày 2026-10-29 (vượt phạm vi cần lúc này), không xếp lịch; giữ nguyên kế hoạch.**
-
-**F-24/F-25: hoãn theo người dùng ngày 2026-10-29 (chưa cần), không xếp lịch; giữ nguyên kế hoạch. C7/C8 không còn chặn tính năng đang xếp lịch.**
+Lịch sử (không còn đúng): thứ tự F-22 → F-20 → F-21 và việc hoãn F-23/F-24/F-25/F-26/F-27; tất cả F-01..F-27 đã merge.

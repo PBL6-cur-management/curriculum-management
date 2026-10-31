@@ -93,6 +93,14 @@ Một dòng cho mỗi tính năng; việc chi tiết (CV-xxx) ở `docs/planning
 | UI-03 | Rà soát nghiệp vụ và UI CTĐT / học phần / phê duyệt theo vai trò R5→R4→R3→R1 | 🔄 | Đang làm; test để sau cùng |
 | DEV-01 | `pnpm dev:setup` dựng hạ tầng Docker một lệnh | ✅ | PR #34, 2026-10-31 |
 | TAIGA-01 | Lập lại backlog Taiga: 13 sprint 15/06–15/12/2026 | ✅ | PR #36, 2026-10-31 |
+| SMOKE-01 | Smoke checklist 29 kịch bản theo vai (`docs/testing/smoke-checklist.md`) thay cho 413 ca thủ công | ✅ | PR #43; chưa chạy vòng 1 (cần `source/e2e/.env`) |
+| DEBT-01 | Tạo `source/e2e/.env` (`E2E_ADMIN_PASSWORD`, `E2E_PASSWORD`), chạy Playwright, duyệt luồng R5→R4→R3→R1, smoke vòng 1, chụp màn hình cho impeccable polish | ❌ | Người dùng tạo file |
+| DEBT-02 | Thêm `REDIS_DB=0` vào `source/backend/.env.example` | ❌ | Người dùng làm (sửa của trợ lý bị từ chối quyền) |
+| DEBT-03 | `ctdt_real` bị từ chối sao lưu `BACKUP_FILE_MISSING`: 1 `ChangeRequestDocument` trỏ tới tệp mất | ❌ | Khôi phục tệp hoặc xóa tài liệu trước khi bật sao lưu |
+| DEBT-04 | Thay số quyết định giữ chỗ `DUT-<programCode>-<version>` (41 bản ban hành, PR #41) bằng số thật của Khoa | ❌ | Nợ Khoa |
+| DEBT-05 | 213 dòng tự chọn ở 27/46 phiên bản chưa thuộc nhóm nào (nguồn không có tối thiểu; chưa mô hình quy tắc "chọn 1 trong N hướng") | ❌ | Nợ Khoa (C10) |
+| DEBT-06 | Vận hành: 7 đêm sao lưu, diễn tập B5/B6, sao chép ngoài máy, fixture 300 học phần/500 sinh viên + k6 canonical, uptime dài hạn, NFR-02 trên phần cứng thật, bản 1.1 PENDING→ACTIVE ngày đầu học kỳ | ❌ | |
+| DEBT-07 | Flake `chooseOption` chưa sửa; Taiga MCP không kết nối được trong phiên 2026-10-31 | ❌ | |
 | F-20 | Cổng sinh viên                   | ✅     | Cổng sinh viên đã merge (PR #26–#31) vào main; còn Manual và đầu vào Khoa C4 (cập nhật 2026-10-31) |
 | F-21 | API cho dDUT                     | ✅     | API dDUT đã merge (PR #26–#31) vào main; còn đầu vào Khoa C6 (cập nhật 2026-10-31) |
 

@@ -472,3 +472,13 @@ Format:
   - Fixture tổng hợp 300 học phần/500 sinh viên.
   - k6 canonical trên stack `deploy/` thật.
   - 7 đêm sao lưu, diễn tập B5/B6, sao chép ngoài máy, uptime dài hạn.
+
+## 2026-10-31 — sửa lỗi nghiệp vụ, smoke checklist, kiểm chứng
+
+- PR #39 (F-26 + F-27), #40 (spec BackupStore 14 ca), #41 (seed), #42 (menu), #43 (smoke checklist và audit UI) đã gộp vào `main`.
+- **#41**: bản ban hành DUT có số quyết định giữ chỗ `DUT-<programCode>-<version>`; trước đó 38 phân khóa báo `INVALID_COHORT_ASSIGNMENT` khi đối soát ghi danh. Chạy lại `pnpm prisma:seed:dut` điền 41 số trên `ctdt_real`, còn 0 phân khóa sai. Phải thay bằng số thật của Khoa.
+- **#42**: `MeDto.canApprove` (R1/R3/R4 hoặc ủy quyền dùng được hôm nay) ẩn "Chờ tôi duyệt" khi sai; "Trạng thái hệ thống" cần quyền vận hành nên R5/R6 không còn thấy nhóm "Quản trị".
+- **#43**: `docs/testing/smoke-checklist.md` (29 kịch bản theo vai) thay việc chạy từng ca trong 413 ca thủ công (người dùng chốt 2026-10-31). Audit Impeccable tĩnh cho CTĐT, học phần, đề xuất, sao lưu: detector sạch; sửa hàng chờ duyệt dùng `keepPreviousData` và `CourseItemsEditor` hex → `token.colorErrorBg`.
+- **Kiểm chứng trên main**: BE unit 1797/1797; BE e2e 679/679 (4 skip), 43 file, khoảng 302 giây; FE 693/693, tsc 0, lint 0 lỗi.
+- Dọn nhánh: `refactor/program-workspace-tabs` (PR #35 đã thay thế), các nhánh tính năng đã gộp, worktree `cm-f26-leftovers`.
+- **Nợ**: Playwright và duyệt luồng R5→R4→R3→R1 trên trình duyệt chưa chạy (thiếu `source/e2e/.env`); `REDIS_DB=0` chưa có trong `.env.example`; `ctdt_real` từ chối sao lưu `BACKUP_FILE_MISSING`; 213 dòng tự chọn chưa thuộc nhóm (C10); nợ vận hành (7 đêm sao lưu, B5/B6, ngoài máy, k6 canonical, uptime, NFR-02, bản 1.1); flake `chooseOption`; Taiga MCP không kết nối.
