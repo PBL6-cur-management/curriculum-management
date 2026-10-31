@@ -2,11 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { App } from 'antd';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type {
-  BackupRun,
-  BackupStatus,
-  RestoreDrill,
-} from '../api/backups';
+import type { BackupRun, BackupStatus, RestoreDrill } from '../api/backups';
 import { BackupsPage } from './BackupsPage';
 
 const json = (body: unknown, status = 200) =>
@@ -87,9 +83,7 @@ function stub(reads: Record<string, unknown | Response>) {
       const path = url.split('?')[0]!;
       const answer = reads[path];
       if (answer instanceof Response) return answer;
-      return path in reads
-        ? json(answer)
-        : json({ message: 'Not found' }, 404);
+      return path in reads ? json(answer) : json({ message: 'Not found' }, 404);
     }),
   );
   return calls;
@@ -140,7 +134,12 @@ describe('BackupsPage', () => {
     expect(
       screen.getByText(/Trang này không cho phép phục hồi hoặc tải bản sao/),
     ).toBeInTheDocument();
-    for (const name of [/phục hồi ngay/i, /sao lưu ngay/i, /tải xuống/i, /xóa/i])
+    for (const name of [
+      /phục hồi ngay/i,
+      /sao lưu ngay/i,
+      /tải xuống/i,
+      /xóa/i,
+    ])
       expect(screen.queryByRole('button', { name })).not.toBeInTheDocument();
   });
 
@@ -158,7 +157,9 @@ describe('BackupsPage', () => {
     expect(
       await screen.findByText(/Dữ liệu chưa được bảo vệ/),
     ).toBeInTheDocument();
-    expect(await screen.findByText('Chưa có bản sao lưu nào')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Chưa có bản sao lưu nào'),
+    ).toBeInTheDocument();
   });
 
   it('shows the failure code and message for a failed backup', async () => {

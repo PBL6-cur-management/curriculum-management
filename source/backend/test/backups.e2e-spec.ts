@@ -121,7 +121,9 @@ describe('backup operations API', () => {
   });
 
   it('refuses anonymous callers and roles without backup.view', async () => {
-    await request(app.getHttpServer()).get(`${BASE}/backups/status`).expect(401);
+    await request(app.getHttpServer())
+      .get(`${BASE}/backups/status`)
+      .expect(401);
     for (const path of ['/backups/status', '/backups', '/restore-drills'])
       await r2.get(`${BASE}${path}`).expect(403);
   });

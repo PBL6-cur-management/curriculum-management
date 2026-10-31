@@ -156,8 +156,14 @@ describe('computeStatus', () => {
 
   it('takes the recovery time and tier from the latest accepted drill only', () => {
     const drills = [
-      drill({ acceptedAt: '2026-10-01T08:00:00.000+07:00', recoveryMs: 900_000 }),
-      drill({ acceptedAt: '2026-10-30T08:00:00.000+07:00', recoveryMs: 120_000 }),
+      drill({
+        acceptedAt: '2026-10-01T08:00:00.000+07:00',
+        recoveryMs: 900_000,
+      }),
+      drill({
+        acceptedAt: '2026-10-30T08:00:00.000+07:00',
+        recoveryMs: 120_000,
+      }),
       drill({ status: 'RESTORED', acceptedAt: null, recoveryMs: 1 }),
     ];
     const status = computeStatus(

@@ -32,7 +32,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "e2e:world": "tsx prisma/e2e-world.ts",
-    "e2e:purge": "tsx prisma/e2e-purge.ts"
+    "e2e:purge": "tsx prisma/e2e-purge.ts",
+    "backup:drill": "tsx scripts/backup-restore-drill.ts"
   },
   "dependencies": {
     "@nestjs/bullmq": "^12.0.0",
