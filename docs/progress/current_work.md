@@ -1,15 +1,11 @@
 # Current Work — F-20..F-25 đã merge; rà soát nghiệp vụ và UI CTĐT/học phần/phê duyệt
 
-<<<<<<< HEAD
 **Start here**: đọc [bàn giao 2026-10-31](handoff.md), rồi đi luồng phê duyệt theo vai trò R5→R4→R3→R1 trên UI, rà nghiệp vụ và tiếp tục chỉnh UI CTĐT / học phần / phê duyệt; test để sau cùng. Chưa build: F-26, F-27 (hoãn). Taiga (Phase 6) đã lập lại 13 sprint (PR #36).
 
 ## Việc đã merge 2026-10-31
 
 - F-20..F-25 đã có trên main (PR #26–#31); các mục "Up Next" bên dưới về F-22 → F-20 → F-21 và việc hoãn F-23/24/25 là lịch sử, không còn đúng.
 - PR #34 `pnpm dev:setup` (hạ tầng Docker PostgreSQL/Redis/Mailpit, mã chạy trên máy); PR #35 `ProgramWorkspaceLayout` lồng mọi route `/programs/:programId/...` + `useUrlQuery` + `navigationMemory`/`BackLink preferHistory`; PR #36 Taiga 13 sprint; PR #37 dọn quan hệ học phần. Chi tiết: progress_log 2026-10-31.
-=======
-**Start here**: F-01..F-25 đã có mã trên main (xem `git log`; `todo.md` có thể còn cũ). Đang làm **F-26** (`feat/f-26-backup-restore-drill`): còn e2e engine/phục hồi thật (cần PostgreSQL client 18 native), spec cho restore-drill/verifier, architecture docs, nghiệm thu vận hành; rồi **F-27**. Phase 4 UI cụm D (CTĐT) dở: refactor workspace tab đã commit ở `refactor/program-workspace-tabs`. Taiga (Phase 6) chờ người dùng đặt `TAIGA_USERNAME`/`TAIGA_PASSWORD` và gửi slug.
->>>>>>> 2434af4 (docs(backup): F-26 runbook, manual test guide and progress sync)
 
 ## Dữ liệu thật DUT và cải tổ UI — 2026-10-30
 
