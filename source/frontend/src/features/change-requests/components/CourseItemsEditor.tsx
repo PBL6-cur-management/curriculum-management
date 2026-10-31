@@ -12,6 +12,7 @@ import {
   Table,
   Tag,
   Typography,
+  theme,
 } from 'antd';
 import { useMemo, useState } from 'react';
 import { ApiError } from '../../../shared/api/client';
@@ -106,6 +107,7 @@ interface ItemsFormProps {
 }
 
 function ItemsForm({ request, course, relations }: ItemsFormProps) {
+  const { token } = theme.useToken();
   const { message } = App.useApp();
   const save = useReplaceAuthoredItems(request.id);
   const [state, setItemsState] = useState<CourseItemsState>(() =>
@@ -183,7 +185,7 @@ function ItemsForm({ request, course, relations }: ItemsFormProps) {
           onRow={({ field }) => ({
             style:
               errorKey === `field:${field}`
-                ? { background: '#fff2f0' }
+                ? { background: token.colorErrorBg }
                 : undefined,
           })}
           columns={[
@@ -346,6 +348,7 @@ function RelationTable({
   errorKey,
   editable,
 }: RelationTableProps) {
+  const { token } = theme.useToken();
   const [editing, setEditing] = useState<CourseRelationRow | null>(null);
   const edit = (
     relationId: string,
@@ -368,7 +371,7 @@ function RelationTable({
         onRow={(relation) => ({
           style:
             errorKey === `relation:${relation.id}`
-              ? { background: '#fff2f0' }
+              ? { background: token.colorErrorBg }
               : undefined,
         })}
         columns={[
@@ -435,7 +438,7 @@ function RelationTable({
           onRow={(_row, index) => ({
             style:
               errorKey === `add:${index}`
-                ? { background: '#fff2f0' }
+                ? { background: token.colorErrorBg }
                 : undefined,
           })}
           columns={[

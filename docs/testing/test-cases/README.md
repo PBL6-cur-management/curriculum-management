@@ -24,6 +24,10 @@
 - [F-18 Điều kiện đăng ký học phần](./f-18-course-registration-eligibility-test-cases.md) — 16 ca: 14 tự động Passed ngày 10/30/26 (Backend unit/e2e Testcontainers, Frontend unit); 2 Manual Not run (015/016). Không có Playwright riêng; Playwright F-07 35/35 là hồi quy MH-25.
 - [F-19 Xét tốt nghiệp](./f-19-graduation-review-test-cases.md) — 35 ca: 19 tự động Passed ngày 10/30/26 (16 Backend e2e/unit Testcontainers, 3 nhóm Frontend unit); 16 Manual Not run (020..035). Không có Playwright riêng.
 
+## Kiểm thử thủ công từ 2026-10-31
+
+Người dùng chốt giảm thiểu kiểm thử thủ công: 413 ca Manual dưới đây không còn chạy lần lượt. Cổng thủ công của mỗi lượt phát hành là [checklist smoke theo vai](../smoke-checklist.md) (29 kịch bản). Các ca chi tiết giữ lại làm tham chiếu khi một kịch bản smoke thất bại.
+
 ## Tổng kết thực thi theo chỉ mục
 
 Đếm trực tiếp các dòng `Fxx-TC_nnn` trong 19 tài liệu `f-*-test-cases.md` ngày 2026-10-30: **925 ca = 512 tự động Passed + 413 thủ công chưa chạy**; không còn ca tự động chưa có kết quả trong chỉ mục. Phân rã: 13 tính năng MVP 759/381/378 (tổng/Passed/thủ công); F-09 30/27/3; F-16 27/22/5; F-12 26/21/5; F-17 32/28/4; F-18 16/14/2; F-19 35/19/16. Passed tự động là dòng có `Is Test?`/`Automated? = Yes` và `Test Result`/`Result = Passed`; Manual là dòng No, mỗi TC chỉ tính một lần. Không cộng auth setup hoặc đếm trùng các tầng automation của cùng TC. Năm ca MVP xuyên tính năng trong mvp-flow-test-cases.md đã Passed, được theo dõi riêng, không cộng vào tổng theo tính năng này.
