@@ -1,6 +1,6 @@
 # Current Work — F-20..F-25 đã merge; rà soát nghiệp vụ và UI CTĐT/học phần/phê duyệt
 
-**Start here**: đi luồng phê duyệt theo vai trò R5→R4→R3→R1 trên UI, rà nghiệp vụ và tiếp tục chỉnh UI CTĐT / học phần / phê duyệt; test để sau cùng. Chưa build: F-26, F-27 (hoãn). Taiga (Phase 6) đã lập lại 13 sprint (PR #36).
+**Start here**: đọc [bàn giao 2026-10-31](handoff.md), rồi đi luồng phê duyệt theo vai trò R5→R4→R3→R1 trên UI, rà nghiệp vụ và tiếp tục chỉnh UI CTĐT / học phần / phê duyệt; test để sau cùng. Chưa build: F-26, F-27 (hoãn). Taiga (Phase 6) đã lập lại 13 sprint (PR #36).
 
 ## Việc đã merge 2026-10-31
 
@@ -45,7 +45,7 @@
 - Luồng MVP-TC_001..005 đã Passed ở lần 3 và 4 ngày 2026-10-25 (14 Passed gồm 9 setup + 5 ca nghiệp vụ, 1.7 phút/lần); không cộng setup vào số ca nghiệp vụ.
 - Chưa kiểm chứng đúng bản **1.1 từ PENDING → ACTIVE** vào ngày đầu học kỳ với worker thật đang chạy, cùng thay đổi bản đang áp dụng; không đổi ngày seed hay dùng endpoint test để thay bằng chứng này.
 - **Flake `chooseOption` chưa sửa**: lần 2/4 tại `fixtures/select.ts:22`, qua `fixtures/curriculum.ts:27`, combobox `plannedSemester` còn `aria-expanded=true` sau 10 giây. Ngày 10/26/26 cũng gặp ở F09-TC_001 qua `specs/f-09-excel-import-export.spec.ts:22`: Loại dữ liệu vẫn aria-expanded=true, value rỗng sau 10 giây (Failed 1/2 lần, TC giữ Passed theo lượt thành công). Đã xuất hiện ở spec thứ hai; các lượt Passed không chứng minh hết flake. Không sửa fixture.
-- Migration/seed trên máy người dùng, dữ liệu giữ chỗ, năm mặc định DUT cần xác nhận và môi trường dữ liệu thật riêng vẫn theo [handoff §3.3](handoff.md); không suy trạng thái máy người dùng từ database kiểm chứng. `FILES_ROOT` cần ổ bền và sao lưu cùng DB.
+- Migration/seed trên máy người dùng, dữ liệu giữ chỗ, năm mặc định DUT cần xác nhận và môi trường dữ liệu thật riêng vẫn theo [handoff, phần lịch sử MVP §3.3](handoff.md); không suy trạng thái máy người dùng từ database kiểm chứng. `FILES_ROOT` cần ổ bền và sao lưu cùng DB.
 
 ## Chờ người dùng quyết định
 
