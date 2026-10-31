@@ -79,6 +79,7 @@ Device-side states (airplane mode, low storage) need no backend action.
 
 ### Features
 - [Test case theo tính năng — quy ước và chỉ mục](./test-cases/README.md)
+- [F-26 Sao lưu và diễn tập phục hồi — hướng dẫn kiểm thử](./feature__f-26-backup-restore-drill.md)
 - [F-01 Đăng nhập, phiên — Test Cases](./test-cases/f-01-auth-session-test-cases.md)
 - [F-02 Tài khoản, vai trò, phạm vi quyền — Test Cases](./test-cases/f-02-accounts-roles-permissions-test-cases.md)
 - [F-03 Đơn vị và nhóm chuyên môn — Test Cases](./test-cases/f-03-org-units-subject-groups-test-cases.md)

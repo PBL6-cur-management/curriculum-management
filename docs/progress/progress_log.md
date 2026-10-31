@@ -433,6 +433,7 @@ Format:
 - Chờ người dùng: Taiga (biến môi trường `TAIGA_USERNAME`/`TAIGA_PASSWORD`, slug dự án, duyệt bảng phân công).
 - Start here: Phase 4 thiết kế lại màn hình, cụm D (CTĐT) → E → F → G → C → H → B; sau đó F-22 → F-20 → F-21.
 
+<<<<<<< HEAD
 ## 2026-10-31 — Điều hướng CTĐT, dev:setup, Taiga, F-20..F-25 đã merge
 
 - F-20..F-25 đã merge vào main (PR #26–#31); `todo.md` được sửa theo. Còn lại chưa build: F-26, F-27 (hoãn). Người dùng ưu tiên rà soát nghiệp vụ và UI CTĐT / học phần / phê duyệt, test để sau cùng.
@@ -441,3 +442,13 @@ Format:
 - PR #36 `chore(taiga)`: `source/backend/scripts/taiga/{taiga-client.ts,reschedule-backlog.ts}`; Taiga 13 sprint hai tuần 15/06–15/12/2026, người phụ trách Hieu Nguyen / Manh Kien / Tien (180/180/188 điểm); `sprint-plan.md` §0 đã cập nhật.
 - PR #37 `refactor(courses)`: dòng quan hệ học phần bỏ nút "Tạo đề xuất" từng dòng; thẻ trạng thái chỉ cho học phần liên quan không ACTIVE; `ProgramsUsingList` bỏ AntD `List` đã deprecated.
 - Chưa chạy lại bộ test đầy đủ. Start here: đi luồng phê duyệt theo vai trò R5→R4→R3→R1 trên UI, tiếp tục chỉnh UI.
+=======
+## 2026-10-31 — F-26 sao lưu và diễn tập phục hồi (một phần)
+
+- Rebase `feat/f-26-backup-restore-drill` lên main; thêm `spec` cho `computeStatus`, e2e API `test/backups.e2e-spec.ts` (9 ca), 3 hàng `backup.view` trong bảng quyền (188/188).
+- Thêm CLI `pnpm backup:drill` (`restore`, `verify`, `accept`, `inspect`, `capture-upgrade`, `compare-upgrade`) và spec; sửa lỗi tùy chọn lặp lại không bị từ chối do spec phát hiện.
+- Frontend: `OpenAPI` đã có DTO (thêm `@ApiOkResponse` vào controller), trang `BackupsPage`, route, menu, 14 test.
+- Docs: `docs/technical/backup-restore-runbook.md`, `docs/testing/feature__f-26-backup-restore-drill.md`.
+- **Chưa làm / bị chặn**: e2e engine và phục hồi thật (máy chưa cài PostgreSQL client 18 native), spec cho restore-drill/restore-verifier/upgrade-verifier/backup-store, cập nhật architecture docs, nghiệm thu vận hành thật.
+- Ghi chú: `todo.md`/`current_work.md` cũ cho F-20..F-25; git log cho thấy F-20..F-25 đã merge vào main.
+>>>>>>> 2434af4 (docs(backup): F-26 runbook, manual test guide and progress sync)
