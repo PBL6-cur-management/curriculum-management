@@ -91,3 +91,9 @@ Format:
 - **Triệu chứng**: commit `dd78389` đưa 43 file `source/current-data-dut/` (hồ sơ SV/GV có CMND, SĐT, địa chỉ, cột `Matkhau`, học phí, điểm) lên `origin/main`; repo GitHub đang PUBLIC.
 - **Xử lý**: ngừng theo dõi thư mục, thêm vào `.gitignore` (nhánh `chore/remove-school-dump`). File trên đĩa giữ nguyên cho pipeline seed.
 - **Còn mở**: lịch sử git vẫn chứa dump. Xử lý dứt điểm cần chuyển repo sang Private và viết lại lịch sử (`git filter-repo`) — người dùng chọn chưa làm.
+
+## [2026-10-31] EnrollmentReconciliationProcessor báo "Dữ liệu gán khóa chưa hợp lệ" trên dữ liệu DUT
+**Symptom**: Trên `ctdt_real`, worker đối soát lượt theo học ghi lỗi `INVALID_COHORT_ASSIGNMENT` ("Dữ liệu gán khóa chưa hợp lệ; cần kiểm tra trước khi xác định phiên bản áp dụng."). Truy vấn chỉ đọc cho thấy 38/62 dòng `CohortVersion` trỏ tới phiên bản ACTIVE/HISTORICAL có `decisionNumber` null.
+**Possible cause**: `seed-programs.ts` (`pnpm prisma:seed:dut`) tạo phiên bản đã ban hành mà không đặt `decisionNumber`, vì nguồn DUT không có số quyết định. `issuedVersionFact` coi phiên bản thiếu số quyết định là chưa ban hành, nên `normalizeAssignment` từ chối mọi bản gán khóa vào phiên bản đó. Các số `QĐ-EP…` hiện có thuộc thế giới e2e, không phải dữ liệu DUT.
+**Resolution**: Seed DUT ghi số giữ chỗ `DUT-<mã CTĐT>-<phiên bản>` cho phiên bản đã ban hành (`dutDecisionPlaceholder`). Khi chạy lại trên DB cũ, seed điền các số còn trống của chương trình đã có, không đổi số đã nhập tay. Chạy lại `pnpm prisma:seed:dut` trên `ctdt_real`: đã điền 41 số, còn 0 bản gán khóa trỏ tới phiên bản thiếu số. Spec mới: `prisma/seed-data/dut/load/seed-programs.spec.ts`.
+**How to avoid**: Dữ liệu nhập từ nguồn ngoài phải thỏa cùng điều kiện "đã ban hành" mà luồng phát hành dùng (`issuedVersionFact`): số phiên bản, số quyết định, ngày ban hành, học kỳ hiệu lực. Số giữ chỗ chờ Khoa thay bằng số quyết định thật (nợ C9/C10).

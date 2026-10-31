@@ -66,7 +66,7 @@ try {
     );
   }
   console.log(
-    `programs: created ${programs.created.length}; skipped ${programs.skippedExisting.length}`,
+    `programs: created ${programs.created.length}; skipped ${programs.skippedExisting.length}; placeholder decision numbers filled ${programs.backfilledDecisions}`,
   );
   for (const difference of catalog.semesterDateDifferences) {
     console.log(

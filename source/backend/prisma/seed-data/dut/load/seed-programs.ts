@@ -8,9 +8,21 @@ import { releasedStatuses } from '../legacy-mapping.js';
 import type { CatalogSeedResult } from './seed-catalog.js';
 
 export const DUT_PROGRAM_TX_TIMEOUT_MS = 60_000;
+
+// The DUT source has no legal decision numbers. Issued versions still need one (applied-version rules refuse an
+// issued version without it), so the seed writes a labelled placeholder that the Khoa replaces later.
+export function dutDecisionPlaceholder(
+  programCode: string,
+  versionNumber: string,
+): string {
+  return `DUT-${programCode}-${versionNumber}`;
+}
+
+const ISSUED_STATUSES = ['PENDING', 'ACTIVE', 'HISTORICAL'] as const;
 export interface ProgramsSeedResult {
   created: string[];
   skippedExisting: string[];
+  backfilledDecisions: number;
 }
 interface ProgramSeedContext {
   facultyId: string;
@@ -133,6 +145,10 @@ async function writeProgram(
         programId: row.id,
         ...versionDescription(entry.version),
         versionNumber: `${index + 1}.0`,
+        decisionNumber: dutDecisionPlaceholder(
+          program.programCode,
+          `${index + 1}.0`,
+        ),
         status: statuses[index],
         effectiveSemesterId: entry.semesterId,
         publishedById: ctx.publisherId,
@@ -176,7 +192,11 @@ export async function seedDutPrograms(
   file: DutProgramsFile,
   ctx: ProgramSeedContext,
 ): Promise<ProgramsSeedResult> {
-  const result: ProgramsSeedResult = { created: [], skippedExisting: [] };
+  const result: ProgramsSeedResult = {
+    created: [],
+    skippedExisting: [],
+    backfilledDecisions: 0,
+  };
   const today = todayDate();
   for (const program of file.programs) {
     const existing = await prisma.program.findUnique({
@@ -184,6 +204,11 @@ export async function seedDutPrograms(
       select: { id: true },
     });
     if (existing) {
+      result.backfilledDecisions += await backfillDecisionNumbers(
+        prisma,
+        existing.id,
+        program.programCode,
+      );
       result.skippedExisting.push(program.programCode);
       continue;
     }
@@ -194,4 +219,33 @@ export async function seedDutPrograms(
     result.created.push(program.programCode);
   }
   return result;
+}
+
+// Re-running the seed on an older database fills only the missing placeholders; a number entered by hand stays.
+async function backfillDecisionNumbers(
+  prisma: PrismaClient,
+  programId: string,
+  programCode: string,
+): Promise<number> {
+  const missing = await prisma.programVersion.findMany({
+    where: {
+      programId,
+      decisionNumber: null,
+      sourceRequestId: null,
+      versionNumber: { not: null },
+      status: { in: [...ISSUED_STATUSES] },
+    },
+    select: { id: true, versionNumber: true },
+  });
+  for (const version of missing)
+    await prisma.programVersion.update({
+      where: { id: version.id },
+      data: {
+        decisionNumber: dutDecisionPlaceholder(
+          programCode,
+          version.versionNumber!,
+        ),
+      },
+    });
+  return missing.length;
 }
