@@ -4,51 +4,33 @@ import styles from './LoginShowcase.module.css';
 // Login brand panel: three short scenes of what a training program holds, rotating on their own.
 // Decorative except the scene buttons; under reduced motion it stays on one scene and never animates.
 
-const SCENE_MS = 2000;
+const SCENE_MS = 3500;
 
-type Block = 'general' | 'core' | 'major';
+// A curriculum frame: four semesters; one prerequisite chain lights up across them.
+const SEMESTERS = [
+  ['Giải tích 1', 'Tin học đại cương', 'Triết học'],
+  ['Vật lý 1', 'Kỹ thuật lập trình', 'Toán rời rạc'],
+  ['Cấu trúc dữ liệu', 'Kiến trúc máy tính', 'Giải tích 2'],
+  ['Cơ sở dữ liệu', 'Hệ điều hành', 'PBL 2'],
+];
+// [semester, row] of each course on the chain, in order.
+const CHAIN = [
+  [0, 1],
+  [1, 1],
+  [2, 0],
+  [3, 0],
+] as const;
 
-const FRAME: { semester: string; courses: { name: string; block: Block }[] }[] =
-  [
-    {
-      semester: 'HK1',
-      courses: [
-        { name: 'Giải tích 1', block: 'general' },
-        { name: 'Tin học đại cương', block: 'general' },
-        { name: 'Triết học', block: 'general' },
-      ],
-    },
-    {
-      semester: 'HK2',
-      courses: [
-        { name: 'Toán rời rạc', block: 'core' },
-        { name: 'Lập trình C++', block: 'core' },
-        { name: 'Vật lý 1', block: 'general' },
-      ],
-    },
-    {
-      semester: 'HK3',
-      courses: [
-        { name: 'Cấu trúc dữ liệu', block: 'core' },
-        { name: 'Kiến trúc máy tính', block: 'core' },
-        { name: 'PBL 1', block: 'major' },
-      ],
-    },
-    {
-      semester: 'HK4',
-      courses: [
-        { name: 'Cơ sở dữ liệu', block: 'core' },
-        { name: 'Hệ điều hành', block: 'major' },
-        { name: 'PBL 2', block: 'major' },
-      ],
-    },
-  ];
+const COL_W = 136;
+const COL_GAP = 20;
+const CHIP_H = 52;
+const ROW_GAP = 14;
+const HEAD_H = 30;
+const TOP = HEAD_H + 12;
+const STEP = 0.5; // seconds between two lit courses
 
-const BLOCK_LABEL: Record<Block, string> = {
-  general: 'Đại cương',
-  core: 'Cơ sở ngành',
-  major: 'Chuyên ngành',
-};
+const chipX = (column: number) => column * (COL_W + COL_GAP);
+const chipY = (row: number) => TOP + row * (CHIP_H + ROW_GAP);
 
 const FLOW = [
   { role: 'Giảng viên', step: 'Soạn đề xuất' },
@@ -67,41 +49,123 @@ const delay = (seconds: number) =>
   ({ animationDelay: `${seconds}s` }) as CSSProperties;
 
 function FrameScene() {
-  let order = 0;
+  const width = 4 * COL_W + 3 * COL_GAP;
+  const height = TOP + 3 * CHIP_H + 2 * ROW_GAP + 4;
+  const step = (index: number) => 0.7 + index * STEP;
+  const chainIndex = (column: number, row: number) =>
+    CHAIN.findIndex(([c, r]) => c === column && r === row);
   return (
-    <div className={styles.frame}>
-      <div className={styles.frameGrid}>
-        {FRAME.map((column) => (
-          <div key={column.semester} className={styles.semester}>
-            <span className={styles.semesterHead}>{column.semester}</span>
-            {column.courses.map((course) => (
-              <span
-                key={course.name}
-                className={styles.course}
-                style={delay(0.05 + order++ * 0.05)}
+    <svg
+      className={styles.path}
+      viewBox={`-4 -4 ${width + 8} ${height + 8}`}
+      aria-hidden="true"
+    >
+      <defs>
+        <marker
+          id="login-arrow"
+          viewBox="0 0 10 10"
+          refX="8"
+          refY="5"
+          markerWidth="7"
+          markerHeight="7"
+          orient="auto-start-reverse"
+        >
+          <path d="M0 0L10 5L0 10z" className={styles.arrowHead} />
+        </marker>
+      </defs>
+      {SEMESTERS.map((courses, column) => (
+        <g key={column}>
+          <rect
+            className={styles.semesterPill}
+            x={chipX(column)}
+            y={0}
+            width={COL_W}
+            height={HEAD_H}
+            rx={8}
+          />
+          <text
+            className={styles.semesterText}
+            x={chipX(column) + COL_W / 2}
+            y={HEAD_H / 2 + 5}
+            textAnchor="middle"
+          >
+            Học kỳ {column + 1}
+          </text>
+          {courses.map((name, row) => {
+            const lit = chainIndex(column, row);
+            const last = lit === CHAIN.length - 1;
+            return (
+              <g
+                key={name}
+                className={styles.chip}
+                style={delay(0.05 + (column * 3 + row) * 0.04)}
               >
-                <i className={styles[course.block]} />
-                {course.name}
-              </span>
-            ))}
-          </div>
-        ))}
-      </div>
-      <div className={styles.legend}>
-        {(Object.keys(BLOCK_LABEL) as Block[]).map((block) => (
-          <span key={block}>
-            <i className={styles[block]} />
-            {BLOCK_LABEL[block]}
-          </span>
-        ))}
-        <span className={styles.credits}>
-          <span className={styles.creditsBar}>
-            <span className={styles.creditsFill} />
-          </span>
-          <b>150 tín chỉ</b>
-        </span>
-      </div>
-    </div>
+                <rect
+                  className={styles.chipBox}
+                  x={chipX(column)}
+                  y={chipY(row)}
+                  width={COL_W}
+                  height={CHIP_H}
+                  rx={10}
+                />
+                {lit >= 0 && (
+                  <rect
+                    className={last ? styles.chipTarget : styles.chipLit}
+                    style={delay(step(lit))}
+                    x={chipX(column)}
+                    y={chipY(row)}
+                    width={COL_W}
+                    height={CHIP_H}
+                    rx={10}
+                  />
+                )}
+                <text
+                  className={styles.chipText}
+                  x={chipX(column) + COL_W / 2}
+                  y={chipY(row) + CHIP_H / 2 + 5}
+                  textAnchor="middle"
+                >
+                  {name}
+                </text>
+                {lit >= 0 && (
+                  <text
+                    className={
+                      last
+                        ? `${styles.chipTextLit} ${styles.chipTextTarget}`
+                        : styles.chipTextLit
+                    }
+                    style={delay(step(lit))}
+                    x={chipX(column) + COL_W / 2}
+                    y={chipY(row) + CHIP_H / 2 + 5}
+                    textAnchor="middle"
+                  >
+                    {name}
+                  </text>
+                )}
+              </g>
+            );
+          })}
+        </g>
+      ))}
+      {CHAIN.slice(1).map(([column, row], index) => {
+        const [fromColumn, fromRow] = CHAIN[index];
+        const x1 = chipX(fromColumn) + COL_W;
+        const y1 = chipY(fromRow) + CHIP_H / 2;
+        const x2 = chipX(column) - 2;
+        const y2 = chipY(row) + CHIP_H / 2;
+        const mid = (x1 + x2) / 2;
+        return (
+          <path
+            key={`${column}-${row}`}
+            className={styles.arrow}
+            style={delay(step(index) + 0.1)}
+            d={`M${x1} ${y1} C${mid} ${y1} ${mid} ${y2} ${x2} ${y2}`}
+            pathLength={1}
+            markerEnd="url(#login-arrow)"
+          />
+        );
+      })}
+    </svg>
   );
 }
 
@@ -114,7 +178,7 @@ function FlowScene() {
         </span>
         {FLOW.map((node, index) => (
           <div key={node.role} className={styles.flowNode}>
-            <span className={styles.flowDot} style={delay(0.15 + index * 0.3)}>
+            <span className={styles.flowDot} style={delay(0.3 + index * 0.55)}>
               <svg viewBox="0 0 16 16" aria-hidden="true">
                 <path d="M3.5 8.5l3 3 6-7" />
               </svg>
@@ -124,7 +188,7 @@ function FlowScene() {
           </div>
         ))}
       </div>
-      <div className={styles.flowDone} style={delay(1.25)}>
+      <div className={styles.flowDone} style={delay(2.3)}>
         <svg viewBox="0 0 16 16" aria-hidden="true">
           <path d="M3.5 8.5l3 3 6-7" />
         </svg>
@@ -142,7 +206,7 @@ function VersionScene() {
         <div
           key={version.name}
           className={styles.version}
-          style={delay(index * 0.12)}
+          style={delay(index * 0.2)}
         >
           <div className={styles.versionHead}>
             <b>{version.name}</b>
@@ -160,7 +224,7 @@ function VersionScene() {
               <span
                 key={cohort}
                 className={styles.cohort}
-                style={delay(0.45 + order++ * 0.1)}
+                style={delay(0.9 + order++ * 0.18)}
               >
                 Khóa {cohort}
               </span>
@@ -173,7 +237,7 @@ function VersionScene() {
 }
 
 const SCENES = [
-  { title: 'Khung chương trình theo học kỳ', render: FrameScene },
+  { title: 'Khung chương trình và học phần tiên quyết', render: FrameScene },
   { title: 'Đề xuất thay đổi qua ba cấp duyệt', render: FlowScene },
   { title: 'Phiên bản ban hành cho từng khóa', render: VersionScene },
 ];
