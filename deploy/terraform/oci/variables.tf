@@ -32,6 +32,17 @@ variable "availability_domain_index" {
   default     = 0
 }
 
+variable "fault_domain" {
+  description = "FAULT-DOMAIN-1..3 to pin the VM to one fault domain, or empty to let Oracle pick. Free A1 capacity differs per fault domain, so the retry script rotates through them."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = contains(["", "FAULT-DOMAIN-1", "FAULT-DOMAIN-2", "FAULT-DOMAIN-3"], var.fault_domain)
+    error_message = "fault_domain must be empty or FAULT-DOMAIN-1, FAULT-DOMAIN-2, FAULT-DOMAIN-3."
+  }
+}
+
 # Always Free (2026): Ampere A1 2 OCPU and 12 GB in total per tenancy; 200 GB of boot + block storage in total.
 # The defaults take the whole A1 allowance for this one VM; anything above would be billed.
 variable "ocpus" {

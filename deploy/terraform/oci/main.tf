@@ -107,6 +107,7 @@ resource "oci_core_instance" "demo" {
   compartment_id      = local.compartment_id
   availability_domain = data.oci_identity_availability_domains.all.availability_domains[var.availability_domain_index].name
   display_name        = var.name
+  fault_domain        = var.fault_domain != "" ? var.fault_domain : null
   shape               = "VM.Standard.A1.Flex"
 
   shape_config {
@@ -134,7 +135,8 @@ resource "oci_core_instance" "demo" {
 
   # A newer Ubuntu build or an edited cloud-init must never replace the VM: it holds the demo data.
   lifecycle {
-    ignore_changes = [source_details[0].source_id, metadata]
+    # fault_domain: once a VM exists, the domain it got must not force a rebuild.
+    ignore_changes = [source_details[0].source_id, metadata, fault_domain]
   }
 }
 
