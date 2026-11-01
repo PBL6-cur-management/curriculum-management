@@ -31,7 +31,7 @@ terraform apply
 terraform output
 ```
 
-`Out of host capacity` (Singapore hay hết máy ARM): `../../scripts/apply-until-capacity.sh` (thử lại mỗi 5 phút), hoặc `ocpus = 1`, `memory_gb = 6`.
+`Out of host capacity` (Singapore hay hết máy ARM): `../../scripts/apply-until-capacity.sh` (1 lần gọi mỗi 120–150 s, chạy tới khi có máy), hoặc `ocpus = 1`, `memory_gb = 6`.
 
 Chờ cloud-init: `ssh -i ~/.ssh/oci_ctdt ubuntu@<IP> cloud-init status --wait` → `status: done`.
 
