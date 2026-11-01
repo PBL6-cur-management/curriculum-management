@@ -1,10 +1,10 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import styles from './LoginShowcase.module.css';
 
-// Login brand panel: four short scenes of what a training program holds, rotating on their own.
+// Login brand panel: three short scenes of what a training program holds, rotating on their own.
 // Decorative except the scene buttons; under reduced motion it stays on one scene and never animates.
 
-const SCENE_MS = 6500;
+const SCENE_MS = 2000;
 
 type Block = 'general' | 'core' | 'major';
 
@@ -50,15 +50,6 @@ const BLOCK_LABEL: Record<Block, string> = {
   major: 'Chuyên ngành',
 };
 
-const PLOS = ['PLO1', 'PLO2', 'PLO3', 'PLO4', 'PLO5'];
-// Contribution level per course × PLO: H high, M medium, L low, '' none.
-const MATRIX: { course: string; levels: string[] }[] = [
-  { course: 'Lập trình C++', levels: ['H', 'M', '', 'L', ''] },
-  { course: 'Cấu trúc dữ liệu', levels: ['M', 'H', 'M', '', ''] },
-  { course: 'Cơ sở dữ liệu', levels: ['', 'M', 'H', '', 'L'] },
-  { course: 'PBL 2', levels: ['L', '', 'M', 'H', 'H'] },
-];
-
 const FLOW = [
   { role: 'Giảng viên', step: 'Soạn đề xuất' },
   { role: 'Điều phối nhóm', step: 'Cấp 1' },
@@ -87,7 +78,7 @@ function FrameScene() {
               <span
                 key={course.name}
                 className={styles.course}
-                style={delay(0.15 + order++ * 0.12)}
+                style={delay(0.05 + order++ * 0.05)}
               >
                 <i className={styles[course.block]} />
                 {course.name}
@@ -114,44 +105,6 @@ function FrameScene() {
   );
 }
 
-function MatrixScene() {
-  return (
-    <table className={styles.matrix}>
-      <thead>
-        <tr>
-          <th />
-          {PLOS.map((plo) => (
-            <th key={plo}>{plo}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {MATRIX.map((row, r) => (
-          <tr
-            key={row.course}
-            className={styles.matrixRow}
-            style={delay(r * 0.15)}
-          >
-            <th>{row.course}</th>
-            {row.levels.map((level, c) => (
-              <td key={PLOS[c]}>
-                {level && (
-                  <span
-                    className={`${styles.cell} ${styles[`level${level}`]}`}
-                    style={delay(0.5 + (r * PLOS.length + c) * 0.07)}
-                  >
-                    {level}
-                  </span>
-                )}
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-}
-
 function FlowScene() {
   return (
     <div className={styles.flow}>
@@ -161,7 +114,7 @@ function FlowScene() {
         </span>
         {FLOW.map((node, index) => (
           <div key={node.role} className={styles.flowNode}>
-            <span className={styles.flowDot} style={delay(0.4 + index * 1.1)}>
+            <span className={styles.flowDot} style={delay(0.15 + index * 0.3)}>
               <svg viewBox="0 0 16 16" aria-hidden="true">
                 <path d="M3.5 8.5l3 3 6-7" />
               </svg>
@@ -171,7 +124,7 @@ function FlowScene() {
           </div>
         ))}
       </div>
-      <div className={styles.flowDone} style={delay(4.9)}>
+      <div className={styles.flowDone} style={delay(1.25)}>
         <svg viewBox="0 0 16 16" aria-hidden="true">
           <path d="M3.5 8.5l3 3 6-7" />
         </svg>
@@ -189,7 +142,7 @@ function VersionScene() {
         <div
           key={version.name}
           className={styles.version}
-          style={delay(index * 0.35)}
+          style={delay(index * 0.12)}
         >
           <div className={styles.versionHead}>
             <b>{version.name}</b>
@@ -207,7 +160,7 @@ function VersionScene() {
               <span
                 key={cohort}
                 className={styles.cohort}
-                style={delay(1.3 + order++ * 0.3)}
+                style={delay(0.45 + order++ * 0.1)}
               >
                 Khóa {cohort}
               </span>
@@ -221,7 +174,6 @@ function VersionScene() {
 
 const SCENES = [
   { title: 'Khung chương trình theo học kỳ', render: FrameScene },
-  { title: 'Ma trận học phần – chuẩn đầu ra', render: MatrixScene },
   { title: 'Đề xuất thay đổi qua ba cấp duyệt', render: FlowScene },
   { title: 'Phiên bản ban hành cho từng khóa', render: VersionScene },
 ];
