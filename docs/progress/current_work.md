@@ -1,6 +1,6 @@
-# Current Work — F-01..F-27 đã merge; chờ môi trường e2e để duyệt luồng phê duyệt và smoke
+# Current Work — F-01..F-27 đã merge; Playwright trên dữ liệu thật đã chạy (trừ F-06); chờ smoke vòng 1 và duyệt luồng phê duyệt
 
-**Start here**: đọc [bàn giao 2026-10-31 (tối)](handoff.md). Việc kế tiếp: người dùng tạo `source/e2e/.env`, rồi chạy Playwright, đi luồng phê duyệt R5→R4→R3→R1 trên UI, chạy [smoke checklist](../testing/smoke-checklist.md) vòng 1 (29 kịch bản, thay 413 ca thủ công) và chụp màn hình cho impeccable polish. Main: BE unit 1797/1797, BE e2e 679/679, FE 693/693.
+**Start here**: đọc [bàn giao 2026-10-31 (tối)](handoff.md). Playwright trên `ctdt_real` đã chạy xong ngày 2026-11-01 trừ F-06 (xem progress_log). Việc kế tiếp: đi luồng phê duyệt R5→R4→R3→R1 trên UI, chạy [smoke checklist](../testing/smoke-checklist.md) vòng 1 (29 kịch bản, thay 413 ca thủ công) và chụp màn hình cho impeccable polish. Main: BE unit 1797/1797, BE e2e 679/679, FE 693/693.
 
 ## Seed lại dữ liệu thật DUT — 2026-10-31
 
@@ -14,7 +14,7 @@
 ## Việc đã merge 2026-10-31 (tối)
 
 - PR #39 F-26 + F-27; #40 spec BackupStore; #41 số quyết định giữ chỗ DUT (`DUT-<programCode>-<version>`, phải thay bằng số thật của Khoa); #42 `MeDto.canApprove` và quyền menu "Quản trị"; #43 smoke checklist và audit UI. Chi tiết: progress_log 2026-10-31.
-- Nợ mở: thiếu `source/e2e/.env`; `REDIS_DB=0` chưa có trong `.env.example`; `ctdt_real` từ chối sao lưu `BACKUP_FILE_MISSING`; 213 dòng tự chọn chưa thuộc nhóm (C10); nợ vận hành; flake `chooseOption`. Xem [todo](todo.md) DEBT-01..07.
+- Nợ mở: `REDIS_DB=0` chưa có trong `.env.example`; `ctdt_real` từ chối sao lưu `BACKUP_FILE_MISSING`; 213 dòng tự chọn chưa thuộc nhóm (C10); nợ vận hành; flake `chooseOption`. Xem [todo](todo.md) DEBT-01..07.
 
 ## Việc đã merge 2026-10-31 (sáng)
 
@@ -83,7 +83,7 @@ Các mục trên **chưa được Khoa trả lời**. Người dùng cho phép b
 
 ## Up Next
 
-1. Tạo `source/e2e/.env`, chạy Playwright, smoke vòng 1, duyệt luồng R5→R4→R3→R1 và chụp màn hình cho `/impeccable polish`.
+1. Chạy smoke vòng 1, duyệt luồng R5→R4→R3→R1 và chụp màn hình cho `/impeccable polish`.
 2. Seed lại dữ liệu thật đã xong (xem phần đầu). Còn chờ Khoa: trạng thái GRADUATED/WITHDRAWN không suy ra được từ nguồn, văn bằng khóa K2026, số quyết định thật, 37 khung lệch tín chỉ.
 3. Xử lý nợ DEBT-01..07 trong [todo](todo.md); đầu vào Khoa C1..C10 vẫn chờ trả lời.
 4. Nợ vận hành F-26/F-27: 7 đêm sao lưu, diễn tập B5/B6, sao chép ngoài máy, fixture 300 học phần/500 sinh viên rồi k6 canonical, uptime dài hạn.

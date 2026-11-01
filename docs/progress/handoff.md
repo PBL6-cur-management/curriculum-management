@@ -24,7 +24,7 @@
 
 ### 3. Việc người dùng cần làm trước
 
-1. Tạo `source/e2e/.env` với `E2E_ADMIN_PASSWORD`, `E2E_PASSWORD` (máy MSI chưa có). Sau đó: chạy Playwright, đi luồng phê duyệt R5→R4→R3→R1 trên trình duyệt, chạy smoke vòng 1, chụp màn hình cho impeccable polish.
+1. (Cập nhật 2026-11-01: `source/e2e/.env` đã có, Playwright đã chạy, xem progress_log.) Việc còn lại: đi luồng phê duyệt R5→R4→R3→R1 trên trình duyệt, chạy smoke vòng 1, chụp màn hình cho impeccable polish.
 2. Thêm `REDIS_DB=0` vào `source/backend/.env.example`.
 3. `ctdt_real` trên máy này: sao lưu bị từ chối `BACKUP_FILE_MISSING` vì 1 `ChangeRequestDocument` trỏ tới tệp mất; khôi phục tệp hoặc xóa tài liệu trước khi bật sao lưu.
 

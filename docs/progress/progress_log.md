@@ -503,3 +503,12 @@ Format:
 - Số liệu `ctdt_real`: 42 CTĐT / 89 phiên bản, 449 học phần, 40 học kỳ (ngày thật từ `DHBK_CDS.tmKehoach`, 5 kỳ hè ước lượng), 14 khóa, 6 956 dòng khung / 329 nhóm tự chọn (0 dòng không nhóm), 554 quan hệ học phần, 332 giảng viên, 1 923 sinh viên, 75 180 kết quả. Chi tiết trong báo cáo.
 - Kiểm chứng: BE unit 1856/1856, FE 697/697. BE e2e: 131/131 trên 13 file (semesters, releases, cohort-versions, corrections, version-comparison, publication, ddut-api, students, student-version-resolution, student-portal, graduation, graduation-batches, graduation-corrections, reports).
 - Chưa làm: Playwright và smoke (thiếu `source/e2e/.env`); chưa đi tay UI với dữ liệu mới. Đóng DEBT-04 và DEBT-05; câu hỏi mở cho Khoa ghi ở báo cáo.
+
+## 2026-11-01 — Playwright trên dữ liệu thật DUT
+
+- Chạy trên `ctdt_real`, dev server cục bộ, Playwright 1.64, 1 worker. Đính chính: báo cáo trước nói thiếu `source/e2e/.env` là sai; tệp đã có (đã sửa ở report reseed, current_work, handoff, todo).
+- Kết quả theo nhóm sau khi sửa: F-01..F-05 152/152; F-07+F-08 48/48; F-09..F-12 96 đạt + 7 ca cũ đã sửa; F-13..F-16 101 đạt + 5 ca cũ đã sửa; F-17, F-20, F-21 đạt hết; mvp-flow 14/14. F-06 chưa chạy lại: người dùng đang tự sửa spec/fixture (4 ca cũ, ô bảng nay hiện tên + mã).
+- Lượt chạy đầy đủ đầu tiên (1,2 giờ) gặp 100 lỗi `SESSION_REQUIRED` do phiên hết hạn sau 60 phút không hoạt động; chạy theo nhóm dưới 60 phút.
+- PR #47 `fix(frontend)`: `SortableRow` gán id `undefined` cho hàng giữ chỗ bảng rỗng của AntD, dnd-kit coi là đang kéo và nâng z-index 9999, che hộp thoại "Thêm học phần vào khung". Hàng không khóa nay render `<tr>` thường, hàng đang kéo z-index 1; thêm `SortableRow.test.tsx`. Kèm e2e: `chooseOption` thu hẹp select ảo có tìm kiếm, fixture consistency đọc tiêu đề workspace, helper `curriculumWarning` mở bảng cảnh báo gập (gập khi trên 3 từ PR #35).
+- PR #48, #49, #50 `test(e2e)`: sửa spec cũ sau PR #35 (tab thay liên kết, tiêu đề chương trình cấp 3, từ chối ngoài phạm vi "Bạn không có quyền xem chương trình này") và sau F-17 (R1 thấy cả bốn loại nhập); F10-TC_023 ghi tệp trên 50 MB ra đĩa vì Playwright từ chối tải lên trong bộ nhớ trên 50 MB.
+- Nợ mới: DEBT-09 (F12-TC_004 flaky), DEBT-10 (F09-TC_001 flaky), DEBT-11 (a11y nút "Tiếp tục xác nhận"). Còn: smoke vòng 1 và duyệt luồng R5→R4→R3→R1 trên UI (DEBT-01).

@@ -96,8 +96,8 @@ Một dòng cho mỗi tính năng; việc chi tiết (CV-xxx) ở `docs/planning
 | UI-03 | Rà soát nghiệp vụ và UI CTĐT / học phần / phê duyệt theo vai trò R5→R4→R3→R1 | 🔄 | Đang làm; test để sau cùng |
 | DEV-01 | `pnpm dev:setup` dựng hạ tầng Docker một lệnh | ✅ | PR #34, 2026-10-31 |
 | TAIGA-01 | Lập lại backlog Taiga: 13 sprint 15/06–15/12/2026 | ✅ | PR #36, 2026-10-31 |
-| SMOKE-01 | Smoke checklist 29 kịch bản theo vai (`docs/testing/smoke-checklist.md`) thay cho 413 ca thủ công | ✅ | PR #43; chưa chạy vòng 1 (cần `source/e2e/.env`) |
-| DEBT-01 | Tạo `source/e2e/.env` (`E2E_ADMIN_PASSWORD`, `E2E_PASSWORD`), chạy Playwright, duyệt luồng R5→R4→R3→R1, smoke vòng 1, chụp màn hình cho impeccable polish | ❌ | Người dùng tạo file |
+| SMOKE-01 | Smoke checklist 29 kịch bản theo vai (`docs/testing/smoke-checklist.md`) thay cho 413 ca thủ công | ✅ | PR #43; chưa chạy vòng 1 |
+| DEBT-01 | Chạy smoke vòng 1, duyệt luồng R5→R4→R3→R1 trên UI, chụp màn hình cho impeccable polish (Playwright đã chạy 2026-11-01; ghi chú "thiếu `source/e2e/.env`" là sai, tệp đã có) | ❌ | |
 | DEBT-02 | Thêm `REDIS_DB=0` vào `source/backend/.env.example` | ❌ | Người dùng làm (sửa của trợ lý bị từ chối quyền) |
 | DEBT-03 | `ctdt_real` bị từ chối sao lưu `BACKUP_FILE_MISSING`: 1 `ChangeRequestDocument` trỏ tới tệp mất | ❌ | Khôi phục tệp hoặc xóa tài liệu trước khi bật sao lưu |
 | DEBT-04 | Số quyết định giữ chỗ `DUT-<programCode>-<version>`: đã bỏ giữ chỗ (2026-10-31), số quyết định để NULL, chờ số thật của Khoa (xem DEBT-08) | ✅ | Đóng bằng reseed; số thật nợ Khoa |
@@ -117,3 +117,6 @@ Một dòng cho mỗi tính năng; việc chi tiết (CV-xxx) ở `docs/planning
 | F-24 | Đồ thị, PDF, dòng thời gian, bảng sức khỏe | ✅     | Đã merge (PR #26–#31) vào main; còn đầu vào Khoa C7 (cập nhật 2026-10-31) |
 | F-25 | Ủy quyền, email, nhắc hạn                  | ✅     | Đã merge (PR #26–#31) vào main; còn đầu vào Khoa C8 (cập nhật 2026-10-31) |
 | F-27 | Triển khai, thử tải, theo dõi hoạt động    | ✅     | Xong: Node 24, Dockerfile BE/FE, `deploy/compose.yaml` + Caddyfile, bộ thu health, logger JSON tự viết (không pino, không Uptime Kuma — người dùng chốt 2026-10-31), kịch bản k6 chỉ-đọc + preflight với đường dẫn sinh viên đã xác minh. Nợ: fixture tổng hợp 300 học phần/500 sinh viên, chạy k6 canonical trên stack thật, bằng chứng uptime dài hạn — [Triển khai](../operations/deployment.md), [Kế hoạch](../implementation/f-27-deployment-load-test-monitoring-implementation-plan.md) |
+| DEBT-09 | F12-TC_004 flaky: sau khi lưu ánh xạ đánh giá–CLO, ô đã tick đôi khi hiện bỏ chọn và "Chưa được đánh giá" còn nguyên; chạy riêng thì đạt. Nghi remount với dữ liệu đề cương cũ trong `AssessmentCloTab`/`useEditorRemountKey`, chưa chứng minh | ❌ | |
+| DEBT-10 | F09-TC_001 flaky một lần trong lượt chạy dài (hết hạn tải xuống/"Tải tệp mẫu"); đạt hai lần khi chạy riêng | ❌ | |
+| DEBT-11 | a11y AntD: sau trạng thái loading của mutation, nút "Tiếp tục xác nhận" trong `CohortVersionAssignmentForm` giữ biểu tượng loading ẩn nên tên truy cập đọc "loading Tiếp tục xác nhận"; hiển thị bình thường | ❌ | |
