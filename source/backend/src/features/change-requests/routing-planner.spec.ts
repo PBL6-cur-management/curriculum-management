@@ -275,6 +275,16 @@ describe('RoutingPlanner', () => {
     expect(level(noCourse, 1)[0].skipReason).toBe(
       'Đề xuất không thay đổi học phần nào',
     );
+    // A curriculum change that only moves another faculty's course (e.g. mathematics) is not "no course".
+    const foreignOnly = await planner.plan(
+      world({ courses: [], programs: [program('p1')] }),
+      programRequest(),
+      [curriculumItem('3190141')],
+      TODAY,
+    );
+    expect(level(foreignOnly, 1)[0].skipReason).toBe(
+      'Không áp dụng — học phần của khoa khác',
+    );
   });
 
   it('skips the row of the creator, wherever it is', async () => {

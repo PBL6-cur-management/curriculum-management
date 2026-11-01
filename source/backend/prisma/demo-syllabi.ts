@@ -7,8 +7,6 @@
 // Sample (the school has none): CLOs, the assessment–CLO mapping, and any section above that is empty.
 // Touches only Draft syllabi whose description is still the demo placeholder, so a second run changes nothing.
 import 'dotenv/config';
-import { createReadStream, existsSync } from 'node:fs';
-import { join } from 'node:path';
 import { PrismaPg } from '@prisma/adapter-pg';
 import {
   PUBLISHABLE_SYLLABUS_SELECT,
@@ -19,37 +17,15 @@ import {
   PrismaClient,
   SyllabusStatus,
 } from '../src/generated/prisma/client.js';
+import { mirrorRoot } from './seed-data/dut/extract/mirror-tables.js';
 import {
-  csvRecords,
-  mirrorRoot,
-} from './seed-data/dut/extract/mirror-tables.js';
+  readMirrorCsv as readCsv,
+  type MirrorRow as Row,
+} from './demo-mirror.js';
 
 const PLACEHOLDER_MARK = 'Đề cương mẫu cho bản demo';
 const SAMPLE_NOTE =
   '<p><em>Bản demo: phần in nghiêng ghi “mẫu” là nội dung minh họa, chưa phải đề cương chính thức của Khoa.</em></p>';
-
-type Row = Record<string, string>;
-
-async function readCsv(root: string, database: string, table: string) {
-  const file = join(root, 'csv', database, `${table}.csv`);
-  if (!existsSync(file))
-    throw new Error(`Thiếu bảng ${database}/${table} trong bản sao (${file}).`);
-  const rows: Row[] = [];
-  let header: string[] | null = null;
-  for await (const record of csvRecords(
-    createReadStream(file, { encoding: 'utf8' }),
-  )) {
-    if (!header) {
-      header = record;
-      continue;
-    }
-    if (record.length !== header.length) continue;
-    rows.push(
-      Object.fromEntries(header.map((name, i) => [name, record[i].trim()])),
-    );
-  }
-  return rows;
-}
 
 const filled = (value: string | undefined) =>
   value !== undefined && value !== '' && value !== 'NULL' ? value : null;
