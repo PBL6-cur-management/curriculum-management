@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { Alert, Button, Divider, Flex, Form, Input, Typography } from 'antd';
+import { Alert, Button, Flex, Form, Input, Typography } from 'antd';
 import { Navigate, useLocation, useNavigate } from 'react-router';
 import type { LoginRedirectState } from '../../../shared/auth/RequireAuth';
 import { useMe } from '../../../shared/auth/useMe';
@@ -104,24 +104,16 @@ export function LoginPage() {
             </Button>
           </Form>
           {demo && (
-            <>
-              <Divider plain>Xem thử hệ thống</Divider>
-              <Flex vertical gap={8}>
-                <Typography.Text type="secondary">
-                  Tài khoản demo:{' '}
-                  <Typography.Text code>{demo.username}</Typography.Text> /{' '}
-                  <Typography.Text code>{demo.password}</Typography.Text> (đủ
-                  mọi vai trò cán bộ)
-                </Typography.Text>
-                <Button
-                  block
-                  onClick={signInAsDemo}
-                  disabled={loginMutation.isPending}
-                >
-                  Dùng tài khoản demo
-                </Button>
-              </Flex>
-            </>
+            <Flex justify="center" style={{ marginTop: 16 }}>
+              <Button
+                size="small"
+                type="link"
+                onClick={signInAsDemo}
+                disabled={loginMutation.isPending}
+              >
+                Dùng tài khoản demo
+              </Button>
+            </Flex>
           )}
         </div>
       </main>
