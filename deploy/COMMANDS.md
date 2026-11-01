@@ -23,7 +23,8 @@ terraform apply                     # tạo/cập nhật
 terraform output                    # IP, public_host, dns_record, lệnh ssh
 terraform output -raw public_ip
 terraform destroy                   # HẾT DEMO: xóa sạch (nhớ xóa bản ghi A ở tenten)
-../../scripts/apply-until-capacity.sh 15 12  # "Out of host capacity": mỗi vòng thử 3 fault domain × (2/12 rồi 1/6), nghỉ 15 s, tối đa 12 giờ
+../../scripts/apply-until-capacity.sh      # "Out of host capacity": 1 lần gọi mỗi 120–150 s, luân phiên 2/12 và 1/6, chạy tới khi có máy;
+                                           # lỗi mạng/429 chờ 5–10 phút; dừng nếu thấy VM ngoài state (in lệnh import)
 ```
 
 - Hết máy mãi: trong `terraform.tfvars` đặt `ocpus = 1`, `memory_gb = 6` rồi `apply`.
