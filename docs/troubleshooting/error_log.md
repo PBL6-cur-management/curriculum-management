@@ -108,3 +108,15 @@ Format:
 - "Trạng thái hệ thống" chỉ hiện cho người có `user.manage`, `permission.view` hoặc `backup.view`.
 - Kiểm chứng: spec `me.dto.spec.ts` (3 ca), `menuItems.test.tsx` (2 ca mới); FE 693/693; BE e2e auth 9/9.
 **How to avoid**: Mục menu nào cũng phải có điều kiện hiển thị, vì một mục không điều kiện làm cả nhóm hiện ra. Khi một khả năng được quyết định bằng dữ liệu (phân công, ủy quyền) chứ không bằng mã quyền, đưa cờ đã tính sẵn vào `/api/auth/me` thay vì suy từ mã quyền gần giống.
+
+## [2026-11-01] Bảng khung rỗng che hộp thoại "Thêm học phần vào khung"
+**Symptom**: Playwright báo `<div class="ant-table-expanded-row-fixed"> ... intercepts pointer events` khi bấm "Lưu" trong "Thêm học phần vào khung" trên khung rỗng; người dùng cũng không bấm được nút.
+**Root cause**: `SortableRow` nhận hàng giữ chỗ không khóa của bảng AntD rỗng với id `undefined`; dnd-kit so với `active?.id` (cũng `undefined`) nên coi là đang kéo và nâng z-index 9999. Phần tử sticky `.ant-table-expanded-row-fixed` nằm đè lên hộp thoại.
+**Resolution**: PR #47: hàng không khóa render `<tr>` thường, hàng đang kéo dùng z-index 1; thêm `SortableRow.test.tsx`.
+**How to avoid**: Component dùng id làm khóa dnd-kit phải xử lý hàng không có khóa; đừng so sánh hai giá trị `undefined`.
+
+## [2026-11-01] Chạy Playwright dài gặp hàng loạt SESSION_REQUIRED
+**Symptom**: Lượt chạy đầy đủ 1,2 giờ có 100 ca lỗi `SESSION_REQUIRED`.
+**Root cause**: Phiên máy chủ hết hạn sau 60 phút không hoạt động; trạng thái đăng nhập dựng ở setup đã chết khi các spec sau chạy.
+**Resolution**: Chạy Playwright theo nhóm spec, mỗi nhóm dưới 60 phút (kết quả ở progress_log 2026-11-01).
+**How to avoid**: Không chạy toàn bộ bộ e2e một lượt; chia nhóm hoặc dựng lại phiên giữa các nhóm.

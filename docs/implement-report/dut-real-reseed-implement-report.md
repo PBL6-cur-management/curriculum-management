@@ -4,7 +4,7 @@
 > - Nhánh `feat/dut-real-reseed`. Kế hoạch: [dut-real-reseed-implementation-plan](../implementation/dut-real-reseed-implementation-plan.md). Các chỗ lệch nằm ở §9 của kế hoạch.
 > - Nguồn: bản sao CSV cục bộ của CSDL Trường (`tmProxDUT` và `DHBK_CDS.tmKehoach`), chép chỉ đọc. Lần dựng này không kết nối máy Trường.
 > - Kiểm chứng: BE unit 1856/1856, BE e2e 131/131 (13 file bị chạm), FE 697/697; tsc, lint, Prettier sạch.
-> - Chưa làm: chưa chạy Playwright và smoke vì còn thiếu `source/e2e/.env`. Chưa đi tay trên UI qua màn Học kỳ và xét tốt nghiệp với dữ liệu mới.
+> - Đã chạy Playwright trên `ctdt_real` ngày 2026-11-01 (Playwright 1.64, 1 worker): F-01..F-05 152/152; F-07+F-08 48/48; F-09..F-12 96 đạt + 7 ca cũ đã sửa; F-13..F-16 101 đạt + 5 ca cũ đã sửa; F-17, F-20, F-21 đạt hết; mvp-flow 14/14; F-06 chưa chạy lại (4 ca cũ do ô bảng nay hiện tên + mã, người dùng đang sửa spec). Chưa chạy smoke vòng 1 và chưa đi tay UI qua màn Học kỳ và xét tốt nghiệp. Đính chính: báo cáo trước ghi thiếu `source/e2e/.env` là sai, tệp đã có.
 
 ## Deliverable
 
