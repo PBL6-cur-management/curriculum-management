@@ -6,7 +6,7 @@ import { chooseOption } from '../fixtures/select.js';
 import { uniqueSuffix } from '../fixtures/unique.js';
 import {
   addCurriculumItem, assignElectiveItems, chooseCurriculumFilter, chooseCurriculumSegment, createElectiveGroup,
-  curriculumRow, electiveGroupRow, prepareCurriculumItem, prepareElectiveGroup,
+  curriculumRow, curriculumWarning, electiveGroupRow, prepareCurriculumItem, prepareElectiveGroup,
   semesterCard, setRequisite,
 } from '../fixtures/curriculum.js';
 
@@ -73,7 +73,7 @@ test.describe('F-07 Khung chương trình, nhóm tự chọn', () => {
     await page.goto(program.curriculumPath);
     await chooseCurriculumSegment(page, 'Theo học kỳ');
     await expect(semesterCard(page, 7).getByText('Chưa có học phần', { exact: true })).toBeVisible();
-    await expect(page.getByRole('list', { name: 'Cảnh báo của khung', exact: true }).getByText('Học kỳ 7 chưa có học phần nào.', { exact: true })).toBeVisible();
+    await expect(await curriculumWarning(page, 'Học kỳ 7 chưa có học phần nào.')).toBeVisible();
   });
 
   test('F07-TC_012 Kiểm tra kết hợp học kỳ và tự chọn', async ({ page }) => {
@@ -209,7 +209,7 @@ test.describe('F-07 Khung chương trình, nhóm tự chọn', () => {
     await chooseOption(page, dialog.getByLabel('Học kỳ', { exact: true }), 'Học kỳ 3');
     await dialog.getByRole('button', { name: 'Lưu', exact: true }).click();
     await expect(dialog).not.toBeVisible();
-    await expect(page.getByRole('list', { name: 'Cảnh báo của khung', exact: true }).getByText(`${target.code} (học kỳ 3) cần ${source.code} trước, nhưng ${source.code} xếp ở học kỳ 4.`, { exact: true })).toBeVisible();
+    await expect(await curriculumWarning(page, `${target.code} (học kỳ 3) cần ${source.code} trước, nhưng ${source.code} xếp ở học kỳ 4.`)).toBeVisible();
   });
 
   test('F07-TC_023 Kiểm tra danh sách dùng ở hai chương trình trong form sửa', async ({ page }) => {

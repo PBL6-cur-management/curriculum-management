@@ -2,7 +2,9 @@ import { expect, type Page } from '@playwright/test';
 
 export async function openConsistency(page: Page, curriculumPath: string, code: string) {
   await page.goto(curriculumPath.replace(/\/curriculum$/, '/consistency'));
-  await expect(page.getByRole('heading', { name: new RegExp(`^Kiểm tra nhất quán — ${code} `) })).toBeVisible();
+  // The program workspace (PR #35) names the program in its own heading; the page heading is the check alone.
+  await expect(page.getByRole('heading', { level: 3, name: new RegExp(`^${code} — `) })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Kiểm tra nhất quán', exact: true })).toBeVisible();
 }
 
 export function creditRow(page: Page, label: 'Bắt buộc' | 'Tự chọn' | 'Tổng') {
