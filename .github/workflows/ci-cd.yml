@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read # paths-filter lists a PR's files through the API
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -21,7 +22,7 @@ env:
 
 jobs:
   changes:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
@@ -51,7 +52,7 @@ jobs:
   backend:
     needs: changes
     if: needs.changes.outputs.backend == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     defaults:
       run:
@@ -80,7 +81,7 @@ jobs:
   frontend:
     needs: changes
     if: needs.changes.outputs.frontend == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     defaults:
       run:
@@ -103,7 +104,7 @@ jobs:
   terraform:
     needs: changes
     if: needs.changes.outputs.terraform == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     defaults:
       run:
@@ -124,7 +125,7 @@ jobs:
       && !contains(needs.*.result, 'cancelled')
       && ((github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.app == 'true')
           || github.event_name == 'workflow_dispatch')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     environment: demo
     concurrency:
