@@ -1,4 +1,11 @@
-import { useEffect, useState, type CSSProperties } from 'react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type RefObject,
+} from 'react';
 import styles from './LoginShowcase.module.css';
 
 // Login brand panel: three short scenes of what a training program holds, rotating on their own.
@@ -49,9 +56,54 @@ const VERSIONS = [
 const delay = (seconds: number) =>
   ({ animationDelay: `${seconds}s` }) as CSSProperties;
 
+// Curves joining the lit courses, measured from the rendered cards so they follow the layout.
+function useChainLinks(graph: RefObject<HTMLDivElement | null>) {
+  const [links, setLinks] = useState<string[]>([]);
+  useLayoutEffect(() => {
+    const box = graph.current;
+    if (!box) return;
+    const measure = () => {
+      const origin = box.getBoundingClientRect();
+      const cards = [...box.querySelectorAll<HTMLElement>('[data-chain]')]
+        .sort((a, b) => Number(a.dataset.chain) - Number(b.dataset.chain))
+        .map((card) => card.getBoundingClientRect());
+      setLinks(
+        cards.slice(1).map((to, index) => {
+          const from = cards[index];
+          const x1 = from.right - origin.left;
+          const y1 = from.top + from.height / 2 - origin.top;
+          const x2 = to.left - origin.left;
+          const y2 = to.top + to.height / 2 - origin.top;
+          const mid = (x1 + x2) / 2;
+          return `M${x1} ${y1} C${mid} ${y1} ${mid} ${y2} ${x2} ${y2}`;
+        }),
+      );
+    };
+    measure();
+    if (typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(box);
+    return () => observer.disconnect();
+  }, [graph]);
+  return links;
+}
+
 function FrameScene() {
+  const graph = useRef<HTMLDivElement>(null);
+  const links = useChainLinks(graph);
   return (
-    <div className={styles.graph}>
+    <div ref={graph} className={styles.graph}>
+      <svg className={styles.links} aria-hidden="true">
+        {links.map((d, index) => (
+          <path
+            key={d}
+            d={d}
+            pathLength={1}
+            className={styles.link}
+            style={delay(0.6 + index * STEP + 0.15)}
+          />
+        ))}
+      </svg>
       {SEMESTERS.map((courses, column) => (
         <div key={column} className={styles.semester}>
           <span className={styles.semesterHead}>Học kỳ {column + 1}</span>
@@ -65,6 +117,7 @@ function FrameScene() {
               <span
                 key={code}
                 className={className}
+                data-chain={onChain ? column : undefined}
                 style={
                   {
                     '--enter': `${0.04 * (column * 3 + row)}s`,
