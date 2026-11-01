@@ -16,7 +16,14 @@
   padding: 40px 48px;
   overflow: hidden;
   color: var(--login-on-brand);
-  background: linear-gradient(135deg, var(--login-from), var(--login-to));
+  background:
+    radial-gradient(
+        circle at 1px 1px,
+        color-mix(in oklab, var(--login-on-brand) 16%, transparent) 1px,
+        transparent 1.5px
+      )
+      0 0 / 22px 22px,
+    linear-gradient(135deg, var(--login-from), var(--login-to));
 }
 
 .identity {
@@ -54,73 +61,11 @@
   line-height: 1.5;
 }
 
-.graph {
-  width: 100%;
-  max-width: 640px;
-  height: auto;
-  align-self: center;
-}
-
-.tagline {
-  margin: 0;
-  max-width: 28ch;
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 1.4;
-  text-wrap: balance;
-}
-
-.edge {
-  fill: none;
-  stroke: var(--login-on-brand);
-  stroke-opacity: 0.35;
-  stroke-width: 1.5;
-}
-
-.flow {
-  fill: none;
-  stroke: var(--login-on-brand);
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-dasharray: 6 200;
-  animation: flow 3.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
-}
-
-.node {
-  fill: var(--login-node);
-  stroke: var(--login-on-brand);
-  stroke-opacity: 0.55;
-}
-
-.nodeDone {
-  fill: var(--login-on-brand);
-}
-
-.nodeLabel {
-  fill: var(--login-on-brand);
-  font-size: 11px;
-  font-weight: 500;
-}
-
-.nodeDone + .nodeLabel {
-  fill: var(--login-from);
-}
-
-@keyframes flow {
-  from {
-    stroke-dashoffset: 206;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .flow {
-    animation: none;
-    stroke-dasharray: none;
-    stroke-opacity: 0.6;
-  }
+.showcaseSlot {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .formSide {
@@ -146,8 +91,7 @@
     gap: 0;
   }
 
-  .graph,
-  .tagline {
+  .showcaseSlot {
     display: none;
   }
 
