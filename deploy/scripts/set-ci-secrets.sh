@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Stores what the deploy job needs in the GitHub environment "demo": VM address, CI SSH key, pinned host key.
 # Run locally after `terraform apply`, with `gh auth login` done:  deploy/scripts/set-ci-secrets.sh
+# (DEMO_HOST=<ip> to point CD at another VM, e.g. the trial one).
 set -euo pipefail
 
 TF_DIR="$(cd "$(dirname "$0")/../terraform/oci" && pwd)"
@@ -14,7 +15,8 @@ if [[ "$(gh api 'repos/{owner}/{repo}' --jq .permissions.admin)" != "true" ]]; t
   exit 1
 fi
 
-HOST="$(terraform -chdir="$TF_DIR" output -raw public_ip)"
+# DEMO_HOST overrides the A1 address, e.g. DEMO_HOST="$(terraform output -raw trial_public_ip)" for the trial VM.
+HOST="${DEMO_HOST:-$(terraform -chdir="$TF_DIR" output -raw public_ip)}"
 [[ -f "$CI_KEY" ]] || { echo "Thiếu khóa CI $CI_KEY (ssh-keygen -t ed25519 -f ~/.ssh/ctdt_ci -N '')" >&2; exit 1; }
 
 # Pin the VM's host key now, from this machine, so the runner never trusts a key on first use.
