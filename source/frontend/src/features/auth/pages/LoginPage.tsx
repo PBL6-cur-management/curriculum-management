@@ -7,7 +7,7 @@ import { demoLogin } from '../../../shared/config/demoFlags';
 import { palette } from '../../../shared/design-system/tokens';
 import { ROUTES } from '../../../routes';
 import type { LoginRequest } from '../api/auth';
-import { CourseGraph } from '../components/CourseGraph';
+import { LoginShowcase } from '../components/LoginShowcase';
 import styles from '../components/LoginPage.module.css';
 import { useLogin } from '../hooks/useLogin';
 import { REQUIRED_PASSWORD, REQUIRED_USERNAME } from '../schema/authRules';
@@ -16,7 +16,12 @@ const BRAND_VARS = {
   '--login-from': palette.headerFrom,
   '--login-to': palette.headerTo,
   '--login-on-brand': palette.white,
-  '--login-node': `color-mix(in oklab, ${palette.white} 14%, transparent)`,
+  '--login-ink': palette.slate800,
+  '--login-muted': palette.slate500,
+  '--login-fill': palette.slate200,
+  '--block-general': palette.brand,
+  '--block-core': palette.pass,
+  '--block-major': palette.warn,
 } as CSSProperties;
 
 export function LoginPage() {
@@ -49,14 +54,16 @@ export function LoginPage() {
             <p className={styles.appName}>Quản lý Chương trình đào tạo</p>
           </div>
         </div>
-        <CourseGraph />
-        <p className={styles.tagline}>
-          Khung chương trình, đề cương và đề xuất thay đổi ở một nơi.
-        </p>
+        <div className={styles.showcaseSlot}>
+          <LoginShowcase />
+        </div>
       </section>
       <main className={styles.formSide}>
         <div className={styles.form}>
-          <Typography.Title level={3} style={{ marginTop: 0, marginBottom: 24 }}>
+          <Typography.Title
+            level={3}
+            style={{ marginTop: 0, marginBottom: 24 }}
+          >
             Đăng nhập
           </Typography.Title>
           {loginMutation.isError && (
