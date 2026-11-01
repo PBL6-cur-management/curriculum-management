@@ -444,7 +444,8 @@ test.describe('F-11 PLO, CLO, ma trận', () => {
       const owned = await createAdminOutcome(browser);
       try {
         await page.goto(outcomePath(owned.program, 'course-plo-matrix'));
-        await expect(page.getByText('Bạn không có quyền xem ma trận này', { exact: true })).toBeVisible();
+        // The program workspace (PR #35) refuses the whole program before the tab renders.
+        await expect(page.getByText('Bạn không có quyền xem chương trình này', { exact: true })).toBeVisible();
         const response = await page.request.get(`/api/program-versions/${owned.versionId}/course-plo-matrix`);
         expect(response.status()).toBe(403);
       } finally { await owned.context.close(); }
@@ -453,7 +454,9 @@ test.describe('F-11 PLO, CLO, ma trận', () => {
       const owned = await createAdminOutcome(browser);
       try {
         await page.goto(outcomePath(owned.program, 'plos'));
-        await expect(page.getByText('Bạn không có quyền xem PLO này', { exact: true })).toBeVisible();
+        await expect(page.getByText('Bạn không có quyền xem chương trình này', { exact: true })).toBeVisible();
+        const response = await page.request.get(`/api/program-versions/${owned.versionId}/plos`);
+        expect(response.status()).toBe(403);
       } finally { await owned.context.close(); }
     });
   });

@@ -146,7 +146,10 @@ export function coverageSection(page: Page, title: string) {
 export async function cloneOutcomeProgram(page: Page, program: TestProgram) {
   await page.goto(program.path);
   const cloned = await cloneProgram(page);
-  const curriculumPath = await page.getByRole('link', { name: 'Khung chương trình', exact: true }).getAttribute('href');
-  if (!curriculumPath) throw new Error('Thiếu khung của bản sao riêng.');
+  // The program workspace navigates by tabs (PR #35); the clone's frame path is the URL its tab opens.
+  await page.getByRole('navigation', { name: 'Các mục của chương trình', exact: true }).getByRole('tab', { name: 'Khung chương trình', exact: true }).click();
+  await expect(page).toHaveURL(/\/curriculum$/);
+  const curriculumPath = new URL(page.url()).pathname;
+  await page.goto(cloned.path);
   return { ...cloned, curriculumPath };
 }
