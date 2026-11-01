@@ -1,0 +1,2 @@
+# Shell scripts run on Linux (VM, CI): never check them out with CRLF, even with core.autocrlf=true.
+*.sh text eol=lf

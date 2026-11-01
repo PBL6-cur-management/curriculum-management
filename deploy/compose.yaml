@@ -67,9 +67,12 @@ services:
     image: 'ctdt/backend:${RELEASE_TAG:?Set release tag}'
     build:
       context: ../source/backend
-      target: runtime
+      # runtime-chromium adds Debian's Chromium so curriculum PDFs (F-24) render; plain runtime has no browser.
+      target: '${API_BUILD_TARGET:-runtime}'
       args:
         NODE_IMAGE: '${NODE_IMAGE:?Set pinned Node image}'
+    # Chromium keeps rendering buffers in /dev/shm; Docker's 64 MB default is too small for a long curriculum.
+    shm_size: '256m'
     environment:
       NODE_ENV: production
       PORT: '3000'

@@ -2,6 +2,8 @@
 
 Docker Compose + Caddy cho môi trường thật (project `ctdt-production`). Quy trình đầy đủ: `docs/operations/deployment.md`.
 
+**Demo trên Oracle Cloud Always Free** (`https://ctdt.oguri-lab.io.vn`): tổng quan [DEPLOY_INFRA.md](DEPLOY_INFRA.md), chi phí [COST.md](COST.md), lệnh [COMMANDS.md](COMMANDS.md), Terraform `terraform/oci/`, script `scripts/`, mẫu biến [demo.env.example](demo.env.example), hướng dẫn lần đầu [docs/operations/demo-oracle-free.md](../docs/operations/demo-oracle-free.md).
+
 ## Biến môi trường của `compose.yaml`
 
 Đặt trong tệp `--env-file` nằm ngoài repository. Không commit giá trị bí mật.
@@ -16,6 +18,7 @@ Docker Compose + Caddy cho môi trường thật (project `ctdt-production`). Qu
 | `LOG_LEVEL` | Một trong các mức hợp lệ trong `env.validation.ts` (mặc định `info`) |
 | `NODE_IMAGE`, `POSTGRES_IMAGE`, `REDIS_IMAGE`, `CADDY_IMAGE` | Image cố định phiên bản |
 | `RELEASE_TAG` | Nhãn bản phát hành |
+| `API_BUILD_TARGET` | `runtime` (mặc định, không trình duyệt) hoặc `runtime-chromium` (có Chromium để xuất PDF CTĐT) |
 | `HEALTH_INTERVAL`, `HEALTH_TIMEOUT`, `HEALTH_RETRIES`, `HEALTH_START_PERIOD` | Tham số healthcheck |
 | `DOCKER_LOG_MAX_SIZE`, `DOCKER_LOG_MAX_FILE` | Xoay vòng nhật ký container |
 

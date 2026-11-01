@@ -2,6 +2,11 @@
 
 **Start here**: đọc [bàn giao 2026-10-31 (tối)](handoff.md). Playwright trên `ctdt_real` đã chạy xong ngày 2026-11-01 trừ F-06 (xem progress_log). Việc kế tiếp: đi luồng phê duyệt R5→R4→R3→R1 trên UI, chạy [smoke checklist](../testing/smoke-checklist.md) vòng 1 (29 kịch bản, thay 413 ca thủ công) và chụp màn hình cho impeccable polish. Main: BE unit 1797/1797, BE e2e 679/679, FE 693/693.
 
+## Demo trên Oracle Cloud Always Free — 2026-11-01
+
+- Nhánh `chore/demo-oracle` (commit `2b0d1ea`): Terraform OCI, CI/CD, script deploy, sửa Dockerfile; đã kiểm chứng stack production cục bộ. Chi tiết: [demo-oracle-free](../operations/demo-oracle-free.md), progress_log 2026-11-01.
+- Việc kế: người dùng tạo OCI API key (`~/.oci/config`) và khóa SSH `~/.ssh/oci_ctdt`, `~/.ssh/ctdt_ci`; rồi `terraform apply`, bản ghi A ở tenten, `demo.env` trên VM, export/restore dữ liệu, `set-ci-secrets.sh`, merge PR.
+
 ## Seed lại dữ liệu thật DUT — 2026-10-31
 
 - Nhánh `feat/dut-real-reseed`: `ctdt_real` dựng lại từ bản sao CSDL Trường, bỏ giá trị giữ chỗ, số quyết định NULL, học kỳ có ngày thật. Kế hoạch: [dut-real-reseed-implementation-plan](../implementation/dut-real-reseed-implementation-plan.md); báo cáo: [dut-real-reseed-implement-report](../implement-report/dut-real-reseed-implement-report.md). Lệnh: `pnpm db:rebuild:real --yes`.

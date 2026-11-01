@@ -34,7 +34,7 @@
 - **Worker không kiểm tra lại quyền.** Plan BE-06 muốn worker nạp lại quyền của chủ job trước khi render. Bản build kiểm tra quyền khi tạo job, kiểm tra chủ sở hữu khi hỏi trạng thái, và kiểm tra lại phạm vi chương trình khi tải file. Như vậy người bị thu hồi quyền trong lúc job chạy vẫn không tải được file.
 - **Đồ thị bố cục cố định.** Mỗi học kỳ là một cột, các học phần điều kiện ngoài khung nằm ở cột đầu, thứ tự trong cột theo khung. Không kéo/thu phóng: khung cuộn ngang để tiêu đề cột luôn khớp. Chuỗi phụ thuộc đi theo học trước/tiên quyết; song hành chỉ hiện quan hệ trực tiếp. Danh sách dưới đồ thị mang cùng thông tin cho bàn phím và trình đọc màn hình.
 - **Liên kết sửa lỗi.** Mỗi vấn đề có `target`; lỗi đề cương mở trang đề cương học phần, lỗi ngừng mở mở trang học phần (thêm `courseId` vào `HealthIssueDto`).
-- **Triển khai cần Chrome.** `pnpm install` không tự tải trình duyệt. Chạy `pnpm exec puppeteer browsers install chrome` trên máy chủ, hoặc đặt `PDF_BROWSER_PATH` trỏ tới Chrome/Chromium có sẵn.
+- **Triển khai cần Chrome.** `pnpm install` không tự tải trình duyệt. Chạy `pnpm exec puppeteer browsers install chrome` trên máy chủ, hoặc đặt `PDF_BROWSER_PATH` trỏ tới Chrome/Chromium có sẵn. Khi chạy trong container không có sandbox, đặt `PDF_BROWSER_NO_SANDBOX=true` (mặc định `false`; thêm 2026-11-01).
 
 ## Cổng còn mở (cần Khoa)
 
