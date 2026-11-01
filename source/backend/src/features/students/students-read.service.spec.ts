@@ -121,6 +121,14 @@ describe('StudentsReadService', () => {
       const where = studentFindMany.mock.calls[0]![0].where;
       expect(where.OR).toHaveLength(2);
     });
+
+    it('searches without a semester: no term check, a director still limited to directed programs', async () => {
+      await service.list(director, { q: '102230239', ...page });
+      const where = studentFindMany.mock.calls[0]![0].where;
+      expect(JSON.stringify(where)).toContain('"in":["p1"]');
+      expect(JSON.stringify(where)).not.toContain('fromSemester');
+      expect(where.OR).toHaveLength(2);
+    });
   });
 
   describe('detail', () => {

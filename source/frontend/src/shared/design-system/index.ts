@@ -13,3 +13,4 @@ export { FilterBar } from './FilterBar.js';
 export { SummaryStrip, type SummaryItem } from './SummaryStrip.js';
 export { PageSkeleton } from './PageSkeleton.js';
 export { EMPTY_LABEL, formatEmpty } from './formatEmpty.js';
+export { SearchInput } from './SearchInput.js';

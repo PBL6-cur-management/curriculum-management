@@ -38,12 +38,23 @@ export class StudentDetailQueryDto extends StudentSemesterQueryDto {
   programId?: string;
 }
 
-export class StudentListQueryDto extends PageQueryDto {
-  @ApiProperty()
+// Optional semester: without one the list is not tied to a term (a program filter matches any enrollment in it).
+export class StudentOptionalSemesterQueryDto {
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
   @MaxLength(ID_MAX)
-  semesterId!: string;
+  semesterId?: string;
+}
+
+export class StudentListQueryDto extends PageQueryDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(ID_MAX)
+  semesterId?: string;
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()

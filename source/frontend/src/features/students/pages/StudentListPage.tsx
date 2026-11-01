@@ -8,21 +8,19 @@ import {
 } from '../../../shared/api/pagination';
 import {
   DataTable,
-  EmptyState,
   ListPageLayout,
   PageHeader,
   StatusTag,
 } from '../../../shared/design-system';
-import { useDebouncedValue } from '../../../shared/hooks/useDebouncedValue';
 import { StudentFilters } from '../components/StudentFilters';
 import type { StudentListParams, StudentSummary } from '../api/students';
 import {
-  STUDENT_SEARCH_DEBOUNCE_MS,
   STUDENT_SOURCE_LABELS,
   STUDENT_STATUS_COLORS,
   STUDENT_STATUS_LABELS,
 } from '../constants/studentLabels';
-import { useStudents } from '../hooks/useStudents';
+import { useStudents, useStudentSemesters } from '../hooks/useStudents';
+import { currentSemester } from '../constants/currentSemester';
 
 export function StudentListPage() {
   const [search, setSearch] = useSearchParams();
@@ -33,7 +31,7 @@ export function StudentListPage() {
   const rawPage = Number(search.get('page') ?? 1);
   const rawSize = Number(search.get('pageSize') ?? DEFAULT_PAGE_SIZE);
   const params: StudentListParams = {
-    semesterId: search.get('semesterId') ?? '',
+    semesterId: search.get('semesterId') || undefined,
     programId: search.get('programId') || undefined,
     cohortId: search.get('cohortId') || undefined,
     q: search.get('q') || undefined,
@@ -43,8 +41,17 @@ export function StudentListPage() {
     page: Number.isSafeInteger(rawPage) && rawPage > 0 ? rawPage : 1,
     pageSize: PAGE_SIZE_OPTIONS.includes(rawSize) ? rawSize : DEFAULT_PAGE_SIZE,
   };
-  const q = useDebouncedValue(params.q, STUDENT_SEARCH_DEBOUNCE_MS);
-  const students = useStudents({ ...params, q });
+  // SearchInput already waits for typing to stop; the URL value is final.
+  const students = useStudents(params);
+  const semesters = useStudentSemesters();
+  // A profile is read as of a semester: links carry the chosen one, else the current one.
+  const linkSemester =
+    params.semesterId || currentSemester(semesters.data ?? [])?.id;
+  const profileSearch = (() => {
+    const next = new URLSearchParams(search);
+    if (linkSemester) next.set('semesterId', linkSemester);
+    return next.toString();
+  })();
   function change(
     values: Record<string, string | undefined>,
     resetPage = true,
@@ -73,9 +80,7 @@ export function StudentListPage() {
       }
       filters={<StudentFilters params={params} onChange={change} />}
       table={
-        !params.semesterId ? (
-          <EmptyState description="Chọn học kỳ để xem sinh viên" />
-        ) : students.isError ? (
+        students.isError ? (
           <Alert
             type="error"
             showIcon
@@ -109,7 +114,7 @@ export function StudentListPage() {
                 dataIndex: 'studentCode',
                 render: (code: string, student) => (
                   <Link
-                    to={`${generatePath(ROUTES.studentDetail, { studentId: student.id })}?${search}`}
+                    to={`${generatePath(ROUTES.studentDetail, { studentId: student.id })}?${profileSearch}`}
                   >
                     {code}
                   </Link>

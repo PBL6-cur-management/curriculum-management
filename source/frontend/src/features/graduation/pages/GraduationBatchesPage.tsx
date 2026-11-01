@@ -124,9 +124,10 @@ export function GraduationBatchesPage() {
                   ? 'Chọn học kỳ và chương trình phụ trách để xét hàng loạt.'
                   : 'Chọn học kỳ và ít nhất một chương trình hoặc khóa tuyển sinh.'
               }
+              style={{ marginBlock: 16 }}
             />
           )}
-          <Flex gap="small" wrap>
+          <Flex gap="small" wrap style={{ marginTop: validFilters ? 16 : 0 }}>
             <Button
               disabled={!validFilters || preview.isPending || create.isPending}
               loading={preview.isPending}
@@ -148,16 +149,26 @@ export function GraduationBatchesPage() {
               Xác nhận đợt xét
             </Button>
           </Flex>
-          {preview.isError && <GraduationError error={preview.error} />}
+          {preview.isError && (
+            <div style={{ marginTop: 16 }}>
+              <GraduationError error={preview.error} />
+            </div>
+          )}
           {preview.data && (
             <Alert
               type="info"
+              style={{ marginTop: 16 }}
               title={`${preview.data.studentCount} sinh viên · ${preview.data.enrollmentCount} lượt chương trình`}
               description="Sinh viên song ngành có thể có hai lượt xét. Danh sách sẽ được khóa tại lúc xác nhận; thay đổi phạm vi cần xem trước lại. Dữ liệu học tập được đọc khi xử lý từng lượt, không chụp nguyên khóa cùng lúc; lỗi một lượt không chặn các lượt còn lại."
             />
           )}
           {confirmationMessage && (
-            <Alert type="warning" showIcon title={confirmationMessage} />
+            <Alert
+              type="warning"
+              showIcon
+              title={confirmationMessage}
+              style={{ marginTop: 16 }}
+            />
           )}
           {create.isError && <GraduationError error={create.error} />}
         </Card>

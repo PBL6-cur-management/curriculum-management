@@ -28,7 +28,7 @@ import {
   StudentDetailQueryDto,
   StudentListQueryDto,
   StudentResultsQueryDto,
-  StudentSemesterQueryDto,
+  StudentOptionalSemesterQueryDto,
 } from './dto/student-query.dto.js';
 import {
   StudentAppliedVersionDto,
@@ -57,7 +57,7 @@ export class StudentsController {
   @RequirePermission(PERMISSIONS.STUDENT_VIEW_PROGRESS)
   @ApiOkResponse({ type: [StudentProgramOptionDto] })
   programOptions(
-    @Query() query: StudentSemesterQueryDto,
+    @Query() query: StudentOptionalSemesterQueryDto,
     @CurrentAccess() access: AccessContext,
   ) {
     return this.reads.programOptions(access, query);
