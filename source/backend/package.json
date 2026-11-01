@@ -34,8 +34,11 @@
     "e2e:world": "tsx prisma/e2e-world.ts",
     "e2e:purge": "tsx prisma/e2e-purge.ts",
     "db:demo-account": "tsx prisma/demo-account.ts",
+    "db:demo-fixtures": "tsx prisma/demo-fixtures.ts",
+    "db:demo-syllabi": "tsx prisma/demo-syllabi.ts",
     "backup:drill": "tsx scripts/backup-restore-drill.ts",
-    "db:rebuild:real": "tsx scripts/rebuild-real.ts"
+    "db:rebuild:real": "tsx scripts/rebuild-real.ts",
+    "db:demo-curate": "tsx prisma/demo-curate.ts"
   },
   "dependencies": {
     "@nestjs/bullmq": "^12.0.0",
