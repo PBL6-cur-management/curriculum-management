@@ -1,3 +1,4 @@
+import { truncateSync, writeFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 import { asRole } from "../fixtures/accounts.js";
 import { createCourse } from "../fixtures/courses.js";
@@ -316,24 +317,22 @@ test.describe("F-10 Đề cương", () => {
     await expect(attachmentRow(page, "Không hợp lệ.zip")).toHaveCount(0);
   });
 
-  test("F10-TC_023 Kiểm tra từ chối quá dung lượng", async ({ page }) => {
+  test("F10-TC_023 Kiểm tra từ chối quá dung lượng", async ({ page }, testInfo) => {
     await createSyllabus(page);
     await page.getByRole("tab", { name: "Tệp đính kèm", exact: true }).click();
     const hint = await page.getByText(/^Nhận tệp /).innerText();
     const matched = /tối đa (\d+(?:\.\d+)?) MB/.exec(hint);
     if (!matched) throw new Error("Không đọc được giới hạn tệp từ giao diện.");
-    const buffer = Buffer.alloc(Number(matched[1]) * 1024 * 1024 + 1);
-    buffer.write("%PDF-1.4");
+    // Playwright caps in-memory uploads at 50 MB, the limit itself, so the oversize file goes through disk.
+    const oversize = testInfo.outputPath("Quá dung lượng.pdf");
+    writeFileSync(oversize, "%PDF-1.4");
+    truncateSync(oversize, Number(matched[1]) * 1024 * 1024 + 1);
     await chooseOption(
       page,
       page.getByRole("combobox", { name: "Loại tài liệu" }),
       "Đề cương đã ký",
     );
-    await page.locator('input[type="file"]').setInputFiles({
-      name: "Quá dung lượng.pdf",
-      mimeType: "application/pdf",
-      buffer,
-    });
+    await page.locator('input[type="file"]').setInputFiles(oversize);
     await expect(
       page.getByText(`Không nhận tệp "Quá dung lượng.pdf". ${hint}`, {
         exact: true,
