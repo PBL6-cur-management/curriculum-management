@@ -151,11 +151,10 @@ test.describe("MVP CTĐT → khung → nhất quán → đề xuất → duyệt
       status: "ACTIVE",
     });
     await page.goto(program.path);
-    await expect(
-      page.getByRole("link", { name: "Khung chương trình", exact: true }),
-    ).toHaveAttribute("href", program.curriculumPath);
+    // The program workspace (PR #35) opens the applied version's frame from its "Khung chương trình" tab.
     await page
-      .getByRole("link", { name: "Khung chương trình", exact: true })
+      .getByRole("navigation", { name: "Các mục của chương trình", exact: true })
+      .getByRole("tab", { name: "Khung chương trình", exact: true })
       .click();
     await expect(page).toHaveURL(new RegExp(`${program.curriculumPath}$`));
     await expect(curriculumRow(page, program.course)).toBeVisible();
@@ -313,11 +312,10 @@ test.describe("MVP CTĐT → khung → nhất quán → đề xuất → duyệt
       status: "ACTIVE",
     });
     await page.goto(program.path);
-    await expect(
-      page.getByRole("link", { name: "Khung chương trình", exact: true }),
-    ).toHaveAttribute("href", program.curriculumPath);
+    // The program workspace (PR #35) opens the applied version's frame from its "Khung chương trình" tab.
     await page
-      .getByRole("link", { name: "Khung chương trình", exact: true })
+      .getByRole("navigation", { name: "Các mục của chương trình", exact: true })
+      .getByRole("tab", { name: "Khung chương trình", exact: true })
       .click();
     await expect(page).toHaveURL(new RegExp(`${program.curriculumPath}$`));
     await expect(curriculumRow(page, program.course)).toBeVisible();
