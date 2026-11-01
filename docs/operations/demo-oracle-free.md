@@ -63,7 +63,7 @@ Mã: CD sẽ ship mỗi lần merge; lần đầu ship tay từ máy bạn (cùn
 
 ```bash
 SHA=$(git rev-parse origin/main)
-git archive --format=tar.gz "$SHA" | ssh -i ~/.ssh/oci_ctdt ubuntu@<IP> \
+git -c core.autocrlf=false archive --format=tar.gz "$SHA" | ssh -i ~/.ssh/oci_ctdt ubuntu@<IP> \
   "d=/srv/ctdt/releases/$SHA; mkdir -p \$d && tar -xz -C \$d && chmod +x \$d/deploy/scripts/*.sh"
 ```
 

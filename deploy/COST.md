@@ -35,6 +35,22 @@
 - Tài khoản để ở **Free Tier** (chưa PAYG): hết 300 USD/30 ngày dùng thử, tài nguyên không thuộc Always Free bị dừng chứ không bị tính tiền.
 - Hết demo: `terraform destroy` → không còn gì để tính.
 
+## VM tạm trả bằng credit dùng thử (`trial.tf`)
+
+Singapore hay hết máy A1 (lần đầu 2026-11-01 hết cả A1 lẫn E4). Trong lúc chờ, `trial_x86_vm = true` tạo một VM x86 trả bằng **credit Free Trial**, không trả bằng thẻ:
+
+| Mục | Giá trị |
+|---|---|
+| Shape đang dùng | `VM.Standard.E5.Flex` 1 OCPU / 6 GB, đĩa 50 GB (`trial_shape` đổi được: E3/E4/E5) |
+| Giá niêm yết | ~0,055 USD/giờ ≈ 1,3 USD/ngày ≈ 40 USD/30 ngày — trừ vào credit |
+| Tiền thật | **0 đ**: tài khoản Free Tier không có phương thức thanh toán, hết credit hoặc hết 30 ngày thì VM bị dừng, không bị tính tiền |
+| Hạn | Credit dùng trong **30 ngày từ 2026-11-01** (đến ~2026-12-01) hoặc tới khi hết, cái nào đến trước |
+| Budget alert | Sẽ gửi email vì có chi phí (dù trừ vào credit) — bình thường |
+
+Xem credit còn lại: Console → **Billing & Cost Management → Subscriptions** (dòng promotion: số tiền, ngày hết), hoặc **Cost Management → Cost Analysis**. Khi A1 có máy: chuyển demo sang A1, đặt `trial_x86_vm = false`, `terraform apply`.
+
+Nếu nâng Pay As You Go trong thời gian dùng thử, VM này từ đó tính tiền thật vào thẻ khi credit hết — phải xóa nó trước.
+
 ## Rủi ro không phải tiền
 
 - Oracle có thể **thu hồi VM Always Free nhàn rỗi** (CPU, mạng, bộ nhớ đều dưới 20% suốt 7 ngày) của tài khoản chưa PAYG. Dữ liệu gốc vẫn ở máy bạn; dựng lại bằng `terraform apply` + `restore-demo-data.sh`.
