@@ -1,54 +1,44 @@
-import { useEffect, useState, type CSSProperties } from 'react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type RefObject,
+} from 'react';
 import styles from './LoginShowcase.module.css';
 
 // Login brand panel: three short scenes of what a training program holds, rotating on their own.
 // Decorative except the scene buttons; under reduced motion it stays on one scene and never animates.
 
-const SCENE_MS = 2000;
+const SCENE_MS = 3500;
 
-type Block = 'general' | 'core' | 'major';
-
-const FRAME: { semester: string; courses: { name: string; block: Block }[] }[] =
+// A slice of the prerequisite graph: four semesters of real DUT courses; one chain lights up in turn.
+const SEMESTERS = [
   [
-    {
-      semester: 'HK1',
-      courses: [
-        { name: 'Giải tích 1', block: 'general' },
-        { name: 'Tin học đại cương', block: 'general' },
-        { name: 'Triết học', block: 'general' },
-      ],
-    },
-    {
-      semester: 'HK2',
-      courses: [
-        { name: 'Toán rời rạc', block: 'core' },
-        { name: 'Lập trình C++', block: 'core' },
-        { name: 'Vật lý 1', block: 'general' },
-      ],
-    },
-    {
-      semester: 'HK3',
-      courses: [
-        { name: 'Cấu trúc dữ liệu', block: 'core' },
-        { name: 'Kiến trúc máy tính', block: 'core' },
-        { name: 'PBL 1', block: 'major' },
-      ],
-    },
-    {
-      semester: 'HK4',
-      courses: [
-        { name: 'Cơ sở dữ liệu', block: 'core' },
-        { name: 'Hệ điều hành', block: 'major' },
-        { name: 'PBL 2', block: 'major' },
-      ],
-    },
-  ];
-
-const BLOCK_LABEL: Record<Block, string> = {
-  general: 'Đại cương',
-  core: 'Cơ sở ngành',
-  major: 'Chuyên ngành',
-};
+    ['3190111', 'Giải tích 1'],
+    ['1022863', 'Kỹ thuật lập trình'],
+    ['1022940', 'Nhập môn ngành'],
+  ],
+  [
+    ['3190121', 'Giải tích 2'],
+    ['1023280', 'Cấu trúc dữ liệu'],
+    ['3050011', 'Vật lý 1'],
+  ],
+  [
+    ['1023693', 'Lập trình hướng đối tượng'],
+    ['1021263', 'Toán rời rạc'],
+    ['3190260', 'Đại số tuyến tính'],
+  ],
+  [
+    ['1023290', 'Cơ sở dữ liệu'],
+    ['1020292', 'Mạng máy tính'],
+    ['3190141', 'Xác suất thống kê'],
+  ],
+] as const;
+// Row of the chain's course in each semester.
+const CHAIN_ROW = [1, 1, 0, 0];
+const STEP = 0.6; // seconds between two lit courses
 
 const FLOW = [
   { role: 'Giảng viên', step: 'Soạn đề xuất' },
@@ -66,41 +56,82 @@ const VERSIONS = [
 const delay = (seconds: number) =>
   ({ animationDelay: `${seconds}s` }) as CSSProperties;
 
+// Curves joining the lit courses, measured from the rendered cards so they follow the layout.
+function useChainLinks(graph: RefObject<HTMLDivElement | null>) {
+  const [links, setLinks] = useState<string[]>([]);
+  useLayoutEffect(() => {
+    const box = graph.current;
+    if (!box) return;
+    const measure = () => {
+      const origin = box.getBoundingClientRect();
+      const cards = [...box.querySelectorAll<HTMLElement>('[data-chain]')]
+        .sort((a, b) => Number(a.dataset.chain) - Number(b.dataset.chain))
+        .map((card) => card.getBoundingClientRect());
+      setLinks(
+        cards.slice(1).map((to, index) => {
+          const from = cards[index];
+          const x1 = from.right - origin.left;
+          const y1 = from.top + from.height / 2 - origin.top;
+          const x2 = to.left - origin.left;
+          const y2 = to.top + to.height / 2 - origin.top;
+          const mid = (x1 + x2) / 2;
+          return `M${x1} ${y1} C${mid} ${y1} ${mid} ${y2} ${x2} ${y2}`;
+        }),
+      );
+    };
+    measure();
+    if (typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(box);
+    return () => observer.disconnect();
+  }, [graph]);
+  return links;
+}
+
 function FrameScene() {
-  let order = 0;
+  const graph = useRef<HTMLDivElement>(null);
+  const links = useChainLinks(graph);
   return (
-    <div className={styles.frame}>
-      <div className={styles.frameGrid}>
-        {FRAME.map((column) => (
-          <div key={column.semester} className={styles.semester}>
-            <span className={styles.semesterHead}>{column.semester}</span>
-            {column.courses.map((course) => (
+    <div ref={graph} className={styles.graph}>
+      <svg className={styles.links} aria-hidden="true">
+        {links.map((d, index) => (
+          <path
+            key={d}
+            d={d}
+            pathLength={1}
+            className={styles.link}
+            style={delay(0.6 + index * STEP + 0.15)}
+          />
+        ))}
+      </svg>
+      {SEMESTERS.map((courses, column) => (
+        <div key={column} className={styles.semester}>
+          <span className={styles.semesterHead}>Học kỳ {column + 1}</span>
+          {courses.map(([code, name], row) => {
+            const onChain = CHAIN_ROW[column] === row;
+            const last = column === SEMESTERS.length - 1;
+            const className = onChain
+              ? `${styles.course} ${last ? styles.courseTarget : styles.courseLit}`
+              : `${styles.course} ${styles.courseDim}`;
+            return (
               <span
-                key={course.name}
-                className={styles.course}
-                style={delay(0.05 + order++ * 0.05)}
+                key={code}
+                className={className}
+                data-chain={onChain ? column : undefined}
+                style={
+                  {
+                    '--enter': `${0.04 * (column * 3 + row)}s`,
+                    '--lit': `${0.6 + column * STEP}s`,
+                  } as CSSProperties
+                }
               >
-                <i className={styles[course.block]} />
-                {course.name}
+                <span className={styles.courseCode}>{code}</span>
+                <span className={styles.courseName}>{name}</span>
               </span>
-            ))}
-          </div>
-        ))}
-      </div>
-      <div className={styles.legend}>
-        {(Object.keys(BLOCK_LABEL) as Block[]).map((block) => (
-          <span key={block}>
-            <i className={styles[block]} />
-            {BLOCK_LABEL[block]}
-          </span>
-        ))}
-        <span className={styles.credits}>
-          <span className={styles.creditsBar}>
-            <span className={styles.creditsFill} />
-          </span>
-          <b>150 tín chỉ</b>
-        </span>
-      </div>
+            );
+          })}
+        </div>
+      ))}
     </div>
   );
 }
@@ -114,7 +145,7 @@ function FlowScene() {
         </span>
         {FLOW.map((node, index) => (
           <div key={node.role} className={styles.flowNode}>
-            <span className={styles.flowDot} style={delay(0.15 + index * 0.3)}>
+            <span className={styles.flowDot} style={delay(0.3 + index * 0.55)}>
               <svg viewBox="0 0 16 16" aria-hidden="true">
                 <path d="M3.5 8.5l3 3 6-7" />
               </svg>
@@ -124,7 +155,7 @@ function FlowScene() {
           </div>
         ))}
       </div>
-      <div className={styles.flowDone} style={delay(1.25)}>
+      <div className={styles.flowDone} style={delay(2.3)}>
         <svg viewBox="0 0 16 16" aria-hidden="true">
           <path d="M3.5 8.5l3 3 6-7" />
         </svg>
@@ -142,7 +173,7 @@ function VersionScene() {
         <div
           key={version.name}
           className={styles.version}
-          style={delay(index * 0.12)}
+          style={delay(index * 0.2)}
         >
           <div className={styles.versionHead}>
             <b>{version.name}</b>
@@ -160,7 +191,7 @@ function VersionScene() {
               <span
                 key={cohort}
                 className={styles.cohort}
-                style={delay(0.45 + order++ * 0.1)}
+                style={delay(0.9 + order++ * 0.18)}
               >
                 Khóa {cohort}
               </span>
@@ -173,7 +204,7 @@ function VersionScene() {
 }
 
 const SCENES = [
-  { title: 'Khung chương trình theo học kỳ', render: FrameScene },
+  { title: 'Học phần tiên quyết qua các học kỳ', render: FrameScene },
   { title: 'Đề xuất thay đổi qua ba cấp duyệt', render: FlowScene },
   { title: 'Phiên bản ban hành cho từng khóa', render: VersionScene },
 ];

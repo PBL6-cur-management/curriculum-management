@@ -16,14 +16,7 @@
   padding: 40px 48px;
   overflow: hidden;
   color: var(--login-on-brand);
-  background:
-    radial-gradient(
-        circle at 1px 1px,
-        color-mix(in oklab, var(--login-on-brand) 16%, transparent) 1px,
-        transparent 1.5px
-      )
-      0 0 / 22px 22px,
-    linear-gradient(135deg, var(--login-from), var(--login-to));
+  background: linear-gradient(135deg, var(--login-from), var(--login-to));
 }
 
 .identity {
