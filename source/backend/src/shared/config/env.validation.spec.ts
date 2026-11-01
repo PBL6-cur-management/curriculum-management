@@ -49,6 +49,17 @@ describe('validateEnv', () => {
     );
   });
 
+  it('keeps the PDF browser sandbox on unless explicitly turned off', () => {
+    expect(validateEnv(REQUIRED).PDF_BROWSER_NO_SANDBOX).toBe('false');
+    expect(
+      validateEnv({ ...REQUIRED, PDF_BROWSER_NO_SANDBOX: 'true' })
+        .PDF_BROWSER_NO_SANDBOX,
+    ).toBe('true');
+    expect(() =>
+      validateEnv({ ...REQUIRED, PDF_BROWSER_NO_SANDBOX: 'yes' }),
+    ).toThrow(/PDF_BROWSER_NO_SANDBOX/);
+  });
+
   it('still converts numeric variables', () => {
     expect(validateEnv({ ...REQUIRED, REDIS_PORT: '6380' }).REDIS_PORT).toBe(
       6380,

@@ -1,0 +1,37 @@
+#cloud-config
+# First boot of the demo VM: open 80/443 in the host firewall, install Docker, prepare /srv/ctdt.
+# Runs once. Terraform ignores later edits of this file (the VM is never replaced for it).
+
+write_files:
+  - path: /etc/ssh/sshd_config.d/90-ctdt.conf
+    permissions: '0644'
+    content: |
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+      PermitRootLogin no
+
+  # Oracle's Ubuntu image ships iptables rules ending in REJECT; the security list alone is not enough.
+  - path: /usr/local/sbin/ctdt-open-web-ports
+    permissions: '0755'
+    content: |
+      #!/bin/sh
+      set -eu
+      for port in 80 443; do
+        if ! iptables -C INPUT -p tcp -m state --state NEW --dport "$port" -j ACCEPT 2>/dev/null; then
+          reject=$(iptables -L INPUT --line-numbers -n | awk '$2 == "REJECT" { print $1; exit }')
+          iptables -I INPUT "${reject:-1}" -p tcp -m state --state NEW --dport "$port" -j ACCEPT
+        fi
+      done
+      netfilter-persistent save
+
+runcmd:
+  - /usr/local/sbin/ctdt-open-web-ports
+  - systemctl reload ssh || systemctl reload sshd
+  - curl -fsSL https://get.docker.com -o /tmp/get-docker.sh
+  - sh /tmp/get-docker.sh
+  - usermod -aG docker ubuntu
+  - systemctl enable --now docker
+  # Releases, incoming data and the env file belong to ubuntu; attachments to uid 1000 (node in the API image).
+  - install -d -o ubuntu -g ubuntu -m 0750 /srv/ctdt /srv/ctdt/releases /srv/ctdt/incoming
+  - install -d -o 1000 -g 1000 -m 0750 /srv/ctdt/files
+  - touch /srv/ctdt/.cloud-init-done

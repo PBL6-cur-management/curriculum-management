@@ -18,6 +18,7 @@
 !prisma/seed-data/seed-access-control.ts
 !prisma/seed-data/semesters.ts
 !src/**
+!assets/**
 # Never in an image: secrets, host-built output, tests, generated client, local data.
 **/.env
 **/.env.*

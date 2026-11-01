@@ -4,6 +4,14 @@ import puppeteer, { type Browser } from 'puppeteer';
 import type { Env } from '../../../shared/config/env.validation.js';
 import { PDF_RENDER_TIMEOUT_MS } from '../publication.constants.js';
 
+const BROWSER_ARGS = [
+  '--disable-gpu',
+  '--no-first-run',
+  '--disable-extensions',
+];
+// Only for a container without the capabilities Chrome's sandbox needs (PDF_BROWSER_NO_SANDBOX).
+const NO_SANDBOX_ARG = '--no-sandbox';
+
 // One headless browser, launched on first use. The page runs no script and may load nothing:
 // the HTML is escaped text with embedded fonts, so every network request is aborted.
 @Injectable()
@@ -19,7 +27,10 @@ export class PdfRendererService implements OnModuleDestroy {
         headless: true,
         executablePath:
           this.config.get('PDF_BROWSER_PATH', { infer: true }) || undefined,
-        args: ['--disable-gpu', '--no-first-run', '--disable-extensions'],
+        args:
+          this.config.get('PDF_BROWSER_NO_SANDBOX', { infer: true }) === 'true'
+            ? [...BROWSER_ARGS, NO_SANDBOX_ARG]
+            : BROWSER_ARGS,
       })
       .catch((error: unknown) => {
         this.browser = null;

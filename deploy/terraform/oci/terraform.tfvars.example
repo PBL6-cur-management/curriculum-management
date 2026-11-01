@@ -1,0 +1,12 @@
+# Copy to terraform.tfvars (gitignored) and fill in. OCIDs are identifiers, not secrets, but keep them local anyway.
+region             = "ap-singapore-1"
+tenancy_ocid       = "ocid1.tenancy.oc1..xxxxxxxx"
+budget_alert_email = "you@example.com"
+
+# Defaults, shown for reference:
+# public_host               = "ctdt.oguri-lab.io.vn"
+# ocpus                     = 2   # "Out of host capacity" in Singapore: try 1
+# memory_gb                 = 12  # ... with 6
+# boot_volume_gb            = 100
+# availability_domain_index = 0   # Singapore has a single availability domain
+# ssh_public_key_paths      = ["~/.ssh/oci_ctdt.pub", "~/.ssh/ctdt_ci.pub"]

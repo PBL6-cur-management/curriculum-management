@@ -83,6 +83,11 @@ export class Env {
   @IsNotEmpty()
   PDF_BROWSER_PATH?: string;
 
+  // A container that drops every capability cannot start Chrome's sandbox; the browser then only renders
+  // our own escaped HTML with scripts and network off. 'true'/'false' strings, as EMAIL_ENABLED.
+  @IsIn(['true', 'false'])
+  PDF_BROWSER_NO_SANDBOX: 'true' | 'false' = 'false';
+
   // F-25 email (US-115): off until the Faculty approves an SMTP sender (E-1). Development uses Mailpit on 1025.
   // 'true'/'false' strings: implicit conversion would turn the text "false" into true.
   @IsIn(['true', 'false'])
