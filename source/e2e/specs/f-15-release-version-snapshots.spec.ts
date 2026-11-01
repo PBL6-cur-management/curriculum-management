@@ -352,10 +352,14 @@ test.describe("F-15 Ban hành phiên bản", () => {
     }) => {
       const { program, request } = await prepareApprovedRelease(page, browser);
       await page.goto(program.path);
-      await expect(page.getByRole("heading", { level: 2 })).toContainText(
-        program.name,
-      );
-      await page.getByRole("link", { name: /Khung chương trình$/ }).click();
+      // The program workspace (PR #35): level-3 program heading, sections as tabs.
+      await expect(
+        page.getByRole("heading", { level: 3 }).first(),
+      ).toContainText(program.name);
+      await page
+        .getByRole("navigation", { name: "Các mục của chương trình", exact: true })
+        .getByRole("tab", { name: "Khung chương trình", exact: true })
+        .click();
       await expect(page).toHaveURL(
         new RegExp(`/versions/${program.versionId}/curriculum$`),
       );

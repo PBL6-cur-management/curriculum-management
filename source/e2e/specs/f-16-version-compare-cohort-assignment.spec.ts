@@ -26,8 +26,9 @@ test.describe("F-16 Giới hạn quyền sinh viên", () => {
       `${data.program.path}/cohort-versions`,
     ]) {
       await page.goto(path);
+      // The program workspace (PR #35) refuses the whole program before the page renders.
       await expect(page.getByRole("main")).toContainText(
-        "Bạn không có quyền truy cập trang này",
+        "Bạn không có quyền xem chương trình này",
       );
     }
     for (const path of [
@@ -109,8 +110,9 @@ test.describe("F-16 So sánh và gán phiên bản", () => {
       .click();
     expect((await rejected).status()).toBe(409);
     await expect(confirm).not.toBeVisible();
+    // AntD keeps the hidden loading icon inside the disabled button, so its name reads "loading Tiếp tục xác nhận".
     await expect(
-      form.getByRole("button", { name: "Tiếp tục xác nhận", exact: true }),
+      form.getByRole("button", { name: /Tiếp tục xác nhận$/ }),
     ).toBeDisabled();
     await expect(form).toContainText(target.cohortCode);
     expect(
@@ -122,10 +124,10 @@ test.describe("F-16 So sánh và gán phiên bản", () => {
       .getByRole("button", { name: "Nạp lại dữ liệu", exact: true })
       .click();
     await expect(
-      form.getByRole("button", { name: "Tiếp tục xác nhận", exact: true }),
+      form.getByRole("button", { name: /Tiếp tục xác nhận$/ }),
     ).toBeEnabled();
     await form
-      .getByRole("button", { name: "Tiếp tục xác nhận", exact: true })
+      .getByRole("button", { name: /Tiếp tục xác nhận$/ })
       .click();
     await confirm
       .getByRole("button", { name: "Xác nhận gán phiên bản", exact: true })
@@ -159,8 +161,9 @@ test.describe("F-16 So sánh và gán phiên bản", () => {
       new RegExp(`/version-comparison\\?${data.pair}$`),
     );
     for (const section of data.comparison.sections)
+      // Sections are collapse headers; "Khung chương trình" is also a workspace tab.
       await expect(
-        main.getByText(section.title, { exact: true }),
+        main.getByRole("button", { name: section.title, exact: true }),
       ).toBeVisible();
     await main
       .getByRole("link", { name: "Xem khác biệt đề cương", exact: true })
