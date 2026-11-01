@@ -36,6 +36,7 @@ describe('ApprovalService', () => {
   const prisma = {
     approvalDelegation: { findMany: vi.fn().mockResolvedValue([]) },
     changeRequest: { findFirst: vi.fn() },
+    user: { findUnique: vi.fn().mockResolvedValue(null) },
     $transaction: vi.fn((run: (client: unknown) => unknown) => run(tx)),
   };
   const recorder = {
@@ -100,6 +101,16 @@ describe('ApprovalService', () => {
       code: 'SELF_APPROVAL',
     });
     expect(recorder.actionableRows).not.toHaveBeenCalled();
+  });
+
+  it('lets a demo account (canSelfApprove) decide its own request', async () => {
+    prisma.changeRequest.findFirst.mockResolvedValue({
+      ...base,
+      createdById: 'approver',
+    });
+    prisma.user.findUnique.mockResolvedValueOnce({ canSelfApprove: true });
+    await service.approve('r1', {}, ACCESS);
+    expect(recorder.actionableRows).toHaveBeenCalled();
   });
 
   it('refuses a caller with no row to decide', async () => {

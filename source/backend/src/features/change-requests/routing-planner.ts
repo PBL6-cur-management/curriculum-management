@@ -23,6 +23,7 @@ import {
 import { AppException } from '../../shared/exception/app.exception.js';
 import { HOME_FACULTY_CODE } from '../../shared/org-units/home-faculty.js';
 import type { PrismaService } from '../../shared/prisma/prisma.service.js';
+import { maySelfApprove } from '../../shared/change-requests/self-approval.js';
 import { activeDirectorWhere } from '../../shared/programs/active-director.js';
 import { activeMembershipWhere } from '../../shared/subject-groups/active-membership.js';
 import { SUBMISSION_ERRORS } from './change-request-feature.errors.js';
@@ -146,13 +147,19 @@ export class RoutingPlanner {
         today,
       )),
       academicOffice,
-    ].map((step) =>
-      // FR-61, BR-27: nobody approves their own request; the row stays as a record.
-      step.approverId !== null && step.approverId === request.createdById
-        ? { ...step, isSkipped: true, skipReason: SKIP_REASONS.CREATOR }
-        : step,
-    );
-    return { steps, affectedPrograms: programs };
+    ];
+    const creatorSelfApproves = await maySelfApprove(db, request.createdById);
+    return {
+      steps: steps.map((step) =>
+        // FR-61, BR-27: nobody approves their own request; the row stays as a record. Demo accounts excepted.
+        step.approverId !== null &&
+        step.approverId === request.createdById &&
+        !creatorSelfApproves
+          ? { ...step, isSkipped: true, skipReason: SKIP_REASONS.CREATOR }
+          : step,
+      ),
+      affectedPrograms: programs,
+    };
   }
 
   // Level 3 is an office, not a person: the row has no approver and any other active R1 acts on it (D8, F13-01).
@@ -163,7 +170,8 @@ export class RoutingPlanner {
   ): Promise<PlannedStep> {
     if (
       (await isAcademicOfficeHolder(db, creatorId, today)) &&
-      !(await otherAcademicOfficeHolderExists(db, creatorId, today))
+      !(await otherAcademicOfficeHolderExists(db, creatorId, today)) &&
+      !(await maySelfApprove(db, creatorId))
     ) {
       throw new AppException(SUBMISSION_ERRORS.NO_OTHER_ACADEMIC_OFFICE);
     }

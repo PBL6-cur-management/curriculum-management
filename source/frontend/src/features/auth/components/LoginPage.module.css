@@ -1,0 +1,158 @@
+/* Login split layout. Colours come from tokens.ts through the --login-* properties set on .page. */
+
+.page {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 4fr);
+  min-height: 100vh;
+  background: var(--ctdt-color-bg-container);
+}
+
+.brand {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 32px;
+  padding: 40px 48px;
+  overflow: hidden;
+  color: var(--login-on-brand);
+  background: linear-gradient(135deg, var(--login-from), var(--login-to));
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  background: var(--login-on-brand);
+}
+
+.logo img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.unit {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+.appName {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.graph {
+  width: 100%;
+  max-width: 640px;
+  height: auto;
+  align-self: center;
+}
+
+.tagline {
+  margin: 0;
+  max-width: 28ch;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-wrap: balance;
+}
+
+.edge {
+  fill: none;
+  stroke: var(--login-on-brand);
+  stroke-opacity: 0.35;
+  stroke-width: 1.5;
+}
+
+.flow {
+  fill: none;
+  stroke: var(--login-on-brand);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 6 200;
+  animation: flow 3.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.node {
+  fill: var(--login-node);
+  stroke: var(--login-on-brand);
+  stroke-opacity: 0.55;
+}
+
+.nodeDone {
+  fill: var(--login-on-brand);
+}
+
+.nodeLabel {
+  fill: var(--login-on-brand);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.nodeDone + .nodeLabel {
+  fill: var(--login-from);
+}
+
+@keyframes flow {
+  from {
+    stroke-dashoffset: 206;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flow {
+    animation: none;
+    stroke-dasharray: none;
+    stroke-opacity: 0.6;
+  }
+}
+
+.formSide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.form {
+  width: 100%;
+  max-width: 360px;
+}
+
+@media (max-width: 768px) {
+  .page {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .brand {
+    padding: 20px 16px;
+    gap: 0;
+  }
+
+  .graph,
+  .tagline {
+    display: none;
+  }
+
+  .formSide {
+    align-items: flex-start;
+    padding: 32px 16px;
+  }
+}

@@ -87,6 +87,7 @@ const EquivalenceGroupsPage = lazy(() =>
   ),
 );
 import { ProgramWorkspaceLayout } from './features/programs/components/ProgramWorkspaceLayout';
+import { ComingSoonGate } from './shared/components/ComingSoon';
 
 const ProgramListPage = lazy(() =>
   import('./features/programs/pages/ProgramListPage').then((module) => ({
@@ -508,7 +509,9 @@ export const router = createBrowserRouter([
             path: ROUTES.integrationClients,
             element: (
               <RequirePermission code={PERMISSIONS.integrationClientManage}>
-                <IntegrationClientsPage />
+                <ComingSoonGate feature="integration-clients">
+                  <IntegrationClientsPage />
+                </ComingSoonGate>
               </RequirePermission>
             ),
           },
@@ -516,7 +519,9 @@ export const router = createBrowserRouter([
             path: ROUTES.schoolSync,
             element: (
               <RequirePermission code={PERMISSIONS.syncConfigure}>
-                <SchoolSyncSettingsPage />
+                <ComingSoonGate feature="school-sync">
+                  <SchoolSyncSettingsPage />
+                </ComingSoonGate>
               </RequirePermission>
             ),
           },
@@ -524,7 +529,9 @@ export const router = createBrowserRouter([
             path: ROUTES.backups,
             element: (
               <RequirePermission code={PERMISSIONS.backupView}>
-                <BackupsPage />
+                <ComingSoonGate feature="backups">
+                  <BackupsPage />
+                </ComingSoonGate>
               </RequirePermission>
             ),
           },
@@ -532,7 +539,9 @@ export const router = createBrowserRouter([
             path: ROUTES.schoolSyncRuns,
             element: (
               <RequirePermission code={PERMISSIONS.syncConfigure}>
-                <SchoolSyncRunsPage />
+                <ComingSoonGate feature="school-sync">
+                  <SchoolSyncRunsPage />
+                </ComingSoonGate>
               </RequirePermission>
             ),
           },
@@ -540,7 +549,9 @@ export const router = createBrowserRouter([
             path: ROUTES.schoolSyncRunDetail,
             element: (
               <RequirePermission code={PERMISSIONS.syncConfigure}>
-                <SchoolSyncRunDetailPage />
+                <ComingSoonGate feature="school-sync">
+                  <SchoolSyncRunDetailPage />
+                </ComingSoonGate>
               </RequirePermission>
             ),
           },

@@ -124,6 +124,8 @@ services:
       args:
         NODE_IMAGE: '${NODE_IMAGE:?Set pinned Node image}'
         CADDY_IMAGE: '${CADDY_IMAGE:?Set pinned Caddy image}'
+        VITE_DEMO_LOGIN: '${VITE_DEMO_LOGIN:-}'
+        VITE_COMING_SOON: '${VITE_COMING_SOON:-}'
     environment:
       PUBLIC_HOST: '${PUBLIC_HOST:?Set public hostname}'
     ports: ['80:80', '443:443']

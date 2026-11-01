@@ -220,6 +220,8 @@ model User {
   username                  String                      @unique
   passwordHash              String
   mustChangePassword        Boolean                     @default(false)
+  /// Demo accounts only (prisma/demo-account.ts): may approve requests they created.
+  canSelfApprove            Boolean                     @default(false)
   orgUnitId                 String?
   orgUnit                   OrgUnit?                    @relation(fields: [orgUnitId], references: [id], onDelete: Restrict)
   roleAssignments           RoleAssignment[]            @relation("AssignmentHolder")

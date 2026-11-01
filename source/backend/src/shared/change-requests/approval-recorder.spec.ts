@@ -28,6 +28,7 @@ function client() {
     },
     roleAssignment: { findFirst: vi.fn().mockResolvedValue(null) },
     approvalDelegation: { findMany: vi.fn().mockResolvedValue([]) },
+    user: { findUnique: vi.fn().mockResolvedValue(null) },
   };
 }
 const asTx = (db: ReturnType<typeof client>) =>
@@ -101,6 +102,19 @@ describe('ApprovalRecorder', () => {
         recorder.actionableRows(asTx(db), request, 'creator', TODAY),
       ).resolves.toEqual([]);
       expect(db.approvalStep.findMany).not.toHaveBeenCalled();
+    });
+
+    it('returns the own rows of a demo creator (canSelfApprove)', async () => {
+      const db = client();
+      db.user.findUnique.mockResolvedValue({ canSelfApprove: true });
+      db.approvalStep.findMany.mockResolvedValue([
+        { id: 's1', approverId: 'creator' },
+      ]);
+      await expect(
+        recorder.actionableRows(asTx(db), request, 'creator', TODAY),
+      ).resolves.toEqual([
+        { id: 's1', approverId: 'creator', viaDelegationId: null },
+      ]);
     });
 
     it('returns nothing outside a pending status', async () => {
