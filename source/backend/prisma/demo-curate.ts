@@ -9,6 +9,8 @@ const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
 });
 const MAX_PASSES = 50;
+// A request's working copy (sourceRequestId) belongs to it: it goes with the request instead of being detached.
+const owned = (key: { column: string }) => key.column === 'sourceRequestId';
 
 interface ForeignKey {
   child: string;
@@ -81,6 +83,14 @@ async function roots(withId: Set<string>): Promise<Map<string, Set<string>>> {
     `SELECT id FROM "ChangeRequest"
      WHERE title ~ '^Đề xuất [0-9A-F]{16}$' OR title ~ '^[0-9A-F]{16}a+$' OR title = 'Testing'`,
   );
+  // --title <regex>: also remove requests whose title matches, e.g. drafts a failed seed left behind.
+  const titleFlag = process.argv.indexOf('--title');
+  if (titleFlag > 0 && process.argv[titleFlag + 1])
+    await add(
+      '"ChangeRequest"',
+      `SELECT id FROM "ChangeRequest" WHERE title ~ $1`,
+      process.argv[titleFlag + 1],
+    );
   return marked;
 }
 
@@ -94,7 +104,12 @@ async function closure(
     changed = false;
     for (const key of keys) {
       const parents = marked.get(key.parent);
-      if (key.nullable || !parents?.size || !withId.has(key.child)) continue;
+      if (
+        (key.nullable && !owned(key)) ||
+        !parents?.size ||
+        !withId.has(key.child)
+      )
+        continue;
       const set = marked.get(key.child) ?? new Set<string>();
       for (const row of await q(
         `SELECT id FROM ${key.child} WHERE "${key.column}" = ANY($1)`,
@@ -142,7 +157,7 @@ try {
   for (const key of keys) {
     const parents = marked.get(key.parent);
     if (!parents?.size) continue;
-    if (key.nullable)
+    if (key.nullable && !owned(key))
       await attempt(
         `UPDATE ${key.child} SET "${key.column}" = NULL WHERE "${key.column}" = ANY($1)`,
         [...parents],

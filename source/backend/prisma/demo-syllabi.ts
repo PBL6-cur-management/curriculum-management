@@ -11,6 +11,10 @@ import { createReadStream, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { PrismaPg } from '@prisma/adapter-pg';
 import {
+  PUBLISHABLE_SYLLABUS_SELECT,
+  syllabusPublishIssues,
+} from '../src/shared/releases/syllabus-release-issues.js';
+import {
   Prisma,
   PrismaClient,
   SyllabusStatus,
@@ -173,7 +177,9 @@ const prisma = new PrismaClient({
 });
 
 try {
-  const root = mirrorRoot(process.argv[2]);
+  const root = mirrorRoot(
+    process.argv.slice(2).find((arg) => !arg.startsWith('--')),
+  );
   const [teacherCourses, proxCourses, formulas, weekly] = await Promise.all([
     readCsv(root, 'DATA_GVien1', 'tmHocPhan'),
     readCsv(root, 'tmProxDUT', 'tmHocPhan'),
@@ -197,7 +203,18 @@ try {
   const syllabi = await prisma.syllabus.findMany({
     where: {
       status: SyllabusStatus.DRAFT,
-      courseDescription: { contains: PLACEHOLDER_MARK },
+      sourceRequestId: null,
+      OR: [
+        { courseDescription: { contains: PLACEHOLDER_MARK } },
+        // A draft someone emptied in the UI before it was filled: no text, no CLO, no formula.
+        {
+          AND: [
+            { OR: [{ courseDescription: null }, { courseDescription: '' }] },
+            { clos: { none: {} } },
+            { assessmentComponents: { none: {} } },
+          ],
+        },
+      ],
     },
     select: {
       id: true,
@@ -338,6 +355,36 @@ try {
     `Đã điền ${counts.syllabi} đề cương: mô tả thật ${counts.realDescription}, nội dung tuần thật ${counts.realWeeks}, ` +
       `công thức điểm thật ${counts.realFormula}, tài liệu tham khảo ${counts.references}; phần còn lại là mẫu.`,
   );
+  // --publish: a course taught in a released program has a published syllabus, so change requests can target it.
+  // Publishes each ordinary draft that passes the release rule, for courses with no published revision yet.
+  if (process.argv.includes('--publish')) {
+    const drafts = await prisma.syllabus.findMany({
+      where: {
+        status: SyllabusStatus.DRAFT,
+        sourceRequestId: null,
+        course: { syllabi: { none: { status: SyllabusStatus.PUBLISHED } } },
+      },
+      select: PUBLISHABLE_SYLLABUS_SELECT,
+    });
+    let published = 0;
+    const blocked: string[] = [];
+    for (const draft of drafts) {
+      const issues = syllabusPublishIssues(draft);
+      if (issues.length) {
+        blocked.push(`${draft.courseId}: ${issues.join(', ')}`);
+        continue;
+      }
+      await prisma.syllabus.update({
+        where: { id: draft.id },
+        data: { status: SyllabusStatus.PUBLISHED, publishedAt: new Date() },
+      });
+      published += 1;
+    }
+    console.log(
+      `Đã ban hành ${published} đề cương; ${blocked.length} chưa đủ điều kiện.`,
+    );
+    for (const line of blocked.slice(0, 20)) console.log(`  ${line}`);
+  }
 } finally {
   await prisma.$disconnect();
 }
