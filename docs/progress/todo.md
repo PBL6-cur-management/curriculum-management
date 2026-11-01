@@ -120,3 +120,4 @@ Một dòng cho mỗi tính năng; việc chi tiết (CV-xxx) ở `docs/planning
 | DEBT-09 | F12-TC_004 flaky: sau khi lưu ánh xạ đánh giá–CLO, ô đã tick đôi khi hiện bỏ chọn và "Chưa được đánh giá" còn nguyên; chạy riêng thì đạt. Nghi remount với dữ liệu đề cương cũ trong `AssessmentCloTab`/`useEditorRemountKey`, chưa chứng minh | ❌ | |
 | DEBT-10 | F09-TC_001 flaky một lần trong lượt chạy dài (hết hạn tải xuống/"Tải tệp mẫu"); đạt hai lần khi chạy riêng | ❌ | |
 | DEBT-11 | a11y AntD: sau trạng thái loading của mutation, nút "Tiếp tục xác nhận" trong `CohortVersionAssignmentForm` giữ biểu tượng loading ẩn nên tên truy cập đọc "loading Tiếp tục xác nhận"; hiển thị bình thường | ❌ | |
+| DEBT-12 | Demo Oracle Free: chưa `terraform apply`, bản ghi DNS, deploy thật, chạy CI trên GitHub, GitHub secrets ([demo-oracle-free](../operations/demo-oracle-free.md)) | ❌ | Cần OCI API key và khóa SSH của người dùng |

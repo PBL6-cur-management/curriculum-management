@@ -41,8 +41,13 @@ scripts\load\Invoke-LoadTest.ps1 -Profile canonical -BaseUrl https://host -Manif
 | Hạng mục | Kiểm tra | Trạng thái |
 |---|---|---|
 | Compose hợp lệ | `docker compose config --quiet` | Đã chạy (placeholder) |
-| Caddy: `/api/docs*` 404, SPA fallback | Chạy stack thật | Chưa chạy |
+| Caddy: `/api/docs*` 404, SPA fallback | Chạy stack thật | Đã chạy (stack cục bộ cô lập, 2026-11-01): `/api/docs` 404, deep link SPA 200, HTTP→HTTPS 308 |
 | `health-evidence.test.mjs`, `manifest.test.mjs` | `node --test scripts` | Chưa chạy (hoãn đến cuối) |
 | `env.validation.spec` LOG_LEVEL | `pnpm test` | Chưa chạy |
 | Thử tải canonical | k6 | Bị chặn: thiếu fixture sinh viên |
 | Bằng chứng uptime | collector | Cần chạy thật nhiều ngày |
+
+## Sửa Dockerfile khi chạy stack production lần đầu (2026-11-01)
+
+- Ảnh runtime sao chép `assets/` (thiếu phông PDF); `pnpm prune --prod --ignore-scripts` (prune chạy lại `prisma generate` bị lỗi); stage mới `runtime-chromium` (Chromium Debian, `PDF_BROWSER_PATH=/usr/bin/chromium`, `PDF_BROWSER_NO_SANDBOX=true`).
+- `compose.yaml`: `target: ${API_BUILD_TARGET:-runtime}`, `shm_size: 256m`. Demo dùng `API_BUILD_TARGET=runtime-chromium`. Xem [demo Oracle Free](demo-oracle-free.md).

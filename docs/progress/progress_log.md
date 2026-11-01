@@ -512,3 +512,15 @@ Format:
 - PR #47 `fix(frontend)`: `SortableRow` gán id `undefined` cho hàng giữ chỗ bảng rỗng của AntD, dnd-kit coi là đang kéo và nâng z-index 9999, che hộp thoại "Thêm học phần vào khung". Hàng không khóa nay render `<tr>` thường, hàng đang kéo z-index 1; thêm `SortableRow.test.tsx`. Kèm e2e: `chooseOption` thu hẹp select ảo có tìm kiếm, fixture consistency đọc tiêu đề workspace, helper `curriculumWarning` mở bảng cảnh báo gập (gập khi trên 3 từ PR #35).
 - PR #48, #49, #50 `test(e2e)`: sửa spec cũ sau PR #35 (tab thay liên kết, tiêu đề chương trình cấp 3, từ chối ngoài phạm vi "Bạn không có quyền xem chương trình này") và sau F-17 (R1 thấy cả bốn loại nhập); F10-TC_023 ghi tệp trên 50 MB ra đĩa vì Playwright từ chối tải lên trong bộ nhớ trên 50 MB.
 - Nợ mới: DEBT-09 (F12-TC_004 flaky), DEBT-10 (F09-TC_001 flaky), DEBT-11 (a11y nút "Tiếp tục xác nhận"). Còn: smoke vòng 1 và duyệt luồng R5→R4→R3→R1 trên UI (DEBT-01).
+
+## 2026-11-01 — triển khai demo trên Oracle Cloud Always Free
+
+- Nhánh `chore/demo-oracle`, commit `2b0d1ea`. Terraform `deploy/terraform/oci/`: VCN, subnet, security list 22/80/443, một VM.Standard.A1.Flex 2 OCPU/12 GB Ubuntu 24.04 ARM, IP công khai tạm (tùy chọn `use_reserved_ip`), cảnh báo ngân sách 1 USD, cloud-init cài Docker và mở iptables. Vùng `ap-singapore-1`; tên `ctdt.oguri-lab.io.vn` (bản ghi A thêm tay ở tenten.vn).
+- Một VM chạy `deploy/compose.yaml` hiện có; `deploy/demo.env.example` ghim ảnh `node:24.22.2-bookworm-slim`, `postgres:18.6-bookworm`, `redis:8.2.11-bookworm`, `caddy:2.11.7-alpine`.
+- Sửa Dockerfile backend khi chạy stack F-27 thật lần đầu: sao chép `assets/` (phông PDF), `pnpm prune --prod --ignore-scripts`, stage `runtime-chromium`. `compose.yaml`: `API_BUILD_TARGET`, `shm_size: 256m`.
+- Biến môi trường mới `PDF_BROWSER_NO_SANDBOX` (`true|false`, mặc định `false`) trong `env.validation.ts`; `pdf-renderer.service.ts` thêm `--no-sandbox` khi `true`; thêm `pdf-renderer.service.spec.ts`.
+- CI/CD `.github/workflows/ci-cd.yml` (tsc, lint, test chọn lọc, terraform fmt/validate; job deploy khi push main qua SSH chạy `deploy/scripts/deploy-release.sh`, kiểm tra sức khỏe qua Caddy, có rollback). Script: `deploy-release.sh`, `restore-demo-data.sh`, `export-demo-data.ps1`, `apply-until-capacity.sh`, `set-ci-secrets.sh`.
+- Tài liệu: `deploy/DEPLOY_INFRA.md`, `deploy/COST.md`, `deploy/COMMANDS.md`, [demo-oracle-free](../operations/demo-oracle-free.md); `deploy/README.md` liên kết.
+- Kiểm chứng: stack production dựng và chạy cục bộ (project compose `ctdt-localcheck`, đã gỡ): migrate 23 migration, `/api/health` ok, `/api/docs` 404, deep link SPA 200, HTTP→HTTPS 308, `ctdt_real` khôi phục bằng `pg_restore` (337 user, 0 tài khoản `e2e.*`), đăng nhập qua Caddy 200 với cookie HttpOnly; Secure; SameSite=Lax, `/api/auth/me` 200, Chromium xuất PDF trong container api chỉ đọc. BE unit 1859/1859, tsc và lint sạch; FE build, lint, test LoginPage đạt.
+- Chưa làm: `terraform apply`, bản ghi DNS, lần deploy thật, chạy CI trên GitHub, GitHub secrets.
+

@@ -139,4 +139,4 @@ deploy/scripts/set-ci-secrets.sh        # local: IP + khóa CI + host key → Gi
 gh secret list --env demo
 ```
 
-Chạy lại sau khi IP VM đổi (VM tạo lại mà không dùng `use_reserved_ip`).
+Chạy lại sau khi IP VM đổi (VM tạo lại mà không dùng `use_reserved_ip`). Cần quyền admin trên repo. `gh` báo *Bad credentials* → `unset GITHUB_TOKEN` (token hỏng trong biến môi trường che mất token keyring).

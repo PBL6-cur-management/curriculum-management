@@ -7,6 +7,13 @@ TF_DIR="$(cd "$(dirname "$0")/../terraform/oci" && pwd)"
 CI_KEY="${CI_KEY:-$HOME/.ssh/ctdt_ci}"
 ENVIRONMENT=demo
 
+# Environments and secrets need admin on the repository; a push-only collaborator gets a bare 404.
+if [[ "$(gh api 'repos/{owner}/{repo}' --jq .permissions.admin)" != "true" ]]; then
+  echo "Tài khoản gh hiện tại không có quyền admin trên repo: nhờ admin của org chạy script này," >&2
+  echo "hoặc cấp quyền admin (Settings → Collaborators and teams)." >&2
+  exit 1
+fi
+
 HOST="$(terraform -chdir="$TF_DIR" output -raw public_ip)"
 [[ -f "$CI_KEY" ]] || { echo "Thiếu khóa CI $CI_KEY (ssh-keygen -t ed25519 -f ~/.ssh/ctdt_ci -N '')" >&2; exit 1; }
 

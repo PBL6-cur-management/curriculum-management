@@ -90,9 +90,11 @@ Script nạp CSDL, chép tệp, rồi gọi `deploy-release.sh` (build ~5–10 p
 ## 8. Bật CD
 
 ```bash
-gh auth login                        # nếu gh báo Bad credentials
+unset GITHUB_TOKEN                   # biến này trên máy đang chứa token hỏng; gh dùng keyring thay thế
 deploy/scripts/set-ci-secrets.sh     # tạo environment "demo" + 3 secret
 ```
+
+Cần **quyền admin** trên repo `4UT15T1Ck/curriculum-management` (tài khoản `flyingdoggoo` hiện chỉ có quyền push, kiểm 2026-11-01). Nhờ admin của org chạy script, hoặc cấp quyền admin cho bạn.
 
 Org `4UT15T1Ck` phải cho phép GitHub Actions (Settings → Actions). Từ đây mỗi lần merge vào `main` có đụng mã/compose là tự deploy.
 
