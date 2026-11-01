@@ -134,12 +134,22 @@ export class RoutingPlanner {
         affectedPrograms: [],
       };
     }
-    const courses = await this.affectedHomeCourses(db, request, items);
+    const { courses, touchesCourses } = await this.affectedHomeCourses(
+      db,
+      request,
+      items,
+    );
     const programs = request.programId
       ? await this.programById(db, request.programId)
       : await this.programsUsing(db, request.courseId!);
     const steps = [
-      ...(await this.coordinatorSteps(db, courses, today)),
+      ...(await this.coordinatorSteps(
+        db,
+        courses,
+        // Only other faculties' courses changed (e.g. a mathematics course moved): no coordinator here (EC-24).
+        touchesCourses ? SKIP_REASONS.FOREIGN_COURSE : SKIP_REASONS.NO_COURSE,
+        today,
+      )),
       ...(await this.directorSteps(
         db,
         programs,
@@ -193,11 +203,14 @@ export class RoutingPlanner {
     db: Db,
     request: RoutingSubject,
     items: readonly ChangeItemDraft[],
-  ): Promise<RoutedCourse[]> {
+  ): Promise<{ courses: RoutedCourse[]; touchesCourses: boolean }> {
     if (request.course) {
-      return [
-        { id: request.course.id, ownerGroupId: request.course.ownerGroupId },
-      ];
+      return {
+        courses: [
+          { id: request.course.id, ownerGroupId: request.course.ownerGroupId },
+        ],
+        touchesCourses: true,
+      };
     }
     const codes = [
       ...new Set(
@@ -206,23 +219,25 @@ export class RoutingPlanner {
           .map((item) => item.itemKey.split(KEY_SEPARATOR)[0]),
       ),
     ];
-    if (codes.length === 0) return [];
-    return db.course.findMany({
+    if (codes.length === 0) return { courses: [], touchesCourses: false };
+    const courses = await db.course.findMany({
       where: {
         courseCode: { in: codes },
         ownerFaculty: { unitCode: HOME_FACULTY_CODE },
       },
       select: { id: true, ownerGroupId: true },
     });
+    return { courses, touchesCourses: true };
   }
 
   private async coordinatorSteps(
     db: Db,
     courses: readonly RoutedCourse[],
+    noCourseReason: string,
     today: Date,
   ): Promise<PlannedStep[]> {
     if (courses.length === 0) {
-      return [skipped(APPROVAL_LEVEL.COORDINATOR, SKIP_REASONS.NO_COURSE)];
+      return [skipped(APPROVAL_LEVEL.COORDINATOR, noCourseReason)];
     }
     const steps: PlannedStep[] = [];
     if (courses.some((course) => course.ownerGroupId === null)) {

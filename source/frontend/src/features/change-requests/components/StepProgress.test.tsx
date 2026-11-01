@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import type { ApprovalStep } from '../api/changeRequests';
 import { step } from '../testFixtures';
 import { groupByLevel } from '../utils/groupByLevel';
 import { StepProgress } from './StepProgress';
@@ -55,6 +56,46 @@ describe('StepProgress', () => {
       screen.getByText('Người duyệt là người tạo đề xuất'),
     ).toBeInTheDocument();
     expect(screen.getByText('Đã duyệt')).toBeInTheDocument();
+  });
+});
+
+describe('StepProgress merging', () => {
+  it('shows one director of many programmes as one line naming them', () => {
+    const director = { id: 'd', fullName: 'Tài khoản demo' };
+    render(
+      <StepProgress
+        steps={['A', 'B', 'C', 'D', 'E'].map((code, index) =>
+          step(String(index), 2, {
+            approver: director,
+            forProgram: { id: code, programCode: `CNTT-${code}` },
+          } as Partial<ApprovalStep>),
+        )}
+      />,
+    );
+    expect(screen.getAllByText('Tài khoản demo')).toHaveLength(1);
+    expect(
+      screen.getByText('(5 CTĐT: CNTT-A, CNTT-B, CNTT-C và 2 CTĐT khác)'),
+    ).toBeInTheDocument();
+  });
+
+  it('keeps two directors apart and names nobody for a skipped level-1 row', () => {
+    render(
+      <StepProgress
+        steps={[
+          step('1', 1, {
+            approver: null,
+            isSkipped: true,
+            skipReason: 'Đề xuất không thay đổi học phần nào',
+          }),
+          step('2', 2, { approver: { id: 'x', fullName: 'GĐ X' } }),
+          step('3', 2, { approver: { id: 'y', fullName: 'GĐ Y' } }),
+        ]}
+      />,
+    );
+    expect(screen.getByText('Không có người duyệt')).toBeInTheDocument();
+    expect(screen.queryByText('Phòng Đào tạo')).not.toBeInTheDocument();
+    expect(screen.getByText('GĐ X')).toBeInTheDocument();
+    expect(screen.getByText('GĐ Y')).toBeInTheDocument();
   });
 });
 

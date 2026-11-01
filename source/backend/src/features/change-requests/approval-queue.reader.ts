@@ -8,6 +8,7 @@ import type { AccessContext } from '../../shared/authz/access-context.js';
 import { isAcademicOfficeHolder } from '../../shared/change-requests/academic-office.js';
 import { isActionable } from '../../shared/change-requests/approval-rules.js';
 import { APPROVAL_LEVEL } from '../../shared/change-requests/approval.constants.js';
+import { maySelfApprove } from '../../shared/change-requests/self-approval.js';
 import {
   grantFor,
   usableGrants,
@@ -76,6 +77,10 @@ export class ApprovalQueueReader {
       : {};
     // Candidates by SQL; "same round, request at this row's level" compares two tables, so it is checked in code.
     const grants = await usableGrants(this.prisma, access.userId, today);
+    // FR-61: one's own requests never wait on oneself, except for the demo account, which may self-approve.
+    const notMine = (await maySelfApprove(this.prisma, access.userId))
+      ? {}
+      : { createdById: { not: access.userId } };
     const named = await this.prisma.approvalStep.findMany({
       where: {
         approverId: {
@@ -89,7 +94,7 @@ export class ApprovalQueueReader {
               ChangeRequestStatus.PENDING_DIRECTOR,
             ],
           },
-          createdById: { not: access.userId },
+          ...notMine,
           ...typeFilter,
         },
       },
@@ -110,7 +115,7 @@ export class ApprovalQueueReader {
       ? await this.prisma.changeRequest.findMany({
           where: {
             status: ChangeRequestStatus.PENDING_ACADEMIC_OFFICE,
-            createdById: { not: access.userId },
+            ...notMine,
             ...typeFilter,
           },
           select: QUEUE_FINAL_SELECT,

@@ -34,11 +34,13 @@ describe('ApprovalQueueReader', () => {
   const stepsFindMany = vi.fn();
   const requestsFindMany = vi.fn();
   const roleFindFirst = vi.fn();
+  const userFindUnique = vi.fn();
   const prisma = {
     approvalDelegation: { findMany: vi.fn().mockResolvedValue([]) },
     approvalStep: { findMany: stepsFindMany },
     changeRequest: { findMany: requestsFindMany },
     roleAssignment: { findFirst: roleFindFirst },
+    user: { findUnique: userFindUnique },
   };
   const reader = new ApprovalQueueReader(prisma as unknown as PrismaService);
   const access = new AccessContext('me', []);
@@ -48,6 +50,26 @@ describe('ApprovalQueueReader', () => {
     stepsFindMany.mockResolvedValue([]);
     requestsFindMany.mockResolvedValue([]);
     roleFindFirst.mockResolvedValue(null);
+    userFindUnique.mockResolvedValue({ canSelfApprove: false });
+  });
+
+  it("leaves out the caller's own requests", async () => {
+    await reader.read({}, access);
+    expect(stepsFindMany.mock.calls[0][0].where.changeRequest).toMatchObject({
+      createdById: { not: 'me' },
+    });
+  });
+
+  it("keeps the demo account's own requests, since it may approve them", async () => {
+    userFindUnique.mockResolvedValue({ canSelfApprove: true });
+    roleFindFirst.mockResolvedValue({ id: 'ra' });
+    await reader.read({}, access);
+    expect(
+      stepsFindMany.mock.calls[0][0].where.changeRequest,
+    ).not.toHaveProperty('createdById');
+    expect(requestsFindMany.mock.calls[0][0].where).not.toHaveProperty(
+      'createdById',
+    );
   });
 
   it('drops a dead row of an earlier round and a row of another level', async () => {

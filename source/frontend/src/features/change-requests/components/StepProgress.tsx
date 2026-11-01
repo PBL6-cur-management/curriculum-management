@@ -1,5 +1,5 @@
 import { Card, Col, Flex, Row, Tag, Tooltip, Typography } from 'antd';
-import { groupByLevel } from '../utils/groupByLevel';
+import { groupByLevel, mergeSameApprover } from '../utils/groupByLevel';
 import type { ApprovalStep } from '../api/changeRequests';
 import { STEP_COLORS, STEP_KIND_LABELS } from '../constants/approvalLabels';
 import {
@@ -12,15 +12,50 @@ interface StepProgressProps {
   steps: readonly ApprovalStep[];
 }
 
-// One approver row; shared by the current round here and every round of the history.
-export function StepLine({ step }: { step: ApprovalStep }) {
-  const who = step.approver?.fullName ?? ACADEMIC_OFFICE_LABEL;
-  const scope = step.forSubjectGroup?.groupCode ?? step.forProgram?.programCode;
+interface StepLineProps {
+  step: ApprovalStep;
+  // Codes of every programme or group this decision stands for; defaults to the row's own.
+  scopes?: readonly string[];
+}
+
+const NO_APPROVER_LABEL = 'Không có người duyệt';
+const SCOPES_SHOWN = 3;
+
+function ScopeList({
+  step,
+  scopes,
+}: {
+  step: ApprovalStep;
+  scopes: readonly string[];
+}) {
+  if (scopes.length === 0) return null;
+  if (scopes.length === 1)
+    return <Typography.Text type="secondary">({scopes[0]})</Typography.Text>;
+  const noun = step.forSubjectGroup ? 'nhóm' : 'CTĐT';
+  const shown = scopes.slice(0, SCOPES_SHOWN).join(', ');
+  const rest = scopes.length - SCOPES_SHOWN;
+  return (
+    <Tooltip title={scopes.join(', ')}>
+      <Typography.Text type="secondary">
+        ({scopes.length} {noun}: {shown}
+        {rest > 0 ? ` và ${rest} ${noun} khác` : ''})
+      </Typography.Text>
+    </Tooltip>
+  );
+}
+
+// One approver line; shared by the current round here and every round of the history.
+export function StepLine({ step, scopes }: StepLineProps) {
+  const who =
+    step.approver?.fullName ??
+    (step.approvalLevel === 3 ? ACADEMIC_OFFICE_LABEL : NO_APPROVER_LABEL);
+  const own =
+    step.forSubjectGroup?.groupCode ?? step.forProgram?.programCode ?? null;
   return (
     <Flex vertical gap={2}>
       <Flex gap="small" align="center" wrap>
         <Typography.Text delete={step.isSkipped}>{who}</Typography.Text>
-        {scope && <Typography.Text type="secondary">({scope})</Typography.Text>}
+        <ScopeList step={step} scopes={scopes ?? (own ? [own] : [])} />
         {step.isSkipped ? (
           <Tooltip title={step.skipReason}>
             <Tag>{STEP_KIND_LABELS.SKIPPED}</Tag>
@@ -57,7 +92,8 @@ export function StepLine({ step }: { step: ApprovalStep }) {
   );
 }
 
-// One column per level and one line per approver row, so two coordinators show two lines (EC-22).
+// One column per level and one line per approver, so two coordinators show two lines (EC-22) while one director
+// standing for six programmes shows one line naming the six.
 export function StepProgress({ steps }: StepProgressProps) {
   return (
     <Row gutter={[16, 16]}>
@@ -65,8 +101,8 @@ export function StepProgress({ steps }: StepProgressProps) {
         <Col key={approvalLevel} xs={24} md={8}>
           <Card size="small" title={`Cấp ${approvalLevel} — ${levelName}`}>
             <Flex vertical gap="small">
-              {rows.map((row) => (
-                <StepLine key={row.id} step={row} />
+              {mergeSameApprover(rows).map(({ step, scopes }) => (
+                <StepLine key={step.id} step={step} scopes={scopes} />
               ))}
             </Flex>
           </Card>

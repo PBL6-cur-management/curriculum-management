@@ -38,7 +38,8 @@
     "db:demo-syllabi": "tsx prisma/demo-syllabi.ts",
     "backup:drill": "tsx scripts/backup-restore-drill.ts",
     "db:rebuild:real": "tsx scripts/rebuild-real.ts",
-    "db:demo-curate": "tsx prisma/demo-curate.ts"
+    "db:demo-curate": "tsx prisma/demo-curate.ts",
+    "db:demo-org": "tsx prisma/demo-org.ts"
   },
   "dependencies": {
     "@nestjs/bullmq": "^12.0.0",

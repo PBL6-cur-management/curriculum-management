@@ -13,6 +13,7 @@ import { errorMessage } from '../../../shared/forms/applyFieldErrors';
 import { DEAD_STEP_LABEL, STEP_COLORS } from '../constants/approvalLabels';
 import { useApprovalHistory } from '../hooks/useApprovals';
 import { formatDateTime } from '../utils/format';
+import { mergeSameApprover } from '../utils/groupByLevel';
 import { StepLine } from './StepProgress';
 
 interface ApprovalHistoryProps {
@@ -55,11 +56,11 @@ export function ApprovalHistory({
                     </Typography.Text>
                   ),
                 },
-                ...round.steps.map((step) => ({
+                ...mergeSameApprover(round.steps).map(({ step, scopes }) => ({
                   color: STEP_COLORS[step.action],
                   content: (
                     <Flex gap="small" align="start" wrap>
-                      <StepLine step={step} />
+                      <StepLine step={step} scopes={scopes} />
                       {round.submissionRound < submissionRound &&
                         step.action === 'PENDING' && (
                           <Tag>{DEAD_STEP_LABEL}</Tag>
