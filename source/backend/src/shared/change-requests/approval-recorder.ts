@@ -17,6 +17,7 @@ import {
 } from './approval.constants.js';
 import { APPROVAL_ERRORS } from './approval.errors.js';
 import { grantFor, usableGrants } from './delegation-authority.js';
+import { blocksSelfApproval } from './self-approval.js';
 
 type Db = PrismaService | Prisma.TransactionClient;
 
@@ -75,7 +76,8 @@ export class ApprovalRecorder {
     today: Date,
   ): Promise<ActionableRow[]> {
     const level = levelOfStatus(request.status);
-    if (level === null || userId === request.createdById) return [];
+    if (level === null) return [];
+    if (await blocksSelfApproval(db, request.createdById, userId)) return [];
     const isFinalLevel = level === APPROVAL_LEVEL.ACADEMIC_OFFICE;
     if (isFinalLevel && !(await isAcademicOfficeHolder(db, userId, today))) {
       return [];

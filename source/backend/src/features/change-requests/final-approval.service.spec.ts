@@ -70,6 +70,7 @@ describe('FinalApprovalService', () => {
     };
     semester: { findUnique: ReturnType<typeof vi.fn> };
     changeItem: { count: ReturnType<typeof vi.fn> };
+    user: { findUnique: ReturnType<typeof vi.fn> };
     $executeRaw: ReturnType<typeof vi.fn>;
   };
   let recorder: Record<string, ReturnType<typeof vi.fn>>;
@@ -101,6 +102,7 @@ describe('FinalApprovalService', () => {
         }),
       },
       changeItem: { count: vi.fn().mockResolvedValue(0) },
+      user: { findUnique: vi.fn().mockResolvedValue(null) },
       $executeRaw: vi.fn(step('graph-lock')),
     };
     recorder = {
@@ -381,6 +383,20 @@ describe('FinalApprovalService', () => {
       await expect(service.approve('r1', dto, OFFICE)).rejects.toMatchObject({
         code: 'SELF_APPROVAL',
       });
+    });
+
+    it('lets a demo account (canSelfApprove) approve its own request', async () => {
+      db.changeRequest.findFirst.mockResolvedValue({
+        ...request,
+        createdById: 'office',
+      });
+      db.user.findUnique.mockResolvedValue({ canSelfApprove: true });
+
+      const outcome = await service.approve('r1', dto, OFFICE).then(
+        () => 'ok',
+        (error: { code?: string }) => error.code,
+      );
+      expect(outcome).not.toBe('SELF_APPROVAL');
     });
 
     it('refuses a request that is not waiting at level 3', async () => {

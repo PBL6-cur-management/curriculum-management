@@ -75,6 +75,39 @@ describe('LoginPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Đăng nhập' }));
     expect(await screen.findByText(message)).toBeInTheDocument();
   });
+  it('hides the demo account box unless the demo build sets it', async () => {
+    renderLogin(vi.fn().mockResolvedValue(new Response('{}', { status: 401 })));
+    await screen.findByLabelText('Tên đăng nhập');
+    expect(
+      screen.queryByRole('button', { name: 'Dùng tài khoản demo' }),
+    ).not.toBeInTheDocument();
+  });
+  it('signs in with the demo account in one click', async () => {
+    vi.stubEnv('VITE_DEMO_LOGIN', 'demo:demo');
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(new Response('{}', { status: 401 }))
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            id: '1',
+            username: 'demo',
+            userCode: 'DEMO',
+            fullName: 'Tài khoản demo',
+            email: null,
+            mustChangePassword: false,
+          }),
+        ),
+      );
+    renderLogin(fetchMock);
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Dùng tài khoản demo' }),
+    );
+    expect(await screen.findByText('home marker')).toBeInTheDocument();
+    const body = JSON.parse(String(fetchMock.mock.calls[1][1].body)) as unknown;
+    expect(body).toEqual({ username: 'demo', password: 'demo' });
+    vi.unstubAllEnvs();
+  });
   it('validates an empty username', async () => {
     renderLogin(vi.fn());
     fireEvent.click(await screen.findByRole('button', { name: 'Đăng nhập' }));

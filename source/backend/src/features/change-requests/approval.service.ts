@@ -30,6 +30,7 @@ import type {
   OverrideDecisionDto,
 } from './decision.dto.js';
 import { OrganizationalApplier } from './organizational-applier.js';
+import { blocksSelfApproval } from '../../shared/change-requests/self-approval.js';
 import { findVisibleRequest, type RequestCore } from './request-visibility.js';
 import { WorkingCopyService } from './working-copy.service.js';
 
@@ -241,7 +242,9 @@ export class ApprovalService {
     access: AccessContext,
   ): Promise<RequestCore> {
     const request = await findVisibleRequest(this.prisma, id, access);
-    if (request.createdById === access.userId) {
+    if (
+      await blocksSelfApproval(this.prisma, request.createdById, access.userId)
+    ) {
       throw new AppException(APPROVAL_ERRORS.SELF_APPROVAL);
     }
     return request;

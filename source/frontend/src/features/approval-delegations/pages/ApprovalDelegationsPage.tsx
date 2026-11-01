@@ -22,6 +22,7 @@ import {
   useDelegations,
   useRevokeDelegation,
 } from '../hooks/useDelegations';
+import { EmailRemindersNotice } from '../../../shared/components/ComingSoon';
 
 const STATUS_LABELS: Record<DelegationStatus, string> = {
   ACTIVE: 'Đang hiệu lực',
@@ -131,6 +132,7 @@ export function ApprovalDelegationsPage() {
           )
         }
       />
+      <EmailRemindersNotice />
       <FilterBar>
         <Segmented
           options={[

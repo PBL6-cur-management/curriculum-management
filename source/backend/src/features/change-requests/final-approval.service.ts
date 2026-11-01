@@ -31,6 +31,7 @@ import type {
 } from './final-approval.dto.js';
 import { hasGradingChanges } from './grading-changes.js';
 import { FinalApprovalPreviewReader } from './final-approval.preview.js';
+import { blocksSelfApproval } from '../../shared/change-requests/self-approval.js';
 import { findVisibleRequest } from './request-visibility.js';
 
 const NOT_FINAL_TYPES: readonly ChangeRequestType[] = [
@@ -168,7 +169,9 @@ export class FinalApprovalService {
         APPROVAL_FEATURE_ERRORS.FINAL_APPROVAL_NOT_APPLICABLE,
       );
     }
-    if (visible.createdById === access.userId) {
+    if (
+      await blocksSelfApproval(this.prisma, visible.createdById, access.userId)
+    ) {
       throw new AppException(APPROVAL_ERRORS.SELF_APPROVAL);
     }
     if (levelOfStatus(visible.status) !== APPROVAL_LEVEL.ACADEMIC_OFFICE) {

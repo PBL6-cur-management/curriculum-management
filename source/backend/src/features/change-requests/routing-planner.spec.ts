@@ -37,6 +37,7 @@ interface World {
   members?: ReturnType<typeof coordinator>[];
   programs?: ReturnType<typeof program>[];
   directors?: ReturnType<typeof director>[];
+  selfApprovers?: string[];
 }
 
 function world(state: World) {
@@ -72,6 +73,15 @@ function world(state: World) {
     },
     programDirectorAssignment: {
       findMany: vi.fn().mockResolvedValue(state.directors ?? []),
+    },
+    user: {
+      findUnique: vi.fn(({ where }: { where: { id: string } }) =>
+        Promise.resolve(
+          (state.selfApprovers ?? []).includes(where.id)
+            ? { canSelfApprove: true }
+            : null,
+        ),
+      ),
     },
   } as unknown as Prisma.TransactionClient;
 }
@@ -282,6 +292,32 @@ describe('RoutingPlanner', () => {
       skipReason: 'Người duyệt là người tạo đề xuất',
     });
     expect(level(plan, 2)[0].isSkipped).toBe(false);
+  });
+
+  it('keeps the row of a demo creator (canSelfApprove) so the demo can walk every level', async () => {
+    const db = world({
+      courses: [COURSE_A],
+      groups: ['gA'],
+      members: [coordinator('gA', 'author')],
+      programs: [program('p1')],
+      directors: [director('p1', 'dir1')],
+      selfApprovers: ['author'],
+    });
+    const plan = await planner.plan(db, courseRequest(), [], TODAY);
+    expect(level(plan, 1)[0]).toMatchObject({
+      approverId: 'author',
+      isSkipped: false,
+    });
+  });
+
+  it('lets a demo academic-office creator submit when nobody else holds the role', async () => {
+    const plan = await planner.plan(
+      world({ holders: ['author'], selfApprovers: ['author'] }),
+      programRequest({ requestType: ChangeRequestType.ORGANIZATION }),
+      [],
+      TODAY,
+    );
+    expect(level(plan, 3)).toHaveLength(1);
   });
 
   it('sends an organisational request to the academic office alone', async () => {

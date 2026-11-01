@@ -13,6 +13,7 @@ import {
   useUpdateNotificationPreferences,
 } from '../../../shared/notifications/useNotifications';
 import { PageHeader } from '../../../shared/design-system';
+import { EmailRemindersNotice } from '../../../shared/components/ComingSoon';
 
 const INITIAL_QUERY: NotificationQuery = {
   page: 1,
@@ -65,6 +66,7 @@ export function NotificationsPage() {
           </>
         }
       />
+      <EmailRemindersNotice />
       <Segmented
         options={[
           { label: 'Tất cả', value: VIEW.ALL },

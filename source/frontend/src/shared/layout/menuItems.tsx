@@ -13,6 +13,8 @@ import { Link } from 'react-router';
 import { ROUTES } from '../../routes';
 import { prefetchRoute } from './prefetchRoute';
 import { PERMISSIONS, type PermissionCode } from '../auth/permissions';
+import { ComingSoonTag } from '../components/ComingSoon';
+import { isComingSoon, type ComingSoonFeature } from '../config/demoFlags';
 
 // A leaf has a `path`; a group has `children` and no path of its own.
 export interface AppMenuItem {
@@ -30,6 +32,8 @@ export interface AppMenuItem {
   defaultOpen?: boolean;
   // Top level only: one glyph per entry so the eye finds a group without reading.
   icon?: ReactNode;
+  // Tagged "Sắp có" (and its route shows a description page) when the demo build lists this key.
+  comingSoon?: ComingSoonFeature;
   children?: readonly AppMenuItem[];
 }
 
@@ -153,11 +157,13 @@ export const APP_MENU: readonly AppMenuItem[] = [
       {
         path: ROUTES.schoolSync,
         label: 'Đồng bộ CSDL Trường',
+        comingSoon: 'school-sync',
         permission: PERMISSIONS.syncConfigure,
       },
       {
         path: ROUTES.integrationClients,
         label: 'Bên tích hợp dDUT',
+        comingSoon: 'integration-clients',
         permission: PERMISSIONS.integrationClientManage,
       },
     ],
@@ -189,6 +195,7 @@ export const APP_MENU: readonly AppMenuItem[] = [
       {
         path: ROUTES.backups,
         label: 'Sao lưu và phục hồi',
+        comingSoon: 'backups',
         permission: PERMISSIONS.backupView,
       },
       {
@@ -273,6 +280,9 @@ export function toMenuItems(
                 onFocus={() => item.path && prefetchRoute(item.path)}
               >
                 {item.label}
+                {item.comingSoon && isComingSoon(item.comingSoon) && (
+                  <ComingSoonTag />
+                )}
               </Link>
             ),
           },

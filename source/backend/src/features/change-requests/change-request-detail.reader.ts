@@ -44,6 +44,7 @@ import { UPLOAD_STATUSES } from './change-request.constants.js';
 import { ConflictFinder } from './conflict-finder.js';
 import { targetKey } from './request-target.resolver.js';
 import { visibleOrDelegatedWhere } from './request-visibility.js';
+import { blocksSelfApproval } from '../../shared/change-requests/self-approval.js';
 
 const NO_NUMBER = 'chưa đánh số';
 // These end at level 3 with the plain Đồng ý; every other type is released on MH-43.
@@ -222,7 +223,11 @@ export class ChangeRequestDetailReader {
         access.has(PERMISSIONS.CHANGE_REQUEST_OVERRIDE) &&
         (level === APPROVAL_LEVEL.COORDINATOR ||
           level === APPROVAL_LEVEL.DIRECTOR) &&
-        !isCreator,
+        !(await blocksSelfApproval(
+          this.prisma,
+          row.createdById,
+          access.userId,
+        )),
       canComment: access.has(PERMISSIONS.CHANGE_REQUEST_COMMENT),
     };
   }

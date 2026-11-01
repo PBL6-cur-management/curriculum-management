@@ -102,6 +102,7 @@ Migration `20261018151319_access_control` (F-02) sinh bằng `prisma migrate dev
 | `username`                | `String`     | Duy nhất (`User_username_key`); lưu dạng đã chuẩn hóa (`shared/auth/username.ts`) |
 | `passwordHash`            | `String`     | Argon2id                                                                          |
 | `mustChangePassword`      | `Boolean`    | Mặc định `false`; `true` thì chỉ gọi được `me`, đổi mật khẩu, đăng xuất           |
+| `canSelfApprove`          | `Boolean`    | Mặc định `false`; chỉ tài khoản demo (`pnpm db:demo-account`) bật để tự duyệt đề xuất của mình qua cả ba cấp. Migration `20261101130000_user_can_self_approve` |
 | `orgUnitId`               | `String?`    | FK `OrgUnit`; chỉ mục                                                             |
 | `createdAt` / `updatedAt` | `DateTime`   | `now()` / `@updatedAt`                                                            |
 
@@ -396,6 +397,8 @@ Các enum sau Giá trị liệt kê lưu ở dạng `SCREAMING_SNAKE` như từ 
 ## Seed
 
 `prisma/seed.ts`, chạy bằng `pnpm prisma:seed` (`prisma db seed` → `tsx prisma/seed.ts`, khai ở `prisma.config.ts`). Upsert một tài khoản R1: tên đăng nhập `SEED_ADMIN_USERNAME` (mặc định `admin`), mã `ADMIN`, mật khẩu `SEED_ADMIN_PASSWORD` (bắt buộc, theo chính sách mật khẩu), `mustChangePassword = true`; tài khoản đã có thì không đổi.
+
+`prisma/demo-account.ts` (`pnpm db:demo-account`), chỉ cho bản demo công khai: upsert tài khoản `demo` (mật khẩu `DEMO_PASSWORD`, mặc định `demo`, cố ý ngoài chính sách mật khẩu), đơn vị Phòng Đào tạo, `mustChangePassword = false`, `canSelfApprove = true`, vai trò R1–R5 phạm vi SYSTEM. Chạy lại an toàn. Không chạy trên CSDL có người dùng thật.
 
 Quyền và vai trò (F-02, `prisma/seed-data/*`): đơn vị Trường → Khoa CNTT + Phòng Đào tạo, 6 vai trò, 41 quyền (từ điển dữ liệu mục 9, thêm `permission.manage`), ma trận ban đầu 123 ô, gán R1 hệ thống cho tài khoản quản trị. Ô `RolePermission` chỉ được tạo cho quyền seed chèn lần đầu, nên chạy lại seed không hoàn tác thay đổi R1 làm trên MH-15 — ô đã xóa vẫn mất. Đã chạy hai lần trên cơ sở dữ liệu phát triển: `OrgUnit` 3, `Role` 6, `Permission` 41, `RolePermission` 123, `RoleAssignment` 1.
 
