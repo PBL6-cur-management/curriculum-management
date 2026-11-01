@@ -20,7 +20,7 @@ const studentPath = (studentId: string) =>
   `/students/${encodeURIComponent(studentId)}`;
 export const fetchStudents = (params: StudentListParams) =>
   getJson<Schemas['StudentPageDto']>(withQuery('/students', params));
-export const fetchStudentPrograms = (semesterId: string) =>
+export const fetchStudentPrograms = (semesterId?: string) =>
   getJson<Schemas['StudentProgramOptionDto'][]>(
     withQuery('/students/program-options', { semesterId }),
   );

@@ -30,8 +30,8 @@ export const studentKeys = {
   all: STUDENT_QUERY_ROOT,
   list: (params: StudentListParams) =>
     [...STUDENT_QUERY_ROOT, 'list', params] as const,
-  programs: (semesterId: string) =>
-    [...STUDENT_QUERY_ROOT, 'programs', semesterId] as const,
+  programs: (semesterId?: string) =>
+    [...STUDENT_QUERY_ROOT, 'programs', semesterId ?? ''] as const,
   detail: (studentId: string, context: StudentDetailContext) =>
     [...STUDENT_QUERY_ROOT, 'detail', studentId, context] as const,
   results: (studentId: string, params: StudentResultParams) =>
@@ -55,18 +55,16 @@ export function useStudentCohorts() {
     queryFn: fetchCohorts,
   });
 }
-export function useStudentPrograms(semesterId: string) {
+export function useStudentPrograms(semesterId?: string) {
   return useQuery({
     queryKey: studentKeys.programs(semesterId),
-    queryFn: () => fetchStudentPrograms(semesterId),
-    enabled: Boolean(semesterId),
+    queryFn: () => fetchStudentPrograms(semesterId || undefined),
   });
 }
 export function useStudents(params: StudentListParams) {
   return useQuery({
     queryKey: studentKeys.list(params),
     queryFn: () => fetchStudents(params),
-    enabled: Boolean(params.semesterId),
     placeholderData: (previous, previousQuery) => {
       const prior = previousQuery?.queryKey[2] as StudentListParams | undefined;
       return prior &&

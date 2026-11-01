@@ -152,6 +152,7 @@ export function GraduationContextForm({
         <Alert
           type="info"
           title="Chọn học kỳ, chương trình và sinh viên; không tự chọn phiên bản mới nhất."
+          style={{ marginBottom: 16 }}
         />
       )}
       <Button type="primary" htmlType="submit">

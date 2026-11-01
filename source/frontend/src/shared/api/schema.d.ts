@@ -10672,7 +10672,7 @@ export interface operations {
   StudentsController_programOptions: {
     parameters: {
       query: {
-        semesterId: string;
+        semesterId?: string;
       };
       header?: never;
       path?: never;
@@ -10695,7 +10695,7 @@ export interface operations {
       query: {
         page?: number;
         pageSize?: number;
-        semesterId: string;
+        semesterId?: string;
         q?: string;
         cohortId?: string;
         programId?: string;

@@ -6,16 +6,24 @@ import { StudentListPage } from './StudentListPage';
 
 afterEach(() => vi.unstubAllGlobals());
 describe('StudentListPage', () => {
-  it('requires an explicit semester without fetching a global student list', async () => {
-    const { fetchMock } = renderStudentPage({ element: <StudentListPage /> });
+  it('lists and searches students without choosing a semester', async () => {
+    const { fetchMock } = renderStudentPage({
+      element: <StudentListPage />,
+      responses: new Map([
+        [
+          '/api/students?page=1&pageSize=20',
+          { items: [student], total: 1, page: 1, pageSize: 20 },
+        ],
+      ]),
+    });
     expect(
-      await screen.findByText('Chọn học kỳ để xem sinh viên'),
+      await screen.findByRole('link', { name: '000123' }),
     ).toBeInTheDocument();
     expect(
       fetchMock.mock.calls.some(([path]) =>
-        String(path).startsWith('/api/students?'),
+        String(path).startsWith('/api/students?page=1'),
       ),
-    ).toBe(false);
+    ).toBe(true);
   });
   it('carries filters into profile links and resets page after debounced search', async () => {
     const params = 'semesterId=s1&programId=p1&page=2';
@@ -37,7 +45,7 @@ describe('StudentListPage', () => {
       'href',
       `/students/st1?${params}`,
     );
-    fireEvent.change(screen.getByRole('textbox', { name: 'Tìm sinh viên' }), {
+    fireEvent.change(screen.getByLabelText('Tìm sinh viên'), {
       target: { value: '000' },
     });
     await waitFor(() =>

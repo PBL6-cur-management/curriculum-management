@@ -33,7 +33,7 @@ import type {
   StudentDetailQueryDto,
   StudentListQueryDto,
   StudentResultsQueryDto,
-  StudentSemesterQueryDto,
+  StudentOptionalSemesterQueryDto,
 } from './dto/student-query.dto.js';
 import {
   ENROLLMENT_INCLUDE,
@@ -78,11 +78,11 @@ export class StudentsReadService {
 
   async programOptions(
     access: AccessContext,
-    query: StudentSemesterQueryDto,
+    query: StudentOptionalSemesterQueryDto,
   ): Promise<StudentProgramOptionDto[]> {
     const scope = staffStudentScope(access);
     return this.prisma.$transaction(async (tx) => {
-      await requireSemesterStart(tx, query.semesterId);
+      if (query.semesterId) await requireSemesterStart(tx, query.semesterId);
       const rows = await tx.program.findMany({
         where: {
           ...(scope.all ? {} : { id: { in: [...scope.programIds] } }),
@@ -115,7 +115,9 @@ export class StudentsReadService {
   ): Promise<Page<StudentSummaryDto>> {
     const scope = staffStudentScope(access);
     return this.prisma.$transaction(async (tx) => {
-      const semester = await requireSemesterStart(tx, query.semesterId);
+      const semester = query.semesterId
+        ? await requireSemesterStart(tx, query.semesterId)
+        : null;
       const where = this.listWhere(scope, semester, query);
       const [rows, total] = await Promise.all([
         tx.student.findMany({
@@ -268,10 +270,11 @@ export class StudentsReadService {
     }, REPEATABLE_READ);
   }
 
-  // R1 sees every student when no program is named; a named program, and every R3 query, requires an enrollment in it that covers the semester.
+  // R1 sees every student when no program is named; a named program, and every R3 query, requires an enrollment in it
+  // that covers the semester, or any enrollment in it when no semester is chosen.
   private listWhere(
     scope: StaffStudentScope,
-    semester: StartedSemester,
+    semester: StartedSemester | null,
     filters: {
       programId?: string;
       cohortId?: string;
@@ -281,7 +284,7 @@ export class StudentsReadService {
   ): Prisma.StudentWhereInput {
     const programIds = scope.all ? undefined : [...scope.programIds];
     const covering: Prisma.ProgramEnrollmentWhereInput = {
-      ...enrollmentCoversWhere(semester),
+      ...(semester ? enrollmentCoversWhere(semester) : {}),
       ...(programIds ? { programId: { in: programIds } } : {}),
       ...(filters.programId ? { programId: filters.programId } : {}),
     };

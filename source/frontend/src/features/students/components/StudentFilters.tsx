@@ -1,11 +1,15 @@
-import { Alert, Button, Input, Select } from 'antd';
+import { Alert, Button, Select } from 'antd';
+import { SearchInput } from '../../../shared/design-system';
 import { semesterLabel } from '../../../shared/releases/semesters';
 import {
   useStudentCohorts,
   useStudentPrograms,
   useStudentSemesters,
 } from '../hooks/useStudents';
-import { STUDENT_STATUS_LABELS } from '../constants/studentLabels';
+import {
+  STUDENT_SEARCH_DEBOUNCE_MS,
+  STUDENT_STATUS_LABELS,
+} from '../constants/studentLabels';
 import type { StudentListParams } from '../api/students';
 
 interface StudentFiltersProps {
@@ -20,7 +24,8 @@ export function StudentFilters({ params, onChange }: StudentFiltersProps) {
     <>
       <Select
         aria-label="Học kỳ"
-        placeholder="Chọn học kỳ"
+        placeholder="Mọi học kỳ"
+        allowClear
         value={params.semesterId || undefined}
         style={{ minWidth: 220 }}
         loading={semesters.isPending}
@@ -39,7 +44,6 @@ export function StudentFilters({ params, onChange }: StudentFiltersProps) {
         allowClear
         showSearch
         optionFilterProp="label"
-        disabled={!params.semesterId}
         value={params.programId}
         style={{ minWidth: 220 }}
         loading={programs.isFetching}
@@ -72,12 +76,13 @@ export function StudentFilters({ params, onChange }: StudentFiltersProps) {
         )}
         onChange={(value) => onChange({ status: value })}
       />
-      <Input
-        aria-label="Tìm sinh viên"
+      <SearchInput
+        ariaLabel="Tìm sinh viên"
         placeholder="Mã sinh viên hoặc họ tên"
-        value={params.q ?? ''}
-        style={{ maxWidth: 280 }}
-        onChange={(event) => onChange({ q: event.target.value })}
+        value={params.q}
+        style={{ width: 280 }}
+        delayMs={STUDENT_SEARCH_DEBOUNCE_MS}
+        onCommit={(q) => onChange({ q })}
       />
       {[semesters, cohorts, programs].some((query) => query.isError) && (
         <Alert
@@ -89,7 +94,7 @@ export function StudentFilters({ params, onChange }: StudentFiltersProps) {
               onClick={() => {
                 void semesters.refetch();
                 void cohorts.refetch();
-                if (params.semesterId) void programs.refetch();
+                void programs.refetch();
               }}
             >
               Thử lại
