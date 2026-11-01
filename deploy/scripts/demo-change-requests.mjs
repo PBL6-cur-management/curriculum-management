@@ -252,12 +252,12 @@ const SCENARIOS = [
         targetId: c.id,
         title: this.title,
         reason:
-          'Tên tiếng Anh trên bảng điểm không thống nhất giữa các khóa. Đề nghị dùng "Introduction to Information Technology Engineering" ' +
+          'Tên tiếng Anh trên bảng điểm không thống nhất giữa các khóa. Đề nghị dùng "Introduction to Information Technology" ' +
           'theo danh mục học phần song ngữ của Trường.',
       });
       await api('PUT', `/change-requests/${r.id}/items`, {
         items: [
-          { operation: 'SET_COURSE_FIELD', field: 'englishName', value: 'Introduction to Information Technology Engineering' },
+          { operation: 'SET_COURSE_FIELD', field: 'englishName', value: 'Introduction to Information Technology' },
         ],
       });
       const s = await submit(r.id);
@@ -323,7 +323,10 @@ await signIn(DEMO, process.env.DEMO_PASSWORD ?? 'demo');
 const staffPassword = process.env.DEMO_STAFF_PASSWORD;
 if (!staffPassword) throw new Error('Đặt DEMO_STAFF_PASSWORD (mật khẩu các tài khoản mẫu của db:demo-org).');
 for (const user of STAFF) await signIn(user, staffPassword);
-const existing = new Set(rows(await api('GET', '/change-requests?pageSize=100')).map((r) => r.title));
+// Drafts are visible to their author only, so every account's list counts.
+const existing = new Set();
+for (const user of [DEMO, ...STAFF])
+  for (const r of rows(await call(user, 'GET', '/change-requests?pageSize=100'))) existing.add(r.title);
 for (const scenario of SCENARIOS) {
   if (existing.has(scenario.title)) {
     console.log(`skip  ${scenario.title}`);

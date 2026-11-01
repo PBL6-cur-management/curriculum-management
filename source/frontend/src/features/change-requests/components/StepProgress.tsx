@@ -1,5 +1,6 @@
 import { Card, Col, Flex, Row, Tag, Tooltip, Typography } from 'antd';
 import { groupByLevel, mergeSameApprover } from '../utils/groupByLevel';
+import { ScopeCodes } from './ScopeCodes';
 import type { ApprovalStep } from '../api/changeRequests';
 import { STEP_COLORS, STEP_KIND_LABELS } from '../constants/approvalLabels';
 import {
@@ -19,31 +20,6 @@ interface StepLineProps {
 }
 
 const NO_APPROVER_LABEL = 'Không có người duyệt';
-const SCOPES_SHOWN = 3;
-
-function ScopeList({
-  step,
-  scopes,
-}: {
-  step: ApprovalStep;
-  scopes: readonly string[];
-}) {
-  if (scopes.length === 0) return null;
-  if (scopes.length === 1)
-    return <Typography.Text type="secondary">({scopes[0]})</Typography.Text>;
-  const noun = step.forSubjectGroup ? 'nhóm' : 'CTĐT';
-  const shown = scopes.slice(0, SCOPES_SHOWN).join(', ');
-  const rest = scopes.length - SCOPES_SHOWN;
-  return (
-    <Tooltip title={scopes.join(', ')}>
-      <Typography.Text type="secondary">
-        ({scopes.length} {noun}: {shown}
-        {rest > 0 ? ` và ${rest} ${noun} khác` : ''})
-      </Typography.Text>
-    </Tooltip>
-  );
-}
-
 // One approver line; shared by the current round here and every round of the history.
 export function StepLine({ step, scopes }: StepLineProps) {
   const who =
@@ -55,7 +31,11 @@ export function StepLine({ step, scopes }: StepLineProps) {
     <Flex vertical gap={2}>
       <Flex gap="small" align="center" wrap>
         <Typography.Text delete={step.isSkipped}>{who}</Typography.Text>
-        <ScopeList step={step} scopes={scopes ?? (own ? [own] : [])} />
+        <ScopeCodes
+          codes={scopes ?? (own ? [own] : [])}
+          noun={step.forSubjectGroup ? 'nhóm' : 'CTĐT'}
+          parenthesised
+        />
         {step.isSkipped ? (
           <Tooltip title={step.skipReason}>
             <Tag>{STEP_KIND_LABELS.SKIPPED}</Tag>

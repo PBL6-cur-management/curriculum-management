@@ -1,3 +1,4 @@
+import { ScopeCodes } from '../components/ScopeCodes';
 import { Flex, Result, Select, Table, Tag } from 'antd';
 import type { TableColumnsType } from 'antd';
 import { useUrlQuery } from '../../../shared/hooks/useUrlQuery';
@@ -14,7 +15,6 @@ import { useApprovalQueue } from '../hooks/useApprovals';
 import { formatDateTime } from '../utils/format';
 import {
   FilterBar,
-  formatEmpty,
   PageHeader,
   SummaryStrip,
   type SummaryItem,
@@ -55,7 +55,14 @@ const COLUMNS: TableColumnsType<ApprovalQueueItem> = [
     // F-25: a row reached through a grant names whose level it is.
     render: (standsFor: string | null, item) => (
       <Flex gap={4} wrap align="center">
-        {formatEmpty(standsFor, SELF_LABEL)}
+        {standsFor ? (
+          <ScopeCodes
+            codes={standsFor.split(', ')}
+            noun={item.approvalLevel === 1 ? 'nhóm' : 'CTĐT'}
+          />
+        ) : (
+          SELF_LABEL
+        )}
         {item.delegatedFor.map((ref) => (
           <Tag key={ref.delegationId} color="purple">
             Duyệt thay {ref.delegator.fullName}
