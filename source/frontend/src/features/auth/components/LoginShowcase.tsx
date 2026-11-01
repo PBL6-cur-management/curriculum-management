@@ -6,31 +6,32 @@ import styles from './LoginShowcase.module.css';
 
 const SCENE_MS = 3500;
 
-// A curriculum frame: four semesters; one prerequisite chain lights up across them.
+// A slice of the prerequisite graph: four semesters of real DUT courses; one chain lights up in turn.
 const SEMESTERS = [
-  ['Giải tích 1', 'Tin học đại cương', 'Triết học'],
-  ['Vật lý 1', 'Kỹ thuật lập trình', 'Toán rời rạc'],
-  ['Cấu trúc dữ liệu', 'Kiến trúc máy tính', 'Giải tích 2'],
-  ['Cơ sở dữ liệu', 'Hệ điều hành', 'PBL 2'],
-];
-// [semester, row] of each course on the chain, in order.
-const CHAIN = [
-  [0, 1],
-  [1, 1],
-  [2, 0],
-  [3, 0],
+  [
+    ['3190111', 'Giải tích 1'],
+    ['1022863', 'Kỹ thuật lập trình'],
+    ['1022940', 'Nhập môn ngành'],
+  ],
+  [
+    ['3190121', 'Giải tích 2'],
+    ['1023280', 'Cấu trúc dữ liệu'],
+    ['3050011', 'Vật lý 1'],
+  ],
+  [
+    ['1023693', 'Lập trình hướng đối tượng'],
+    ['1021263', 'Toán rời rạc'],
+    ['3190260', 'Đại số tuyến tính'],
+  ],
+  [
+    ['1023290', 'Cơ sở dữ liệu'],
+    ['1020292', 'Mạng máy tính'],
+    ['3190141', 'Xác suất thống kê'],
+  ],
 ] as const;
-
-const COL_W = 136;
-const COL_GAP = 20;
-const CHIP_H = 52;
-const ROW_GAP = 14;
-const HEAD_H = 30;
-const TOP = HEAD_H + 12;
-const STEP = 0.5; // seconds between two lit courses
-
-const chipX = (column: number) => column * (COL_W + COL_GAP);
-const chipY = (row: number) => TOP + row * (CHIP_H + ROW_GAP);
+// Row of the chain's course in each semester.
+const CHAIN_ROW = [1, 1, 0, 0];
+const STEP = 0.6; // seconds between two lit courses
 
 const FLOW = [
   { role: 'Giảng viên', step: 'Soạn đề xuất' },
@@ -49,123 +50,36 @@ const delay = (seconds: number) =>
   ({ animationDelay: `${seconds}s` }) as CSSProperties;
 
 function FrameScene() {
-  const width = 4 * COL_W + 3 * COL_GAP;
-  const height = TOP + 3 * CHIP_H + 2 * ROW_GAP + 4;
-  const step = (index: number) => 0.7 + index * STEP;
-  const chainIndex = (column: number, row: number) =>
-    CHAIN.findIndex(([c, r]) => c === column && r === row);
   return (
-    <svg
-      className={styles.path}
-      viewBox={`-4 -4 ${width + 8} ${height + 8}`}
-      aria-hidden="true"
-    >
-      <defs>
-        <marker
-          id="login-arrow"
-          viewBox="0 0 10 10"
-          refX="8"
-          refY="5"
-          markerWidth="7"
-          markerHeight="7"
-          orient="auto-start-reverse"
-        >
-          <path d="M0 0L10 5L0 10z" className={styles.arrowHead} />
-        </marker>
-      </defs>
+    <div className={styles.graph}>
       {SEMESTERS.map((courses, column) => (
-        <g key={column}>
-          <rect
-            className={styles.semesterPill}
-            x={chipX(column)}
-            y={0}
-            width={COL_W}
-            height={HEAD_H}
-            rx={8}
-          />
-          <text
-            className={styles.semesterText}
-            x={chipX(column) + COL_W / 2}
-            y={HEAD_H / 2 + 5}
-            textAnchor="middle"
-          >
-            Học kỳ {column + 1}
-          </text>
-          {courses.map((name, row) => {
-            const lit = chainIndex(column, row);
-            const last = lit === CHAIN.length - 1;
+        <div key={column} className={styles.semester}>
+          <span className={styles.semesterHead}>Học kỳ {column + 1}</span>
+          {courses.map(([code, name], row) => {
+            const onChain = CHAIN_ROW[column] === row;
+            const last = column === SEMESTERS.length - 1;
+            const className = onChain
+              ? `${styles.course} ${last ? styles.courseTarget : styles.courseLit}`
+              : `${styles.course} ${styles.courseDim}`;
             return (
-              <g
-                key={name}
-                className={styles.chip}
-                style={delay(0.05 + (column * 3 + row) * 0.04)}
+              <span
+                key={code}
+                className={className}
+                style={
+                  {
+                    '--enter': `${0.04 * (column * 3 + row)}s`,
+                    '--lit': `${0.6 + column * STEP}s`,
+                  } as CSSProperties
+                }
               >
-                <rect
-                  className={styles.chipBox}
-                  x={chipX(column)}
-                  y={chipY(row)}
-                  width={COL_W}
-                  height={CHIP_H}
-                  rx={10}
-                />
-                {lit >= 0 && (
-                  <rect
-                    className={last ? styles.chipTarget : styles.chipLit}
-                    style={delay(step(lit))}
-                    x={chipX(column)}
-                    y={chipY(row)}
-                    width={COL_W}
-                    height={CHIP_H}
-                    rx={10}
-                  />
-                )}
-                <text
-                  className={styles.chipText}
-                  x={chipX(column) + COL_W / 2}
-                  y={chipY(row) + CHIP_H / 2 + 5}
-                  textAnchor="middle"
-                >
-                  {name}
-                </text>
-                {lit >= 0 && (
-                  <text
-                    className={
-                      last
-                        ? `${styles.chipTextLit} ${styles.chipTextTarget}`
-                        : styles.chipTextLit
-                    }
-                    style={delay(step(lit))}
-                    x={chipX(column) + COL_W / 2}
-                    y={chipY(row) + CHIP_H / 2 + 5}
-                    textAnchor="middle"
-                  >
-                    {name}
-                  </text>
-                )}
-              </g>
+                <span className={styles.courseCode}>{code}</span>
+                <span className={styles.courseName}>{name}</span>
+              </span>
             );
           })}
-        </g>
+        </div>
       ))}
-      {CHAIN.slice(1).map(([column, row], index) => {
-        const [fromColumn, fromRow] = CHAIN[index];
-        const x1 = chipX(fromColumn) + COL_W;
-        const y1 = chipY(fromRow) + CHIP_H / 2;
-        const x2 = chipX(column) - 2;
-        const y2 = chipY(row) + CHIP_H / 2;
-        const mid = (x1 + x2) / 2;
-        return (
-          <path
-            key={`${column}-${row}`}
-            className={styles.arrow}
-            style={delay(step(index) + 0.1)}
-            d={`M${x1} ${y1} C${mid} ${y1} ${mid} ${y2} ${x2} ${y2}`}
-            pathLength={1}
-            markerEnd="url(#login-arrow)"
-          />
-        );
-      })}
-    </svg>
+    </div>
   );
 }
 
@@ -237,7 +151,7 @@ function VersionScene() {
 }
 
 const SCENES = [
-  { title: 'Khung chương trình và học phần tiên quyết', render: FrameScene },
+  { title: 'Học phần tiên quyết qua các học kỳ', render: FrameScene },
   { title: 'Đề xuất thay đổi qua ba cấp duyệt', render: FlowScene },
   { title: 'Phiên bản ban hành cho từng khóa', render: VersionScene },
 ];
