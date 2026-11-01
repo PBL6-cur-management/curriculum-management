@@ -41,11 +41,19 @@ export function DragHandle() {
 }
 
 interface SortableRowProps extends HTMLAttributes<HTMLTableRowElement> {
-  // AntD puts the table's rowKey here, which is the sortable id.
-  'data-row-key': string;
+  // AntD puts the table's rowKey here, which is the sortable id. Rows AntD draws itself (the empty-table
+  // placeholder, expanded rows) have none.
+  'data-row-key'?: string;
 }
 
 export function SortableRow(props: SortableRowProps) {
+  // Only data rows are sortable. A row without a key would get id `undefined`, and dnd-kit compares it with
+  // `active?.id` (also `undefined` while nothing is dragged), so it would count as "dragging" forever.
+  if (!props['data-row-key']) return <tr {...props} />;
+  return <SortableDataRow {...props} data-row-key={props['data-row-key']} />;
+}
+
+function SortableDataRow(props: SortableRowProps & { 'data-row-key': string }) {
   const {
     attributes,
     listeners,
@@ -59,7 +67,8 @@ export function SortableRow(props: SortableRowProps) {
     ...props.style,
     transform: CSS.Translate.toString(transform),
     transition,
-    ...(isDragging ? { position: 'relative', zIndex: 9999 } : {}),
+    // Above the sibling rows of its own table only; never above modals, popups or the sticky header.
+    ...(isDragging ? { position: 'relative', zIndex: 1 } : {}),
   };
   const context = useMemo(
     () => ({ setActivatorNodeRef, listeners, attributes }),
