@@ -120,4 +120,7 @@ Một dòng cho mỗi tính năng; việc chi tiết (CV-xxx) ở `docs/planning
 | DEBT-09 | F12-TC_004 flaky: sau khi lưu ánh xạ đánh giá–CLO, ô đã tick đôi khi hiện bỏ chọn và "Chưa được đánh giá" còn nguyên; chạy riêng thì đạt. Nghi remount với dữ liệu đề cương cũ trong `AssessmentCloTab`/`useEditorRemountKey`, chưa chứng minh | ❌ | |
 | DEBT-10 | F09-TC_001 flaky một lần trong lượt chạy dài (hết hạn tải xuống/"Tải tệp mẫu"); đạt hai lần khi chạy riêng | ❌ | |
 | DEBT-11 | a11y AntD: sau trạng thái loading của mutation, nút "Tiếp tục xác nhận" trong `CohortVersionAssignmentForm` giữ biểu tượng loading ẩn nên tên truy cập đọc "loading Tiếp tục xác nhận"; hiển thị bình thường | ❌ | |
-| DEBT-12 | Demo Oracle Free: chưa `terraform apply`, bản ghi DNS, deploy thật, chạy CI trên GitHub, GitHub secrets ([demo-oracle-free](../operations/demo-oracle-free.md)) | ❌ | Cần OCI API key và khóa SSH của người dùng |
+| DEBT-12 | Demo Oracle Free: apply, DNS (Route 53), deploy tự động, CI và secrets đã xong 2026-11-01; chạy tại https://ctdt.oguri-lab.io.vn ([demo-oracle-free](../operations/demo-oracle-free.md)) | ✅ | PR #52; repo nay ở `PBL6-cur-management` |
+| DEBT-13 | Demo: đổi mật khẩu admin và tạo tài khoản demo theo vai trò trước khi gửi link cho giảng viên | ❌ | Qua màn Quản trị; không ghi mật khẩu vào repo |
+| DEBT-14 | Demo: chuyển từ VM x86 tạm (`trial.tf`, tín dụng tới ~2026-12-01) sang A1 Always Free khi hết "Out of host capacity" | ❌ | Đặt `trial_x86_vm=false`, UPSERT Route 53, chạy lại `set-ci-secrets.sh`; `apply-until-capacity.sh` đang săn |
+| DEBT-15 | Demo: chưa kiểm tra đăng nhập bằng Playwright trên link công khai | ❌ | |

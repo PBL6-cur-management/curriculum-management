@@ -140,3 +140,18 @@ gh secret list --env demo
 ```
 
 Chạy lại sau khi IP VM đổi (VM tạo lại mà không dùng `use_reserved_ip`). Cần quyền admin trên repo. `gh` báo *Bad credentials* → `unset GITHUB_TOKEN` (token hỏng trong biến môi trường che mất token keyring).
+
+## 10. DNS (Route 53) và VM tạm
+
+```bash
+# Trỏ ctdt tới IP mới (DNS ở Route 53, không phải tenten)
+aws route53 change-resource-record-sets --hosted-zone-id <ZONE_ID> --change-batch file://change.json   # Action: UPSERT, A, ctdt.oguri-lab.io.vn
+# Sau khi đổi VM/IP (gồm VM x86 tạm từ trial.tf)
+DEMO_HOST=<ip> deploy/scripts/set-ci-secrets.sh
+# Ship thủ công: tắt autocrlf để script giữ LF
+SHA=$(git rev-parse HEAD)
+git -c core.autocrlf=false archive --format=tar.gz "$SHA" | ssh -i ~/.ssh/oci_ctdt ubuntu@<IP>   "d=/srv/ctdt/releases/$SHA; mkdir -p \$d && tar -xz -C \$d && chmod +x \$d/deploy/scripts/*.sh && \$d/deploy/scripts/deploy-release.sh"
+```
+
+Repo: `https://github.com/PBL6-cur-management/curriculum-management`.
+

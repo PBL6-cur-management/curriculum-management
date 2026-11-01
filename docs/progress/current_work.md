@@ -4,8 +4,8 @@
 
 ## Demo trên Oracle Cloud Always Free — 2026-11-01
 
-- Nhánh `chore/demo-oracle` (commit `2b0d1ea`): Terraform OCI, CI/CD, script deploy, sửa Dockerfile; đã kiểm chứng stack production cục bộ. Chi tiết: [demo-oracle-free](../operations/demo-oracle-free.md), progress_log 2026-11-01.
-- Việc kế: người dùng tạo OCI API key (`~/.oci/config`) và khóa SSH `~/.ssh/oci_ctdt`, `~/.ssh/ctdt_ci`; rồi `terraform apply`, bản ghi A ở tenten, `demo.env` trên VM, export/restore dữ liệu, `set-ci-secrets.sh`, merge PR.
+- **Demo đã chạy thật**: https://ctdt.oguri-lab.io.vn (PR #52 đã merge; deploy tự động main `5a0c087` thành công). Đang chạy trên VM x86 tạm `trial.tf` (E5.Flex 1 OCPU/6 GB, tín dụng Free Trial tới khoảng 2026-12-01) vì A1 Always Free hết chỗ; `apply-until-capacity.sh` vẫn săn A1. DNS ở Route 53. Chi tiết: [demo-oracle-free](../operations/demo-oracle-free.md), progress_log 2026-11-01.
+- Còn mở: đổi mật khẩu admin và tạo tài khoản demo theo vai trò trước khi gửi link; chuyển sang A1 khi có chỗ (`trial_x86_vm=false`, UPSERT Route 53, `set-ci-secrets.sh`); Playwright đăng nhập trên link công khai. Xem DEBT-13..15.
 
 ## Seed lại dữ liệu thật DUT — 2026-10-31
 

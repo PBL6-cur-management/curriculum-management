@@ -81,3 +81,10 @@ Bộ test đầy đủ (≈1800 unit backend, 680 e2e, 700 frontend) vẫn chạ
 - **Rollback chỉ quay lại mã**: migration đã chạy thì không đảo ngược.
 - Email, nhắc hạn, đồng bộ CSDL Trường, sao lưu: **tắt** trên demo.
 - `/api/docs` bị Caddy chặn (404) — đúng thiết kế F-27.
+
+## 7. Cập nhật 2026-11-01
+
+- **Repo** nay ở `PBL6-cur-management/curriculum-management` (trước là `4UT15T1Ck/...`); bí mật CD nằm trong environment `demo` của repo mới.
+- **DNS nằm ở AWS Route 53**, không phải tenten (tên miền `oguri-lab.io.vn` ủy quyền cho Route 53; bản ghi thêm ở tenten không có tác dụng). Đổi IP: `aws route53 change-resource-record-sets` với UPSERT bản ghi A `ctdt`.
+- **VM x86 tạm**: khi A1 hết chỗ, `deploy/terraform/oci/trial.tf` tạo VM.Standard.E5.Flex 1 OCPU/6 GB trả bằng tín dụng Free Trial (hạn khoảng 2026-12-01). Chuyển sang A1: đặt `trial_x86_vm=false`.
+
