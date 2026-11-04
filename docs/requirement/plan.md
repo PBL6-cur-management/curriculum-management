@@ -129,6 +129,7 @@ thuộc nhóm mình. Tài liệu sẽ có 1 bảng ma trận `vai trò × hành 
 - Xem đề cương chi tiết + công thức điểm của từng HP.
 - Gợi ý học phần đủ điều kiện đăng ký cho học kỳ tới.
 - REST API + tài liệu OpenAPI để dDUT tích hợp. **Web là trọng tâm**, app chỉ tiêu thụ API.
+- F-28: ứng dụng di động độc lập mô phỏng dDUT chỉ dùng cho trình diễn, ở repo riêng `dut_curriculum_app`, tiêu thụ API hiện có bằng phiên cookie; không thay thế ứng dụng dDUT của Trường. Tài khoản `demo.sinhvien` dùng hồ sơ và kết quả tổng hợp, không gắn với sinh viên thật.
 
 **M10 — Tích hợp dữ liệu (Excel + DB)**
 - Import Excel: danh mục HP, khung CTĐT, bảng điểm SV. Bắt buộc có **dry-run** và báo lỗi theo từng
@@ -262,6 +263,7 @@ Phần rules engine sẽ đặc tả bằng bảng quyết định (điều ki�
   rồi bơm dữ liệu từ Excel vào? Có được cấp quyền truy cập thật không, hay chỉ có bản dump?
 - **Q13.** Xác thực: dùng **SSO của trường** hay tự làm tài khoản trong hệ thống?
 - **Q14.** Nhóm có phải **tự làm app mobile** không, hay chỉ cần cung cấp API và phía dDUT tự tích hợp?
+  **Đã chốt (F-28, 2026-11-01):** tự làm ứng dụng mô phỏng dDUT trong repo riêng `dut_curriculum_app`, chỉ để trình diễn qua API hiện có và phiên cookie; không thay thế dDUT của Trường, không bổ sung đăng nhập Microsoft/Office 365.
 - **Q15.** Cần hỗ trợ **song ngữ Việt/Anh** cho tên học phần, PLO, CLO (phục vụ kiểm định AUN) trong
   phạm vi PBL6, hay để sau?
 - **Q16.** Có bao nhiêu CTĐT thực tế cần quản lý, và có file Excel mẫu của **cả CTĐT kỹ sư lẫn cử

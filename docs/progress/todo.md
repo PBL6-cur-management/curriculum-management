@@ -10,6 +10,13 @@ Một dòng cho mỗi tính năng; việc chi tiết (CV-xxx) ở `docs/planning
 
 ---
 
+## F-28 — Demo mobile (phần backend)
+
+| # | Item | Status | Notes |
+|---|---|---|---|
+| F-28 | Tài khoản sinh viên tổng hợp cho demo mobile | ✅ | Backend `prisma/demo-student.ts` + `pnpm db:demo-student`, docs phạm vi/vận hành; tsc/oxlint/Prettier qua. App ở repo riêng `dut_curriculum_app`; chưa chạy script hoặc kiểm tra API trên CSDL. [Báo cáo](../implement-report/f-28-demo-student-account-implement-report.md) |
+| F28-MANUAL | Chạy tài khoản demo và xác minh portal/eligibility/graduation | ❌ | Người dùng chạy `pnpm db:demo-student` hai lần khi PostgreSQL hoạt động; kiểm tra số lượng ổn định, đăng nhập và dữ liệu. Chạy lại sau rebuild/restore; không coi là đã deploy |
+
 ## Core / Infrastructure
 
 | #    | Item                                          | Status | Notes                                                                                                                                                                                                                           |

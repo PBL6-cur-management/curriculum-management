@@ -534,3 +534,14 @@ Format:
 - Dữ liệu: bản sao `ctdt_real` cục bộ đã khôi phục (337 người dùng, 0 tài khoản `e2e.*`, locale `vi-VN`). Không xuất tệp đính kèm (kho cục bộ trống).
 - Bài học: `git archive` từ checkout Windows có `core.autocrlf=true` sinh script CRLF ("bash: No such file"). Đã sửa bằng `.gitattributes` `*.sh text eol=lf` và `git -c core.autocrlf=false archive` trong lệnh ship thủ công.
 - Còn mở: đổi mật khẩu admin và tạo tài khoản demo theo vai trò trước khi gửi link cho giảng viên; chuyển sang A1 khi có chỗ rồi đặt `trial_x86_vm=false`; chưa kiểm tra đăng nhập bằng Playwright trên link công khai. Đóng DEBT-12, mở DEBT-13..15.
+
+## [F-28] Tài khoản sinh viên demo tổng hợp
+
+**Date**: 2026-11-01
+**Files changed**: `source/backend/prisma/demo-student.ts`, `source/backend/package.json`, `docs/requirement/REQUIREMENTS.md`, `docs/requirement/plan.md`, `docs/operations/demo-oracle-free.md`, `docs/progress/current_work.md`, `docs/progress/todo.md`, `docs/progress/progress_log.md`, `docs/implementation/f-28-demo-student-account-implementation-plan.md`, `docs/implement-report/f-28-demo-student-account-implement-report.md`.
+
+- S-01: tạo/làm mới tài khoản `demo.sinhvien`, hồ sơ `Sinh viên Demo`, mã `DEMOSV001`; chỉ sao chép các ID/`major` được duyệt từ đăng ký mẫu, không sao chép danh tính hay kết quả thật. Tự chọn mẫu theo chương trình/khóa và học kỳ; sinh kết quả theo thang DUT, không ngẫu nhiên. Upsert tài khoản/hồ sơ và thay đăng ký/kết quả trong transaction; lỗi khóa ngoại giải thích tham chiếu còn tồn tại và rollback.
+- S-02: thêm `pnpm db:demo-student`, không thêm dependency hoặc migration.
+- S-03: cập nhật phạm vi F-28 ở REQUIREMENTS §12 và plan.md Q14/M9; app chỉ demo qua API hiện có bằng cookie, ở repo riêng `dut_curriculum_app`, không thay thế dDUT của Trường. Bổ sung lệnh, biến môi trường, cảnh báo chạy lại và bước xác minh cho người vận hành.
+- Lần chạy trước dừng đúng điều kiện baseline lỗi. Phiên điều phối đã sửa `node_modules` và Prisma client trước khi giao tiếp; đợt tiếp tục đo lại `tsc --noEmit -p tsconfig.json` sạch. Kiểm tra sau triển khai: tsc exit 0, oxlint script exit 0, Prettier script/package exit 0. Không chạy install/generate lại.
+- Chưa chạy script, truy vấn PostgreSQL, login/API hoặc deploy; các bước thủ công được giao lại người dùng. Giữ nguyên các phần blocker cũ trong báo cáo, cập nhật status và nối thêm phần đính chính/kết quả mới.

@@ -154,7 +154,7 @@ export const SELECTION: Selection[] = [
     '_THTNTT_SoTC',
   ]),
   ...pick('DATA_SV1', 'people', ['DSSV_KhoaWeb', 'NhanThan']),
-  ...pick('DHBK_CDS', 'curriculum', ['congthucdiem']),
+  ...pick('DHBK_CDS', 'curriculum', ['congthucdiem', 'tmKehoach']),
 ];
 
 interface CatalogColumn {

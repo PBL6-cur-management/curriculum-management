@@ -1284,7 +1284,7 @@ HÀM XetTotNghiep(sinhVien):
 | 4 | Nhập điểm và quản lý điểm | Thuộc hệ thống quản lý điểm hiện hành. Hệ thống này chỉ **đọc** kết quả |
 | 5 | Quản lý lớp học phần, phân công giảng dạy | Thuộc hệ thống khác |
 | 6 | Quản lý học phí, công nợ sinh viên | Ngoài phạm vi nghiệp vụ |
-| 7 | Xây dựng ứng dụng di động độc lập | Hệ thống cung cấp API; việc tích hợp do phía dDUT thực hiện |
+| 7 | Thay thế ứng dụng dDUT của Trường | Ngoại lệ trong phạm vi: ứng dụng di động độc lập mô phỏng dDUT (F-28), repo riêng `dut_curriculum_app`, chỉ dùng cho trình diễn, tiêu thụ API hiện có bằng phiên cookie; không thay thế ứng dụng dDUT của Trường. |
 | 8 | Quản lý hồ sơ nhân sự giảng viên | Thuộc hệ thống nhân sự |
 
 ---

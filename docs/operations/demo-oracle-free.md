@@ -100,6 +100,26 @@ Org `4UT15T1Ck` phải cho phép GitHub Actions (Settings → Actions). Từ đ�
 
 ## 9. Kiểm tra
 
+### Tài khoản sinh viên tổng hợp cho F-28
+
+Ứng dụng mô phỏng dDUT nằm ở repo riêng `dut_curriculum_app`, chỉ dùng trình diễn API hiện có bằng phiên cookie; không thay thế dDUT của Trường. Web student portal dùng được cùng tài khoản.
+
+Sau khi dữ liệu thật đã được dựng/khôi phục, người vận hành chủ động chạy trong thư mục backend (hoặc trong container backend có môi trường tương ứng):
+
+```powershell
+pnpm db:demo-student
+```
+
+- Mặc định đăng nhập `demo.sinhvien` / `demo`, mã sinh viên `DEMOSV001`, tên `Sinh viên Demo`; mật khẩu ngắn công khai, chỉ dùng trên CSDL demo, không dùng ở hệ thống có người dùng thật phụ thuộc.
+- Biến môi trường tùy chọn: `DEMO_STUDENT_USERNAME`, `DEMO_STUDENT_PASSWORD`, `DEMO_STUDENT_PROGRAM_CODE`, `DEMO_STUDENT_COHORT_CODE`. Hai biến mã lọc chính xác chương trình/khóa; khi có lọc tường minh chỉ cần ít nhất một học kỳ thường đã bắt đầu.
+- Không chỉ định mã: chọn đăng ký ACTIVE PRIMARY không ngoại lệ, có ít nhất 4 học kỳ thường đã bắt đầu; ưu tiên mã chứa `CNTT`, rồi khóa đông sinh viên nhất trong chương trình, hòa thì theo mã chương trình/khóa. Script in chương trình, khóa, phiên bản và số kết quả; nếu không có mẫu sẽ báo các mã chương trình hiện có.
+- Chỉ sao chép các ID và `major` theo đăng ký mẫu, không đọc tên/mã/email hay điểm sinh viên thật. Kết quả tổng hợp: một môn bắt buộc ở kỳ đầu bị trượt, các môn bắt buộc kỳ trước đã đạt, kỳ thường mới nhất đã bắt đầu đang học; tự chọn và kỳ tương lai không có kết quả. Học kỳ hè không được tính.
+- Chạy lại thay toàn bộ đăng ký và kết quả của sinh viên demo trong một transaction. Nếu bản xét tốt nghiệp đã lưu hoặc lịch sử thay đổi kết quả đang tham chiếu, script báo lỗi và rollback; nhờ cán bộ kiểm tra, không tự xóa dữ liệu tham chiếu.
+- Chạy lại sau mỗi `db:rebuild:real` hoặc khôi phục bản sao chưa có tài khoản; mã mặc định không khớp mẫu dọn của `db:demo-curate`. Nếu đổi username sau lần tạo đầu, mã tài khoản cố định có thể xung đột: giữ username đã dùng hoặc nhờ cán bộ kiểm tra, không ghi đè tài khoản khác.
+- Sau khi chạy, tự kiểm tra đăng nhập, `GET /api/portal/me` có chương trình, các API registration-eligibility và graduation trả dữ liệu (có thể có chẩn đoán `CANNOT_AUDIT` khi chương trình thiếu đầu vào). Chạy script hai lần để kiểm tra số lượng ổn định. Các bước này chưa được chạy trong đợt triển khai chỉ kiểm tra tĩnh.
+
+### Kiểm tra demo công khai
+
 - `curl https://ctdt.oguri-lab.io.vn/api/health` → `{"status":"ok"...}`, chứng chỉ Let's Encrypt hợp lệ.
 - `curl -I https://ctdt.oguri-lab.io.vn/api/docs` → 404.
 - Đăng nhập từng tài khoản demo, mở CTĐT, xuất PDF, tải một tệp đính kèm.

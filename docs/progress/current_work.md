@@ -2,6 +2,13 @@
 
 **Start here**: đọc [bàn giao 2026-10-31 (tối)](handoff.md). Playwright trên `ctdt_real` đã chạy xong ngày 2026-11-01 trừ F-06 (xem progress_log). Việc kế tiếp: đi luồng phê duyệt R5→R4→R3→R1 trên UI, chạy [smoke checklist](../testing/smoke-checklist.md) vòng 1 (29 kịch bản, thay 413 ca thủ công) và chụp màn hình cho impeccable polish. Main: BE unit 1797/1797, BE e2e 679/679, FE 693/693.
 
+## F-28 — Tài khoản sinh viên demo, kiểm tra tĩnh hoàn tất — 2026-11-01
+
+- Đã có `prisma/demo-student.ts` và `pnpm db:demo-student`: hồ sơ `demo.sinhvien` / `DEMOSV001`, đăng ký PRIMARY theo mẫu thật, điểm hoàn toàn tổng hợp; không gắn tài khoản vào sinh viên thật. Mặc định ưu tiên `CNTT`, khóa đông và ít nhất 4 học kỳ thường đã bắt đầu; có biến môi trường chọn chương trình/khóa.
+- Ứng dụng mô phỏng dDUT ở repo riêng `dut_curriculum_app`, chỉ trình diễn API hiện có bằng phiên cookie; REQUIREMENTS §12 và plan.md Q14/M9 đã ghi phạm vi này. Chưa triển khai app trong repo backend/web.
+- Backend `tsc`, lint script và Prettier đã qua. Baseline cũ do dependency/client Prisma lỗi thời đã được phiên điều phối sửa bằng `pnpm install --frozen-lockfile` và `pnpm exec prisma generate` trước đợt này. Xem [báo cáo F-28](../implement-report/f-28-demo-student-account-implement-report.md).
+- **Tiếp theo (người vận hành):** khi PostgreSQL có sẵn, chạy script hai lần, kiểm tra login/portal/eligibility/graduation; chạy lại sau rebuild/restore. Chưa tạo tài khoản trên CSDL hay VM trong đợt này. Hướng dẫn và bốn biến môi trường: [demo-oracle-free](../operations/demo-oracle-free.md#tài-khoản-sinh-viên-tổng-hợp-cho-f-28).
+
 ## Demo trên Oracle Cloud Always Free — 2026-11-01
 
 - **Demo đã chạy thật**: https://ctdt.oguri-lab.io.vn (PR #52 đã merge; deploy tự động main `5a0c087` thành công). Đang chạy trên VM x86 tạm `trial.tf` (E5.Flex 1 OCPU/6 GB, tín dụng Free Trial tới khoảng 2026-12-01) vì A1 Always Free hết chỗ; `apply-until-capacity.sh` vẫn săn A1. DNS ở Route 53. Chi tiết: [demo-oracle-free](../operations/demo-oracle-free.md), progress_log 2026-11-01.
