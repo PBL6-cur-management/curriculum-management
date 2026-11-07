@@ -81,6 +81,15 @@ resource "oci_core_security_list" "public" {
   }
 
   # Path MTU discovery.
+  # scale.tf: the LB and the API pool reach PostgreSQL, Redis, NFS and Caddy :8080 inside the subnet only.
+  # Unconditional on purpose: apply-until-capacity.sh targets the demo instance without scale_out, and
+  # -target pulls this list in; a conditional rule was removed that way and the LB went 502 (2026-11-06).
+  ingress_security_rules {
+    description = "VCN-internal traffic (scale-out)"
+    source      = "10.0.1.0/24"
+    protocol    = "6"
+  }
+
   ingress_security_rules {
     source   = "0.0.0.0/0"
     protocol = "1"

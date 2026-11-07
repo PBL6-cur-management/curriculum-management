@@ -1,0 +1,65 @@
+# VM2: web-only API + Caddy :8080 behind the OCI load balancer. No database here:
+# PostgreSQL, Redis and the attachment folder (NFS) live on VM1.
+name: ctdt-api2
+
+x-logging: &rotated-logging
+  driver: json-file
+  options: { max-size: '10m', max-file: '5' }
+
+services:
+  api:
+    image: 'ctdt/backend:${RELEASE_TAG:?}'
+    build:
+      context: ../../source/backend
+      target: '${API_BUILD_TARGET:-runtime}'
+      args:
+        NODE_IMAGE: '${NODE_IMAGE:?}'
+    shm_size: '256m'
+    environment:
+      NODE_ENV: production
+      PORT: '3000'
+      DATABASE_URL: '${VM2_DATABASE_URL:?}'
+      SESSION_SECRET: '${SESSION_SECRET:?}'
+      SESSION_IDLE_MINUTES: '60'
+      REDIS_HOST: '${VM1_PRIVATE_IP:?}'
+      REDIS_PORT: '6379'
+      FILES_ROOT: /var/lib/ctdt/files
+      LOG_LEVEL: '${LOG_LEVEL:-info}'
+      QUEUE_WORKERS_ENABLED: 'false'
+    volumes:
+      - type: bind
+        source: /srv/ctdt/files
+        target: /var/lib/ctdt/files
+        bind: { create_host_path: false }
+    healthcheck:
+      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.status===200?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 7s
+      retries: 6
+      start_period: 30s
+    init: true
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ['no-new-privileges:true']
+    stop_grace_period: 30s
+    restart: unless-stopped
+    logging: *rotated-logging
+
+  caddy:
+    image: 'ctdt/frontend:${RELEASE_TAG:?}'
+    build:
+      context: ../../source/frontend
+      target: runtime
+      args:
+        NODE_IMAGE: '${NODE_IMAGE:?}'
+        CADDY_IMAGE: '${CADDY_IMAGE:?}'
+        VITE_DEMO_LOGIN: '${VITE_DEMO_LOGIN:-}'
+        VITE_COMING_SOON: '${VITE_COMING_SOON:-}'
+    ports: ['8080:8080']
+    volumes:
+      - ./Caddyfile.vm2:/etc/caddy/Caddyfile:ro
+    depends_on:
+      api: { condition: service_healthy }
+    restart: unless-stopped
+    logging: *rotated-logging

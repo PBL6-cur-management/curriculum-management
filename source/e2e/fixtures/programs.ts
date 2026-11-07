@@ -40,11 +40,14 @@ async function postProgram(page: Page, input: ProgramInput) {
 export async function createProgram(page: Page, input: ProgramInput = {}) {
   const program = await postProgram(page, input);
   await page.goto(`/programs/${program.id}`);
-  await expect(page.getByRole('heading', { level: 2 })).toContainText(`${program.code} — ${program.name}`);
+  await expect(programHeading(page)).toContainText(`${program.code} — ${program.name}`);
   const path = new URL(page.url()).pathname;
-  await expect(page.getByRole('link', { name: 'Khung chương trình', exact: true })).toBeVisible();
-  const curriculumPath = await page.getByRole('link', { name: 'Khung chương trình', exact: true }).getAttribute('href');
-  if (!curriculumPath) throw new Error('Thiếu đường dẫn khung chương trình riêng.');
+  // The workspace navigates by tabs (PR #35), so the frame path is read from the URL the tab opens.
+  await openProgramTab(page, 'Khung chương trình');
+  await expect(page).toHaveURL(/\/curriculum$/);
+  const curriculumPath = new URL(page.url()).pathname;
+  await openProgramTab(page, 'Tổng quan');
+  await expect(page).toHaveURL((url) => url.pathname === path);
   return { code: program.code, name: program.name, path, curriculumPath };
 }
 
@@ -54,6 +57,17 @@ export async function openProgramEdit(page: Page, input: ProgramInput = {}) {
   await expect(page.getByRole('heading', { name: `Sửa thông tin chương trình ${program.code}`, exact: true })).toBeVisible();
   await expect(page.getByLabel('Tên chương trình', { exact: true })).toHaveValue(program.name);
   return program;
+}
+
+// The program workspace (ProgramWorkspaceLayout) names the program in an h3 above two rows of tabs.
+export function programHeading(page: Page) {
+  return page.getByRole('heading', { level: 3 }).first();
+}
+
+export async function openProgramTab(page: Page, group: string, subPage?: string) {
+  const nav = page.getByRole('navigation', { name: 'Các mục của chương trình', exact: true });
+  await nav.getByRole('tab', { name: group, exact: true }).click();
+  if (subPage) await nav.getByRole('tab', { name: subPage, exact: true }).click();
 }
 
 export function programInfo(page: Page) {
@@ -83,6 +97,6 @@ export async function cloneProgram(page: Page) {
   await dialog.getByLabel('Tên chương trình mới', { exact: true }).fill(name);
   await dialog.getByRole('button', { name: 'Nhân bản', exact: true }).click();
   await expect(dialog).not.toBeVisible();
-  await expect(page.getByRole('heading', { level: 2 })).toContainText(`${code} — ${name}`);
+  await expect(programHeading(page)).toContainText(`${code} — ${name}`);
   return { code, name, path: new URL(page.url()).pathname };
 }

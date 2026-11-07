@@ -4,6 +4,7 @@ Một chỗ để bắt đầu: dựng hệ thống trên máy, chạy kiểm th
 
 | Cần gì | Ở đâu |
 |---|---|
+| Tài khoản đăng nhập theo vai, biến mật khẩu, thế giới `e2e.*` | [`docs/ACCOUNTS.md`](../ACCOUNTS.md) |
 | Bước đi thử từng tính năng (nguồn chính) | §7 "Kiểm chứng" của `docs/implementation/f-xx-*-implementation-plan.md`, tóm tắt lại ở mục USER ACTIONS / đi thử của `docs/implement-report/f-xx-*-implement-report.md` |
 | Kịch bản nghiệm thu theo bậc (NT-Bx-yy) | `docs/planning/test-plan.md` §7 |
 | Kịch bản quy tắc nghiệp vụ và trường hợp biên (KB-xxx) | `docs/planning/test-plan.md` §6 |
