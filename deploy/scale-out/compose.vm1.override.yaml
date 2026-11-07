@@ -1,0 +1,14 @@
+# VM1 additions for the scale-out (used with deploy/compose.yaml):
+#   docker compose -p ctdt-production -f <release>/deploy/compose.yaml -f /srv/ctdt/scale-out/compose.vm1.override.yaml ...
+# PostgreSQL and Redis listen on the private IP only (security list + iptables allow 10.0.1.0/24).
+services:
+  postgres:
+    ports: ['${VM1_PRIVATE_IP:?}:5432:5432']
+  redis:
+    ports: ['${VM1_PRIVATE_IP:?}:6379:6379']
+  caddy:
+    ports: ['80:80', '443:443', '${VM1_PRIVATE_IP:?}:8080:8080']
+    volumes:
+      - /srv/ctdt/scale-out/Caddyfile.vm1:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config

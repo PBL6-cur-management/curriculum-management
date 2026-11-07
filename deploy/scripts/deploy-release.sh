@@ -23,11 +23,17 @@ flock -n 9 || { echo "Một lần deploy khác đang chạy." >&2; exit 1; }
 PUBLIC_HOST="$(grep -E '^PUBLIC_HOST=' "$ENV_FILE" | cut -d= -f2-)"
 PREVIOUS_DIR="$(readlink -f "$ROOT/current" 2>/dev/null || true)"
 
+# Scale-out (deploy/scale-out/README.md): when the override exists, PostgreSQL/Redis keep their private
+# ports for VM2 and Caddy keeps the :8080 site the load balancer calls. Without it a deploy would cut VM2 off.
+SCALE_OVERRIDE="$ROOT/scale-out/compose.vm1.override.yaml"
+
 dc() {
   local dir="$1"
   shift
+  local files=(-f "$dir/deploy/compose.yaml")
+  if [[ -f "$SCALE_OVERRIDE" ]]; then files+=(-f "$SCALE_OVERRIDE"); fi
   RELEASE_TAG="$(basename "$dir")" docker compose -p "$PROJECT" \
-    -f "$dir/deploy/compose.yaml" --env-file "$ENV_FILE" "$@"
+    "${files[@]}" --env-file "$ENV_FILE" "$@"
 }
 
 healthy_through_caddy() {
