@@ -110,3 +110,11 @@ export async function setRequisite(page: Page, target: CurriculumCourse, source:
   await dialog.getByRole('button', { name: 'Lưu', exact: true }).click();
   await expect(dialog).not.toBeVisible();
 }
+
+// The warnings panel folds behind "Xem chi tiết" once it holds more than three warnings; open it before reading one.
+export async function curriculumWarning(page: Page, text: string) {
+  const expand = page.getByRole('button', { name: 'Xem chi tiết', exact: true });
+  if (await expand.isVisible().catch(() => false)) await expand.click();
+  // A panel mixing severities prefixes each line with its severity ("Cảnh báo: …"), so match the line, not the whole text.
+  return page.getByRole('list', { name: 'Cảnh báo của khung', exact: true }).getByRole('listitem').filter({ hasText: text });
+}

@@ -33,17 +33,15 @@ test.describe("F-09 Nhập, xuất Excel", () => {
       expect(download.suggestedFilename()).toBe(`${type}_mau.xlsx`);
       expect(await download.failure()).toBeNull();
     }
+    // Since F-17 the student list and results imports share DATA_IMPORT_EXCEL, so R1 is offered all four types.
     await page.getByLabel("Loại dữ liệu", { exact: true }).click();
-    await expect(
-      page
-        .locator(".ant-select-item-option-content")
-        .filter({ hasText: "Danh sách sinh viên" }),
-    ).toHaveCount(0);
-    await expect(
-      page
-        .locator(".ant-select-item-option-content")
-        .filter({ hasText: "Kết quả học tập" }),
-    ).toHaveCount(0);
+    for (const label of ["Danh sách sinh viên", "Kết quả học tập"]) {
+      await expect(
+        page
+          .locator(".ant-select-dropdown:visible .ant-select-item-option-content")
+          .filter({ hasText: label }),
+      ).toHaveCount(1);
+    }
   });
 
   test("F09-TC_002 Kiểm tra xuất nhập lại, xác nhận và xem lịch sử tệp gốc", async ({

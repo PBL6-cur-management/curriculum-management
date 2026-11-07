@@ -95,7 +95,7 @@ test.describe('F-06 Thông tin chương trình, Giám đốc CTĐT', () => {
   test('F06-TC_018 Kiểm tra tìm không có kết quả', async ({ page }) => {
     await page.goto('/programs');
     await page.getByPlaceholder('Tìm theo mã hoặc tên chương trình', { exact: true }).fill(`NONE${uniqueSuffix()}`);
-    await expect(page.getByText('Chưa có chương trình', { exact: true })).toBeVisible();
+    await expect(page.getByText('Không có chương trình khớp bộ lọc', { exact: true })).toBeVisible();
   });
 
   test('F06-TC_020 Kiểm tra trùng mã chương trình riêng', async ({ page }) => {
@@ -166,7 +166,7 @@ test.describe('F-06 Thông tin chương trình, Giám đốc CTĐT', () => {
     await expect(page.getByText('Đã ngừng sử dụng chương trình.', { exact: true })).toBeVisible();
     await page.goto('/programs');
     await page.getByPlaceholder('Tìm theo mã hoặc tên chương trình', { exact: true }).fill(program.code);
-    await expect(page.getByText('Chưa có chương trình', { exact: true })).toBeVisible();
+    await expect(page.getByText('Không có chương trình khớp bộ lọc', { exact: true })).toBeVisible();
     await chooseOption(page, page.getByRole('combobox', { name: 'Trạng thái', exact: true }), 'Tất cả');
     await expect(programRow(page, program.code).getByText('Ngừng sử dụng', { exact: true })).toBeVisible();
   });

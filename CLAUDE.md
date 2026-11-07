@@ -68,6 +68,8 @@ Answered in `docs/planning/feature-questions.md` §F-00; the code moves to this 
 | `docs/implementation/` | Building a planned feature — the plan names every file and how to verify it |
 | `docs/progress/todo.md` | Picking up new work |
 | `docs/troubleshooting/error_log.md` | Debugging — check whether the symptom was already diagnosed |
+| `docs/ACCOUNTS.md` | Logging in as a role, running Playwright/e2e or the smoke checklist — which account per role, which env var holds its password (never the password itself) |
+| `docs/testing/smoke-checklist.md` | Manual testing — the 29-scenario role checklist replaces running the 413 manual cases |
 
 ## Design system
 

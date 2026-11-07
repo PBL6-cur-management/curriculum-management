@@ -1,6 +1,20 @@
 # Tài khoản đại diện cho các vai trò
 
-Danh sách tài khoản dùng để đăng nhập thử từng vai trò khi phát triển và kiểm thử. **Tài liệu này không chứa mật khẩu**: mật khẩu lấy từ biến môi trường hoặc tệp riêng nêu ở từng mục. Không thêm mật khẩu thật vào tệp này.
+Danh sách tài khoản dùng để đăng nhập thử từng vai trò khi phát triển và kiểm thử. Mật khẩu **cục bộ** của môi trường phát triển ghi ngay dưới đây (người dùng cho phép ngày 2026-10-31). Không dùng chúng ở môi trường thật, và không thêm mật khẩu của môi trường thật vào tệp này.
+
+## Mật khẩu cục bộ (máy phát triển, Playwright)
+
+Đặt trong `source/e2e/.env` (đã gitignore):
+
+```dotenv
+E2E_ADMIN_USERNAME=admin
+E2E_ADMIN_PASSWORD=0905748953a
+E2E_PASSWORD=0905748953a
+```
+
+- `E2E_ADMIN_PASSWORD`: mật khẩu hiện tại của `admin`, tức sau lần đổi bắt buộc đầu tiên.
+- `E2E_PASSWORD`: mật khẩu chung của mọi tài khoản `e2e.*` ở mục 2. Đặt cùng giá trị khi chạy `pnpm e2e:world`.
+- Chạy Playwright: theo [playwright-guide.md](testing/playwright-guide.md).
 
 Ứng dụng chạy tại `http://localhost:5173` (frontend) và `http://localhost:3000` (backend). Cách chạy xem `scripts/README.md`.
 

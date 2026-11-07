@@ -4,7 +4,7 @@ Từ 2026-10-31, người dùng chốt giảm thiểu kiểm thử thủ công. 
 
 - Phần đã có test tự động (BE unit/e2e, FE vitest, Playwright) **không** lặp lại ở đây. Checklist chỉ giữ những gì máy không kiểm được: nhìn, đọc chữ, cảm giác luồng, email thật, file thật.
 - Mỗi lượt phát hành: một người chạy hết bảng, khoảng 60–90 phút, ghi Passed / Failed / Blocked kèm ngày và ghi chú.
-- Tài khoản: thế giới `e2e.*` (`pnpm e2e:world`) hoặc tài khoản thật đã phân vai. Mật khẩu đặt trong `source/e2e/.env`, không ghi vào tài liệu.
+- Tài khoản: theo [`docs/ACCOUNTS.md`](../ACCOUNTS.md), gồm thế giới `e2e.*` (`pnpm e2e:world`) và tài khoản thật đã phân vai. Mật khẩu lấy từ biến môi trường nêu ở đó (`E2E_ADMIN_PASSWORD`, `E2E_PASSWORD` trong `source/e2e/.env`), không ghi vào tài liệu.
 - Gặp lỗi: ghi hết một lượt vào `docs/troubleshooting/error_log.md` rồi mới sửa theo nhóm.
 
 ## Trạng thái lượt gần nhất

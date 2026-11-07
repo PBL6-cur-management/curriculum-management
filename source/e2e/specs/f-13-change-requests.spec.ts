@@ -30,8 +30,9 @@ test.describe('F-13 Đề xuất thay đổi', () => {
       await expect(requestHeading(page, request)).toBeVisible();
       await expect(page.getByText(`Điều chỉnh ${program.code}`, { exact: true })).toBeVisible();
       await page.goto(program.path);
-      await expect(page.getByRole('heading', { level: 2 })).toContainText(program.name);
-      await expect(page.getByRole('heading', { level: 2 })).not.toContainText(`Điều chỉnh ${program.code}`);
+      // The program workspace (PR #35) titles the program with a level-3 heading.
+      await expect(page.getByRole('heading', { level: 3 }).first()).toContainText(program.name);
+      await expect(page.getByRole('heading', { level: 3 }).first()).not.toContainText(`Điều chỉnh ${program.code}`);
     });
 
     test('F13-TC_007 Xóa Nháp chưa gửi sau xác nhận', async ({ page }) => {
