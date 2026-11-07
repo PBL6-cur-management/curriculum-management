@@ -3,7 +3,7 @@ import {
   ChangeRequestStatus,
   ChangeRequestType,
   RequestOrigin,
-  type ChangeTargetType,
+  ChangeTargetType,
   type Prisma,
 } from '../../generated/prisma/client.js';
 import type { AccessContext } from '../../shared/authz/access-context.js';
@@ -20,6 +20,7 @@ import { COMMON_ERRORS } from '../../shared/exception/error-codes.js';
 import { FileStorageService } from '../../shared/files/file-storage.service.js';
 import { toPage, toSkipTake, type Page } from '../../shared/pagination/page.js';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
+import { programContentTarget } from '../../shared/programs/program-content-target.js';
 import { waitingBefore } from '../../shared/time/days-since.js';
 import { todayDate } from '../../shared/time/today.js';
 import { ChangeRequestDetailReader } from './change-request-detail.reader.js';
@@ -109,7 +110,13 @@ export class ChangeRequestsService {
     // The permission first, so a caller who may not create this kind of request learns that before the target is looked up.
     assertMayCreate(access, dto.requestType);
     const target = await this.targets.resolve(dto.targetType, dto.targetId);
-    assertCanCreate(access, dto.requestType, dto.targetType, target);
+    await assertCanCreate(
+      this.prisma,
+      access,
+      dto.requestType,
+      dto.targetType,
+      target,
+    );
     const today = todayDate();
     const id = await this.prisma.$transaction(async (tx) => {
       const request = await tx.changeRequest.create({
@@ -258,12 +265,13 @@ function assertMayCreate(access: AccessContext, type: ChangeRequestType): void {
 
 // An organisational request needs its own permission on the group / program; a data request needs the right to edit
 // the target through either path. assertCan reports OUT_OF_SCOPE when the caller holds the permission elsewhere.
-function assertCanCreate(
+async function assertCanCreate(
+  db: PrismaService,
   access: AccessContext,
   type: ChangeRequestType,
   targetType: ChangeTargetType,
   target: ResolvedTarget,
-): void {
+): Promise<void> {
   if (type === ChangeRequestType.ORGANIZATION) {
     access.assertCan(
       PERMISSIONS.CHANGE_REQUEST_CREATE_ORGANIZATIONAL,
@@ -273,9 +281,27 @@ function assertCanCreate(
   }
   access.assertCan(PERMISSIONS.CHANGE_REQUEST_CREATE, {});
   const codes = editPermissionsFor(type, targetType);
-  if (!codes.some((code) => access.modeFor(code, target.scope) !== null)) {
-    access.assertCan(codes[0], target.scope);
+  // Lecturers edit a programme's rows through their subject group, so the check sees the groups it lists.
+  const scope = editsProgramContent(type, targetType)
+    ? await programContentTarget(db, {
+        id: target.id,
+        facultyId: target.scope.orgUnitIds?.[0] ?? '',
+      })
+    : target.scope;
+  if (!codes.some((code) => access.modeFor(code, scope) !== null)) {
+    access.assertCan(codes[0], scope);
   }
+}
+
+function editsProgramContent(
+  type: ChangeRequestType,
+  targetType: ChangeTargetType,
+): boolean {
+  return (
+    type === ChangeRequestType.CURRICULUM ||
+    (type === ChangeRequestType.OUTCOME &&
+      targetType === ChangeTargetType.PROGRAM)
+  );
 }
 
 // One PostgreSQL sequence: unique and gap-tolerant under concurrency; the year is for reading only (D13).

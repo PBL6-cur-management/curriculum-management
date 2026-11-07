@@ -57,7 +57,6 @@ function renderForm(
   const router = createMemoryRouter(
     [
       { path: '/programs', element: <p>Danh sách chương trình</p> },
-      { path: '/programs/new', element: <ProgramFormPage /> },
       { path: '/programs/:programId/edit', element: <ProgramFormPage /> },
       { path: '/programs/:programId', element: <p>Tổng quan chương trình</p> },
     ],
@@ -87,53 +86,45 @@ const writes = (fetchMock: ReturnType<typeof renderForm>) =>
     ([, init]) => init?.method === 'POST' || init?.method === 'PATCH',
   );
 
+const EDIT_PATH = '/programs/p1/edit';
+
 function fill(label: string, value: string) {
   fireEvent.change(screen.getByLabelText(label), { target: { value } });
 }
 
-async function fillValid(code: string) {
-  fireEvent.change(await screen.findByLabelText('Mã chương trình'), {
-    target: { value: code },
-  });
-  fireEvent.mouseDown(screen.getByLabelText('Trình độ'));
-  fireEvent.click(await screen.findByTitle('Kỹ sư'));
-  fill('Tên chương trình', 'Chương trình mới');
-  fill('Mã ngành', '7480106');
-  fill('Tên ngành', 'Kỹ thuật máy tính');
-  fill('Số học kỳ', '10');
-  fill('Tổng số tín chỉ', '150');
-  fill('Tín chỉ bắt buộc', '140');
-  fill('Tín chỉ tự chọn', '10');
+async function openFilled() {
+  const code = await screen.findByLabelText('Mã chương trình');
+  await waitFor(() => expect(code).toHaveValue('1024034'));
 }
 
 afterEach(() => vi.unstubAllGlobals());
 
 describe('ProgramFormPage', () => {
-  it('names the missing required fields without sending a request', async () => {
-    const fetchMock = renderForm('/programs/new');
-    fireEvent.click(await screen.findByRole('button', { name: 'Lưu' }));
+  it('names the emptied required fields without sending a request', async () => {
+    const fetchMock = renderForm(EDIT_PATH);
+    await openFilled();
+    fill('Tên chương trình', '');
+    fill('Tổng số tín chỉ', '');
+    fireEvent.click(screen.getByRole('button', { name: 'Lưu' }));
     expect(
-      await screen.findByText('Nhập mã chương trình.'),
+      await screen.findByText('Nhập tên chương trình.'),
     ).toBeInTheDocument();
-    expect(screen.getByText('Chọn trình độ.')).toBeInTheDocument();
-    expect(screen.getByText('Nhập tên chương trình.')).toBeInTheDocument();
     expect(screen.getByText('Nhập tổng số tín chỉ.')).toBeInTheDocument();
     expect(writes(fetchMock)).toHaveLength(0);
   });
 
   it('refuses a malformed credit number with the range', async () => {
-    const fetchMock = renderForm('/programs/new');
-    fireEvent.change(await screen.findByLabelText('Tổng số tín chỉ'), {
-      target: { value: '-1' },
-    });
+    const fetchMock = renderForm(EDIT_PATH);
+    await openFilled();
+    fill('Tổng số tín chỉ', '-1');
     fireEvent.click(screen.getByRole('button', { name: 'Lưu' }));
     expect(await screen.findByText(CREDITS_MESSAGE)).toBeInTheDocument();
     expect(writes(fetchMock)).toHaveLength(0);
   });
 
   it('shows the gap while typing and clears it once the sums agree (KB-011)', async () => {
-    const fetchMock = renderForm('/programs/new');
-    await fillValid('9999999');
+    const fetchMock = renderForm(EDIT_PATH);
+    await openFilled();
     fill('Tín chỉ bắt buộc', '120');
     fill('Tín chỉ tự chọn', '25');
     expect(
@@ -144,10 +135,10 @@ describe('ProgramFormPage', () => {
     expect(writes(fetchMock)).toHaveLength(0);
   });
 
-  it('still posts a mismatch and shows the server refusal under the total', async () => {
+  it('still sends a mismatch and shows the server refusal under the total', async () => {
     const message =
       'Tín chỉ bắt buộc cộng tín chỉ tự chọn phải bằng tổng tín chỉ (chênh lệch 5 tín chỉ).';
-    const fetchMock = renderForm('/programs/new', {
+    const fetchMock = renderForm(EDIT_PATH, {
       write: () =>
         json(
           {
@@ -158,7 +149,7 @@ describe('ProgramFormPage', () => {
           400,
         ),
     });
-    await fillValid('9999999');
+    await openFilled();
     fill('Tín chỉ bắt buộc', '120');
     fill('Tín chỉ tự chọn', '25');
     fireEvent.click(screen.getByRole('button', { name: 'Lưu' }));
@@ -166,50 +157,8 @@ describe('ProgramFormPage', () => {
     expect(await screen.findByText(message)).toBeInTheDocument();
   });
 
-  it('posts the trimmed code and string credits, then opens the overview', async () => {
-    const fetchMock = renderForm('/programs/new');
-    await fillValid('  9999999 ');
-    fireEvent.click(screen.getByRole('button', { name: 'Lưu' }));
-    await waitFor(() => expect(writes(fetchMock)).toHaveLength(1));
-    const [url, init] = writes(fetchMock)[0];
-    expect(String(url)).toBe('/api/programs');
-    expect(JSON.parse(String(init?.body))).toEqual({
-      programCode: '9999999',
-      degreeLevel: 'ENGINEER',
-      programName: 'Chương trình mới',
-      majorCode: '7480106',
-      majorName: 'Kỹ thuật máy tính',
-      semesterCount: 10,
-      totalCredits: '150',
-      compulsoryCredits: '140',
-      electiveCredits: '10',
-    });
-    expect(
-      await screen.findByText('Tổng quan chương trình'),
-    ).toBeInTheDocument();
-  });
-
-  it('puts a duplicate-code refusal under the code field', async () => {
-    renderForm('/programs/new', {
-      write: () =>
-        json(
-          {
-            code: 'PROGRAM_CODE_TAKEN',
-            message: 'Mã chương trình đã tồn tại.',
-            details: [{ field: 'programCode', constraints: ['unique'] }],
-          },
-          409,
-        ),
-    });
-    await fillValid('1024034');
-    fireEvent.click(screen.getByRole('button', { name: 'Lưu' }));
-    expect(
-      await screen.findByText('Mã chương trình đã tồn tại.'),
-    ).toBeInTheDocument();
-  });
-
-  it('fills edit mode from the Draft, disables the code and patches without it', async () => {
-    const fetchMock = renderForm('/programs/p1/edit');
+  it('fills from the Draft, disables the code and patches without it', async () => {
+    const fetchMock = renderForm(EDIT_PATH);
     const code = await screen.findByLabelText('Mã chương trình');
     await waitFor(() => expect(code).toHaveValue('1024034'));
     expect(code).toBeDisabled();
@@ -230,7 +179,7 @@ describe('ProgramFormPage', () => {
   });
 
   it('sends the caller back to the overview when the edit must go through a request', async () => {
-    renderForm('/programs/p1/edit', {
+    renderForm(EDIT_PATH, {
       program: { ...PROGRAM, editPath: 'VIA_REQUEST', draftVersion: null },
     });
     expect(

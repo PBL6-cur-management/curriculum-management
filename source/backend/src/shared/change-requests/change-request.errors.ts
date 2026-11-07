@@ -14,6 +14,12 @@ export const REQUEST_DRAFT_ERRORS = {
     message:
       'Đề xuất không còn ở trạng thái Nháp; không sửa được bản nháp của nó.',
   },
+  WRONG_REQUEST_TYPE: {
+    status: HttpStatus.CONFLICT,
+    code: 'REQUEST_COPY_WRONG_TYPE',
+    message:
+      'Đề xuất sửa thông tin chương trình chỉ sửa được thông tin chung. Hãy tạo đề xuất khung chương trình hoặc chuẩn đầu ra cho thay đổi này.',
+  },
   COPY_HAS_NO_ATTACHMENTS: {
     status: HttpStatus.CONFLICT,
     code: 'REQUEST_COPY_NO_ATTACHMENTS',

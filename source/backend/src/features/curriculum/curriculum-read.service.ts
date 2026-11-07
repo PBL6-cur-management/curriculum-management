@@ -19,6 +19,7 @@ import { programCredits } from '../../shared/curriculum/program-credits.js';
 import { rowCredits } from '../../shared/curriculum/row-course.js';
 import { AppException } from '../../shared/exception/app.exception.js';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
+import { programContentTarget } from '../../shared/programs/program-content-target.js';
 import {
   programEditState,
   programTarget,
@@ -96,7 +97,7 @@ export class CurriculumReadService {
         : editPathFor(
             access,
             PERMISSIONS.CURRICULUM_EDIT,
-            programTarget(version.program),
+            await programContentTarget(this.prisma, version.program),
             state,
           );
     // A request's working copy is editable by its creator while the request is a Draft; otherwise the old rule.

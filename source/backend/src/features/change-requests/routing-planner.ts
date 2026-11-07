@@ -11,6 +11,11 @@ import {
   SKIP_REASONS,
   type ApprovalLevel,
 } from '../../shared/change-requests/approval.constants.js';
+import {
+  AUTHORED_ENTITY,
+  AUTHORED_OPERATION,
+  type AuthoredPayload,
+} from '../../shared/change-requests/authored-item.types.js';
 import { groupBy } from '../../shared/collections/group-by.js';
 import {
   isAcademicOfficeHolder,
@@ -121,9 +126,16 @@ export class RoutingPlanner {
     if (request.requestType === ChangeRequestType.ORGANIZATION) {
       return { steps: [academicOffice], affectedPrograms: [] };
     }
+    // A relation also concerns the course at its other end, so a foreign request course is not enough to skip.
+    const relationRouting =
+      request.requestType === ChangeRequestType.COURSE_RELATION;
+    const relationCourses = relationRouting
+      ? await this.affectedHomeCourses(db, request, items)
+      : null;
     if (
       request.course &&
-      request.course.ownerFacultyCode !== HOME_FACULTY_CODE
+      request.course.ownerFacultyCode !== HOME_FACULTY_CODE &&
+      (relationCourses?.courses.length ?? 0) === 0
     ) {
       return {
         steps: [
@@ -134,14 +146,13 @@ export class RoutingPlanner {
         affectedPrograms: [],
       };
     }
-    const { courses, touchesCourses } = await this.affectedHomeCourses(
-      db,
-      request,
-      items,
-    );
+    const { courses, touchesCourses } =
+      relationCourses ?? (await this.affectedHomeCourses(db, request, items));
     const programs = request.programId
       ? await this.programById(db, request.programId)
-      : await this.programsUsing(db, request.courseId!);
+      : relationRouting
+        ? await this.programsUsingAny(db, courses)
+        : await this.programsUsing(db, request.courseId!);
     const steps = [
       ...(await this.coordinatorSteps(
         db,
@@ -204,6 +215,18 @@ export class RoutingPlanner {
     request: RoutingSubject,
     items: readonly ChangeItemDraft[],
   ): Promise<{ courses: RoutedCourse[]; touchesCourses: boolean }> {
+    if (request.requestType === ChangeRequestType.COURSE_RELATION) {
+      const ids = new Set(request.courseId ? [request.courseId] : []);
+      for (const id of await this.relationEndIds(db, items)) ids.add(id);
+      const courses = await db.course.findMany({
+        where: {
+          id: { in: [...ids] },
+          ownerFaculty: { unitCode: HOME_FACULTY_CODE },
+        },
+        select: { id: true, ownerGroupId: true },
+      });
+      return { courses, touchesCourses: true };
+    }
     if (request.course) {
       return {
         courses: [
@@ -228,6 +251,32 @@ export class RoutingPlanner {
       select: { id: true, ownerGroupId: true },
     });
     return { courses, touchesCourses: true };
+  }
+
+  // An added relation names both ends in its payload; an update or removal names only the relation row.
+  private async relationEndIds(
+    db: Db,
+    items: readonly ChangeItemDraft[],
+  ): Promise<string[]> {
+    const ids: string[] = [];
+    const relationIds: string[] = [];
+    for (const item of items) {
+      if (item.entityType !== AUTHORED_ENTITY.COURSE_RELATION) continue;
+      const payload = item.newValue as AuthoredPayload | null;
+      if (payload?.operation === AUTHORED_OPERATION.ADD_RELATION) {
+        ids.push(payload.sourceCourseId, payload.targetCourseId);
+      } else if (item.recordId) {
+        relationIds.push(item.recordId);
+      }
+    }
+    if (relationIds.length > 0) {
+      const rows = await db.courseRelation.findMany({
+        where: { id: { in: relationIds } },
+        select: { sourceCourseId: true, targetCourseId: true },
+      });
+      for (const row of rows) ids.push(row.sourceCourseId, row.targetCourseId);
+    }
+    return ids;
   }
 
   private async coordinatorSteps(
@@ -276,12 +325,10 @@ export class RoutingPlanner {
           : (seen.add(member.lecturerId), true),
       );
       if (coordinators.length === 0) {
-        steps.push(
-          skipped(APPROVAL_LEVEL.COORDINATOR, SKIP_REASONS.NO_COORDINATOR, {
-            forSubjectGroupId: group.id,
-            scopeLabel: group.groupCode,
-          }),
-        );
+        throw new AppException({
+          ...SUBMISSION_ERRORS.NO_COORDINATOR,
+          message: `${SUBMISSION_ERRORS.NO_COORDINATOR.message} Mã nhóm: ${group.groupCode}.`,
+        });
       }
       for (const member of coordinators) {
         steps.push({
@@ -330,12 +377,10 @@ export class RoutingPlanner {
         seen.has(row.directorId) ? false : (seen.add(row.directorId), true),
       );
       if (directors.length === 0) {
-        steps.push(
-          skipped(APPROVAL_LEVEL.DIRECTOR, SKIP_REASONS.NO_DIRECTOR, {
-            forProgramId: program.id,
-            scopeLabel: program.programCode,
-          }),
-        );
+        throw new AppException({
+          ...SUBMISSION_ERRORS.NO_DIRECTOR,
+          message: `${SUBMISSION_ERRORS.NO_DIRECTOR.message} Mã chương trình: ${program.programCode}.`,
+        });
       }
       for (const row of directors) {
         steps.push({
@@ -362,6 +407,21 @@ export class RoutingPlanner {
       select: PROGRAM_NAME_SELECT,
     });
     return program ? [toAffected(program)] : [];
+  }
+
+  private async programsUsingAny(
+    db: Db,
+    courses: readonly RoutedCourse[],
+  ): Promise<AffectedProgram[]> {
+    const byId = new Map<string, AffectedProgram>();
+    for (const course of courses) {
+      for (const program of await this.programsUsing(db, course.id)) {
+        byId.set(program.id, program);
+      }
+    }
+    return [...byId.values()].sort((a, b) =>
+      a.programCode.localeCompare(b.programCode),
+    );
   }
 
   // Programs in force (Active or Pending version, not a working copy) that list the course (US-057 AC3, EC-23).

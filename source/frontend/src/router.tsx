@@ -948,14 +948,6 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: ROUTES.programNew,
-            element: (
-              <RequirePermission code={PERMISSIONS.programEditInfo}>
-                <ProgramFormPage />
-              </RequirePermission>
-            ),
-          },
-          {
             path: ROUTES.programEdit,
             element: (
               <RequirePermission code={PERMISSIONS.programEditInfo}>

@@ -59,11 +59,9 @@ export function editPermissionsFor(
     case ChangeRequestType.SYLLABUS_CONTENT:
       return [PERMISSIONS.SYLLABUS_EDIT];
     case ChangeRequestType.OUTCOME:
-      return [
-        targetType === ChangeTargetType.PROGRAM
-          ? PERMISSIONS.PLO_EDIT
-          : PERMISSIONS.CLO_EDIT,
-      ];
+      return targetType === ChangeTargetType.PROGRAM
+        ? [PERMISSIONS.PLO_EDIT, PERMISSIONS.CLO_EDIT]
+        : [PERMISSIONS.CLO_EDIT];
     case ChangeRequestType.CURRICULUM:
       return [PERMISSIONS.CURRICULUM_EDIT];
     case ChangeRequestType.PROGRAM_INFO:

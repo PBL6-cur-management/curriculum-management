@@ -116,6 +116,7 @@ describe('ChangeRequestsService', () => {
     approvalDelegation: { findMany: vi.fn().mockResolvedValue([]) },
     $transaction: vi.fn((run: (client: unknown) => unknown) => run(tx)),
     changeRequest: { findFirst: vi.fn(), updateMany: vi.fn() },
+    curriculumItem: { findMany: vi.fn().mockResolvedValue([]) },
   };
   const targets = { resolve: vi.fn() };
   const copies = { create: vi.fn(), discard: vi.fn(), rebase: vi.fn() };
@@ -138,6 +139,7 @@ describe('ChangeRequestsService', () => {
     tx.changeRequestDocument.findMany.mockResolvedValue([]);
     prisma.changeRequest.findFirst.mockResolvedValue(OWN_DRAFT);
     prisma.changeRequest.updateMany.mockResolvedValue({ count: 1 });
+    prisma.curriculumItem.findMany.mockResolvedValue([]);
     targets.resolve.mockResolvedValue({
       targetType: ChangeTargetType.COURSE,
       id: 'c1',
@@ -206,6 +208,101 @@ describe('ChangeRequestsService', () => {
         expect.objectContaining({ id: 'cr1' }),
       );
       expect(details.read).toHaveBeenCalledWith('cr1', MEMBER);
+    });
+
+    describe('on a programme', () => {
+      const lecturer = access(
+        'u4',
+        [
+          {
+            code: PERMISSIONS.CHANGE_REQUEST_CREATE,
+            mode: 'DIRECT',
+            all: true,
+          },
+          { code: PERMISSIONS.CURRICULUM_EDIT, mode: 'VIA_REQUEST' },
+        ],
+        ['g1'],
+      );
+      const programDto = {
+        ...DTO,
+        requestType: ChangeRequestType.CURRICULUM,
+        targetType: ChangeTargetType.PROGRAM,
+        targetId: 'p1',
+      };
+
+      beforeEach(() => {
+        targets.resolve.mockResolvedValue({
+          targetType: ChangeTargetType.PROGRAM,
+          id: 'p1',
+          code: 'P1',
+          name: 'Program',
+          scope: { programIds: ['p1'], orgUnitIds: ['f1'] },
+        });
+      });
+
+      it('lets a lecturer file a curriculum request when a listed course is in their group', async () => {
+        prisma.curriculumItem.findMany.mockResolvedValue([
+          { course: { ownerGroupId: 'g1' } },
+        ]);
+        await service.create(programDto, lecturer);
+        expect(tx.changeRequest.create).toHaveBeenCalledOnce();
+      });
+
+      it('refuses a lecturer when no listed course is in their group', async () => {
+        prisma.curriculumItem.findMany.mockResolvedValue([
+          { course: { ownerGroupId: 'g2' } },
+        ]);
+        await expect(
+          service.create(programDto, lecturer),
+        ).rejects.toMatchObject({ code: 'OUT_OF_SCOPE' });
+      });
+
+      it('lets a CLO editor file a programme outcome request', async () => {
+        const cloEditor = access(
+          'u5',
+          [
+            {
+              code: PERMISSIONS.CHANGE_REQUEST_CREATE,
+              mode: 'DIRECT',
+              all: true,
+            },
+            { code: PERMISSIONS.CLO_EDIT, mode: 'VIA_REQUEST' },
+          ],
+          ['g1'],
+        );
+        prisma.curriculumItem.findMany.mockResolvedValue([
+          { course: { ownerGroupId: 'g1' } },
+        ]);
+        await service.create(
+          { ...programDto, requestType: ChangeRequestType.OUTCOME },
+          cloEditor,
+        );
+        expect(tx.changeRequest.create).toHaveBeenCalledOnce();
+      });
+
+      it('does not widen a programme-info request to the lecturer groups', async () => {
+        const infoEditor = access(
+          'u6',
+          [
+            {
+              code: PERMISSIONS.CHANGE_REQUEST_CREATE,
+              mode: 'DIRECT',
+              all: true,
+            },
+            { code: PERMISSIONS.PROGRAM_EDIT_INFO, mode: 'VIA_REQUEST' },
+          ],
+          ['g1'],
+        );
+        prisma.curriculumItem.findMany.mockResolvedValue([
+          { course: { ownerGroupId: 'g1' } },
+        ]);
+        await expect(
+          service.create(
+            { ...programDto, requestType: ChangeRequestType.PROGRAM_INFO },
+            infoEditor,
+          ),
+        ).rejects.toMatchObject({ code: 'OUT_OF_SCOPE' });
+      });
     });
 
     it('lets an organisational permission holder file an organisational request inside the scope', async () => {

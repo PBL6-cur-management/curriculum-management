@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Button, Flex, Input, Result, Select, Typography } from 'antd';
+import { Flex, Input, Result, Select, Typography } from 'antd';
 import type { TableColumnsType } from 'antd';
-import { Link, generatePath, useNavigate } from 'react-router';
+import { Link, generatePath } from 'react-router';
 import { ROUTES } from '../../../routes';
 import { DEFAULT_PAGE_SIZE } from '../../../shared/api/pagination';
-import { PERMISSIONS } from '../../../shared/auth/permissions';
-import { useCanEditSchoolWide } from '../../../shared/auth/useCan';
 import { useDebouncedValue } from '../../../shared/hooks/useDebouncedValue';
 import { useUrlQuery } from '../../../shared/hooks/useUrlQuery';
 import type {
@@ -60,8 +58,6 @@ export function ProgramListPage() {
     );
   }, [q, setQuery]);
   const { data, isFetching, isError } = useProgramList(query);
-  const canCreate = useCanEditSchoolWide(PERMISSIONS.programEditInfo);
-  const navigate = useNavigate();
   const applyFilters = (next: typeof filters) =>
     setQuery((current) => ({ ...current, ...next, page: 1 }));
   const columns: TableColumnsType<ProgramSummary> = [
@@ -112,19 +108,7 @@ export function ProgramListPage() {
     );
   return (
     <Flex vertical gap="middle">
-      <PageHeader
-        title="Chương trình đào tạo"
-        actions={
-          canCreate && (
-            <Button
-              type="primary"
-              onClick={() => void navigate(ROUTES.programNew)}
-            >
-              Thêm chương trình
-            </Button>
-          )
-        }
-      />
+      <PageHeader title="Chương trình đào tạo" />
       <Flex wrap gap="small">
         <Input.Search
           allowClear

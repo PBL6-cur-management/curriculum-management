@@ -1,6 +1,7 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { FinalApprovalPreview } from '../api/changeRequests';
+import { COURSE_CHANGE_NOTICE } from '../constants/courseChangeNotice';
 import { renderRequestPage } from '../testRender';
 import { FinalApprovalPage } from './FinalApprovalPage';
 
@@ -18,6 +19,7 @@ const preview = (
 ): FinalApprovalPreview => ({
   requestId: 'r1',
   requestCode: 'DX-2026-0001',
+  requestType: 'SYLLABUS_CONTENT',
   kind: 'SYLLABUS',
   stale: false,
   affectedPrograms: [],
@@ -50,6 +52,17 @@ function renderPage(
 afterEach(() => vi.unstubAllGlobals());
 
 describe('FinalApprovalPage', () => {
+  it('warns that released versions keep their snapshot for a course relation request', async () => {
+    renderPage(preview({ requestType: 'COURSE_RELATION', kind: 'AUTHORED' }));
+    expect(await screen.findByText(COURSE_CHANGE_NOTICE)).toBeInTheDocument();
+  });
+
+  it('shows no snapshot warning for a curriculum request', async () => {
+    renderPage(preview({ requestType: 'CURRICULUM', kind: 'PROGRAM_VERSION' }));
+    await screen.findByRole('heading', { name: 'Phê duyệt cuối và ban hành' });
+    expect(screen.queryByText(COURSE_CHANGE_NOTICE)).toBeNull();
+  });
+
   it('links back to the request above the page title', async () => {
     renderPage(preview());
     const back = await screen.findByRole('link', {

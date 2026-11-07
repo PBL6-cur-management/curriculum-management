@@ -41,6 +41,7 @@ export class FinalApprovalPreviewReader {
     const base = {
       requestId: request.id,
       requestCode: request.requestCode,
+      requestType: request.requestType,
       stale: await this.stale.isStale(this.prisma, request),
       canAllowPastSemester:
         request.createdByAcademicOffice &&

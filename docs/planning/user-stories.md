@@ -280,6 +280,7 @@
   3. **Cho** hai chương trình, một Kỹ sư một Cử nhân, khác tổng tín chỉ và số học kỳ — **Khi** lưu cả hai — **Thì** cả hai cùng tồn tại.
   4. **Cho** R3 — **Khi** sửa chương trình không được phân công — **Thì** máy chủ từ chối.
   5. **Cho** chương trình đã có sinh viên — **Khi** muốn bỏ — **Thì** chỉ chuyển được sang Ngừng sử dụng.
+- **Ghi chú (2026-11-06):** AC1 (thêm bản ghi trên UI) bị thay bởi U-2 mới: UI không còn thêm chương trình, chương trình mới chỉ có qua nhân bản. AC2–AC5 áp dụng trên form sửa.
 - **Bao phủ:** FR-23, FR-24 · UC-19 · BR-03 · EC-50 · khác: DEC-12, M-3, U-2
 
 ### US-020 — Phân công Giám đốc CTĐT
@@ -1755,7 +1756,7 @@ Mỗi điểm dưới đây là một chỗ các tài liệu nguồn không kh�
 | Mã | Vấn đề | Lựa chọn tạm | Ảnh hưởng tới | Cần ai trả lời |
 |---|---|---|---|---|
 | U-1 | Danh sách tác nhân trong bộ use case không khớp ma trận quyền SRS mục 3.4. UC-11, UC-13, UC-21, UC-37 không có R5 trong khi ma trận cho R5 ô `Đ` ở học phần, quan hệ, khung, CLO, đề cương, công thức điểm. UC-14, UC-19, UC-26 có R2 trong khi ma trận ghi R2 chỉ xem | Theo ma trận SRS: R5 soạn và đề xuất cho học phần thuộc các nhóm mình là thành viên, không đụng PLO và thông tin chương trình. R2 không soạn dữ liệu đào tạo | US-012, US-015, US-016, US-017, US-019, US-023, US-039, US-042, US-043, US-044, US-049..US-052, US-054 | Thầy hướng dẫn, Khoa |
-| U-2 | DEC-12 loại quy trình tạo chương trình mới từ đầu ra khỏi phạm vi, nhưng dữ liệu của chương trình hiện có vẫn phải vào hệ thống bằng cách nào đó | R1 thêm bản ghi chương trình (US-019) rồi nhập khung từ Excel (US-034). DEC-12 được hiểu là không có quy trình thiết kế và thẩm định chương trình mới, không cấm thêm bản ghi | US-019, US-034, US-071 | Thầy hướng dẫn |
+| U-2 | DEC-12 loại quy trình tạo chương trình mới từ đầu ra khỏi phạm vi, nhưng dữ liệu của chương trình hiện có vẫn phải vào hệ thống bằng cách nào đó | (Đổi 2026-11-06, người dùng quyết định) Không có chức năng thêm chương trình trên UI. Chương trình mới chỉ tạo bằng nhân bản (FR-25, US-022); chương trình hiện có vào hệ thống qua seed/nhập dữ liệu. Quyết định cũ (R1 thêm bản ghi rồi nhập khung từ Excel, thầy hướng dẫn) bị thay vì luồng tạo không qua duyệt và cho phép chương trình không có học phần/đề cương | US-019, US-022, US-034, US-071 | Người dùng (thay quyết định của thầy hướng dẫn) |
 | U-3 | UC-03 cho R2 phân công thành viên nhóm chuyên môn; ma trận SRS chỉ cho R1 quản lý đơn vị và nhóm | B1..B3: chỉ R1 phân công. Từ B4: R2 và R4 gửi đề xuất loại "Thay đổi tổ chức / phân công", R1 xử lý (S-1, E-4) | US-009, US-010, US-060 | Khoa |
 | U-4 | UC-82 cho R3 tra cứu nhật ký; ma trận SRS chỉ cho R1 và R2 xem nhật ký hệ thống | Theo ma trận: chỉ R1 và R2. R3 xem lịch sử của từng đề xuất và từng phiên bản qua US-069, US-079 | US-003 | Khoa |
 | U-5 | UC-52 gộp gán phiên bản cho cả khóa và cho từng sinh viên, trong khi hồ sơ sinh viên chỉ có từ B5 | Tách hai story: gán theo khóa ở B4 (US-080), ghi danh riêng từng sinh viên và ngoại lệ ở B5 (US-084) | US-080, US-084 | Không cần hỏi; đổi nếu dời bậc |

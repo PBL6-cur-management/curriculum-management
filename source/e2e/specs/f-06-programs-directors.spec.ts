@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { asRole } from '../fixtures/accounts.js';
-import { assignDirector, cloneProgram, createProgram, prepareProgram, programInfo, programRow } from '../fixtures/programs.js';
+import { assignDirector, cloneProgram, createProgram, openProgramEdit, programInfo, programRow } from '../fixtures/programs.js';
 import { chooseOption } from '../fixtures/select.js';
 import { createUser } from '../fixtures/users.js';
 import { uniqueSuffix } from '../fixtures/unique.js';
@@ -33,11 +33,14 @@ test.describe('F-06 Thông tin chương trình, Giám đốc CTĐT', () => {
   });
 
   test('F06-TC_005 Kiểm tra lệch tổng tín chỉ', async ({ page }) => {
-    await prepareProgram(page, { total: '150', compulsory: '120', elective: '25' });
+    await openProgramEdit(page);
+    await page.getByLabel('Tổng số tín chỉ', { exact: true }).fill('150');
+    await page.getByLabel('Tín chỉ bắt buộc', { exact: true }).fill('120');
+    await page.getByLabel('Tín chỉ tự chọn', { exact: true }).fill('25');
     await expect(page.getByText('Chênh lệch 5 tín chỉ.', { exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Lưu', exact: true }).click();
     await expect(page.getByText('Tín chỉ bắt buộc cộng tín chỉ tự chọn phải bằng tổng tín chỉ (chênh lệch 5 tín chỉ).', { exact: true })).toBeVisible();
-    await expect(page).toHaveURL(/\/programs\/new$/);
+    await expect(page).toHaveURL(/\/edit$/);
   });
 
   test('F06-TC_006 Kiểm tra Kỹ sư và Cử nhân cùng tồn tại', async ({ page }) => {
@@ -98,39 +101,32 @@ test.describe('F-06 Thông tin chương trình, Giám đốc CTĐT', () => {
     await expect(page.getByText('Chưa có chương trình', { exact: true })).toBeVisible();
   });
 
-  test('F06-TC_020 Kiểm tra trùng mã chương trình riêng', async ({ page }) => {
-    const program = await createProgram(page);
-    await prepareProgram(page, { code: program.code });
-    await page.getByRole('button', { name: 'Lưu', exact: true }).click();
-    await expect(page.getByText('Mã chương trình đã tồn tại.', { exact: true })).toBeVisible();
-  });
-
-  test('F06-TC_021 Kiểm tra mã chương trình bắt buộc', async ({ page }) => {
-    await prepareProgram(page, { code: '' });
-    await page.getByRole('button', { name: 'Lưu', exact: true }).click();
-    await expect(page.getByText('Nhập mã chương trình.', { exact: true })).toBeVisible();
-  });
-
-  test('F06-TC_022 Kiểm tra mã chương trình vượt 20 ký tự', async ({ page }) => {
-    await prepareProgram(page, { code: 'P'.repeat(21) });
-    await page.getByRole('button', { name: 'Lưu', exact: true }).click();
-    await expect(page.getByText('Mã chương trình tối đa 20 ký tự.', { exact: true })).toBeVisible();
+  test('F06-TC_053 Kiểm tra không có chức năng thêm chương trình', async ({ page }) => {
+    await page.goto('/programs');
+    await expect(page.getByRole('heading', { name: 'Chương trình đào tạo', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Thêm chương trình', exact: true })).toHaveCount(0);
+    await page.goto('/programs/new');
+    await expect(page.getByRole('heading', { name: 'Thêm chương trình', exact: true })).toHaveCount(0);
+    await expect(page.getByLabel('Mã chương trình', { exact: true })).toHaveCount(0);
   });
 
   test('F06-TC_023 Kiểm tra tên chương trình bắt buộc', async ({ page }) => {
-    await prepareProgram(page, { name: '' });
+    await openProgramEdit(page);
+    await page.getByLabel('Tên chương trình', { exact: true }).fill('');
     await page.getByRole('button', { name: 'Lưu', exact: true }).click();
     await expect(page.getByText('Nhập tên chương trình.', { exact: true })).toBeVisible();
   });
 
   test('F06-TC_024 Kiểm tra tên chương trình vượt 200 ký tự', async ({ page }) => {
-    await prepareProgram(page, { name: 'N'.repeat(201) });
+    await openProgramEdit(page);
+    await page.getByLabel('Tên chương trình', { exact: true }).fill('N'.repeat(201));
     await page.getByRole('button', { name: 'Lưu', exact: true }).click();
     await expect(page.getByText('Tên chương trình tối đa 200 ký tự.', { exact: true })).toBeVisible();
   });
 
   test('F06-TC_031 Kiểm tra tín chỉ âm', async ({ page }) => {
-    await prepareProgram(page, { total: '-1' });
+    await openProgramEdit(page);
+    await page.getByLabel('Tổng số tín chỉ', { exact: true }).fill('-1');
     await page.getByRole('button', { name: 'Lưu', exact: true }).click();
     await expect(page.getByText('Số tín chỉ phải là số từ 0 đến 999.99, tối đa 2 chữ số thập phân (ví dụ 3, 2.5 hoặc 0).', { exact: true })).toBeVisible();
   });

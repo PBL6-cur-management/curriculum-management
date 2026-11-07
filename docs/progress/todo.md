@@ -131,3 +131,11 @@ Một dòng cho mỗi tính năng; việc chi tiết (CV-xxx) ở `docs/planning
 | DEBT-13 | Demo: đổi mật khẩu admin và tạo tài khoản demo theo vai trò trước khi gửi link cho giảng viên | ❌ | Qua màn Quản trị; không ghi mật khẩu vào repo |
 | DEBT-14 | Demo: chuyển từ VM x86 tạm (`trial.tf`, tín dụng tới ~2026-12-01) sang A1 Always Free khi hết "Out of host capacity" | ❌ | Đặt `trial_x86_vm=false`, UPSERT Route 53, chạy lại `set-ci-secrets.sh`; `apply-until-capacity.sh` đang săn |
 | DEBT-15 | Demo: chưa kiểm tra đăng nhập bằng Playwright trên link công khai | ❌ | |
+| DEBT-16 | Bỏ chức năng thêm chương trình trên UI (DEC-12, U-2 đổi 2026-11-06): nút, tuyến `/programs/new`, nhánh tạo của `ProgramFormPage` | ✅ | FE 31/31, tsc, oxlint sạch; Playwright f-06/f-07/f-08/f-11/mvp-flow chưa chạy lại (Docker tắt) |
+| DEBT-17 | Đóng `POST /api/programs` ở backend (hiện R1 vẫn tạo được bằng gọi API trực tiếp) | ❌ | Chờ quyết định; e2e backend và fixture Playwright đang tạo chương trình qua endpoint này, phải đổi cách dựng dữ liệu trước |
+| DEBT-18 | Danh sách lỗi của thành viên nhóm mục 2–6: bản Nháp hiện "Đang sử dụng"/phiên bản mặc định; khung chưa có chế độ sửa thật; modal dòng khung thiếu Điểm học/Điểm chuyển/Khối kiến thức; ban hành cần kiểm tra điều kiện + phê duyệt; góp ý thầy Hồng Hải | ❌ | Đã phân loại 2026-11-06, chưa bắt đầu |
+| DEBT-19 | Chạy lại BE e2e (change-requests, routing, permission-table) và Playwright cho [workflow-fixes](../implementation/workflow-fixes-implementation-plan.md) khi Docker lên; các ca cũ có thể còn kỳ vọng bỏ qua NO_COORDINATOR/NO_DIRECTOR và việc từ chối R4/R5 tạo đề xuất | ❌ | Mã xong 2026-11-07, unit xanh |
+| DEBT-20 | Phương án C: lan thay đổi học phần (tên, tín chỉ, tiên quyết) sang phiên bản chương trình mới, như ban hành đề cương | ❌ | Hiện chỉ có cảnh báo ảnh chụp (phương án B) |
+| DEBT-21 | Đề xuất bị trả lại sau phê duyệt cuối gửi lại được nhưng không bỏ được | ❌ | Ưu tiên thấp |
+| DEBT-22 | Sinh lại `source/frontend/src/shared/api/schema.d.ts` bằng `pnpm api:types` khi backend chạy | ❌ | `requestType` trên `FinalApprovalPreviewDto` đang thêm tay |
+| DEBT-23 | Ghi chú khảo sát luồng: mục "lan thay đổi chọn phiên bản mới nhất" đã bác bỏ; nhóm tương đương toàn trường cần R1 duyệt trực tiếp là theo thiết kế | ✅ | Chỉ ghi nhận, không có việc |

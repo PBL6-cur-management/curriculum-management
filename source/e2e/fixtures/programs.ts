@@ -12,32 +12,48 @@ interface ProgramInput {
   elective?: string;
 }
 
-export async function prepareProgram(page: Page, input: ProgramInput = {}) {
+const DEGREE_LEVELS: Record<string, string> = { 'Kỹ sư': 'ENGINEER', 'Cử nhân': 'BACHELOR' };
+
+// The UI has no "Thêm chương trình" form: programmes are only ever cloned there, so test data goes in through the API.
+async function postProgram(page: Page, input: ProgramInput) {
   const code = input.code ?? `EP${uniqueSuffix()}`;
   const name = input.name ?? `Chương trình thử ${code}`;
-  await page.goto('/programs/new');
-  await expect(page.getByRole('heading', { name: 'Thêm chương trình', exact: true })).toBeVisible();
-  await page.getByLabel('Mã chương trình', { exact: true }).fill(code);
-  await page.getByLabel('Tên chương trình', { exact: true }).fill(name);
-  await chooseOption(page, page.getByLabel('Trình độ', { exact: true }), input.degree ?? 'Kỹ sư');
-  await page.getByLabel('Mã ngành', { exact: true }).fill('7480201');
-  await page.getByLabel('Tên ngành', { exact: true }).fill('Công nghệ thông tin');
-  await page.getByLabel('Số học kỳ', { exact: true }).fill(input.semesters ?? '8');
-  await page.getByLabel('Tổng số tín chỉ', { exact: true }).fill(input.total ?? '10');
-  await page.getByLabel('Tín chỉ bắt buộc', { exact: true }).fill(input.compulsory ?? '5');
-  await page.getByLabel('Tín chỉ tự chọn', { exact: true }).fill(input.elective ?? '5');
-  return { code, name };
+  const response = await page.request.post('/api/programs', {
+    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    data: {
+      programCode: code,
+      programName: name,
+      degreeLevel: DEGREE_LEVELS[input.degree ?? 'Kỹ sư'],
+      majorCode: '7480201',
+      majorName: 'Công nghệ thông tin',
+      semesterCount: Number(input.semesters ?? '8'),
+      totalCredits: input.total ?? '10',
+      compulsoryCredits: input.compulsory ?? '5',
+      electiveCredits: input.elective ?? '5',
+    },
+  });
+  expect(response.status(), await response.text()).toBe(201);
+  const { id } = (await response.json()) as { id: string };
+  return { code, name, id };
 }
 
 export async function createProgram(page: Page, input: ProgramInput = {}) {
-  const program = await prepareProgram(page, input);
-  await page.getByRole('button', { name: 'Lưu', exact: true }).click();
+  const program = await postProgram(page, input);
+  await page.goto(`/programs/${program.id}`);
   await expect(page.getByRole('heading', { level: 2 })).toContainText(`${program.code} — ${program.name}`);
   const path = new URL(page.url()).pathname;
   await expect(page.getByRole('link', { name: 'Khung chương trình', exact: true })).toBeVisible();
   const curriculumPath = await page.getByRole('link', { name: 'Khung chương trình', exact: true }).getAttribute('href');
   if (!curriculumPath) throw new Error('Thiếu đường dẫn khung chương trình riêng.');
-  return { ...program, path, curriculumPath };
+  return { code: program.code, name: program.name, path, curriculumPath };
+}
+
+export async function openProgramEdit(page: Page, input: ProgramInput = {}) {
+  const program = await postProgram(page, input);
+  await page.goto(`/programs/${program.id}/edit`);
+  await expect(page.getByRole('heading', { name: `Sửa thông tin chương trình ${program.code}`, exact: true })).toBeVisible();
+  await expect(page.getByLabel('Tên chương trình', { exact: true })).toHaveValue(program.name);
+  return program;
 }
 
 export function programInfo(page: Page) {

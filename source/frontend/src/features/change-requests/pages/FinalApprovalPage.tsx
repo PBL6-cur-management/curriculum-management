@@ -1,4 +1,5 @@
 import {
+  Alert,
   App,
   Button,
   Checkbox,
@@ -19,6 +20,10 @@ import { errorMessage } from '../../../shared/forms/applyFieldErrors';
 import { CohortSelect } from '../../../shared/releases/CohortSelect';
 import { SemesterSelect } from '../../../shared/releases/SemesterSelect';
 import { FinalApprovalPreview } from '../components/FinalApprovalPreview';
+import {
+  COURSE_CHANGE_NOTICE,
+  COURSE_CHANGE_TYPES,
+} from '../constants/courseChangeNotice';
 import {
   FINAL_APPROVAL_BUTTON,
   FINAL_APPROVAL_TITLE,
@@ -116,6 +121,9 @@ export function FinalApprovalPage() {
       <BackLink to={back}>Đề xuất {data.requestCode}</BackLink>
       <PageHeader title={FINAL_APPROVAL_TITLE} />
       <FinalApprovalPreview preview={data} />
+      {COURSE_CHANGE_TYPES.includes(data.requestType) && (
+        <Alert type="warning" showIcon title={COURSE_CHANGE_NOTICE} />
+      )}
       <Form<Values>
         form={form}
         layout="vertical"

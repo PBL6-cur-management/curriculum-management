@@ -39,8 +39,6 @@ export const fetchPrograms = (query: ProgramQuery) =>
   getJson<ProgramPage>(withQuery(PROGRAMS_PATH, { ...query }));
 export const fetchProgram = (programId: string) =>
   getJson<ProgramDetail>(programPath(programId));
-export const createProgram = (body: CreateProgramRequest) =>
-  sendJson<ProgramDetail>('POST', PROGRAMS_PATH, body);
 export const updateProgram = (programId: string, body: UpdateProgramRequest) =>
   sendJson<ProgramDetail>('PATCH', programPath(programId), body);
 export const changeProgramStatus = (

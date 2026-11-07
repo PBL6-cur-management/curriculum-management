@@ -1,6 +1,17 @@
 # Current Work — F-01..F-27 đã merge; Playwright trên dữ liệu thật đã chạy (trừ F-06); chờ smoke vòng 1 và duyệt luồng phê duyệt
 
-**Start here**: đọc [bàn giao 2026-10-31 (tối)](handoff.md). Playwright trên `ctdt_real` đã chạy xong ngày 2026-11-01 trừ F-06 (xem progress_log). Việc kế tiếp: đi luồng phê duyệt R5→R4→R3→R1 trên UI, chạy [smoke checklist](../testing/smoke-checklist.md) vòng 1 (29 kịch bản, thay 413 ca thủ công) và chụp màn hình cho impeccable polish. Main: BE unit 1797/1797, BE e2e 679/679, FE 693/693.
+**Start here**: đọc [bàn giao 2026-10-31 (tối)](handoff.md). Playwright trên `ctdt_real` đã chạy xong ngày 2026-11-01 trừ F-06 (xem progress_log). Việc kế tiếp: khi Docker lên, chạy lại Playwright f-06/f-07/f-08/f-11/mvp-flow sau khi bỏ thêm chương trình (2026-11-06) và BE e2e + Playwright cho sửa lỗi luồng phê duyệt (2026-11-07, DEBT-19), vì cả hai đang chặn việc đi luồng phê duyệt trên UI; rồi đi luồng phê duyệt R5→R4→R3→R1 trên UI, chạy [smoke checklist](../testing/smoke-checklist.md) vòng 1 (29 kịch bản, thay 413 ca thủ công) và chụp màn hình cho impeccable polish. Main: BE unit 1797/1797, BE e2e 679/679, FE 693/693.
+
+## Sửa lỗi luồng đề xuất và phê duyệt — mã xong 2026-11-07
+
+- Sáu sửa F1–F6 (R4/R5 tạo đề xuất khung/CLO, định tuyến quan hệ hai đầu, khóa bản PROGRAM_INFO, chặn gửi khi thiếu Điều phối/Giám đốc, cảnh báo ảnh chụp). Unit BE và FE xanh. [Báo cáo](../implement-report/workflow-fixes-implement-report.md).
+- Còn nợ: BE e2e + Playwright ([todo DEBT-19](todo.md)); sinh lại `schema.d.ts` (DEBT-22); phương án C (DEBT-20).
+
+## Bỏ thêm chương trình trên UI (DEC-12) — mã xong 2026-11-06
+
+- FE đã bỏ nút "Thêm chương trình", tuyến `/programs/new`, nhánh tạo của `ProgramFormPage`; chương trình mới chỉ qua nhân bản. FE 31/31, tsc, oxlint sạch. Chi tiết: progress_log 2026-11-06.
+- Còn nợ: chạy lại Playwright f-06/f-07/f-08/f-11/mvp-flow khi Docker lên (todo DEBT-16); quyết định đóng `POST /api/programs` ở backend (DEBT-17).
+- Danh sách lỗi của thành viên nhóm mục 2–6 đã phân loại, chưa bắt đầu (DEBT-18).
 
 ## F-28 — Tài khoản sinh viên demo, kiểm tra tĩnh hoàn tất — 2026-11-01
 
@@ -59,7 +70,7 @@
 
 ## Session Context
 
-- **Last updated**: 2026-10-31.
+- **Last updated**: 2026-11-07 (khu vực đang làm: luồng đề xuất và phê duyệt, sửa F1–F6; trước đó F-06 chương trình).
 - 27 tính năng đã có mã hoàn tất và đã merge: F-01..F-27. Kế hoạch sau MVP được chấp nhận với giới hạn §8; không còn gate quyết định A1..A12/B1/B2. Hoàn tất mã không thay thế các ca thủ công hoặc nghiệm thu Khoa còn nợ.
 - F-15 `createdByAcademicOffice` đã chốt; đính chính là thay thế hành chính hồi tố và lịch học kỳ theo chính sách hiện tại. Không hứa lịch sử bất biến trước đính chính, không lên kế hoạch history/freeze; mỗi lần xét F-19 chụp đúng đầu vào.
 - Công thức điểm không có ngoại lệ học kỳ đã bắt đầu (E1, người dùng chốt 2026-10-26); GRADING_FORMULA đi hết ba cấp duyệt như các loại đề cương khác.

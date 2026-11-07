@@ -97,6 +97,18 @@ export const SUBMISSION_ERRORS = {
     message:
       'Không có cán bộ Phòng Đào tạo nào khác để phê duyệt đề xuất do bạn tạo.',
   },
+  NO_COORDINATOR: {
+    status: HttpStatus.CONFLICT,
+    code: 'NO_COORDINATOR',
+    message:
+      'Nhóm chuyên môn chưa có Điều phối nên chưa gửi duyệt được. Liên hệ Phòng Đào tạo để phân công.',
+  },
+  NO_DIRECTOR: {
+    status: HttpStatus.CONFLICT,
+    code: 'NO_DIRECTOR',
+    message:
+      'Chương trình chưa có Giám đốc CTĐT nên chưa gửi duyệt được. Liên hệ Phòng Đào tạo để phân công.',
+  },
   WITHDRAW_NOT_ALLOWED: {
     status: HttpStatus.CONFLICT,
     code: 'WITHDRAW_NOT_ALLOWED',

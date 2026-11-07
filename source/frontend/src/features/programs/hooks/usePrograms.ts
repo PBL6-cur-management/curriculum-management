@@ -9,7 +9,6 @@ import {
   assignDirector,
   changeProgramStatus,
   cloneProgram,
-  createProgram,
   endDirector,
   fetchDirectors,
   fetchProgram,
@@ -72,7 +71,6 @@ function useProgramMutation<TVars, TResult>(
   });
 }
 
-export const useCreateProgram = () => useProgramMutation(createProgram);
 export const useUpdateProgram = () =>
   useProgramMutation(
     ({ programId, body }: { programId: string; body: UpdateProgramRequest }) =>

@@ -32,6 +32,10 @@ import {
   useChangeRequest,
   useWithdrawChangeRequest,
 } from '../hooks/useChangeRequests';
+import {
+  COURSE_CHANGE_NOTICE,
+  COURSE_CHANGE_TYPES,
+} from '../constants/courseChangeNotice';
 import { formatDateTime } from '../utils/format';
 import {
   BackLink,
@@ -107,6 +111,10 @@ export function ChangeRequestDetailPage() {
           title="Đề xuất đã được rút; bản nháp chỉ còn để tra cứu."
         />
       )}
+      {request.status === 'EFFECTIVE' &&
+        COURSE_CHANGE_TYPES.includes(request.requestType) && (
+          <Alert type="info" showIcon title={COURSE_CHANGE_NOTICE} />
+        )}
       <ConflictAlert conflicts={request.conflicts} />
       {/* The decision first, then what is being decided, then the context. */}
       <ApprovalPanel request={request} />

@@ -9,6 +9,7 @@ import {
   IsString,
   MaxLength,
 } from 'class-validator';
+import { ChangeRequestType } from '../../generated/prisma/client.js';
 import { CurriculumWarningDto } from '../../shared/curriculum/curriculum-warning.dto.js';
 import { emptyToNull } from '../../shared/dtos/transforms.js';
 import { ReleaseDecisionDto } from '../../shared/releases/release-decision.dto.js';
@@ -76,6 +77,8 @@ export class FinalApprovalProgramDto {
 export class FinalApprovalPreviewDto {
   @ApiProperty() requestId!: string;
   @ApiProperty() requestCode!: string;
+  @ApiProperty({ enum: ChangeRequestType, enumName: 'ChangeRequestType' })
+  requestType!: ChangeRequestType;
   @ApiProperty({ enum: FINAL_APPROVAL_KINDS, enumName: 'FinalApprovalKind' })
   kind!: FinalApprovalKind;
   @ApiProperty({ description: 'Dữ liệu gốc đã đổi; phải làm lại bản nháp.' })

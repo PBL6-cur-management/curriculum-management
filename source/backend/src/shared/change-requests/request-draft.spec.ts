@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   ChangeRequestStatus,
+  ChangeRequestType,
   ScopeSource,
   ScopeType,
   type PermissionMode,
@@ -49,6 +50,7 @@ const REQUEST: RequestDraftRef = {
   requestCode: 'DX-2026-0001',
   status: ChangeRequestStatus.DRAFT,
   createdById: 'creator',
+  requestType: ChangeRequestType.SYLLABUS_CONTENT,
 };
 const CODE = PERMISSIONS.SYLLABUS_EDIT;
 
@@ -137,6 +139,45 @@ describe('assertEditPath', () => {
       ),
     ).rejects.toMatchObject({ code: 'REQUEST_NOT_DRAFT' });
   });
+});
+
+describe('programme-info copy', () => {
+  const INFO_REQUEST: RequestDraftRef = {
+    ...REQUEST,
+    requestType: ChangeRequestType.PROGRAM_INFO,
+  };
+
+  it('accepts general-info writes', async () => {
+    const code = PERMISSIONS.PROGRAM_EDIT_INFO;
+    await expect(
+      assertEditPath(
+        access('creator', code, 'VIA_REQUEST'),
+        code,
+        TARGET,
+        INFO_REQUEST,
+        vi.fn(),
+      ),
+    ).resolves.toBeUndefined();
+    expect(
+      canEditCopy(
+        access('creator', code, 'VIA_REQUEST'),
+        code,
+        TARGET,
+        INFO_REQUEST,
+      ),
+    ).toBe(true);
+  });
+
+  it.each([PERMISSIONS.CURRICULUM_EDIT, PERMISSIONS.PLO_EDIT])(
+    'refuses %s writes',
+    async (code) => {
+      const creator = access('creator', code, 'VIA_REQUEST');
+      await expect(
+        assertEditPath(creator, code, TARGET, INFO_REQUEST, vi.fn()),
+      ).rejects.toMatchObject({ code: 'REQUEST_COPY_WRONG_TYPE' });
+      expect(canEditCopy(creator, code, TARGET, INFO_REQUEST)).toBe(false);
+    },
+  );
 });
 
 describe('canEditCopy', () => {

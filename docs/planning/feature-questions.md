@@ -132,7 +132,7 @@ Trả lời một lần, áp cho mọi tính năng. Phần lớn là chỗ khung
 | # | Câu hỏi | Nguồn | A (đề xuất) | B | C | Trả lời |
 |---|---|---|---|---|---|---|
 | F06-01 🏫 | Số chương trình, cấu trúc Kỹ sư vs Cử nhân | Q-11 | Dưới 20 chương trình, cấu trúc như bản mẫu | | | |
-| F06-02 | Đưa chương trình hiện có vào hệ thống | U-2, DEC-12 | R1 thêm bản ghi chương trình rồi nhập khung từ Excel; không có quy trình thiết kế chương trình mới | | | |
+| F06-02 | Đưa chương trình hiện có vào hệ thống | U-2, DEC-12 | Không thêm chương trình trên UI; chương trình hiện có vào qua seed/nhập dữ liệu, chương trình mới chỉ bằng nhân bản (đổi 2026-11-06, người dùng quyết định; xem U-2) | | | |
 | F06-03 | Ai nhân bản chương trình | U-7 | Chỉ R1, sau đó phân công Giám đốc CTĐT cho bản mới | R1, R2, R3 như UC-20 | | |
 | F06-04 🏫 | "CTĐT mới" sau đánh giá tổng thể | R-5 | Nhân bản thành chương trình khác | Phiên bản Chính mới của cùng chương trình | | |
 | F06-05 | Mục tiêu chương trình | R-2 | Chưa làm (deferred-scope) | Thêm `ProgramObjective` ngay | | |

@@ -7,6 +7,7 @@ import {
   SNAPSHOT_ENTITY,
   type ChangeItemDraft,
 } from '../../shared/change-requests/diff/snapshot-entry.js';
+import { AUTHORED_ENTITY } from '../../shared/change-requests/authored-item.types.js';
 import { HOME_FACULTY_CODE } from '../../shared/org-units/home-faculty.js';
 import { RoutingPlanner, type RoutingSubject } from './routing-planner.js';
 
@@ -67,6 +68,7 @@ function world(state: World) {
     subjectGroupMember: {
       findMany: vi.fn().mockResolvedValue(state.members ?? []),
     },
+    courseRelation: { findMany: vi.fn().mockResolvedValue([]) },
     program: {
       findMany: vi.fn().mockResolvedValue(state.programs ?? []),
       findUnique: vi.fn().mockResolvedValue((state.programs ?? [])[0] ?? null),
@@ -252,22 +254,11 @@ describe('RoutingPlanner', () => {
     expect(level(noGroup, 2)[0].skipReason).toBe(
       'Học phần chưa thuộc chương trình đào tạo nào',
     );
-    const noCoordinator = await planner.plan(
-      world({ courses: [COURSE_A], groups: ['gA'], programs: [program('p1')] }),
-      courseRequest(),
-      [],
-      TODAY,
-    );
-    expect(level(noCoordinator, 1)[0]).toMatchObject({
-      forSubjectGroupId: 'gA',
-      skipReason: 'Nhóm chuyên môn chưa có Điều phối',
-    });
-    expect(level(noCoordinator, 2)[0]).toMatchObject({
-      forProgramId: 'p1',
-      skipReason: 'Chương trình chưa có Giám đốc CTĐT',
-    });
     const noCourse = await planner.plan(
-      world({ programs: [program('p1')] }),
+      world({
+        programs: [program('p1')],
+        directors: [director('p1', 'dir1')],
+      }),
       programRequest(),
       [],
       TODAY,
@@ -277,7 +268,11 @@ describe('RoutingPlanner', () => {
     );
     // A curriculum change that only moves another faculty's course (e.g. mathematics) is not "no course".
     const foreignOnly = await planner.plan(
-      world({ courses: [], programs: [program('p1')] }),
+      world({
+        courses: [],
+        programs: [program('p1')],
+        directors: [director('p1', 'dir1')],
+      }),
       programRequest(),
       [curriculumItem('3190141')],
       TODAY,
@@ -285,6 +280,155 @@ describe('RoutingPlanner', () => {
     expect(level(foreignOnly, 1)[0].skipReason).toBe(
       'Không áp dụng — học phần của khoa khác',
     );
+  });
+
+  it('refuses to route past a group without a coordinator, naming the group', async () => {
+    await expect(
+      planner.plan(
+        world({
+          courses: [COURSE_A],
+          groups: ['gA'],
+          programs: [program('p1')],
+        }),
+        courseRequest(),
+        [],
+        TODAY,
+      ),
+    ).rejects.toMatchObject({
+      code: 'NO_COORDINATOR',
+      message: expect.stringContaining('GA'),
+    });
+  });
+
+  it('refuses to route past a programme without a director, naming the programme', async () => {
+    await expect(
+      planner.plan(
+        world({
+          courses: [COURSE_A],
+          groups: ['gA'],
+          members: [coordinator('gA', 'coordA')],
+          programs: [program('p1')],
+        }),
+        courseRequest(),
+        [],
+        TODAY,
+      ),
+    ).rejects.toMatchObject({
+      code: 'NO_DIRECTOR',
+      message: expect.stringContaining('P1'),
+    });
+  });
+
+  describe('course relations', () => {
+    const addRelation = (): ChangeItemDraft => ({
+      sortOrder: 0,
+      entityType: AUTHORED_ENTITY.COURSE_RELATION,
+      itemKey: 'A|B|PREREQUISITE',
+      label: 'A|B',
+      recordId: null,
+      oldValue: null,
+      newValue: {
+        operation: 'ADD_RELATION',
+        sourceCourseId: 'cA',
+        targetCourseId: 'cB',
+        relationType: 'PREREQUISITE',
+        minScore: null,
+      },
+      baseVersion: null,
+    });
+    const relationRequest = (patch: Partial<RoutingSubject> = {}) =>
+      courseRequest({
+        requestType: ChangeRequestType.COURSE_RELATION,
+        ...patch,
+      });
+
+    it('asks both coordinators and the directors of programmes using either end', async () => {
+      const db = world({
+        courses: [COURSE_A, COURSE_B],
+        groups: ['gA', 'gB'],
+        members: [coordinator('gA', 'coordA'), coordinator('gB', 'coordB')],
+        directors: [director('p1', 'dir1'), director('p2', 'dir2')],
+      });
+      vi.mocked(db.program.findMany).mockImplementation((async (args: {
+        where: {
+          versions: {
+            some: { curriculumItems: { some: { courseId: string } } };
+          };
+        };
+      }) =>
+        args.where.versions.some.curriculumItems.some.courseId === 'cA'
+          ? [program('p1')]
+          : [program('p2')]) as never);
+      const plan = await planner.plan(
+        db,
+        relationRequest(),
+        [addRelation()],
+        TODAY,
+      );
+      expect(level(plan, 1).map((step) => step.approverId)).toEqual([
+        'coordA',
+        'coordB',
+      ]);
+      expect(level(plan, 2).map((step) => step.forProgramId)).toEqual([
+        'p1',
+        'p2',
+      ]);
+    });
+
+    it('does not skip a foreign request course whose relation reaches a home course', async () => {
+      const db = world({
+        courses: [COURSE_B],
+        groups: ['gB'],
+        members: [coordinator('gB', 'coordB')],
+        programs: [program('p2')],
+        directors: [director('p2', 'dir2')],
+      });
+      const plan = await planner.plan(
+        db,
+        relationRequest({
+          course: {
+            id: 'cA',
+            ownerGroupId: null,
+            ownerFacultyCode: 'KHOA_KHAC',
+          },
+        }),
+        [addRelation()],
+        TODAY,
+      );
+      expect(level(plan, 1).map((step) => step.approverId)).toEqual(['coordB']);
+      expect(level(plan, 2).map((step) => step.approverId)).toEqual(['dir2']);
+    });
+
+    it('finds the ends of a removed relation through its row', async () => {
+      const db = world({
+        courses: [COURSE_A, COURSE_B],
+        groups: ['gA', 'gB'],
+        members: [coordinator('gA', 'coordA'), coordinator('gB', 'coordB')],
+        programs: [program('p1')],
+        directors: [director('p1', 'dir1')],
+      });
+      vi.mocked(db.courseRelation.findMany).mockResolvedValue([
+        { sourceCourseId: 'cA', targetCourseId: 'cB' },
+      ] as never);
+      const removal: ChangeItemDraft = {
+        ...addRelation(),
+        recordId: 'rel1',
+        newValue: { operation: 'REMOVE_RELATION', relationId: 'rel1' },
+      };
+      await planner.plan(db, relationRequest(), [removal], TODAY);
+      expect(db.courseRelation.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: { in: ['rel1'] } } }),
+      );
+      expect(db.course.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            id: {
+              in: ['cA', 'cA', 'cB'].filter((_, i, a) => a.indexOf(_) === i),
+            },
+          }),
+        }),
+      );
+    });
   });
 
   it('skips the row of the creator, wherever it is', async () => {

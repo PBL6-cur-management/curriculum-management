@@ -148,20 +148,12 @@ describe('ProgramListPage', () => {
     expect(programRequests(fetchMock)).toHaveLength(before + 1);
   });
 
-  it('hides the add button without program.editInfo and shows it with it', async () => {
-    mockFetch();
+  it('offers no add button, even to a holder of program.editInfo', async () => {
+    mockFetch(['program.view', 'program.editInfo']);
     renderPage();
     await screen.findByText('Kỹ thuật máy tính');
     expect(
       screen.queryByRole('button', { name: 'Thêm chương trình' }),
     ).not.toBeInTheDocument();
-  });
-
-  it('shows the add button for a holder of program.editInfo', async () => {
-    mockFetch(['program.view', 'program.editInfo']);
-    renderPage();
-    expect(
-      await screen.findByRole('button', { name: 'Thêm chương trình' }),
-    ).toBeInTheDocument();
   });
 });

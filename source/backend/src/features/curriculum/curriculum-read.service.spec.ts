@@ -295,11 +295,41 @@ describe('CurriculumReadService.read', () => {
     ]);
     const result = await service.read('v1', R4);
     expect(result).toMatchObject({
-      editPath: null,
+      editPath: 'DIRECT',
       canEditStructure: false,
       canAddItems: true,
     });
     expect(result.items.map((item) => item.canEdit)).toEqual([true, false]);
+  });
+
+  it('shows R4 the request path on a released version whose courses include its group', async () => {
+    programVersion.findUnique.mockResolvedValue({
+      ...VERSION,
+      status: ProgramVersionStatus.ACTIVE,
+      versionNumber: '1.0',
+    });
+    programVersion.findFirst.mockResolvedValue({ id: 'v1' });
+    curriculumItem.findMany.mockResolvedValue([row('A', 1, 1)]);
+    const result = await service.read('v1', R4);
+    expect(result).toMatchObject({
+      editPath: 'VIA_REQUEST',
+      canEditStructure: false,
+      canAddItems: false,
+    });
+  });
+
+  it('gives R4 no request path when none of the programme courses is in its group', async () => {
+    programVersion.findUnique.mockResolvedValue({
+      ...VERSION,
+      status: ProgramVersionStatus.ACTIVE,
+      versionNumber: '1.0',
+    });
+    programVersion.findFirst.mockResolvedValue({ id: 'v1' });
+    curriculumItem.findMany.mockResolvedValue([
+      row('B', 1, 1, { course: course('B', '3', 'H') }),
+    ]);
+    const result = await service.read('v1', R4);
+    expect(result.editPath).toBeNull();
   });
 
   it('gives R1 direct editing of an unreleased Draft', async () => {

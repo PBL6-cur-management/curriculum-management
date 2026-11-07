@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { COURSE_CHANGE_NOTICE } from '../constants/courseChangeNotice';
 import { ACTIONS, detail } from '../testFixtures';
 import { renderRequestPage } from '../testRender';
 import { ChangeRequestDetailPage } from './ChangeRequestDetailPage';
@@ -19,6 +20,27 @@ function renderDetail(request: ReturnType<typeof detail>) {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('ChangeRequestDetailPage', () => {
+  it('explains the snapshot rule once a course relation request is effective', async () => {
+    renderDetail(
+      detail({ requestType: 'COURSE_RELATION', status: 'EFFECTIVE' }),
+    );
+    expect(await screen.findByText(COURSE_CHANGE_NOTICE)).toBeInTheDocument();
+  });
+
+  it('keeps the snapshot notice off a course relation request still in progress and off other types', async () => {
+    renderDetail(
+      detail({ requestType: 'COURSE_RELATION', status: 'PENDING_DIRECTOR' }),
+    );
+    await screen.findByText('DX-2026-0001 — Cập nhật mục tiêu');
+    expect(screen.queryByText(COURSE_CHANGE_NOTICE)).toBeNull();
+  });
+
+  it('keeps the snapshot notice off an effective curriculum request', async () => {
+    renderDetail(detail({ requestType: 'CURRICULUM', status: 'EFFECTIVE' }));
+    await screen.findByText('DX-2026-0001 — Cập nhật mục tiêu');
+    expect(screen.queryByText(COURSE_CHANGE_NOTICE)).toBeNull();
+  });
+
   it('offers no action to a viewer who is not the creator', async () => {
     renderDetail(
       detail({

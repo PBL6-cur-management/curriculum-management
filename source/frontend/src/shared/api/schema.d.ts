@@ -4942,6 +4942,7 @@ export interface components {
     FinalApprovalPreviewDto: {
       requestId: string;
       requestCode: string;
+      requestType: components['schemas']['ChangeRequestType'];
       kind: components['schemas']['FinalApprovalKind'];
       /** @description Dữ liệu gốc đã đổi; phải làm lại bản nháp. */
       stale: boolean;

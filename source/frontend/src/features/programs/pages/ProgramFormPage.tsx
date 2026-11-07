@@ -27,11 +27,7 @@ import type {
 } from '../api/programs';
 import { CreditsGapHint } from '../components/CreditsGapHint';
 import { DEGREE_LEVEL_LABELS } from '../constants/programLabels';
-import {
-  useCreateProgram,
-  useProgram,
-  useUpdateProgram,
-} from '../hooks/usePrograms';
+import { useProgram, useUpdateProgram } from '../hooks/usePrograms';
 import {
   PROGRAM_RULES,
   SEMESTERS_MAX,
@@ -61,20 +57,19 @@ function toFormValues(program: ProgramDetail): Partial<ProgramFormValues> {
   };
 }
 
+// Edit-only on purpose: building a programme from scratch is out of scope; new programmes come from cloning.
 export function ProgramFormPage() {
-  const { programId } = useParams();
-  const editing = programId !== undefined;
+  const { programId = '' } = useParams();
   const { message } = App.useApp();
   const navigate = useNavigate();
   const [form] = Form.useForm<ProgramFormValues>();
-  const { data: program, isPending } = useProgram(programId ?? '', editing);
-  const create = useCreateProgram();
+  const { data: program, isPending } = useProgram(programId);
   const update = useUpdateProgram();
   const total = Form.useWatch('totalCredits', form);
   const compulsory = Form.useWatch('compulsoryCredits', form);
   const elective = Form.useWatch('electiveCredits', form);
 
-  const editable = !editing || program?.editPath === 'DIRECT';
+  const editable = program?.editPath === 'DIRECT';
   useEffect(() => {
     if (!program) return;
     if (program.editPath !== 'DIRECT') {
@@ -97,26 +92,17 @@ export function ProgramFormPage() {
       if (!applyFieldErrors(form, error))
         void message.error(errorMessage(error, 'Không lưu được chương trình.'));
     };
-    if (programId !== undefined) {
-      // The code is fixed after creation; the faculty is not editable here either.
-      const { programCode: _code, ...rest } = values;
-      const body: UpdateProgramRequest = rest;
-      update.mutate({ programId, body }, { onSuccess, onError });
-    } else {
-      create.mutate(
-        { ...values, programCode: values.programCode.trim() },
-        { onSuccess, onError },
-      );
-    }
+    // The code is fixed after creation; the faculty is not editable here either.
+    const { programCode: _code, ...rest } = values;
+    const body: UpdateProgramRequest = rest;
+    update.mutate({ programId, body }, { onSuccess, onError });
   };
 
-  if (editing && (isPending || !editable)) return <Skeleton active />;
+  if (isPending || !editable) return <Skeleton active />;
   return (
     <Flex vertical gap="middle">
       <Typography.Title level={2} style={{ margin: 0 }}>
-        {editing
-          ? `Sửa thông tin chương trình ${program?.programCode ?? ''}`
-          : 'Thêm chương trình'}
+        {`Sửa thông tin chương trình ${program?.programCode ?? ''}`}
       </Typography.Title>
       <Form<ProgramFormValues>
         form={form}
@@ -132,7 +118,7 @@ export function ProgramFormPage() {
               label="Mã chương trình"
               rules={PROGRAM_RULES.programCode}
             >
-              <Input disabled={editing} />
+              <Input disabled />
             </Form.Item>
           </Col>
           <Col xs={24} md={8}>
@@ -226,22 +212,12 @@ export function ProgramFormPage() {
           </Col>
         </Row>
         <Space>
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={create.isPending || update.isPending}
-          >
+          <Button type="primary" htmlType="submit" loading={update.isPending}>
             Lưu
           </Button>
           <Button
             onClick={() =>
-              void navigate(
-                program
-                  ? generatePath(ROUTES.programDetail, {
-                      programId: program.id,
-                    })
-                  : ROUTES.programs,
-              )
+              void navigate(generatePath(ROUTES.programDetail, { programId }))
             }
           >
             Hủy

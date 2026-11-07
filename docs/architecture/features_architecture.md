@@ -225,21 +225,21 @@ Kế hoạch: `docs/implementation/f-06-programs-directors-implementation-plan.m
 
 ### Frontend
 
-- Tuyến `ROUTES.programs`, `programNew`, `programDetail`, `programEdit`; menu "Chương trình đào tạo" (`program.view`, ẩn với người chỉ có R6 qua `hideForRoles`).
+- Tuyến `ROUTES.programs`, `programDetail`, `programEdit` (`programNew` bỏ 2026-11-06: `/programs/new` nay rơi vào `/programs/:programId` và không tải được); menu "Chương trình đào tạo" (`program.view`, ẩn với người chỉ có R6 qua `hideForRoles`).
 - `api/programs.ts`, `hooks/usePrograms.ts` (mọi ghi làm mới toàn bộ `['programs']`), `constants/programLabels.ts`, `schema/programRules.ts` (`PROGRAM_RULES`, `CREDITS_EPSILON`).
 
 #### `ProgramListPage` — MH-21 (`/programs`)
 
-- Bảng mã (liên kết MH-22), tên, trình độ, phiên bản hiện hành (`versionLabel`: số phiên bản hoặc "Nháp"), Giám đốc CTĐT, trạng thái; tìm có trễ 300 ms qua `useDebouncedValue`, lọc trình độ, lọc trạng thái (mặc định "Đang sử dụng", có "Tất cả" = không gửi `status`); phân trang phía máy chủ. "Thêm chương trình" hiện theo `useCanEditSchoolWide(programEditInfo)` (cũng hiện với R3, máy chủ trả 403).
+- Bảng mã (liên kết MH-22), tên, trình độ, phiên bản hiện hành (`versionLabel`: số phiên bản hoặc "Nháp"), Giám đốc CTĐT, trạng thái; tìm có trễ 300 ms qua `useDebouncedValue`, lọc trình độ, lọc trạng thái (mặc định "Đang sử dụng", có "Tất cả" = không gửi `status`); phân trang phía máy chủ. Không có nút "Thêm chương trình" (bỏ 2026-11-06, DEC-12/U-2): chương trình mới chỉ có qua nhân bản. Backend vẫn giữ `POST /api/programs` (`program.editInfo`) vì e2e backend và fixture Playwright tạo chương trình qua đó; người có quyền này vẫn gọi API trực tiếp được cho tới khi quyết định đóng.
 
 #### `ProgramOverviewPage` — MH-22 (`/programs/:programId`)
 
 - `ProgramInfoCard` (mô tả của bản Nháp nếu có, không thì bản hiện hành; "Nhân bản từ" liên kết chương trình nguồn), `ProgramDirectorsSection` (bảng cả lịch sử, dòng đang hiệu lực lên trước; chỉ khi `canManage`: "Phân công" qua `AssignDirectorModal` = `UserSelect` + hai `DatePicker`, "Kết thúc" qua `EndDirectorModal` chỉ cho dòng `ACTIVE`/`SCHEDULED`, "Thu hồi" kèm xác nhận "Chỉ dùng khi phân công nhập nhầm"), (`ProgramSectionLinks` đã xóa 2026-10-31: điều hướng nay ở `ProgramWorkspaceLayout`, xem `general_architecture.md`; F-15 thêm `ReleaseCard`, `ProgramVersionsSection`).
 - `ProgramEditButton` theo `editPath` (`DIRECT` → "Sửa thông tin"; `VIA_REQUEST` → "Tạo đề xuất" (từ F-13 là liên kết tới MH-39); `null` → ẩn), `CloneProgramButton` khi `canClone`, `ProgramStatusActions` ("Ngừng sử dụng"/"Dùng lại", hộp xác nhận `App.useApp().modal`) khi `canManage`.
 
-#### `ProgramFormPage` — MH-23 (`/programs/new`, `/programs/:programId/edit`)
+#### `ProgramFormPage` — MH-23 (chỉ `/programs/:programId/edit`)
 
-- Trang với AntD `rules`; tín chỉ là ô chữ gửi nguyên chuỗi, số học kỳ là `InputNumber` 1..12; `CreditsGapHint` hiện "Chênh lệch N tín chỉ." / "Khớp tổng tín chỉ." khi gõ nhưng vẫn cho gửi — máy chủ quyết định (`Number()` chỉ để hiển thị). Sửa: điền từ bản Nháp, mã bị khóa; `editPath` khác `DIRECT` → cảnh báo và chuyển về tổng quan. Lỗi nghiệp vụ có `details.field` đặt dưới ô qua `applyFieldErrors`.
+- Trang với AntD `rules`; tín chỉ là ô chữ gửi nguyên chuỗi, số học kỳ là `InputNumber` 1..12; `CreditsGapHint` hiện "Chênh lệch N tín chỉ." / "Khớp tổng tín chỉ." khi gõ nhưng vẫn cho gửi — máy chủ quyết định (`Number()` chỉ để hiển thị). Chỉ có chế độ sửa (nhánh tạo, `createProgram`, `useCreateProgram` đã bỏ): điền từ bản Nháp, mã bị khóa; `editPath` khác `DIRECT` → cảnh báo và chuyển về tổng quan. Lỗi nghiệp vụ có `details.field` đặt dưới ô qua `applyFieldErrors`.
 
 #### `CloneProgramModal` — MH-24
 
@@ -334,10 +334,15 @@ Kế hoạch: `docs/implementation/f-13-change-requests-implementation-plan.md`;
 - Bảy loại (`ChangeRequestType`); mã đề xuất từ dãy `change_request_code_seq`. Loại có không gian làm việc (khung, đề cương, PLO, thông tin chương trình) được **bản làm việc** — `ProgramVersion`/`Syllabus` có `sourceRequestId`, chép từ bản đã ban hành mới nhất (`WorkingCopyService`, `released-base.ts`); loại học phần, quan hệ, tổ chức soạn mục trong `ChangeItem` (`AuthoredItemsService`).
 - `/api/change-requests`: danh sách, `conflicts` (cảnh báo chồng đề xuất, BR-30), `user-options`, tạo, chi tiết, `PATCH`, `DELETE` (Nháp), `rebase`, `PUT :id/items`, `diff`, `submit-preview` (thấy các cấp bị bỏ qua), `submit` (chạy `ConsistencyChecker`, ghi `ChangeItem`, `RoutingPlanner` tạo `ApprovalStep`), `withdraw`, văn bản (`POST :id/documents`, `/change-request-documents/:id[/file]`).
 - `createdByAcademicOffice` ghi lúc tạo (`isAcademicOfficeHolder`) cho F-15. `StaleChecker` báo bản gốc đã đổi.
+- Phạm vi tạo (sửa 2026-11-07, [workflow-fixes](../implementation/workflow-fixes-implementation-plan.md)): CURRICULUM và OUTCOME trên PROGRAM kiểm quyền trên `programContentTarget` (`src/shared/programs/program-content-target.ts`) = phạm vi chương trình cộng nhóm chuyên môn của học phần trong các phiên bản ACTIVE/PENDING không phải bản làm việc, nên R4/R5 tạo được đề xuất cho dòng của nhóm mình; `editPath` ở trang khung dùng cùng phạm vi, `canEditStructure` vẫn chỉ R1/R3. OUTCOME trên PROGRAM chấp nhận `PLO_EDIT` hoặc `CLO_EDIT`. PROGRAM_INFO và các loại khác giữ phạm vi hẹp.
+- Bản làm việc của PROGRAM_INFO chỉ nhận ghi bằng `PROGRAM_EDIT_INFO`; ghi khung, quan hệ, PLO trả 409 `REQUEST_COPY_WRONG_TYPE` (`assertCopyWritable`, `canEditCopy`).
+- Định tuyến COURSE_RELATION: học phần bị ảnh hưởng = học phần đề xuất + hai đầu của mọi mục quan hệ (chỉ học phần thuộc Khoa); cấp 1 gồm Điều phối nhóm của cả hai đầu, cấp 2 gồm Giám đốc mọi chương trình dùng bất kỳ đầu nào (`programsUsingAny`). FOREIGN_COURSE chỉ bỏ qua khi không còn đầu nào thuộc Khoa.
+- Nhóm cần duyệt mà chưa có Điều phối, hoặc chương trình chưa có Giám đốc, chặn gửi duyệt bằng 409 `NO_COORDINATOR` / `NO_DIRECTOR` có mã nhóm/chương trình (cả ở `submit-preview`), không còn bỏ qua cấp. `SKIP_REASONS.NO_COORDINATOR`/`NO_DIRECTOR` chỉ còn để hiển thị kế hoạch đã gửi trước đó.
 
 ### Frontend — `src/features/change-requests/`
 
 - `ChangeRequestListPage` MH-38 (cột, bộ lọc "Số ngày chờ"), `ChangeRequestFormPage` MH-39, `OrganizationalRequestPage` MH-40, `ChangeRequestDetailPage` MH-41 (`StepProgress`, `DiffView`), `ChangeRequestEditPage` (mở màn hình sửa sẵn có trên bản làm việc, `RequestDraftBanner`). `CreateRequestButton` dùng ở mọi màn hình có `editPath`.
+- Đề xuất COURSE_RELATION (gồm sửa tên, tín chỉ học phần): `FinalApprovalPage` hiện cảnh báo và `ChangeRequestDetailPage` hiện thông báo khi EFFECTIVE (`constants/courseChangeNotice.ts`): phiên bản đã ban hành giữ ảnh chụp, thay đổi vào khung ở phiên bản sau; riêng quan hệ thay thế áp dụng ngay. Dựa trên `FinalApprovalPreviewDto.requestType`.
 
 ---
 

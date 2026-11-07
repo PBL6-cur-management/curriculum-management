@@ -545,3 +545,28 @@ Format:
 - S-03: cập nhật phạm vi F-28 ở REQUIREMENTS §12 và plan.md Q14/M9; app chỉ demo qua API hiện có bằng cookie, ở repo riêng `dut_curriculum_app`, không thay thế dDUT của Trường. Bổ sung lệnh, biến môi trường, cảnh báo chạy lại và bước xác minh cho người vận hành.
 - Lần chạy trước dừng đúng điều kiện baseline lỗi. Phiên điều phối đã sửa `node_modules` và Prisma client trước khi giao tiếp; đợt tiếp tục đo lại `tsc --noEmit -p tsconfig.json` sạch. Kiểm tra sau triển khai: tsc exit 0, oxlint script exit 0, Prettier script/package exit 0. Không chạy install/generate lại.
 - Chưa chạy script, truy vấn PostgreSQL, login/API hoặc deploy; các bước thủ công được giao lại người dùng. Giữ nguyên các phần blocker cũ trong báo cáo, cập nhật status và nối thêm phần đính chính/kết quả mới.
+
+## [F-06] Bỏ chức năng thêm chương trình trên UI (DEC-12)
+
+**Date**: 2026-11-06
+**Files changed**: `source/frontend/src/features/programs/pages/ProgramListPage.tsx`, `ProgramFormPage.tsx`, `ProgramListPage.test.tsx`, `ProgramFormPage.test.tsx`, `api/programs.ts`, `hooks/usePrograms.ts`, `source/frontend/src/routes.ts`, `source/frontend/src/router.tsx`, `source/e2e/fixtures/programs.ts`, `source/e2e/specs/f-06-programs-directors.spec.ts`; docs: `docs/testing/test-cases/f-06-programs-directors-test-cases.md`, `mvp-flow-test-cases.md`, `docs/planning/user-stories.md` (U-2, US-019), `docs/planning/feature-questions.md` (F06-02), `docs/design/screen-inventory.md` (MH-23), `docs/architecture/features_architecture.md`, `docs/progress/*`.
+
+- Người dùng quyết định: tạo CTĐT từ đầu nằm ngoài phạm vi (REQUIREMENTS DEC-12, §12 mục 1); chương trình mới chỉ có qua nhân bản (FR-25). Thay quyết định U-2 cũ (R1 thêm bản ghi rồi nhập khung từ Excel). Kích hoạt: báo lỗi của thành viên nhóm — luồng tạo không qua duyệt và cho phép chương trình không có học phần/đề cương.
+- Frontend: bỏ nút "Thêm chương trình" ở MH-21; bỏ `ROUTES.programNew` và tuyến `/programs/new` (đường dẫn này nay rơi vào `/programs/:programId` và không tải được); `ProgramFormPage` chỉ còn chế độ sửa; bỏ `createProgram`, `useCreateProgram`. Test programs 31/31, `tsc -b` 0, oxlint sạch.
+- Backend không đổi: `POST /api/programs` (`program.editInfo`) giữ lại vì e2e backend và fixture Playwright tạo chương trình qua đó; người có quyền này vẫn tạo được bằng gọi API trực tiếp. Đóng endpoint là việc hoãn, chờ quyết định.
+- Playwright: `createProgram` trong fixture nay POST API rồi mở tổng quan; thêm `openProgramEdit`; F06-TC_005/023/024/031 chạy trên form sửa; xóa TC_020/021/022; thêm F06-TC_053. e2e tsc đạt. **Chưa chạy Playwright** (Docker/dev stack tắt); f-07, f-08, f-11, mvp-flow dùng `createProgram` nên setup đổi theo, cũng chưa chạy lại.
+- Danh sách lỗi của thành viên nhóm mục 2–6 (bản Nháp hiện "Đang sử dụng"/phiên bản mặc định, khung chưa có chế độ sửa thật, trường modal dòng khung Điểm học/Điểm chuyển/Khối kiến thức, ban hành cần kiểm tra điều kiện + phê duyệt, góp ý thầy Hồng Hải) đã phân loại, chưa bắt đầu.
+
+## [workflow-fixes] Sửa sáu lỗi luồng đề xuất và phê duyệt
+
+**Date**: 2026-11-07
+**Files changed**: backend `src/shared/change-requests/request-draft.ts`, `change-request.errors.ts`, `request-kinds.ts`, `src/shared/programs/program-content-target.ts` (mới), `src/features/change-requests/change-requests.service.ts`, `routing-planner.ts`, `change-request-feature.errors.ts`, `final-approval.dto.ts`, `final-approval.preview.ts`, `src/features/curriculum/curriculum-read.service.ts` + spec tương ứng; frontend `src/shared/api/schema.d.ts`, `features/change-requests/constants/courseChangeNotice.ts` (mới), `pages/FinalApprovalPage.tsx`, `pages/ChangeRequestDetailPage.tsx` + test; docs: [kế hoạch](../implementation/workflow-fixes-implementation-plan.md), [báo cáo](../implement-report/workflow-fixes-implement-report.md), `error_log.md`, `features_architecture.md`, `docs/progress/*`.
+
+- F1: R4/R5 tạo được đề xuất CURRICULUM và OUTCOME trên PROGRAM nhờ `programContentTarget` (phạm vi chương trình + nhóm của học phần trong phiên bản ACTIVE/PENDING); `editPath` trang khung dùng cùng phạm vi.
+- F2: đề xuất quan hệ định tuyến theo cả hai đầu (`programsUsingAny`; sửa/xóa đọc `CourseRelation` qua `recordId`).
+- F3: bản làm việc PROGRAM_INFO chỉ nhận `PROGRAM_EDIT_INFO` (409 `REQUEST_COPY_WRONG_TYPE`).
+- F4: OUTCOME trên PROGRAM chấp nhận `PLO_EDIT` hoặc `CLO_EDIT`.
+- F5: thiếu Điều phối/Giám đốc chặn gửi duyệt bằng 409 `NO_COORDINATOR`/`NO_DIRECTOR` thay vì bỏ qua cấp.
+- F6: cảnh báo ảnh chụp ở phê duyệt cuối và chi tiết đề xuất EFFECTIVE cho COURSE_RELATION; `FinalApprovalPreviewDto.requestType`.
+- Sáu sai lệch so với kế hoạch ghi trong báo cáo (`ResolvedTarget` không mở rộng; spec `editPath` đổi `null` → `DIRECT`; `programsUsingAny` mới; hai đầu sửa/xóa đọc từ `CourseRelation`; DTO điền ở `final-approval.preview.ts`; tập loại chỉ có `COURSE_RELATION`).
+- Unit test BE và FE xanh; không migration. Chưa chạy BE e2e và Playwright (Docker tắt), `schema.d.ts` sửa tay: DEBT-19, DEBT-22.
