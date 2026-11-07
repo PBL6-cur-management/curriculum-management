@@ -8,6 +8,8 @@ Các lệnh dưới đây đều một dòng, chạy bằng PowerShell; vị tr�
 
 ## 2. Điều kiện trước khi chạy
 
+> **Tài khoản và mật khẩu:** nguồn chính là [`docs/ACCOUNTS.md`](../ACCOUNTS.md). Ở đó có tài khoản theo vai, thế giới `e2e.*`, các biến `SEED_ADMIN_PASSWORD` / `E2E_ADMIN_PASSWORD` / `E2E_PASSWORD` và cách dựng hoặc gỡ bằng `pnpm e2e:world` / `pnpm e2e:purge`. Danh sách tài khoản demo bên dưới là của bản pilot cũ; khi lệch, theo ACCOUNTS.md.
+
 - Node.js 22, tối thiểu 22.22; pnpm 10.23.0; PostgreSQL và Redis đã hoạt động. Dùng DB phát triển dành cho kiểm thử, không dùng production.
 - Theo [setup-and-test-guide.md](./setup-and-test-guide.md) §1: người dùng cài backend/frontend, áp migration và sinh Prisma client nếu cần. Từ `source/backend`, chạy `pnpm services:up`, `pnpm prisma:migrate`, `pnpm prisma:seed`, rồi `pnpm prisma:seed:demo` theo thứ tự; mỗi lệnh chạy riêng, không nối bằng toán tử shell.
 - `SEED_ADMIN_PASSWORD` và `SEED_DEMO_PASSWORD` đã cấu hình ở backend; không ghi mật khẩu thật vào tài liệu. Nếu cần đặt trong PowerShell, dùng `$env:SEED_ADMIN_PASSWORD = '<mật khẩu do bạn chọn>'` và `$env:SEED_DEMO_PASSWORD = '<mật khẩu do bạn chọn>'` trước lệnh seed; không dùng cú pháp gán biến của Bash.
