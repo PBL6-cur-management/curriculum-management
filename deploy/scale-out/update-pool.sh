@@ -42,6 +42,7 @@ git -C "$REPO" archive "$SHA" source/backend source/frontend | tar -x -C "$WORK"
 ( cd "$REPO" && tar -c deploy/scale-out ${OVERLAY:-} ) | tar -x -C "$WORK"
 tar -C "$WORK" -czf "$WORK.tgz" .
 
+trap_undrain() { [[ -n "${DRAINED:-}" ]] && set_drain "$DRAINED" false; rm -rf "$WORK" "$WORK.tgz"; }
 set_drain() {
   oci lb backend update --load-balancer-id "$LB_ID" --backend-set-name "$BACKEND_SET" \
     --backend-name "$1:8080" --weight 1 --backup false --offline false --drain "$2" \
@@ -52,15 +53,17 @@ for ip in "${POOL_IPS[@]}"; do
   current="$(ssh_pool "$ip" 'grep -E "^RELEASE_TAG=" /srv/ctdt/demo.env | tail -1 | cut -d= -f2')"
   if [[ "$current" == "$TAG" ]]; then echo "$ip already on $TAG"; continue; fi
   echo "== $ip: $current -> $TAG"
-  set_drain "$ip" true
-  ssh_pool "$ip" "mkdir -p /srv/ctdt/releases/$TAG && tar -xz -C /srv/ctdt/releases/$TAG" < "$WORK.tgz"
-  ssh_pool "$ip" "set -e
+  set_drain "$ip" true; DRAINED="$ip"; trap trap_undrain EXIT
+  # Upload with scp: on Windows OpenSSH, "ssh ... < file" through a ProxyCommand can hang after EOF (2026-11-07).
+  scp -q -i "$SSH_KEY" -o "ProxyCommand=ssh -i $SSH_KEY -W %h:%p $VM1" "$WORK.tgz" "ubuntu@$ip:/tmp/$TAG.tgz"
+  ssh_pool "$ip" "mkdir -p /srv/ctdt/releases/$TAG && tar -xzf /tmp/$TAG.tgz -C /srv/ctdt/releases/$TAG && rm /tmp/$TAG.tgz" </dev/null
+  ssh_pool "$ip" </dev/null "set -e
     sed -i '/^RELEASE_TAG=/d' /srv/ctdt/demo.env && echo RELEASE_TAG=$TAG >> /srv/ctdt/demo.env
     cd /srv/ctdt/releases/$TAG/deploy/scale-out
     sudo docker compose -f compose.vm2.yaml --env-file /srv/ctdt/demo.env up -d --build --wait
     curl -fsS -o /dev/null http://127.0.0.1:8080/api/health
     ls -1dt /srv/ctdt/releases/* | tail -n +3 | xargs -r rm -rf   # keep current + previous"
-  set_drain "$ip" false
+  set_drain "$ip" false; DRAINED=""
   echo "$ip done"
 done
 echo "Pool on $TAG."
