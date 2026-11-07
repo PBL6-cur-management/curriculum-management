@@ -570,3 +570,14 @@ Format:
 - F6: cảnh báo ảnh chụp ở phê duyệt cuối và chi tiết đề xuất EFFECTIVE cho COURSE_RELATION; `FinalApprovalPreviewDto.requestType`.
 - Sáu sai lệch so với kế hoạch ghi trong báo cáo (`ResolvedTarget` không mở rộng; spec `editPath` đổi `null` → `DIRECT`; `programsUsingAny` mới; hai đầu sửa/xóa đọc từ `CourseRelation`; DTO điền ở `final-approval.preview.ts`; tập loại chỉ có `COURSE_RELATION`).
 - Unit test BE và FE xanh; không migration. Chưa chạy BE e2e và Playwright (Docker tắt), `schema.d.ts` sửa tay: DEBT-19, DEBT-22.
+
+## [F-06] Danh sách chương trình dạng tổng quan
+
+**Date**: 2026-11-07
+**Files changed**: backend `src/features/programs/program-query.dto.ts` (+ `program-query.dto.spec.ts` mới), `program.dto.ts`, `programs.service.ts`, `program-release-year.ts` (mới, + spec), `programs.service.spec.ts`, `program-clone.service.spec.ts`; frontend `src/features/programs/api/programs.ts`, `constants/programLabels.ts`, `pages/ProgramListPage.tsx` (+ test), `components/ReleasedVersionLinks.tsx` (mới), `components/CohortLinks.tsx` (mới), `src/shared/org-units/OrgUnitSelect.tsx`, `src/shared/api/schema.d.ts`; docs: [kế hoạch](../implementation/program-list-overview-implementation-plan.md), [báo cáo](../implement-report/program-list-overview-implement-report.md), `features_architecture.md`, `screen-inventory.md` (MH-21), `docs/progress/*`.
+
+- `GET /api/programs` thêm `facultyId`, `releaseYear`, `intakeYear` (số nguyên 1900–2100); hai lọc năm phải thỏa trên cùng một phiên bản đã ban hành (`PENDING`/`ACTIVE`/`HISTORICAL`, không phải bản sao).
+- Năm ban hành: năm UTC của `signedDate`, không có thì năm `publishedAt` theo Asia/Ho_Chi_Minh, không có thì `null`.
+- `ProgramSummaryDto`/`ProgramDetailDto` thêm `majorCode`, `majorName`, `releasedVersions` (kèm khóa), xếp theo năm rồi số phiên bản, `null` cuối. Không migration.
+- MH-21: cột Chương trình | Ngành | Mã ngành | Trình độ | Phiên bản (năm ban hành) | Khóa tuyển sinh | Khoa quản lý | Giám đốc CTĐT | Trạng thái; bỏ "Phiên bản hiện hành"; liên kết phiên bản/khóa tới trang khung; lọc khoa, trình độ, năm ban hành, năm tuyển sinh, trạng thái trên URL; bảng cuộn ngang. `OrgUnitSelect` thêm `placeholder` (cũng làm `aria-label`).
+- Build-verifier xác nhận: BE tsc 0, lint 0 lỗi, unit 205 file 1898/1898; FE tsc -b 0, lint 0 lỗi, vitest 139 file 719/719. Chưa chạy BE e2e và Playwright (Docker tắt): DEBT-24; `schema.d.ts` sửa tay: DEBT-22; mã ngành thứ hai TT 74/2026: DEBT-25; polish/audit: DEBT-26.

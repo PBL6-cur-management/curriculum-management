@@ -8,6 +8,7 @@ interface OrgUnitSelectProps {
   activeOnly?: boolean;
   allowClear?: boolean;
   types?: readonly OrgUnit['unitType'][];
+  placeholder?: string;
 }
 
 export function OrgUnitSelect({
@@ -16,6 +17,7 @@ export function OrgUnitSelect({
   activeOnly = true,
   allowClear = true,
   types,
+  placeholder = 'Chọn đơn vị',
 }: OrgUnitSelectProps) {
   const { data = [], isPending } = useOrgUnits();
   const options = data
@@ -34,7 +36,8 @@ export function OrgUnitSelect({
       allowClear={allowClear}
       showSearch
       optionFilterProp="label"
-      placeholder="Chọn đơn vị"
+      placeholder={placeholder}
+      aria-label={placeholder}
     />
   );
 }

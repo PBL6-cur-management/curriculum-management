@@ -39,8 +39,35 @@ import {
 } from './program.dto.js';
 import { ProgramQueryDto } from './program-query.dto.js';
 import { findProgramOrThrow } from './program-reader.js';
+import { RELEASED_STATUSES, releaseYearWhere } from './program-release-year.js';
 import { PROGRAM_CONSTRAINT, PROGRAM_ERRORS } from './programs.errors.js';
 import { UpdateProgramDto } from './update-program.dto.js';
+
+// Both year filters must hold on the same released version, so a cohort is matched to the year it was released in.
+function releasedVersionWhere(
+  query: ProgramQueryDto,
+): Prisma.ProgramWhereInput {
+  const { releaseYear, intakeYear } = query;
+  if (releaseYear === undefined && intakeYear === undefined) {
+    return {};
+  }
+  const conditions: Prisma.ProgramVersionWhereInput[] = [];
+  if (releaseYear !== undefined) {
+    conditions.push(releaseYearWhere(releaseYear));
+  }
+  if (intakeYear !== undefined) {
+    conditions.push({ cohortVersions: { some: { cohort: { intakeYear } } } });
+  }
+  return {
+    versions: {
+      some: {
+        sourceRequestId: null,
+        status: { in: [...RELEASED_STATUSES] },
+        AND: conditions,
+      },
+    },
+  };
+}
 
 @Injectable()
 export class ProgramsService {
@@ -62,6 +89,8 @@ export class ProgramsService {
     const where: Prisma.ProgramWhereInput = {
       ...(query.degreeLevel && { degreeLevel: query.degreeLevel }),
       ...(query.status && { status: query.status }),
+      ...(query.facultyId && { facultyId: query.facultyId }),
+      ...releasedVersionWhere(query),
       ...(query.q && {
         OR: [
           { programCode: { contains: query.q, mode: 'insensitive' } },

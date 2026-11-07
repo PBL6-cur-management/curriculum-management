@@ -23,6 +23,7 @@ import { PrismaService } from '../../shared/prisma/prisma.service.js';
 import { CurriculumFactsReader } from '../../shared/curriculum/curriculum-facts.reader.js';
 import { activeDirectorWhere } from '../../shared/programs/active-director.js';
 import { todayDate } from '../../shared/time/today.js';
+import { releaseYearWhere } from './program-release-year.js';
 import type { CreateProgramDto } from './create-program.dto.js';
 import { ProgramQueryDto } from './program-query.dto.js';
 import type { ProgramRow, VersionInfoRow } from './program.dto.js';
@@ -48,6 +49,9 @@ function version(patch: Partial<VersionInfoRow> = {}): VersionInfoRow {
     compulsoryCredits: new Prisma.Decimal('140'),
     electiveCredits: new Prisma.Decimal('10'),
     updatedAt: NOW,
+    signedDate: null,
+    publishedAt: null,
+    cohortVersions: [],
     ...patch,
   };
 }
@@ -212,6 +216,77 @@ describe('ProgramsService', () => {
             },
           },
         ],
+      });
+    });
+
+    it('filters by faculty', async () => {
+      await service.list(query({ facultyId: 'f1' }), R1);
+      expect(program.findMany.mock.calls[0][0].where).toEqual({
+        facultyId: 'f1',
+      });
+    });
+
+    it('filters release and intake year on the same released version', async () => {
+      await service.list(query({ releaseYear: 2026, intakeYear: 2021 }), R1);
+      expect(program.findMany.mock.calls[0][0].where).toEqual({
+        versions: {
+          some: {
+            sourceRequestId: null,
+            status: { in: ['PENDING', 'ACTIVE', 'HISTORICAL'] },
+            AND: [
+              releaseYearWhere(2026),
+              { cohortVersions: { some: { cohort: { intakeYear: 2021 } } } },
+            ],
+          },
+        },
+      });
+    });
+
+    it('lists released versions only, with release year fallback and sorted deduped cohorts', async () => {
+      const c21 = { id: 'c21', cohortCode: '21', intakeYear: 2021 };
+      const c19 = { id: 'c19', cohortCode: '19', intakeYear: 2019 };
+      program.findMany.mockResolvedValue([
+        row({
+          versions: [
+            version({ id: 'd', status: ProgramVersionStatus.DRAFT }),
+            version({
+              id: 'v2',
+              versionNumber: '2.0',
+              status: ProgramVersionStatus.ACTIVE,
+              publishedAt: new Date('2025-12-31T18:00:00.000Z'),
+              cohortVersions: [
+                { cohort: c21 },
+                { cohort: c19 },
+                { cohort: c21 },
+              ],
+            }),
+            version({
+              id: 'v1',
+              versionNumber: '1.0',
+              status: ProgramVersionStatus.HISTORICAL,
+              signedDate: new Date('2020-05-01T00:00:00.000Z'),
+              publishedAt: new Date('2025-01-01T00:00:00.000Z'),
+            }),
+            version({
+              id: 'v0',
+              versionNumber: '0.9',
+              status: ProgramVersionStatus.PENDING,
+            }),
+          ],
+        }),
+      ]);
+      const page = await service.list(query(), R1);
+      expect(
+        page.items[0].releasedVersions.map((v) => [v.id, v.releaseYear]),
+      ).toEqual([
+        ['v1', 2020],
+        ['v2', 2026],
+        ['v0', null],
+      ]);
+      expect(page.items[0].releasedVersions[1].cohorts).toEqual([c19, c21]);
+      expect(page.items[0]).toMatchObject({
+        majorCode: '7480106',
+        majorName: 'Kỹ thuật máy tính',
       });
     });
 

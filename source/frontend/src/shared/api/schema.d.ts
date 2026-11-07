@@ -3792,6 +3792,18 @@ export interface components {
       versionNumber: string | null;
       status: components['schemas']['ProgramVersionStatus'];
     };
+    ProgramCohortRefDto: {
+      id: string;
+      cohortCode: string;
+      intakeYear: number;
+    };
+    ProgramReleasedVersionDto: {
+      id: string;
+      versionNumber: string | null;
+      status: components['schemas']['ProgramVersionStatus'];
+      releaseYear: number | null;
+      cohorts: components['schemas']['ProgramCohortRefDto'][];
+    };
     ProgramSummaryDto: {
       id: string;
       programCode: string;
@@ -3800,6 +3812,9 @@ export interface components {
       faculty: components['schemas']['OrgUnitRefDto'];
       programName: string;
       currentVersion: components['schemas']['ProgramVersionRefDto'];
+      majorCode: string;
+      majorName: string;
+      releasedVersions: components['schemas']['ProgramReleasedVersionDto'][];
       directors: components['schemas']['UserRefDto'][];
     };
     ProgramPageDto: {
@@ -3853,6 +3868,9 @@ export interface components {
       faculty: components['schemas']['OrgUnitRefDto'];
       programName: string;
       currentVersion: components['schemas']['ProgramVersionRefDto'];
+      majorCode: string;
+      majorName: string;
+      releasedVersions: components['schemas']['ProgramReleasedVersionDto'][];
       directors: components['schemas']['UserRefDto'][];
       currentVersionInfo: components['schemas']['ProgramVersionInfoDto'];
       draftVersion: components['schemas']['ProgramVersionInfoDto'] | null;
@@ -8087,6 +8105,9 @@ export interface operations {
         q?: string;
         degreeLevel?: components['schemas']['DegreeLevel'];
         status?: components['schemas']['ProgramStatus'];
+        facultyId?: string;
+        releaseYear?: number;
+        intakeYear?: number;
       };
       header?: never;
       path?: never;

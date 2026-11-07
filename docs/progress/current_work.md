@@ -1,6 +1,11 @@
 # Current Work — F-01..F-27 đã merge; Playwright trên dữ liệu thật đã chạy (trừ F-06); chờ smoke vòng 1 và duyệt luồng phê duyệt
 
-**Start here**: đọc [bàn giao 2026-10-31 (tối)](handoff.md). Playwright trên `ctdt_real` đã chạy xong ngày 2026-11-01 trừ F-06 (xem progress_log). Việc kế tiếp: khi Docker lên, chạy lại Playwright f-06/f-07/f-08/f-11/mvp-flow sau khi bỏ thêm chương trình (2026-11-06) và BE e2e + Playwright cho sửa lỗi luồng phê duyệt (2026-11-07, DEBT-19), vì cả hai đang chặn việc đi luồng phê duyệt trên UI; rồi đi luồng phê duyệt R5→R4→R3→R1 trên UI, chạy [smoke checklist](../testing/smoke-checklist.md) vòng 1 (29 kịch bản, thay 413 ca thủ công) và chụp màn hình cho impeccable polish. Main: BE unit 1797/1797, BE e2e 679/679, FE 693/693.
+**Start here**: đọc [bàn giao 2026-10-31 (tối)](handoff.md). Playwright trên `ctdt_real` đã chạy xong ngày 2026-11-01 trừ F-06 (xem progress_log). Việc kế tiếp: khi Docker lên, chạy lại Playwright f-06/f-07/f-08/f-11/mvp-flow sau khi bỏ thêm chương trình (2026-11-06) và BE e2e + Playwright cho sửa lỗi luồng phê duyệt (2026-11-07, DEBT-19) và BE e2e + Playwright f-06 cho danh sách chương trình tổng quan (DEBT-24), vì cả hai đang chặn việc đi luồng phê duyệt trên UI; rồi đi luồng phê duyệt R5→R4→R3→R1 trên UI, chạy [smoke checklist](../testing/smoke-checklist.md) vòng 1 (29 kịch bản, thay 413 ca thủ công) và chụp màn hình cho impeccable polish. Main: BE unit 1898/1898, BE e2e 679/679 (chưa chạy lại), FE 719/719.
+
+## Danh sách chương trình dạng tổng quan — mã xong 2026-11-07
+
+- Đã có: `GET /api/programs` lọc khoa/năm ban hành/năm tuyển sinh và trả `releasedVersions` kèm khóa; MH-21 có cột ngành, mã ngành, phiên bản (năm), khóa tuyển sinh, khoa. [Báo cáo](../implement-report/program-list-overview-implement-report.md).
+- Còn nợ: BE e2e + Playwright f-06 (DEBT-24), sinh lại `schema.d.ts` (DEBT-22), mã ngành thứ hai TT 74/2026 (DEBT-25), polish/audit (DEBT-26); build-verifier cuối chưa chạy.
 
 ## Sửa lỗi luồng đề xuất và phê duyệt — mã xong 2026-11-07
 
@@ -70,7 +75,7 @@
 
 ## Session Context
 
-- **Last updated**: 2026-11-07 (khu vực đang làm: luồng đề xuất và phê duyệt, sửa F1–F6; trước đó F-06 chương trình).
+- **Last updated**: 2026-11-07 (khu vực đang làm: danh sách chương trình dạng tổng quan F-06; trước đó luồng đề xuất và phê duyệt F1–F6).
 - 27 tính năng đã có mã hoàn tất và đã merge: F-01..F-27. Kế hoạch sau MVP được chấp nhận với giới hạn §8; không còn gate quyết định A1..A12/B1/B2. Hoàn tất mã không thay thế các ca thủ công hoặc nghiệm thu Khoa còn nợ.
 - F-15 `createdByAcademicOffice` đã chốt; đính chính là thay thế hành chính hồi tố và lịch học kỳ theo chính sách hiện tại. Không hứa lịch sử bất biến trước đính chính, không lên kế hoạch history/freeze; mỗi lần xét F-19 chụp đúng đầu vào.
 - Công thức điểm không có ngoại lệ học kỳ đã bắt đầu (E1, người dùng chốt 2026-10-26); GRADING_FORMULA đi hết ba cấp duyệt như các loại đề cương khác.

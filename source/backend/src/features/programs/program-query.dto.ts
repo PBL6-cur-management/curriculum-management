@@ -1,10 +1,21 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
-import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import {
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  Max,
+  MaxLength,
+  Min,
+} from 'class-validator';
 import { DegreeLevel, ProgramStatus } from '../../generated/prisma/client.js';
 import { trimString } from '../../shared/dtos/transforms.js';
 import { PageQueryDto } from '../../shared/pagination/page-query.dto.js';
 import { PROGRAM_LIMITS } from './create-program.dto.js';
+
+export const PROGRAM_YEAR_MIN = 1900;
+export const PROGRAM_YEAR_MAX = 2100;
 
 export class ProgramQueryDto extends PageQueryDto {
   @ApiPropertyOptional({ maxLength: PROGRAM_LIMITS.QUERY_MAX })
@@ -23,4 +34,25 @@ export class ProgramQueryDto extends PageQueryDto {
   @IsOptional()
   @IsEnum(ProgramStatus)
   status?: ProgramStatus;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  facultyId?: string;
+
+  @ApiPropertyOptional({ minimum: PROGRAM_YEAR_MIN, maximum: PROGRAM_YEAR_MAX })
+  @Type(() => Number)
+  @IsOptional()
+  @IsInt()
+  @Min(PROGRAM_YEAR_MIN)
+  @Max(PROGRAM_YEAR_MAX)
+  releaseYear?: number;
+
+  @ApiPropertyOptional({ minimum: PROGRAM_YEAR_MIN, maximum: PROGRAM_YEAR_MAX })
+  @Type(() => Number)
+  @IsOptional()
+  @IsInt()
+  @Min(PROGRAM_YEAR_MIN)
+  @Max(PROGRAM_YEAR_MAX)
+  intakeYear?: number;
 }

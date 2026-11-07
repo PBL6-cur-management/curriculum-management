@@ -14,6 +14,7 @@ import {
   UserRefDto,
 } from '../../shared/dtos/ref.dto.js';
 import { activeDirectorWhere } from '../../shared/programs/active-director.js';
+import { isReleased, releaseYearOf } from './program-release-year.js';
 
 export class ProgramVersionRefDto {
   @ApiProperty() id!: string;
@@ -33,6 +34,17 @@ export class ProgramVersionInfoDto extends ProgramVersionRefDto {
   @ApiProperty() updatedAt!: string;
 }
 
+export class ProgramCohortRefDto {
+  @ApiProperty() id!: string;
+  @ApiProperty() cohortCode!: string;
+  @ApiProperty() intakeYear!: number;
+}
+
+export class ProgramReleasedVersionDto extends ProgramVersionRefDto {
+  @ApiProperty({ nullable: true, type: Number }) releaseYear!: number | null;
+  @ApiProperty({ type: [ProgramCohortRefDto] }) cohorts!: ProgramCohortRefDto[];
+}
+
 export class ProgramSummaryDto {
   @ApiProperty() id!: string;
   @ApiProperty() programCode!: string;
@@ -44,6 +56,10 @@ export class ProgramSummaryDto {
   @ApiProperty() programName!: string;
   @ApiProperty({ type: ProgramVersionRefDto })
   currentVersion!: ProgramVersionRefDto;
+  @ApiProperty() majorCode!: string;
+  @ApiProperty() majorName!: string;
+  @ApiProperty({ type: [ProgramReleasedVersionDto] })
+  releasedVersions!: ProgramReleasedVersionDto[];
   @ApiProperty({ type: [UserRefDto] }) directors!: UserRefDto[];
 }
 
@@ -103,7 +119,18 @@ export const programInclude = (today: Date) =>
           correctionOfId: { not: null },
         },
       },
-      select: VERSION_INFO_SELECT,
+      select: {
+        ...VERSION_INFO_SELECT,
+        signedDate: true,
+        publishedAt: true,
+        cohortVersions: {
+          select: {
+            cohort: {
+              select: { id: true, cohortCode: true, intakeYear: true },
+            },
+          },
+        },
+      },
       orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
     },
     directors: {
@@ -149,7 +176,11 @@ function toVersionRef(version: VersionInfoRow): ProgramVersionRefDto {
   };
 }
 
-export function toVersionInfo(version: VersionInfoRow): ProgramVersionInfoDto {
+export function toVersionInfo(
+  version: Prisma.ProgramVersionGetPayload<{
+    select: typeof VERSION_INFO_SELECT;
+  }>,
+): ProgramVersionInfoDto {
   return {
     id: version.id,
     versionNumber: version.versionNumber,
@@ -165,6 +196,34 @@ export function toVersionInfo(version: VersionInfoRow): ProgramVersionInfoDto {
   };
 }
 
+function toReleasedVersions(row: ProgramRow): ProgramReleasedVersionDto[] {
+  return row.versions
+    .filter((version) => isReleased(version.status))
+    .map((version) => {
+      const cohorts = new Map(
+        version.cohortVersions.map(({ cohort }) => [cohort.id, cohort]),
+      );
+      return {
+        id: version.id,
+        versionNumber: version.versionNumber,
+        status: version.status,
+        releaseYear: releaseYearOf(version.signedDate, version.publishedAt),
+        cohorts: [...cohorts.values()].sort(
+          (a, b) =>
+            a.intakeYear - b.intakeYear ||
+            a.cohortCode.localeCompare(b.cohortCode),
+        ),
+      };
+    })
+    .sort(
+      (a, b) =>
+        (a.releaseYear ?? Infinity) - (b.releaseYear ?? Infinity) ||
+        (a.versionNumber ?? '').localeCompare(b.versionNumber ?? '', 'en', {
+          numeric: true,
+        }),
+    );
+}
+
 export function toProgramSummaryDto(row: ProgramRow): ProgramSummaryDto {
   const current = currentVersion(row);
   return {
@@ -175,6 +234,9 @@ export function toProgramSummaryDto(row: ProgramRow): ProgramSummaryDto {
     faculty: row.faculty,
     programName: current.programName,
     currentVersion: toVersionRef(current),
+    majorCode: current.majorCode,
+    majorName: current.majorName,
+    releasedVersions: toReleasedVersions(row),
     directors: row.directors.map((assignment) => assignment.director),
   };
 }

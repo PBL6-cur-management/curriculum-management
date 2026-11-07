@@ -5,6 +5,9 @@ export type ProgramSummary = components['schemas']['ProgramSummaryDto'];
 export type ProgramDetail = components['schemas']['ProgramDetailDto'];
 export type ProgramPage = components['schemas']['ProgramPageDto'];
 export type ProgramVersionRef = components['schemas']['ProgramVersionRefDto'];
+export type ProgramReleasedVersion =
+  components['schemas']['ProgramReleasedVersionDto'];
+export type ProgramCohortRef = components['schemas']['ProgramCohortRefDto'];
 export type ProgramVersionInfo = components['schemas']['ProgramVersionInfoDto'];
 export type ProgramDirector = components['schemas']['ProgramDirectorDto'];
 export type VersionInfoEdit = components['schemas']['VersionInfoEditDto'];

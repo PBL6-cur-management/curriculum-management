@@ -39,6 +39,9 @@ function version(patch: Partial<VersionInfoRow> = {}): VersionInfoRow {
     compulsoryCredits: new Prisma.Decimal('140'),
     electiveCredits: new Prisma.Decimal('10'),
     updatedAt: NOW,
+    signedDate: null,
+    publishedAt: null,
+    cohortVersions: [],
     ...patch,
   };
 }
