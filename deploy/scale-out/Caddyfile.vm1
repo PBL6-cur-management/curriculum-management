@@ -1,0 +1,72 @@
+{
+	servers {
+		trusted_proxies static 10.0.1.0/24
+	}
+}
+
+# F-27 BE-04. One public HTTPS origin: the SPA from /srv and the API under /api.
+# No handle_path, custom trusted proxies or forwarded-header overrides: the backend's trust-proxy
+# setting assumes exactly this one hop. If a CDN or another proxy is added, stop and review it.
+{$PUBLIC_HOST} {
+	encode zstd gzip
+
+	# The API documentation is not part of the public surface.
+	@docs path /api/docs /api/docs/* /api/docs-json
+	handle @docs {
+		respond 404
+	}
+
+	# /api/health stays public (the monitor must not be redirected to login) and keeps its 200/503.
+	@api path /api /api/*
+	handle @api {
+		reverse_proxy api:3000
+	}
+
+	@assets path /assets/*
+	handle @assets {
+		root * /srv
+		header Cache-Control "public, max-age=31536000, immutable"
+		file_server
+	}
+
+	# Deep links fall back to index.html, which is always revalidated.
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		header Cache-Control "no-cache"
+		file_server
+	}
+}
+
+# Plain-HTTP site the OCI load balancer calls (TLS ends on the LB). Reached only from 10.0.1.0/24.
+:8080 {
+	encode zstd gzip
+
+	@docs path /api/docs /api/docs/* /api/docs-json
+	handle @docs {
+		respond 404
+	}
+
+	@api path /api /api/*
+	handle @api {
+		reverse_proxy {$API_UPSTREAM:api:3000} {
+			# The browser spoke HTTPS to the LB; the backend trusts exactly one hop (this Caddy),
+			# so tell it the original scheme or the Secure session cookie is never set.
+			header_up X-Forwarded-Proto https
+		}
+	}
+
+	@assets path /assets/*
+	handle @assets {
+		root * /srv
+		header Cache-Control "public, max-age=31536000, immutable"
+		file_server
+	}
+
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		header Cache-Control "no-cache"
+		file_server
+	}
+}

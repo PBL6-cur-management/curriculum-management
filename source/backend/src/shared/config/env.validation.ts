@@ -60,6 +60,11 @@ export class Env {
   @Max(MAX_REDIS_DB)
   REDIS_DB: number = 0;
 
+  // Scale-out: only one instance may run the BullMQ workers (backups, imports, activation...).
+  // Extra API instances behind the load balancer set this to 'false' and only enqueue.
+  @IsIn(['true', 'false'])
+  QUEUE_WORKERS_ENABLED: 'true' | 'false' = 'true';
+
   @IsString()
   @MinLength(SESSION_SECRET_MIN_LENGTH)
   SESSION_SECRET: string;
