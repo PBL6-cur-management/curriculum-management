@@ -1,0 +1,39 @@
+#cloud-config
+# Instance configuration user_data for autoscaled API VMs (deploy/terraform/oci/autoscale.tf).
+# Every boot: ctdt-pool-gate closes :8080 to the load balancer before docker starts the (possibly stale) baked
+# containers; ctdt-pool-sync brings the VM to VM1's release, then opens it. See pool-sync.sh.
+write_files:
+  - path: /usr/local/sbin/ctdt-pool-sync
+    permissions: '0755'
+    encoding: b64
+    content: ${pool_sync_b64}
+  - path: /etc/systemd/system/ctdt-pool-gate.service
+    content: |
+      [Unit]
+      Description=Close :8080 to the load balancer until the release is synced
+      DefaultDependencies=no
+      Before=docker.service network-pre.target
+      Wants=network-pre.target
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/sbin/ctdt-pool-sync gate
+      [Install]
+      WantedBy=multi-user.target
+  - path: /etc/systemd/system/ctdt-pool-sync.service
+    content: |
+      [Unit]
+      Description=Sync this API VM to the release VM1 serves, then open :8080
+      After=docker.service network-online.target ctdt-pool-gate.service
+      Wants=network-online.target
+      Requires=docker.service
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/sbin/ctdt-pool-sync
+      TimeoutStartSec=15min
+      [Install]
+      WantedBy=multi-user.target
+runcmd:
+  - [/usr/local/sbin/ctdt-pool-sync, gate]
+  - [systemctl, daemon-reload]
+  - [systemctl, enable, ctdt-pool-gate.service, ctdt-pool-sync.service]
+  - [systemctl, start, --no-block, ctdt-pool-sync.service]

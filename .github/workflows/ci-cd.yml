@@ -114,11 +114,28 @@ jobs:
       - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
       # Static checks only: apply runs on the operator's machine, so no OCI credential lives on GitHub.
       - run: terraform fmt -check -recursive
-      - run: terraform init -backend=false -input=false
+      # Providers come from GitHub Releases (oracle/oci); a release-download outage on 2026-11-08 (504) failed
+      # this job and therefore blocked deploy. Cache them per lock file and retry init.
+      - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: ~/.terraform.d/plugin-cache
+          key: tf-providers-${{ runner.os }}-${{ hashFiles('deploy/terraform/oci/.terraform.lock.hcl') }}
+      - name: terraform init (cached providers, 3 attempts)
+        env:
+          TF_PLUGIN_CACHE_DIR: /home/runner/.terraform.d/plugin-cache
+        run: |
+          mkdir -p "$TF_PLUGIN_CACHE_DIR"
+          for attempt in 1 2 3; do
+            terraform init -backend=false -input=false && exit 0
+            echo "init failed (attempt $attempt), retrying in 30 s"; sleep 30
+          done
+          exit 1
       - run: terraform validate
 
   deploy:
-    needs: [changes, backend, frontend, terraform]
+    # Not gated on the terraform job: deploy ships the app and never runs terraform, so a provider-download
+    # outage (2026-11-08) must not block it. A terraform failure still turns the run red.
+    needs: [changes, backend, frontend]
     if: >-
       always()
       && !contains(needs.*.result, 'failure')

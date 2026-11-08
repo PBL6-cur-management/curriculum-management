@@ -119,3 +119,25 @@ Từ nay job `deploy` trong `.github/workflows/ci-cd.yml` gọi `deploy/scale-ou
 
 Máy pool được tìm bằng cách quét subnet 10.0.1.0/24 từ VM1 (`:8080/api/health`), nên máy autoscale thêm vào cũng
 được cập nhật. `update-pool.sh` vẫn dùng khi cần cập nhật tay (ví dụ máy vừa autoscale từ image cũ).
+## Máy autoscale tự đồng bộ khi khởi động (thêm ngày 2026-11-08)
+
+Máy pool khởi động từ image chụp sẵn, nên sớm muộn cũng cũ hơn VM1. Giờ mỗi lần khởi động:
+
+1. `ctdt-pool-gate.service` (chạy trước docker) chặn :8080 với subnet bằng iptables (bảng raw), Load Balancer
+   thấy health hỏng nên không gửi request.
+2. `ctdt-pool-sync.service` gắn NFS chỉ-đọc `10.0.1.3:/srv/ctdt/release-export`, đọc `current.sha`, giải nén
+   `release-<sha>.tgz`, build với `compose.vm2.yaml`, chờ health rồi mở chặn. Lỗi thì thử lại 10 phút; vẫn lỗi
+   thì giữ chặn, máy cũ không bao giờ nhận traffic.
+
+`deploy-release.sh` ghi gói release vào `/srv/ctdt/release-export` sau mỗi lần deploy VM1 thành công.
+Script và unit nằm trong `pool-sync.sh` + `pool-cloud-init.yaml` (user_data của instance configuration); image
+`ctdt-demo-api-image` cũng đã cài sẵn chúng để bộ chặn chạy trước docker ngay lần khởi động đầu.
+
+Cài trên VM1 (một lần, đã làm 2026-11-08): `mkdir /srv/ctdt/release-export` (chủ ubuntu) và thêm
+`/srv/ctdt/release-export 10.0.1.0/24(ro,sync,no_subtree_check,root_squash)` vào `/etc/exports.d/ctdt.exports`.
+
+Chụp lại image (khi cần): bật api2, `sudo systemctl start ctdt-pool-sync`, tắt api2, rồi
+`terraform apply -replace='oci_core_image.api[0]' -target=oci_core_instance_pool.api ...`.
+
+CI: job `terraform` lưu cache provider theo lock file và thử init 3 lần; job `deploy` không còn phụ thuộc
+job `terraform` (2026-11-08 GitHub Releases trả 504 làm chặn deploy dù deploy không chạy terraform).
