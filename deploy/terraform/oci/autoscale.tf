@@ -25,64 +25,25 @@ variable "pool_max" {
   }
 }
 
-resource "oci_core_image" "api" {
+# The autoscale image and instance configuration are created by deploy/scale-out/rebake-image.sh on VM1 after
+# every deploy (see rebake.tf), not by Terraform. The pool only needs one to exist when it is first created:
+# bootstrap a new environment with deploy/scale-out/rebake-image.sh before enabling autoscale.
+data "oci_core_instance_configurations" "api" {
   count          = var.autoscale ? 1 : 0
   compartment_id = local.compartment_id
-  instance_id    = oci_core_instance.api2[0].id
-  display_name   = "${var.name}-api-image"
-  launch_mode    = "PARAVIRTUALIZED"
-
-  # Re-bake after updating api2: terraform apply -replace='oci_core_image.api[0]' (see scale-out/README.md).
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  timeouts {
-    create = "60m"
-  }
 }
 
-resource "oci_core_instance_configuration" "api" {
-  count          = var.autoscale ? 1 : 0
-  compartment_id = local.compartment_id
-  display_name   = "${var.name}-api-config"
-
-  # Instance configurations are immutable; the pool must switch to the new one before the old one goes.
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  instance_details {
-    instance_type = "compute"
-    launch_details {
-      compartment_id = local.compartment_id
-      shape          = var.trial_shape
-      shape_config {
-        ocpus         = var.api2_ocpus
-        memory_in_gbs = var.api2_memory_gb
-      }
-      source_details {
-        source_type = "image"
-        image_id    = oci_core_image.api[0].id
-      }
-      create_vnic_details {
-        assign_public_ip = true
-      }
-      metadata = {
-        ssh_authorized_keys = local.ssh_keys
-        # Boot sync: a new VM serves only after it runs VM1's release (deploy/scale-out/pool-sync.sh).
-        user_data = base64encode(templatefile("${path.module}/../../scale-out/pool-cloud-init.yaml", {
-          pool_sync_b64 = base64encode(file("${path.module}/../../scale-out/pool-sync.sh"))
-        }))
-      }
-    }
-  }
+locals {
+  api_configs = var.autoscale ? [
+    for c in data.oci_core_instance_configurations.api[0].instance_configurations : c
+    if startswith(c.display_name, "${var.name}-api-config")
+  ] : []
 }
 
 resource "oci_core_instance_pool" "api" {
   count                     = var.autoscale ? 1 : 0
   compartment_id            = local.compartment_id
-  instance_configuration_id = oci_core_instance_configuration.api[0].id
+  instance_configuration_id = local.api_configs[0].id # bootstrap only; the rebake script switches it
   display_name              = "${var.name}-api-pool"
   size                      = var.pool_min
 
@@ -99,7 +60,7 @@ resource "oci_core_instance_pool" "api" {
   }
 
   lifecycle {
-    ignore_changes = [size] # the autoscaler owns the size
+    ignore_changes = [size, instance_configuration_id] # autoscaler owns size, rebake-image.sh the config
   }
 }
 

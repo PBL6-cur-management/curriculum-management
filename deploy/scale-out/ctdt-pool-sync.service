@@ -1,0 +1,11 @@
+[Unit]
+Description=Sync this API VM to the release VM1 serves, then open :8080
+After=docker.service network-online.target ctdt-pool-gate.service
+Wants=network-online.target
+Requires=docker.service
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/ctdt-pool-sync
+TimeoutStartSec=15min
+[Install]
+WantedBy=multi-user.target
