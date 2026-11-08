@@ -153,7 +153,15 @@ jobs:
             tar -xz -C \"\$d.tmp\"
             chmod +x \"\$d.tmp\"/deploy/scripts/*.sh
             rm -rf \"\$d\" && mv \"\$d.tmp\" \"\$d\""
+      - name: Prebuild on pool VMs (old containers keep serving)
+        env:
+          HOST: ${{ secrets.DEMO_SSH_HOST }}
+        run: bash deploy/scale-out/ci-pool.sh build "$HOST" "$GITHUB_SHA"
       - name: Build, migrate, switch (rolls back on failed health)
         env:
           HOST: ${{ secrets.DEMO_SSH_HOST }}
         run: ssh -o ServerAliveInterval=30 "ubuntu@$HOST" "/srv/ctdt/releases/$GITHUB_SHA/deploy/scripts/deploy-release.sh"
+      - name: Switch pool VMs to the same release
+        env:
+          HOST: ${{ secrets.DEMO_SSH_HOST }}
+        run: bash deploy/scale-out/ci-pool.sh switch "$HOST" "$GITHUB_SHA"
