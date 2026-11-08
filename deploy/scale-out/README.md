@@ -103,3 +103,19 @@ luật VCN-internal, máy pool mất kết nối PostgreSQL/Redis, Load Balancer
    `terraform apply` từ main (kể cả vòng săn A1) lại xoá nó.
 
 Không chạy Terraform song song từ hai máy: vòng săn A1 dùng state chép ngày 2026-11-01, đã lỗi thời.
+
+## CD tự đồng bộ pool (thêm ngày 2026-11-08)
+
+Sự cố 2026-11-08: CD deploy commit mới của frontend + backend lên VM1, pool vẫn chạy API cũ. `/api/*` chia cho
+cả hai máy, nên trang mới thỉnh thoảng nhận phản hồi từ API cũ thiếu trường mới (`releasedVersions`) và vỡ
+("Cannot read properties of undefined (reading 'length')"); F5 hết vì lần sau rơi vào VM1.
+
+Từ nay job `deploy` trong `.github/workflows/ci-cd.yml` gọi `deploy/scale-out/ci-pool.sh`:
+
+1. `build`: trước khi VM1 đổi bản, chép release và build image trên từng máy pool (container cũ vẫn phục vụ).
+   Build lỗi thì CD dừng trước khi VM1 đổi, hai bên không bao giờ lệch.
+2. Deploy VM1 như cũ.
+3. `switch`: dựng lại container pool từ image đã build (khoảng 20 giây).
+
+Máy pool được tìm bằng cách quét subnet 10.0.1.0/24 từ VM1 (`:8080/api/health`), nên máy autoscale thêm vào cũng
+được cập nhật. `update-pool.sh` vẫn dùng khi cần cập nhật tay (ví dụ máy vừa autoscale từ image cũ).
