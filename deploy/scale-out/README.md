@@ -141,3 +141,25 @@ Chụp lại image (khi cần): bật api2, `sudo systemctl start ctdt-pool-sync
 
 CI: job `terraform` lưu cache provider theo lock file và thử init 3 lần; job `deploy` không còn phụ thuộc
 job `terraform` (2026-11-08 GitHub Releases trả 504 làm chặn deploy dù deploy không chạy terraform).
+
+## Image autoscale luôn là bản mới nhất (thêm ngày 2026-11-08)
+
+Sau mỗi lần deploy VM1 thành công, `deploy-release.sh` chạy nền `deploy/scale-out/rebake-image.sh` trên VM1
+(log `/srv/ctdt/rebake.log`, một lần chạy tại một thời điểm):
+
+1. Bật api2. Bộ đồng bộ khởi động trên api2 tự lấy release mới; :8080 mở ra subnet nghĩa là đã xong.
+2. Tắt api2, chụp `ctdt-demo-api-image-<sha7>`.
+3. Nhân bản cấu hình máy của pool với image mới thành `ctdt-demo-api-config-<sha7>`, chuyển pool sang.
+4. Xoá mọi image và cấu hình cũ hơn. Có deploy mới chen vào thì lặp lại tới khi khớp.
+
+VM1 gọi API Oracle bằng danh tính của chính nó (instance principal, `deploy/terraform/oci/rebake.tf`; AWS: IAM
+role gắn vào EC2), không có khoá OCI nào trên GitHub. Từ nay Terraform không quản image và cấu hình máy của pool
+nữa. Cài một lần trên VM1 (đã làm): `python3 -m venv /opt/oci-cli && /opt/oci-cli/bin/pip install oci-cli`.
+
+Script đồng bộ và unit nằm trong repo (`pool-sync.sh`, `ctdt-pool-gate.service`, `ctdt-pool-sync.service`).
+Sau mỗi lần đồng bộ, máy tự cài lại chúng từ release, nên image chụp sau deploy mang bản mới nhất.
+
+## Deploy không qua GitHub
+
+Khi GitHub lỗi: `deploy/scripts/deploy-direct.sh [<commit>]` chạy đúng các bước của job deploy từ máy dev
+(cần commit, key SSH `~/.ssh/oci_ctdt`).

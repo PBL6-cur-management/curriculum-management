@@ -65,6 +65,13 @@ if dc "$RELEASE_DIR" up -d --no-deps --wait --wait-timeout 180 api caddy && heal
       && echo "$SHA" > "$EXPORT/current.sha.tmp" && mv "$EXPORT/current.sha.tmp" "$EXPORT/current.sha" \
       && ls -1t "$EXPORT"/release-*.tgz | tail -n +3 | xargs -r rm -f \
       || echo "==> Cảnh báo: không xuất được release cho pool." >&2
+    # Re-bake the autoscale image on this release in the background (log: /srv/ctdt/rebake.log).
+    REBAKE="$RELEASE_DIR/deploy/scale-out/rebake-image.sh"
+    if [[ -x /opt/oci-cli/bin/oci && -f "$REBAKE" ]]; then
+      cp "$REBAKE" "$ROOT/rebake-image.sh" && chmod +x "$ROOT/rebake-image.sh"
+      nohup setsid flock -n "$ROOT/rebake.lock" "$ROOT/rebake-image.sh" >> "$ROOT/rebake.log" 2>&1 < /dev/null &
+      echo "==> Đang chụp lại image autoscale ở nền (xem $ROOT/rebake.log)."
+    fi
   fi
 else
   echo "==> Health không đạt cho $SHA." >&2

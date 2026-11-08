@@ -1,0 +1,10 @@
+[Unit]
+Description=Close :8080 to the load balancer until the release is synced
+DefaultDependencies=no
+Before=docker.service network-pre.target
+Wants=network-pre.target
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/ctdt-pool-sync gate
+[Install]
+WantedBy=multi-user.target

@@ -9,8 +9,9 @@
 #                       written by deploy-release.sh), wait for health, open the gate. Retries for 10 minutes;
 #                       on failure the gate stays closed, so a stale VM never takes traffic.
 #
-# Installed by cloud-init (instance configuration user_data) as /usr/local/sbin/ctdt-pool-sync with two units:
-# ctdt-pool-gate.service (before docker) and ctdt-pool-sync.service (after docker and the network), every boot.
+# Baked into the autoscale image as /usr/local/sbin/ctdt-pool-sync with ctdt-pool-gate.service (before docker)
+# and ctdt-pool-sync.service (after docker and the network), both every boot. After each sync it re-installs
+# itself and the units from the release, so the image rebaked after a deploy carries the newest version.
 set -uo pipefail
 
 VM1_PRIVATE_IP="${VM1_PRIVATE_IP:-10.0.1.3}"
@@ -48,6 +49,12 @@ for attempt in $(seq 1 60); do
       || { log "compose failed"; sleep 10; continue; }
   fi
   if healthy; then
+    for f in ctdt-pool-gate.service ctdt-pool-sync.service; do
+      cmp -s "$dir/deploy/scale-out/$f" "/etc/systemd/system/$f" || install -m644 "$dir/deploy/scale-out/$f" /etc/systemd/system/
+    done
+    cmp -s "$dir/deploy/scale-out/pool-sync.sh" /usr/local/sbin/ctdt-pool-sync \
+      || install -m755 "$dir/deploy/scale-out/pool-sync.sh" /usr/local/sbin/ctdt-pool-sync
+    systemctl daemon-reload || true
     gate_off
     ls -1dt /srv/ctdt/releases/* 2>/dev/null | tail -n +3 | xargs -r rm -rf
     log "serving $tag"

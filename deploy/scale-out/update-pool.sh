@@ -62,7 +62,7 @@ for ip in "${POOL_IPS[@]}"; do
     cd /srv/ctdt/releases/$TAG/deploy/scale-out
     sudo docker compose -f compose.vm2.yaml --env-file /srv/ctdt/demo.env up -d --build --wait
     curl -fsS -o /dev/null http://127.0.0.1:8080/api/health
-    ls -1dt /srv/ctdt/releases/* | tail -n +3 | xargs -r rm -rf   # keep current + previous"
+    ls -1dt /srv/ctdt/releases/* | tail -n +3 | xargs -r sudo rm -rf   # keep current + previous"
   set_drain "$ip" false; DRAINED=""
   echo "$ip done"
 done
