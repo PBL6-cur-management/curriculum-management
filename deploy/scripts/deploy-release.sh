@@ -57,6 +57,15 @@ dc "$RELEASE_DIR" run --rm migrate
 if dc "$RELEASE_DIR" up -d --no-deps --wait --wait-timeout 180 api caddy && healthy_through_caddy; then
   ln -sfn "$RELEASE_DIR" "$ROOT/current"
   echo "==> OK: https://$PUBLIC_HOST chạy $SHA"
+  # Publish this release for pool VMs (read-only NFS export, read by deploy/scale-out/pool-sync.sh on boot).
+  EXPORT="$ROOT/release-export"
+  if [[ -d "$EXPORT" ]]; then
+    tar -czf "$EXPORT/release-$SHA.tgz.tmp" -C "$RELEASE_DIR" source deploy \
+      && mv "$EXPORT/release-$SHA.tgz.tmp" "$EXPORT/release-$SHA.tgz" \
+      && echo "$SHA" > "$EXPORT/current.sha.tmp" && mv "$EXPORT/current.sha.tmp" "$EXPORT/current.sha" \
+      && ls -1t "$EXPORT"/release-*.tgz | tail -n +3 | xargs -r rm -f \
+      || echo "==> Cảnh báo: không xuất được release cho pool." >&2
+  fi
 else
   echo "==> Health không đạt cho $SHA." >&2
   dc "$RELEASE_DIR" logs --tail 80 api caddy >&2 || true

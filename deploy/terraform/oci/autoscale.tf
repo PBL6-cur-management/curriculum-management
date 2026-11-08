@@ -32,6 +32,11 @@ resource "oci_core_image" "api" {
   display_name   = "${var.name}-api-image"
   launch_mode    = "PARAVIRTUALIZED"
 
+  # Re-bake after updating api2: terraform apply -replace='oci_core_image.api[0]' (see scale-out/README.md).
+  lifecycle {
+    create_before_destroy = true
+  }
+
   timeouts {
     create = "60m"
   }
@@ -41,6 +46,11 @@ resource "oci_core_instance_configuration" "api" {
   count          = var.autoscale ? 1 : 0
   compartment_id = local.compartment_id
   display_name   = "${var.name}-api-config"
+
+  # Instance configurations are immutable; the pool must switch to the new one before the old one goes.
+  lifecycle {
+    create_before_destroy = true
+  }
 
   instance_details {
     instance_type = "compute"
@@ -60,6 +70,10 @@ resource "oci_core_instance_configuration" "api" {
       }
       metadata = {
         ssh_authorized_keys = local.ssh_keys
+        # Boot sync: a new VM serves only after it runs VM1's release (deploy/scale-out/pool-sync.sh).
+        user_data = base64encode(templatefile("${path.module}/../../scale-out/pool-cloud-init.yaml", {
+          pool_sync_b64 = base64encode(file("${path.module}/../../scale-out/pool-sync.sh"))
+        }))
       }
     }
   }
