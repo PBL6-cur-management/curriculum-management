@@ -1,4 +1,13 @@
-import { Flex, Result, Select, Skeleton, Tabs, Typography } from 'antd';
+import {
+  Button,
+  Flex,
+  Result,
+  Select,
+  Skeleton,
+  Tabs,
+  Tag,
+  Typography,
+} from 'antd';
 import {
   generatePath,
   matchPath,
@@ -10,6 +19,7 @@ import {
 import { ROUTES } from '../../../routes';
 import { ApiError } from '../../../shared/api/client';
 import { useCan } from '../../../shared/auth/useCan';
+import { RequestStatusTag } from '../../../shared/change-requests/RequestStatusTag';
 import { BackLink } from '../../../shared/design-system';
 import { useSeesMatrices } from '../../../shared/outcomes/useSeesMatrices';
 import type { ProgramDetail } from '../api/programs';
@@ -17,7 +27,7 @@ import {
   VERSION_STATUS_LABELS,
   versionLabel,
 } from '../constants/programLabels';
-import { useProgram } from '../hooks/usePrograms';
+import { useProgram, useVersionInfo } from '../hooks/usePrograms';
 import { ProgramStatusTag } from './ProgramStatusTag';
 
 // One workspace for everything inside a program (UI review 2026-10-31):
@@ -181,8 +191,7 @@ function findCurrent(groups: WorkspaceGroup[], pathname: string) {
 
 // The version a view opens: the one in the URL, else the Draft being worked on, else the current one.
 function workingVersionId(program: ProgramDetail, versionId?: string) {
-  if (versionId && program.versions.some((v) => v.id === versionId))
-    return versionId;
+  if (versionId) return versionId;
   return program.draftVersion?.id ?? program.currentVersion.id;
 }
 
@@ -195,6 +204,9 @@ export function ProgramWorkspaceLayout() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { data: program, isPending, error } = useProgram(programId);
+  const versionInfoQuery = useVersionInfo(versionId ?? '');
+  const sourceRequest = versionInfoQuery.data?.sourceRequest;
+  const isProposalMode = Boolean(sourceRequest);
   const groups = useWorkspaceGroups();
 
   if (isPending)
@@ -255,56 +267,107 @@ export function ProgramWorkspaceLayout() {
   return (
     <Flex vertical gap={16}>
       <Flex vertical gap={4}>
-        <BackToList />
+        {isProposalMode && sourceRequest ? (
+          <BackLink
+            to={generatePath(ROUTES.changeRequestEdit, {
+              requestId: sourceRequest.id,
+            })}
+            preferHistory
+          >
+            Quay lại đề xuất {sourceRequest.requestCode}
+          </BackLink>
+        ) : (
+          <BackToList />
+        )}
         <Flex align="center" justify="space-between" wrap gap={12}>
           <Flex align="center" wrap gap={8} style={{ minWidth: 0 }}>
             <Typography.Title level={3} style={{ margin: 0 }}>
               {program.programCode} — {program.programName}
             </Typography.Title>
-            <ProgramStatusTag status={program.status} />
+            {isProposalMode && sourceRequest ? (
+              <>
+                <Tag color="processing">
+                  Bản nháp đề xuất {sourceRequest.requestCode}
+                </Tag>
+                <RequestStatusTag status={sourceRequest.status} />
+              </>
+            ) : (
+              <ProgramStatusTag status={program.status} />
+            )}
           </Flex>
-          <Flex align="center" gap={8}>
-            <Typography.Text type="secondary">Phiên bản</Typography.Text>
-            <Select
-              aria-label="Phiên bản đang xem"
-              value={activeVersionId}
-              onChange={switchVersion}
-              style={{ minWidth: 180 }}
-              options={program.versions.map((version) => ({
-                value: version.id,
-                label:
-                  version.status === 'DRAFT'
-                    ? 'Bản nháp'
-                    : `${versionLabel(version)} · ${VERSION_STATUS_LABELS[version.status]}`,
-              }))}
-            />
-          </Flex>
+          {isProposalMode && sourceRequest ? (
+            <Flex align="center" gap={8}>
+              <Button
+                type="primary"
+                onClick={() =>
+                  void navigate(
+                    generatePath(ROUTES.changeRequestEdit, {
+                      requestId: sourceRequest.id,
+                    }),
+                  )
+                }
+              >
+                Về bàn soạn đề xuất
+              </Button>
+            </Flex>
+          ) : (
+            <Flex align="center" gap={8}>
+              <Typography.Text type="secondary">Phiên bản</Typography.Text>
+              <Select
+                aria-label="Phiên bản đang xem"
+                value={activeVersionId}
+                onChange={switchVersion}
+                style={{ minWidth: 180 }}
+                options={program.versions.map((version) => ({
+                  value: version.id,
+                  label:
+                    version.status === 'DRAFT'
+                      ? 'Bản nháp'
+                      : `${versionLabel(version)} · ${VERSION_STATUS_LABELS[version.status]}`,
+                }))}
+              />
+            </Flex>
+          )}
         </Flex>
       </Flex>
-      <nav aria-label="Các mục của chương trình">
-        <Tabs
-          activeKey={current?.group.key ?? ''}
-          onChange={openGroup}
-          items={groups.map((group) => ({
-            key: group.key,
-            label: group.label,
-          }))}
-          tabBarStyle={{ marginBottom: subPages ? 12 : 0 }}
-        />
-        {subPages && (
+      {isProposalMode && current ? (
+        <nav aria-label="Các mục của đề xuất">
           <Tabs
-            size="small"
-            type="card"
-            activeKey={current!.page.key}
+            activeKey={current.page.key}
             onChange={openPage}
-            items={subPages.map((page) => ({
+            items={current.group.pages.map((page) => ({
               key: page.key,
               label: page.label,
             }))}
-            tabBarStyle={{ marginBottom: 0 }}
+            tabBarStyle={{ marginBottom: 12 }}
           />
-        )}
-      </nav>
+        </nav>
+      ) : (
+        <nav aria-label="Các mục của chương trình">
+          <Tabs
+            activeKey={current?.group.key ?? ''}
+            onChange={openGroup}
+            items={groups.map((group) => ({
+              key: group.key,
+              label: group.label,
+            }))}
+            tabBarStyle={{ marginBottom: subPages ? 12 : 0 }}
+          />
+          {subPages && (
+            <Tabs
+              size="small"
+              type="card"
+              activeKey={current!.page.key}
+              onChange={openPage}
+              items={subPages.map((page) => ({
+                key: page.key,
+                label: page.label,
+              }))}
+              tabBarStyle={{ marginBottom: 0 }}
+            />
+          )}
+        </nav>
+      )}
       <Outlet />
     </Flex>
   );

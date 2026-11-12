@@ -53,7 +53,7 @@ describe('legacy mappings', () => {
     ['2121', 3],
   ])('maps semester %s', (code, term) => {
     expect(semesterFromLegacyCode(code)).toEqual({
-      semesterCode: `2021-2022-${term}`,
+      semesterCode: code,
       academicYear: '2021-2022',
       termInYear: term,
     });

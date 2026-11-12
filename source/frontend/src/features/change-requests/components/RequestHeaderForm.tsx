@@ -1,8 +1,12 @@
 import { Button, Flex, Form, Input, Radio, Segmented, Select } from 'antd';
 import type { FormInstance } from 'antd';
+import { useEffect, useRef } from 'react';
 import { hasPermission } from '../../../shared/auth/permissions';
 import { useMe } from '../../../shared/auth/useMe';
-import type { ChangeRequestType } from '../api/changeRequests';
+import type {
+  ChangeRequestType,
+  ChangeTargetType,
+} from '../api/changeRequests';
 import {
   ORIGIN_LABELS,
   REQUEST_TYPE_LABELS,
@@ -50,9 +54,24 @@ export function RequestHeaderForm({
   const { data: me } = useMe();
   const requestType = Form.useWatch('requestType', form);
   const targetType = Form.useWatch('targetType', form);
+  const targetId = Form.useWatch('targetId', form);
   const origin = Form.useWatch('origin', form);
   const kinds = requestType ? TYPE_TARGETS[requestType] : [];
   const editing = mode === 'edit';
+
+  // Remember chosen target per kind so switching requestType/kind preserves prefill and selections
+  const rememberedTargets = useRef<Partial<Record<ChangeTargetType, string>>>(
+    initialValues?.targetType && initialValues.targetId
+      ? { [initialValues.targetType]: initialValues.targetId }
+      : {},
+  );
+
+  useEffect(() => {
+    if (targetType && targetId) {
+      rememberedTargets.current[targetType] = targetId;
+    }
+  }, [targetType, targetId]);
+
   // A type is offered to someone who holds one of its edit permissions somewhere; the server decides on the target.
   const typeOptions = types.map((type) => {
     const unsupported = UNSUPPORTED_TYPES.includes(type);
@@ -67,9 +86,71 @@ export function RequestHeaderForm({
         : REQUEST_TYPE_LABELS[type],
     };
   });
+
   const onTypeChange = (next: ChangeRequestType) => {
-    form.setFieldsValue({ targetType: TYPE_TARGETS[next][0], targetId: '' });
+    const supportedKinds = TYPE_TARGETS[next];
+    const currentType = form.getFieldValue('targetType') as
+      | ChangeTargetType
+      | undefined;
+    const currentId = form.getFieldValue('targetId') as string | undefined;
+
+    // 1. If current targetType is supported by the new requestType: keep targetType and targetId
+    if (currentType && supportedKinds.includes(currentType)) {
+      const idToKeep =
+        currentId ||
+        rememberedTargets.current[currentType] ||
+        (initialValues?.targetType === currentType
+          ? initialValues.targetId
+          : '') ||
+        '';
+      form.setFieldsValue({
+        targetType: currentType,
+        targetId: idToKeep,
+      });
+      return;
+    }
+
+    // 2. If current targetType is not supported, check if initial prefilled target is supported
+    if (
+      initialValues?.targetType &&
+      supportedKinds.includes(initialValues.targetType) &&
+      (rememberedTargets.current[initialValues.targetType] ??
+        initialValues.targetId)
+    ) {
+      form.setFieldsValue({
+        targetType: initialValues.targetType,
+        targetId:
+          rememberedTargets.current[initialValues.targetType] ??
+          initialValues.targetId ??
+          '',
+      });
+      return;
+    }
+
+    // 3. Check if any other supported kind has a remembered target
+    const rememberedKind = supportedKinds.find((kind) =>
+      Boolean(rememberedTargets.current[kind]),
+    );
+    if (rememberedKind) {
+      form.setFieldsValue({
+        targetType: rememberedKind,
+        targetId: rememberedTargets.current[rememberedKind] ?? '',
+      });
+      return;
+    }
+
+    // 4. Fallback to first supported kind and reset targetId
+    form.setFieldsValue({
+      targetType: supportedKinds[0],
+      targetId: '',
+    });
   };
+
+  const isPrefilledTarget =
+    targetType === initialValues?.targetType &&
+    targetId === initialValues?.targetId;
+  const initialLabelForTarget = isPrefilledTarget ? targetLabel : undefined;
+
   return (
     <Form<RequestHeaderValues>
       form={form}
@@ -101,9 +182,17 @@ export function RequestHeaderForm({
               value: kind,
               label: TARGET_TYPE_LABELS[kind],
             }))}
-            onChange={(next) =>
-              form.setFieldsValue({ targetType: next, targetId: '' })
-            }
+            onChange={(next) => {
+              const rememberedId =
+                rememberedTargets.current[next] ??
+                (next === initialValues?.targetType
+                  ? (initialValues.targetId ?? '')
+                  : '');
+              form.setFieldsValue({
+                targetType: next,
+                targetId: rememberedId,
+              });
+            }}
           />
         </Form.Item>
       )}
@@ -118,7 +207,7 @@ export function RequestHeaderForm({
         ) : (
           <TargetSelect
             targetType={targetType ?? kinds[0] ?? 'COURSE'}
-            initialLabel={targetLabel}
+            initialLabel={initialLabelForTarget}
           />
         )}
       </Form.Item>

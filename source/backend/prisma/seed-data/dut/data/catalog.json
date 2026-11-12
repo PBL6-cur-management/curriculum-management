@@ -3712,7 +3712,7 @@
   ],
   "semesters": [
     {
-      "semesterCode": "2013-2014-1",
+      "semesterCode": "1310",
       "academicYear": "2013-2014",
       "termInYear": 1,
       "startDate": "2013-08-12",
@@ -3720,7 +3720,7 @@
       "legacyCode": "1310"
     },
     {
-      "semesterCode": "2013-2014-2",
+      "semesterCode": "1320",
       "academicYear": "2013-2014",
       "termInYear": 2,
       "startDate": "2014-01-06",
@@ -3728,7 +3728,7 @@
       "legacyCode": "1320"
     },
     {
-      "semesterCode": "2014-2015-1",
+      "semesterCode": "1410",
       "academicYear": "2014-2015",
       "termInYear": 1,
       "startDate": "2014-08-11",
@@ -3736,7 +3736,7 @@
       "legacyCode": "1410"
     },
     {
-      "semesterCode": "2014-2015-2",
+      "semesterCode": "1420",
       "academicYear": "2014-2015",
       "termInYear": 2,
       "startDate": "2015-01-05",
@@ -3744,7 +3744,7 @@
       "legacyCode": "1420"
     },
     {
-      "semesterCode": "2014-2015-3",
+      "semesterCode": "1421",
       "academicYear": "2014-2015",
       "termInYear": 3,
       "startDate": "2015-06-08",
@@ -3752,7 +3752,7 @@
       "legacyCode": "1421"
     },
     {
-      "semesterCode": "2015-2016-1",
+      "semesterCode": "1510",
       "academicYear": "2015-2016",
       "termInYear": 1,
       "startDate": "2015-08-10",
@@ -3760,7 +3760,7 @@
       "legacyCode": "1510"
     },
     {
-      "semesterCode": "2015-2016-2",
+      "semesterCode": "1520",
       "academicYear": "2015-2016",
       "termInYear": 2,
       "startDate": "2016-01-04",
@@ -3768,7 +3768,7 @@
       "legacyCode": "1520"
     },
     {
-      "semesterCode": "2015-2016-3",
+      "semesterCode": "1521",
       "academicYear": "2015-2016",
       "termInYear": 3,
       "startDate": "2016-06-13",
@@ -3776,7 +3776,7 @@
       "legacyCode": "1521"
     },
     {
-      "semesterCode": "2016-2017-1",
+      "semesterCode": "1610",
       "academicYear": "2016-2017",
       "termInYear": 1,
       "startDate": "2016-08-08",
@@ -3784,7 +3784,7 @@
       "legacyCode": "1610"
     },
     {
-      "semesterCode": "2016-2017-2",
+      "semesterCode": "1620",
       "academicYear": "2016-2017",
       "termInYear": 2,
       "startDate": "2017-01-02",
@@ -3792,7 +3792,7 @@
       "legacyCode": "1620"
     },
     {
-      "semesterCode": "2016-2017-3",
+      "semesterCode": "1621",
       "academicYear": "2016-2017",
       "termInYear": 3,
       "startDate": "2017-06-12",
@@ -3800,7 +3800,7 @@
       "legacyCode": "1621"
     },
     {
-      "semesterCode": "2017-2018-1",
+      "semesterCode": "1710",
       "academicYear": "2017-2018",
       "termInYear": 1,
       "startDate": "2017-08-07",
@@ -3808,7 +3808,7 @@
       "legacyCode": "1710"
     },
     {
-      "semesterCode": "2017-2018-2",
+      "semesterCode": "1720",
       "academicYear": "2017-2018",
       "termInYear": 2,
       "startDate": "2018-01-01",
@@ -3816,7 +3816,7 @@
       "legacyCode": "1720"
     },
     {
-      "semesterCode": "2017-2018-3",
+      "semesterCode": "1721",
       "academicYear": "2017-2018",
       "termInYear": 3,
       "startDate": "2018-06-11",
@@ -3824,7 +3824,7 @@
       "legacyCode": "1721"
     },
     {
-      "semesterCode": "2018-2019-1",
+      "semesterCode": "1810",
       "academicYear": "2018-2019",
       "termInYear": 1,
       "startDate": "2018-08-06",
@@ -3832,7 +3832,7 @@
       "legacyCode": "1810"
     },
     {
-      "semesterCode": "2018-2019-2",
+      "semesterCode": "1820",
       "academicYear": "2018-2019",
       "termInYear": 2,
       "startDate": "2018-12-10",
@@ -3840,7 +3840,7 @@
       "legacyCode": "1820"
     },
     {
-      "semesterCode": "2018-2019-3",
+      "semesterCode": "1821",
       "academicYear": "2018-2019",
       "termInYear": 3,
       "startDate": "2019-06-10",
@@ -3848,7 +3848,7 @@
       "legacyCode": "1821"
     },
     {
-      "semesterCode": "2019-2020-1",
+      "semesterCode": "1910",
       "academicYear": "2019-2020",
       "termInYear": 1,
       "startDate": "2019-08-05",
@@ -3856,7 +3856,7 @@
       "legacyCode": "1910"
     },
     {
-      "semesterCode": "2019-2020-2",
+      "semesterCode": "1920",
       "academicYear": "2019-2020",
       "termInYear": 2,
       "startDate": "2020-01-06",
@@ -3864,7 +3864,7 @@
       "legacyCode": "1920"
     },
     {
-      "semesterCode": "2019-2020-3",
+      "semesterCode": "1921",
       "academicYear": "2019-2020",
       "termInYear": 3,
       "startDate": "2020-06-08",
@@ -3872,7 +3872,7 @@
       "legacyCode": "1921"
     },
     {
-      "semesterCode": "2020-2021-1",
+      "semesterCode": "2010",
       "academicYear": "2020-2021",
       "termInYear": 1,
       "startDate": "2020-08-03",
@@ -3880,7 +3880,7 @@
       "legacyCode": "2010"
     },
     {
-      "semesterCode": "2020-2021-2",
+      "semesterCode": "2020",
       "academicYear": "2020-2021",
       "termInYear": 2,
       "startDate": "2020-12-28",
@@ -3888,7 +3888,7 @@
       "legacyCode": "2020"
     },
     {
-      "semesterCode": "2020-2021-3",
+      "semesterCode": "2021",
       "academicYear": "2020-2021",
       "termInYear": 3,
       "startDate": "2021-06-14",
@@ -3896,7 +3896,7 @@
       "legacyCode": "2021"
     },
     {
-      "semesterCode": "2021-2022-1",
+      "semesterCode": "2110",
       "academicYear": "2021-2022",
       "termInYear": 1,
       "startDate": "2021-08-02",
@@ -3904,7 +3904,7 @@
       "legacyCode": "2110"
     },
     {
-      "semesterCode": "2021-2022-2",
+      "semesterCode": "2120",
       "academicYear": "2021-2022",
       "termInYear": 2,
       "startDate": "2022-02-07",
@@ -3912,7 +3912,7 @@
       "legacyCode": "2120"
     },
     {
-      "semesterCode": "2021-2022-3",
+      "semesterCode": "2121",
       "academicYear": "2021-2022",
       "termInYear": 3,
       "startDate": "2022-07-04",
@@ -3920,7 +3920,7 @@
       "legacyCode": "2121"
     },
     {
-      "semesterCode": "2022-2023-1",
+      "semesterCode": "2210",
       "academicYear": "2022-2023",
       "termInYear": 1,
       "startDate": "2022-08-01",
@@ -3928,7 +3928,7 @@
       "legacyCode": "2210"
     },
     {
-      "semesterCode": "2022-2023-2",
+      "semesterCode": "2220",
       "academicYear": "2022-2023",
       "termInYear": 2,
       "startDate": "2023-01-02",
@@ -3936,7 +3936,7 @@
       "legacyCode": "2220"
     },
     {
-      "semesterCode": "2022-2023-3",
+      "semesterCode": "2221",
       "academicYear": "2022-2023",
       "termInYear": 3,
       "startDate": "2023-06-19",
@@ -3944,7 +3944,7 @@
       "legacyCode": "2221"
     },
     {
-      "semesterCode": "2023-2024-1",
+      "semesterCode": "2310",
       "academicYear": "2023-2024",
       "termInYear": 1,
       "startDate": "2023-07-31",
@@ -3952,7 +3952,7 @@
       "legacyCode": "2310"
     },
     {
-      "semesterCode": "2023-2024-2",
+      "semesterCode": "2320",
       "academicYear": "2023-2024",
       "termInYear": 2,
       "startDate": "2024-01-15",
@@ -3960,7 +3960,7 @@
       "legacyCode": "2320"
     },
     {
-      "semesterCode": "2023-2024-3",
+      "semesterCode": "2321",
       "academicYear": "2023-2024",
       "termInYear": 3,
       "startDate": "2024-06-17",
@@ -3968,7 +3968,7 @@
       "legacyCode": "2321"
     },
     {
-      "semesterCode": "2024-2025-1",
+      "semesterCode": "2410",
       "academicYear": "2024-2025",
       "termInYear": 1,
       "startDate": "2024-07-29",
@@ -3976,7 +3976,7 @@
       "legacyCode": "2410"
     },
     {
-      "semesterCode": "2024-2025-2",
+      "semesterCode": "2420",
       "academicYear": "2024-2025",
       "termInYear": 2,
       "startDate": "2025-01-06",
@@ -3984,7 +3984,7 @@
       "legacyCode": "2420"
     },
     {
-      "semesterCode": "2024-2025-3",
+      "semesterCode": "2421",
       "academicYear": "2024-2025",
       "termInYear": 3,
       "startDate": "2025-06-16",
@@ -3992,7 +3992,7 @@
       "legacyCode": "2421"
     },
     {
-      "semesterCode": "2025-2026-1",
+      "semesterCode": "2510",
       "academicYear": "2025-2026",
       "termInYear": 1,
       "startDate": "2025-08-04",
@@ -4000,7 +4000,7 @@
       "legacyCode": "2510"
     },
     {
-      "semesterCode": "2025-2026-2",
+      "semesterCode": "2520",
       "academicYear": "2025-2026",
       "termInYear": 2,
       "startDate": "2025-12-29",
@@ -4008,7 +4008,7 @@
       "legacyCode": "2520"
     },
     {
-      "semesterCode": "2025-2026-3",
+      "semesterCode": "2521",
       "academicYear": "2025-2026",
       "termInYear": 3,
       "startDate": "2026-06-15",
@@ -4016,7 +4016,7 @@
       "legacyCode": "2521"
     },
     {
-      "semesterCode": "2026-2027-1",
+      "semesterCode": "2610",
       "academicYear": "2026-2027",
       "termInYear": 1,
       "startDate": "2026-08-10",
@@ -4024,7 +4024,7 @@
       "legacyCode": "2610"
     },
     {
-      "semesterCode": "2026-2027-2",
+      "semesterCode": "2620",
       "academicYear": "2026-2027",
       "termInYear": 2,
       "startDate": "2027-01-04",

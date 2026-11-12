@@ -101,6 +101,8 @@ function renderPage(
   program: Record<string, unknown> = PROGRAM,
   directors: unknown[] = [],
   me: Record<string, unknown> | null = null,
+  initialEntry = '/programs/p1',
+  versionInfo: Record<string, unknown> | null = null,
 ) {
   const writes: { url: string; method: string }[] = [];
   vi.stubGlobal(
@@ -115,6 +117,8 @@ function renderPage(
       if (url === '/api/programs/p1/directors')
         return Promise.resolve(json(directors));
       if (url === '/api/programs/p1') return Promise.resolve(json(program));
+      if (url.startsWith('/api/program-versions/') && versionInfo)
+        return Promise.resolve(json(versionInfo));
       return Promise.resolve(json({}, 404));
     }),
   );
@@ -129,7 +133,7 @@ function renderPage(
         ],
       },
     ],
-    { initialEntries: ['/programs/p1'] },
+    { initialEntries: [initialEntry] },
   );
   render(
     <QueryClientProvider
@@ -347,5 +351,37 @@ describe('ProgramOverviewPage', () => {
         { url: '/api/programs/p1/deactivate', method: 'POST' },
       ]),
     );
+  });
+
+  it('transforms into proposal mode and keeps the copy version on sub-tab navigation', async () => {
+    renderPage(
+      PROGRAM,
+      [],
+      ME,
+      '/programs/p1/versions/v_copy/curriculum',
+      {
+        id: 'v_copy',
+        versionNumber: '1.2',
+        status: 'DRAFT',
+        sourceRequest: {
+          id: 'req123',
+          requestCode: 'DX-2026-0113',
+          status: 'DRAFT',
+        },
+      },
+    );
+    expect(
+      await screen.findByText('Bản nháp đề xuất DX-2026-0113'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /Quay lại đề xuất DX-2026-0113/ }),
+    ).toHaveAttribute('href', '/change-requests/req123/edit');
+    expect(
+      screen.getByRole('button', { name: 'Về bàn soạn đề xuất' }),
+    ).toBeInTheDocument();
+
+    // Verify sub-tabs navigation stays on the working copy
+    fireEvent.click(screen.getByRole('tab', { name: 'Nhóm tự chọn' }));
+    expect(await here()).toBe('/programs/p1/versions/v_copy/elective-groups');
   });
 });

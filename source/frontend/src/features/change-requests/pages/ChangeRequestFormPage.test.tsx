@@ -57,6 +57,54 @@ describe('ChangeRequestFormPage', () => {
     ).toBeInTheDocument();
   });
 
+  it('preserves the prefilled target when changing request type to PROGRAM_INFO', async () => {
+    const { writes } = renderForm(PREFILLED);
+    await fillHeader();
+    await screen.findByText('1024034 — Kỹ thuật máy tính');
+    fireEvent.mouseDown(
+      await screen.findByRole('combobox', { name: 'Loại đề xuất' }),
+    );
+    fireEvent.click(await screen.findByText('Thông tin chương trình'));
+    expect(
+      await screen.findByText('1024034 — Kỹ thuật máy tính'),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Tạo đề xuất' }));
+    expect(await screen.findByText('Bàn soạn đề xuất')).toBeInTheDocument();
+    expect(writes[0]).toMatchObject({
+      method: 'POST',
+      url: '/api/change-requests',
+      body: {
+        requestType: 'PROGRAM_INFO',
+        targetType: 'PROGRAM',
+        targetId: 'p1',
+      },
+    });
+  });
+
+  it('preserves the target and selects PROGRAM kind when switching to OUTCOME', async () => {
+    const { writes } = renderForm(PREFILLED);
+    await fillHeader();
+    await screen.findByText('1024034 — Kỹ thuật máy tính');
+    fireEvent.mouseDown(
+      await screen.findByRole('combobox', { name: 'Loại đề xuất' }),
+    );
+    fireEvent.click(await screen.findByText('Chuẩn đầu ra (PLO/CLO)'));
+    expect(
+      await screen.findByText('1024034 — Kỹ thuật máy tính'),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Tạo đề xuất' }));
+    expect(await screen.findByText('Bàn soạn đề xuất')).toBeInTheDocument();
+    expect(writes[0]).toMatchObject({
+      method: 'POST',
+      url: '/api/change-requests',
+      body: {
+        requestType: 'OUTCOME',
+        targetType: 'PROGRAM',
+        targetId: 'p1',
+      },
+    });
+  });
+
   it('creates the request and moves to its workbench', async () => {
     const { writes } = renderForm(PREFILLED);
     await fillHeader();

@@ -21,7 +21,7 @@ export const SEMESTER_LIMITS = {
 } as const;
 
 export class CreateSemesterDto {
-  @ApiProperty({ example: '2026-2027-1' })
+  @ApiProperty({ example: '2610' })
   @Transform(trimString)
   @IsString()
   @IsNotEmpty()

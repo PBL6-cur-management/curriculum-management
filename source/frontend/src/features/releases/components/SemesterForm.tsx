@@ -92,7 +92,7 @@ export function SemesterForm({ semester, onClose }: SemesterFormProps) {
             { max: CODE_MAX },
           ]}
         >
-          <Input placeholder="2026-2027-1" />
+          <Input placeholder="2610" />
         </Form.Item>
         <Form.Item
           name="academicYear"

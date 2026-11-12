@@ -80,19 +80,29 @@ function withSelected(
 
 function ProgramSelect({ id, value, onChange, initialLabel }: KindSelectProps) {
   const [term, setTerm] = useState('');
+  const [known, setKnown] = useState<Record<string, string>>({});
   const debounced = useDebouncedValue(term.trim(), TARGET_SEARCH_DEBOUNCE_MS);
   const { data = [], isFetching } = useProgramOptions(debounced, true);
+  const currentLabel = (value && (known[value] || initialLabel)) || undefined;
   return (
     <Select
       id={id}
       showSearch
       allowClear
       value={value}
-      onChange={(next: string | undefined) => onChange?.(next)}
+      onChange={(next: string | undefined, option: unknown) => {
+        if (next && option && typeof option === 'object' && 'label' in option) {
+          setKnown((prev) => ({
+            ...prev,
+            [next]: String((option as { label: unknown }).label),
+          }));
+        }
+        onChange?.(next);
+      }}
       onSearch={setTerm}
       filterOption={false}
       loading={isFetching}
-      options={withSelected(data, value, initialLabel)}
+      options={withSelected(data, value, currentLabel)}
       placeholder="Tìm theo mã hoặc tên chương trình"
       notFoundContent={isFetching ? <Spin size="small" /> : 'Không tìm thấy'}
     />
@@ -100,17 +110,27 @@ function ProgramSelect({ id, value, onChange, initialLabel }: KindSelectProps) {
 }
 
 function GroupSelect({ id, value, onChange, initialLabel }: KindSelectProps) {
+  const [known, setKnown] = useState<Record<string, string>>({});
   const { data = [], isFetching } = useSubjectGroupOptions(true);
+  const currentLabel = (value && (known[value] || initialLabel)) || undefined;
   return (
     <Select
       id={id}
       showSearch
       allowClear
       value={value}
-      onChange={(next: string | undefined) => onChange?.(next)}
+      onChange={(next: string | undefined, option: unknown) => {
+        if (next && option && typeof option === 'object' && 'label' in option) {
+          setKnown((prev) => ({
+            ...prev,
+            [next]: String((option as { label: unknown }).label),
+          }));
+        }
+        onChange?.(next);
+      }}
       optionFilterProp="label"
       loading={isFetching}
-      options={withSelected(data, value, initialLabel)}
+      options={withSelected(data, value, currentLabel)}
       placeholder="Chọn nhóm chuyên môn"
       notFoundContent={isFetching ? <Spin size="small" /> : 'Không tìm thấy'}
     />

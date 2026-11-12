@@ -65,7 +65,7 @@ export function semesterFromLegacyCode(code: string): {
   const academicYear = `${year}-${year + 1}`;
   const termInYear = LEGACY_TERM_SUFFIX[code.slice(2)];
   return {
-    semesterCode: `${academicYear}-${termInYear}`,
+    semesterCode: code,
     academicYear,
     termInYear,
   };

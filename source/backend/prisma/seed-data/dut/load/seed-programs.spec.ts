@@ -13,7 +13,7 @@ const version: DutVersion = {
   totalCredits: '130',
   compulsoryCredits: '122',
   electiveCredits: '8',
-  startSemesterCode: '2024-2025-1',
+  startSemesterCode: '2410',
   cohortCode: null,
   groups: [],
   items: [
@@ -42,7 +42,7 @@ const catalog = {
   ]),
   semesterIds: new Map([
     [
-      '2024-2025-1',
+      '2410',
       { id: 'sem-1', startDate: new Date('2024-07-29T00:00:00Z') },
     ],
   ]),
