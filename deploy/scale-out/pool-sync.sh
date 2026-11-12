@@ -45,6 +45,9 @@ for attempt in $(seq 1 60); do
     rm -rf "$dir.tmp" && mkdir -p "$dir.tmp" && tar -xzf "$MNT/release-$sha.tgz" -C "$dir.tmp" \
       && rm -rf "$dir" && mv "$dir.tmp" "$dir" || { log "extract failed"; sleep 10; continue; }
     sed -i '/^RELEASE_TAG=/d' "$ENV_FILE" && echo "RELEASE_TAG=$tag" >> "$ENV_FILE"
+    mkdir -p -m 0777 /srv/ctdt/files 2>/dev/null || true
+    chmod 755 /srv /srv/ctdt 2>/dev/null || true
+    chmod 777 /srv/ctdt/files 2>/dev/null || true
     (cd "$dir/deploy/scale-out" && docker compose -f compose.vm2.yaml --env-file "$ENV_FILE" up -d --build --wait) \
       || { log "compose failed"; sleep 10; continue; }
   fi

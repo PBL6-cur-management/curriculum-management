@@ -61,6 +61,9 @@ for ip in "${IPS[@]}"; do
       echo "$ip built";;
     switch)
       run_pool "$ip" "set -e
+        sudo chmod 755 /srv /srv/ctdt 2>/dev/null || true
+        sudo mkdir -p -m 0777 /srv/ctdt/files 2>/dev/null || true
+        sudo chmod 777 /srv/ctdt/files 2>/dev/null || true
         sed -i '/^RELEASE_TAG=/d' /srv/ctdt/demo.env && echo RELEASE_TAG=$TAG >> /srv/ctdt/demo.env
         cd /srv/ctdt/releases/$TAG/deploy/scale-out
         sudo docker compose -f compose.vm2.yaml --env-file /srv/ctdt/demo.env up -d --no-build --wait

@@ -49,6 +49,9 @@ healthy_through_caddy() {
 }
 
 echo "==> Deploy $SHA (trước đó: ${PREVIOUS_DIR:+$(basename "$PREVIOUS_DIR")})"
+sudo chmod 755 /srv /srv/ctdt 2>/dev/null || true
+sudo mkdir -p -m 0777 /srv/ctdt/files 2>/dev/null || true
+sudo chmod 777 /srv/ctdt/files 2>/dev/null || true
 dc "$RELEASE_DIR" config --quiet
 dc "$RELEASE_DIR" build migrate api caddy
 dc "$RELEASE_DIR" up -d --wait postgres redis

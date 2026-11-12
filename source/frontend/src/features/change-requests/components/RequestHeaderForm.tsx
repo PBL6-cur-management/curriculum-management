@@ -65,12 +65,28 @@ export function RequestHeaderForm({
       ? { [initialValues.targetType]: initialValues.targetId }
       : {},
   );
+  const [rememberedLabels, setRememberedLabels] = useState<
+    Partial<Record<ChangeTargetType, string>>
+  >(
+    initialValues?.targetType && targetLabel
+      ? { [initialValues.targetType]: targetLabel }
+      : {},
+  );
 
   useEffect(() => {
     if (targetType && targetId) {
       rememberedTargets.current[targetType] = targetId;
     }
   }, [targetType, targetId]);
+
+  useEffect(() => {
+    if (targetType && targetLabel) {
+      setRememberedLabels((prev) => ({
+        ...prev,
+        [targetType]: targetLabel,
+      }));
+    }
+  }, [targetType, targetLabel]);
 
   // A type is offered to someone who holds one of its edit permissions somewhere; the server decides on the target.
   const typeOptions = types.map((type) => {
@@ -149,7 +165,9 @@ export function RequestHeaderForm({
   const isPrefilledTarget =
     targetType === initialValues?.targetType &&
     targetId === initialValues?.targetId;
-  const initialLabelForTarget = isPrefilledTarget ? targetLabel : undefined;
+  const initialLabelForTarget =
+    (targetType && rememberedLabels[targetType]) ||
+    (isPrefilledTarget ? targetLabel : undefined);
 
   return (
     <Form<RequestHeaderValues>

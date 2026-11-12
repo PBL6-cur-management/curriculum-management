@@ -209,7 +209,7 @@ export function ProgramWorkspaceLayout() {
   const isProposalMode = Boolean(sourceRequest);
   const groups = useWorkspaceGroups();
 
-  if (isPending)
+  if (isPending || (Boolean(versionId) && versionInfoQuery.isPending))
     return (
       <Flex vertical gap={16} aria-busy="true">
         <Skeleton.Input active style={{ width: 360, height: 28 }} />
@@ -331,17 +331,19 @@ export function ProgramWorkspaceLayout() {
         </Flex>
       </Flex>
       {isProposalMode && current ? (
-        <nav aria-label="Các mục của đề xuất">
-          <Tabs
-            activeKey={current.page.key}
-            onChange={openPage}
-            items={current.group.pages.map((page) => ({
-              key: page.key,
-              label: page.label,
-            }))}
-            tabBarStyle={{ marginBottom: 12 }}
-          />
-        </nav>
+        current.group.key === 'overview' ? null : (
+          <nav aria-label="Các mục của đề xuất">
+            <Tabs
+              activeKey={current.page.key}
+              onChange={openPage}
+              items={current.group.pages.map((page) => ({
+                key: page.key,
+                label: page.label,
+              }))}
+              tabBarStyle={{ marginBottom: 12 }}
+            />
+          </nav>
+        )
       ) : (
         <nav aria-label="Các mục của chương trình">
           <Tabs
