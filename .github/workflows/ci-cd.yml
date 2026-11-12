@@ -48,6 +48,8 @@ jobs:
               - 'deploy/compose.yaml'
               - 'deploy/Caddyfile'
               - 'deploy/scripts/deploy-release.sh'
+              - 'deploy/scale-out/**'
+              - '.github/workflows/ci-cd.yml'
 
   backend:
     needs: changes
