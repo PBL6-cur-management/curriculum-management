@@ -58,10 +58,17 @@ for ip in "${POOL_IPS[@]}"; do
   scp -q -i "$SSH_KEY" -o "ProxyCommand=ssh -i $SSH_KEY -W %h:%p $VM1" "$WORK.tgz" "ubuntu@$ip:/tmp/$TAG.tgz"
   ssh_pool "$ip" "mkdir -p /srv/ctdt/releases/$TAG && tar -xzf /tmp/$TAG.tgz -C /srv/ctdt/releases/$TAG && rm /tmp/$TAG.tgz" </dev/null
   ssh_pool "$ip" </dev/null "set -e
-    sed -i '/^RELEASE_TAG=/d' /srv/ctdt/demo.env && echo RELEASE_TAG=$TAG >> /srv/ctdt/demo.env
+    sudo chmod 755 /srv /srv/ctdt 2>/dev/null || true
+    sudo mkdir -p -m 0777 /srv/ctdt/files 2>/dev/null || true
+    sudo chmod 777 /srv/ctdt/files 2>/dev/null || true
+    sudo sed -i '/^RELEASE_TAG=/d' /srv/ctdt/demo.env 2>/dev/null || true
+    echo \"RELEASE_TAG=$TAG\" | sudo tee -a /srv/ctdt/demo.env >/dev/null
     cd /srv/ctdt/releases/$TAG/deploy/scale-out
-    sudo docker compose -f compose.vm2.yaml --env-file /srv/ctdt/demo.env up -d --build --wait
-    curl -fsS -o /dev/null http://127.0.0.1:8080/api/health
+    sudo RELEASE_TAG=$TAG docker compose -f compose.vm2.yaml --env-file /srv/ctdt/demo.env up -d --build --wait
+    for attempt in \$(seq 1 12); do
+      curl -fsS -m 5 -o /dev/null http://127.0.0.1:8080/api/health && break || sleep 2
+    done
+    curl -fsS -m 5 -o /dev/null http://127.0.0.1:8080/api/health
     ls -1dt /srv/ctdt/releases/* | tail -n +3 | xargs -r sudo rm -rf   # keep current + previous"
   set_drain "$ip" false; DRAINED=""
   echo "$ip done"

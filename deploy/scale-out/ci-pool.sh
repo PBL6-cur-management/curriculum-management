@@ -39,12 +39,18 @@ run_pool() {
     echo __CI_POOL_DONE__" </dev/null > "$out" 2>&1 &
   pid=$!
   while kill -0 "$pid" 2>/dev/null; do
-    grep -q '^__CI_POOL_DONE__' "$out" && { sleep 1; kill "$pid" 2>/dev/null; wait "$pid" 2>/dev/null; break; }
+    if grep -q '^__CI_POOL_DONE__' "$out" 2>/dev/null; then
+      sleep 1; kill "$pid" 2>/dev/null; wait "$pid" 2>/dev/null; break
+    fi
     sleep 2
   done
   wait "$pid" 2>/dev/null || true
-  grep -v '^__CI_POOL_DONE__' "$out" | tail -5
-  grep -q '^__CI_POOL_DONE__' "$out"
+  if ! grep -q '^__CI_POOL_DONE__' "$out"; then
+    echo "=== ERROR on pool VM $ip ===" >&2
+    cat "$out" >&2
+    return 1
+  fi
+  grep -v '^__CI_POOL_DONE__' "$out" | tail -5 || true
 }
 
 for ip in "${IPS[@]}"; do
@@ -55,7 +61,8 @@ for ip in "${IPS[@]}"; do
       git archive --format=tar.gz -o "$WORK/release.tgz" "$SHA"
       scp -q "${POOL_SSH[@]}" "$WORK/release.tgz" "ubuntu@$ip:/tmp/$TAG.tgz"
       run_pool "$ip" "set -e
-        d=/srv/ctdt/releases/$TAG; rm -rf \$d && mkdir -p \$d && tar -xzf /tmp/$TAG.tgz -C \$d && rm /tmp/$TAG.tgz
+        d=/srv/ctdt/releases/$TAG; sudo rm -rf \$d && sudo mkdir -p \$d && sudo tar -xzf /tmp/$TAG.tgz -C \$d && rm -f /tmp/$TAG.tgz
+        sudo chown -R ubuntu:ubuntu \$d 2>/dev/null || true
         cd \$d/deploy/scale-out
         sudo RELEASE_TAG=$TAG docker compose -f compose.vm2.yaml --env-file /srv/ctdt/demo.env build -q"
       echo "$ip built";;
@@ -64,10 +71,14 @@ for ip in "${IPS[@]}"; do
         sudo chmod 755 /srv /srv/ctdt 2>/dev/null || true
         sudo mkdir -p -m 0777 /srv/ctdt/files 2>/dev/null || true
         sudo chmod 777 /srv/ctdt/files 2>/dev/null || true
-        sed -i '/^RELEASE_TAG=/d' /srv/ctdt/demo.env && echo RELEASE_TAG=$TAG >> /srv/ctdt/demo.env
+        sudo sed -i '/^RELEASE_TAG=/d' /srv/ctdt/demo.env 2>/dev/null || true
+        echo \"RELEASE_TAG=$TAG\" | sudo tee -a /srv/ctdt/demo.env >/dev/null
         cd /srv/ctdt/releases/$TAG/deploy/scale-out
-        sudo docker compose -f compose.vm2.yaml --env-file /srv/ctdt/demo.env up -d --no-build --wait
-        curl -fsS -o /dev/null http://127.0.0.1:8080/api/health
+        sudo RELEASE_TAG=$TAG docker compose -f compose.vm2.yaml --env-file /srv/ctdt/demo.env up -d --no-build --wait
+        for attempt in \$(seq 1 12); do
+          curl -fsS -m 5 -o /dev/null http://127.0.0.1:8080/api/health && break || sleep 2
+        done
+        curl -fsS -m 5 -o /dev/null http://127.0.0.1:8080/api/health
         ls -1dt /srv/ctdt/releases/* | tail -n +3 | xargs -r sudo rm -rf
         sudo docker image prune -f >/dev/null"
       echo "$ip on $TAG";;
