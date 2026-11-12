@@ -48,7 +48,7 @@ for attempt in $(seq 1 60); do
     mkdir -p -m 0777 /srv/ctdt/files 2>/dev/null || true
     chmod 755 /srv /srv/ctdt 2>/dev/null || true
     chmod 777 /srv/ctdt/files 2>/dev/null || true
-    (cd "$dir/deploy/scale-out" && docker compose -f compose.vm2.yaml --env-file "$ENV_FILE" up -d --build --wait) \
+    (cd "$dir/deploy/scale-out" && RELEASE_TAG="$tag" docker compose -f compose.vm2.yaml --env-file "$ENV_FILE" up -d --build --wait) \
       || { log "compose failed"; sleep 10; continue; }
   fi
   if healthy; then

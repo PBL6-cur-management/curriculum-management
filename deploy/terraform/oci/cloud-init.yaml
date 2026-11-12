@@ -32,6 +32,6 @@ runcmd:
   - usermod -aG docker ubuntu
   - systemctl enable --now docker
   # Releases, incoming data and the env file belong to ubuntu; attachments to uid 1000 (node in the API image).
-  - install -d -o ubuntu -g ubuntu -m 0750 /srv/ctdt /srv/ctdt/releases /srv/ctdt/incoming
-  - install -d -o 1000 -g 1000 -m 0750 /srv/ctdt/files
+  - install -d -o ubuntu -g ubuntu -m 0755 /srv/ctdt /srv/ctdt/releases /srv/ctdt/incoming
+  - install -d -o 1000 -g 1000 -m 0777 /srv/ctdt/files
   - touch /srv/ctdt/.cloud-init-done
