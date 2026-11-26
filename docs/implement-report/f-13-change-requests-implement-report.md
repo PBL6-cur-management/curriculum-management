@@ -17,6 +17,12 @@ Kế hoạch: `docs/implementation/f-13-change-requests-implementation-plan.md`.
 
 Prettier và build sạch ở cả hai.
 
+## Sửa bộ chọn đối tượng (2026-11-26)
+
+- Form tạo đề xuất lấy mã và tên theo đúng loại và ID đang chọn. Nhãn cho đối tượng điền sẵn ngoài trang đầu được cập nhật khi truy vấn chi tiết hoàn tất. Khi đổi loại đề xuất hoặc loại đối tượng rồi quay lại, form khôi phục ID và hiện nhãn của đúng đối tượng đó.
+- Bộ chọn học phần và chương trình tải tiếp kết quả qua API danh mục khi cuộn đến cuối hoặc bấm **Tải thêm lựa chọn**. Từ khóa mới bắt đầu lại ở trang đầu. Form dùng ID đối tượng để lưu đề xuất.
+- Khi sửa thông tin bản nháp, ô đối tượng chỉ đọc hiển thị mã và tên. Có ca hồi quy cho nhãn đến sau, chọn ngoài trang đầu, giữ đúng lựa chọn khi đổi loại và hiển thị đối tượng của bản nháp.
+
 ## Lệch kế hoạch
 
 1. Vai trò dùng `ROLE_CODES` R1..R6 (kế hoạch ghi tên như `SUBJECT_GROUP_COORDINATOR`); fixture ở `test/fixtures/change-requests.ts` (không phải `test/helpers/`).

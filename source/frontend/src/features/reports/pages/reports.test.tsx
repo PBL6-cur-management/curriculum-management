@@ -17,14 +17,18 @@ import ProgramComparisonPage from './ProgramComparisonPage';
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status });
 
-const PROGRAMS = ['A', 'B'].map((code) => ({
+const PROGRAMS = ['A', 'B', 'C'].map((code) => ({
   id: `p${code}`,
   programCode: `CT${code}`,
   programName: `Chương trình ${code}`,
   degreeLevel: 'UNDERGRADUATE',
   status: 'ACTIVE',
   faculty: { id: 'f', unitCode: 'CNTT', unitName: 'Khoa CNTT' },
-  currentVersion: { id: `v${code}`, versionNumber: '1.0', status: 'ACTIVE' },
+  currentVersion: {
+    id: `v${code}`,
+    versionNumber: code === 'C' ? null : '1.0',
+    status: code === 'C' ? 'DRAFT' : 'ACTIVE',
+  },
   directors: [],
 }));
 
@@ -48,16 +52,18 @@ function stub(answer: Answer) {
       calls.push(url);
       const path = url.split('?')[0];
       if (path === '/api/programs')
-        return json({ items: PROGRAMS, total: 2, page: 1, pageSize: 100 });
+        return json({
+          items: PROGRAMS,
+          total: PROGRAMS.length,
+          page: 1,
+          pageSize: 100,
+        });
       const detail = /^\/api\/programs\/(p\w)$/.exec(path);
       if (detail) {
         const program = PROGRAMS.find((item) => item.id === detail[1])!;
         return json({
           ...program,
-          versions: [
-            program.currentVersion,
-            { id: `${program.id}-draft`, versionNumber: null, status: 'DRAFT' },
-          ],
+          versions: [program.currentVersion],
         });
       }
       return answer(url) ?? json({});
@@ -145,45 +151,80 @@ describe('ProgramComparisonPage (MH-60)', () => {
 });
 
 describe('CreditDistributionPage (MH-61)', () => {
-  it('warns when the requirement does not match the declared total', async () => {
-    const result: CreditDistribution = {
-      version: ref('A'),
-      totals: {
-        allRows: '152',
-        compulsory: '122',
-        electiveOffered: '30',
-        required: '122',
-        declaredTotal: '130',
-        declaredCompulsory: '122',
-        declaredElective: '8',
-        requiredIsPartial: true,
-      },
-      byBlock: [
-        {
-          key: '',
-          label: 'Chưa gán khối kiến thức',
+  it.each([
+    { partial: true, required: '122' },
+    { partial: true, required: '132' },
+    { partial: false, required: '128' },
+  ])(
+    'labels the $required credit total when partial is $partial',
+    async ({ partial, required }) => {
+      const result: CreditDistribution = {
+        version: ref('A'),
+        totals: {
+          allRows: '152',
           compulsory: '122',
-          elective: '30',
-          total: '152',
-          courseCount: 50,
+          electiveOffered: '30',
+          required,
+          declaredTotal: '130',
+          declaredCompulsory: '122',
+          declaredElective: '8',
+          requiredIsPartial: partial,
         },
-      ],
-      bySemester: [],
-      byCourseType: [],
-      electiveGroups: [],
-    };
-    stub((url) =>
-      url.startsWith('/api/reports/credit-distribution')
-        ? json(result)
-        : undefined,
-    );
-    renderPage(<CreditDistributionPage />);
-    await pickProgram('Chương trình', 'CTA — Chương trình A');
-    expect(
-      await screen.findByText('Số tín chỉ yêu cầu chưa khớp tổng công bố'),
-    ).toBeInTheDocument();
-    expect(screen.getByText('Chưa gán khối kiến thức')).toBeInTheDocument();
-  });
+        byBlock: [
+          {
+            key: '',
+            label: 'Chưa gán khối kiến thức',
+            compulsory: '122',
+            elective: '30',
+            total: '152',
+            courseCount: 50,
+          },
+        ],
+        bySemester: [],
+        byCourseType: [],
+        electiveGroups: [
+          {
+            groupCode: 'TC1',
+            groupName: 'Nhóm tự chọn 1',
+            minCredits: partial ? null : '6',
+            minCourses: partial ? 2 : null,
+            offeredCredits: '30',
+          },
+        ],
+      };
+      stub((url) =>
+        url.startsWith('/api/reports/credit-distribution')
+          ? json(result)
+          : undefined,
+      );
+      renderPage(<CreditDistributionPage />);
+      await pickProgram('Chương trình', 'CTA — Chương trình A');
+      expect(
+        await screen.findByText(
+          partial
+            ? 'Tổng yêu cầu mới tính được một phần theo tín chỉ'
+            : 'Số tín chỉ yêu cầu chưa khớp tổng công bố',
+        ),
+      ).toBeInTheDocument();
+      expect(screen.getByText('Chưa gán khối kiến thức')).toBeInTheDocument();
+      if (partial) {
+        expect(
+          screen.getByText(/Nhóm tự chọn theo số học phần/),
+        ).toBeInTheDocument();
+        expect(
+          screen.getByRole('columnheader', { name: 'Tối thiểu số HP' }),
+        ).toBeInTheDocument();
+        expect(screen.getByRole('cell', { name: /^2$/ })).toBeInTheDocument();
+        expect(
+          screen.queryByText('Số tín chỉ yêu cầu chưa khớp tổng công bố'),
+        ).not.toBeInTheDocument();
+        if (required === '132')
+          expect(
+            screen.getByText(/đã vượt tổng công bố 130 TC/),
+          ).toBeInTheDocument();
+      }
+    },
+  );
 });
 
 describe('AccreditationExportPage (MH-62)', () => {
@@ -213,15 +254,44 @@ describe('AccreditationExportPage (MH-62)', () => {
     ).toBeInTheDocument();
   });
 
-  it('offers only issued versions', async () => {
-    stub(() => undefined);
+  it('allows matrices for a draft-only program and disables its dossier', async () => {
+    const calls = stub((url) =>
+      url.endsWith('/matrices/export') ? json({}, 500) : undefined,
+    );
+    renderPage(<AccreditationExportPage />);
+    await pickProgram('Chương trình', 'CTC — Chương trình C');
+    const matrices = screen.getByRole('button', { name: 'Tải ma trận' });
+    await waitFor(() => expect(matrices).toBeEnabled());
+    expect(screen.getByRole('button', { name: 'Tải hồ sơ' })).toBeDisabled();
+    fireEvent.click(matrices);
+    await waitFor(() =>
+      expect(calls).toContain('/api/reports/versions/vC/matrices/export'),
+    );
+  });
+
+  it('explains that the chosen issued version has an empty curriculum', async () => {
+    stub((url) =>
+      url.endsWith('/accreditation/export')
+        ? json(
+            {
+              code: 'REPORT_CURRICULUM_EMPTY',
+              message: 'Phiên bản chưa có học phần trong khung chương trình.',
+            },
+            409,
+          )
+        : undefined,
+    );
     renderPage(<AccreditationExportPage />);
     await pickProgram('Chương trình', 'CTA — Chương trình A');
-    fireEvent.mouseDown(screen.getByLabelText('Chương trình: phiên bản'));
+    const dossier = screen.getByRole('button', { name: 'Tải hồ sơ' });
+    await waitFor(() => expect(dossier).toBeEnabled());
+    fireEvent.click(dossier);
     expect(
-      (await screen.findAllByTitle('1.0 · Đang hiệu lực')).length,
-    ).toBeGreaterThan(0);
-    expect(screen.queryByTitle('Nháp · Nháp')).toBeNull();
+      await screen.findByText(
+        'Phiên bản chưa có học phần trong khung chương trình.',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/Học phần cần bổ sung:/)).not.toBeInTheDocument();
   });
 });
 

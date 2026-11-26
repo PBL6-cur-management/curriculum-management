@@ -1,6 +1,6 @@
 import { Button, Flex, Form, Input, Radio, Segmented, Select } from 'antd';
 import type { FormInstance } from 'antd';
-import { useEffect, useRef, useState } from 'react';
+import { useId, useRef } from 'react';
 import { hasPermission } from '../../../shared/auth/permissions';
 import { useMe } from '../../../shared/auth/useMe';
 import type {
@@ -15,6 +15,7 @@ import {
   UNSUPPORTED_TYPE_HINT,
 } from '../constants/changeRequestLabels';
 import { REASON_MAX } from '../constants/changeRequestLimits';
+import { useTargetLabel } from '../hooks/useChangeRequests';
 import {
   basisNumberRules,
   reasonRules,
@@ -33,7 +34,7 @@ interface RequestHeaderFormProps {
   mode: 'create' | 'edit';
   types: readonly ChangeRequestType[];
   initialValues?: Partial<RequestHeaderValues>;
-  // "CODE — name" of the prefilled target, so the picker shows more than an id.
+  // "CODE — name" of the immutable target when editing an existing request.
   targetLabel?: string;
   onFinish: (values: RequestHeaderValues) => void;
   onCancel?: () => void;
@@ -58,6 +59,11 @@ export function RequestHeaderForm({
   const origin = Form.useWatch('origin', form);
   const kinds = requestType ? TYPE_TARGETS[requestType] : [];
   const editing = mode === 'edit';
+  const readonlyTargetId = useId();
+  const currentLabel = useTargetLabel(
+    editing ? undefined : targetType,
+    editing ? undefined : targetId || undefined,
+  );
 
   // Remember chosen target per kind so switching requestType/kind preserves prefill and selections
   const rememberedTargets = useRef<Partial<Record<ChangeTargetType, string>>>(
@@ -65,28 +71,6 @@ export function RequestHeaderForm({
       ? { [initialValues.targetType]: initialValues.targetId }
       : {},
   );
-  const [rememberedLabels, setRememberedLabels] = useState<
-    Partial<Record<ChangeTargetType, string>>
-  >(
-    initialValues?.targetType && targetLabel
-      ? { [initialValues.targetType]: targetLabel }
-      : {},
-  );
-
-  useEffect(() => {
-    if (targetType && targetId) {
-      rememberedTargets.current[targetType] = targetId;
-    }
-  }, [targetType, targetId]);
-
-  useEffect(() => {
-    if (targetType && targetLabel) {
-      setRememberedLabels((prev) => ({
-        ...prev,
-        [targetType]: targetLabel,
-      }));
-    }
-  }, [targetType, targetLabel]);
 
   // A type is offered to someone who holds one of its edit permissions somewhere; the server decides on the target.
   const typeOptions = types.map((type) => {
@@ -106,74 +90,44 @@ export function RequestHeaderForm({
   const onTypeChange = (next: ChangeRequestType) => {
     const supportedKinds = TYPE_TARGETS[next];
     const currentType = form.getFieldValue('targetType') as
-      | ChangeTargetType
-      | undefined;
-    const currentId = form.getFieldValue('targetId') as string | undefined;
+      ChangeTargetType | undefined;
+    if (currentType && supportedKinds.includes(currentType)) return;
 
-    // 1. If current targetType is supported by the new requestType: keep targetType and targetId
-    if (currentType && supportedKinds.includes(currentType)) {
-      const idToKeep =
-        currentId ||
-        rememberedTargets.current[currentType] ||
-        (initialValues?.targetType === currentType
-          ? initialValues.targetId
-          : '') ||
-        '';
-      form.setFieldsValue({
-        targetType: currentType,
-        targetId: idToKeep,
-      });
-      return;
-    }
-
-    // 2. If current targetType is not supported, check if initial prefilled target is supported
-    if (
-      initialValues?.targetType &&
-      supportedKinds.includes(initialValues.targetType) &&
-      (rememberedTargets.current[initialValues.targetType] ??
-        initialValues.targetId)
-    ) {
-      form.setFieldsValue({
-        targetType: initialValues.targetType,
-        targetId:
-          rememberedTargets.current[initialValues.targetType] ??
-          initialValues.targetId ??
-          '',
-      });
-      return;
-    }
-
-    // 3. Check if any other supported kind has a remembered target
-    const rememberedKind = supportedKinds.find((kind) =>
-      Boolean(rememberedTargets.current[kind]),
-    );
-    if (rememberedKind) {
-      form.setFieldsValue({
-        targetType: rememberedKind,
-        targetId: rememberedTargets.current[rememberedKind] ?? '',
-      });
-      return;
-    }
-
-    // 4. Fallback to first supported kind and reset targetId
+    const initialKind = initialValues?.targetType;
+    const nextKind =
+      initialKind &&
+      supportedKinds.includes(initialKind) &&
+      rememberedTargets.current[initialKind]
+        ? initialKind
+        : (supportedKinds.find((kind) => rememberedTargets.current[kind]) ??
+          supportedKinds[0]);
     form.setFieldsValue({
-      targetType: supportedKinds[0],
-      targetId: '',
+      targetType: nextKind,
+      targetId: rememberedTargets.current[nextKind] ?? '',
     });
   };
 
-  const isPrefilledTarget =
-    targetType === initialValues?.targetType &&
-    targetId === initialValues?.targetId;
-  const initialLabelForTarget =
-    (targetType && rememberedLabels[targetType]) ||
-    (isPrefilledTarget ? targetLabel : undefined);
+  const selectedLabel = targetId
+    ? {
+        id: targetId,
+        label:
+          currentLabel.data ??
+          (currentLabel.isError
+            ? 'Không tải được thông tin đối tượng'
+            : 'Đang tải thông tin đối tượng…'),
+      }
+    : undefined;
 
   return (
     <Form<RequestHeaderValues>
       form={form}
       layout="vertical"
       initialValues={{ origin: 'FACULTY', ...initialValues }}
+      onValuesChange={(changed: Partial<RequestHeaderValues>, values) => {
+        if ('targetId' in changed && values.targetType) {
+          rememberedTargets.current[values.targetType] = values.targetId;
+        }
+      }}
       onFinish={onFinish}
       style={{ maxWidth: 720 }}
     >
@@ -201,34 +155,34 @@ export function RequestHeaderForm({
               label: TARGET_TYPE_LABELS[kind],
             }))}
             onChange={(next) => {
-              const rememberedId =
-                rememberedTargets.current[next] ??
-                (next === initialValues?.targetType
-                  ? (initialValues.targetId ?? '')
-                  : '');
               form.setFieldsValue({
                 targetType: next,
-                targetId: rememberedId,
+                targetId: rememberedTargets.current[next] ?? '',
               });
             }}
           />
         </Form.Item>
       )}
-      <Form.Item
-        name="targetId"
-        label={targetType ? TARGET_TYPE_LABELS[targetType] : 'Đối tượng'}
-        rules={[{ required: true, message: TARGET_FIELD_HINT }]}
-        extra={editing ? undefined : TARGET_FIELD_HINT}
-      >
-        {editing ? (
-          <Input disabled value={targetLabel} placeholder={targetLabel} />
-        ) : (
+      {editing ? (
+        <Form.Item
+          htmlFor={readonlyTargetId}
+          label={targetType ? TARGET_TYPE_LABELS[targetType] : 'Đối tượng'}
+        >
+          <Input id={readonlyTargetId} disabled value={targetLabel} />
+        </Form.Item>
+      ) : (
+        <Form.Item
+          name="targetId"
+          label={targetType ? TARGET_TYPE_LABELS[targetType] : 'Đối tượng'}
+          rules={[{ required: true, message: TARGET_FIELD_HINT }]}
+          extra={TARGET_FIELD_HINT}
+        >
           <TargetSelect
             targetType={targetType ?? kinds[0] ?? 'COURSE'}
-            initialLabel={initialLabelForTarget}
+            selectedLabel={selectedLabel}
           />
-        )}
-      </Form.Item>
+        </Form.Item>
+      )}
       <Form.Item name="title" label="Tiêu đề" rules={titleRules}>
         <Input />
       </Form.Item>

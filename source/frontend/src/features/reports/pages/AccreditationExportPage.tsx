@@ -3,46 +3,49 @@ import { useState } from 'react';
 import { ApiError } from '../../../shared/api/client';
 import { FilterBar, PageHeader } from '../../../shared/design-system';
 import { errorMessage } from '../../../shared/forms/applyFieldErrors';
+import { useProgram } from '../../programs/hooks/usePrograms';
 import { downloadAccreditation, downloadMatrices } from '../api/reports';
 import { VersionPicker } from '../components/VersionPicker';
 
 type Kind = 'matrices' | 'accreditation';
 const GRADING_UNAVAILABLE = 'REPORT_GRADING_UNAVAILABLE';
+const CURRICULUM_EMPTY = 'REPORT_CURRICULUM_EMPTY';
 
 const DOSSIER_SHEETS =
   'Thông tin chung, khung CTĐT, PLO, ma trận học phần–PLO và CLO–PLO, phân bổ tín chỉ, đề cương, đánh giá, danh sách lỗ hổng.';
 
-// The courses a refused dossier names, from the error details.
-function missingCourses(error: unknown): string[] {
-  if (!(error instanceof ApiError) || error.code !== GRADING_UNAVAILABLE)
-    return [];
-  return (error.details ?? []).map((detail) => detail.field);
-}
-
-// MH-62 — US-107/US-108: matrices and the generic accreditation workbook for one released version.
+// MH-62 — US-107/US-108: standalone matrices and the generic dossier for an issued version.
 export default function AccreditationExportPage() {
   const { message } = App.useApp();
   const [pick, setPick] = useState({ programId: '', versionId: '' });
   const [busy, setBusy] = useState<Kind | null>(null);
   const [refused, setRefused] = useState<{
+    versionId: string;
     message: string;
     courses: string[];
   } | null>(null);
+  const { data: program } = useProgram(pick.programId);
+  const version = program?.versions.find((item) => item.id === pick.versionId);
+  const visibleRefusal = refused?.versionId === pick.versionId ? refused : null;
 
   const run = async (kind: Kind) => {
+    if (!version) return;
     setBusy(kind);
     setRefused(null);
     try {
       await (kind === 'matrices' ? downloadMatrices : downloadAccreditation)(
-        pick.versionId,
+        version.id,
       );
       message.success('Đã tải file.');
     } catch (error) {
-      const courses = missingCourses(error);
-      if (courses.length)
+      if (
+        error instanceof ApiError &&
+        (error.code === GRADING_UNAVAILABLE || error.code === CURRICULUM_EMPTY)
+      )
         setRefused({
-          message: errorMessage(error, 'Chưa lập được hồ sơ.'),
-          courses,
+          versionId: version.id,
+          message: error.message,
+          courses: (error.details ?? []).map((detail) => detail.field),
         });
       else message.error(errorMessage(error, 'Không tải được file.'));
     } finally {
@@ -54,12 +57,11 @@ export default function AccreditationExportPage() {
     <Flex vertical gap="middle">
       <PageHeader
         title="Xuất hồ sơ kiểm định"
-        subtitle="Ma trận chuẩn đầu ra và bộ hồ sơ tổng quát cho một phiên bản đã ban hành."
+        subtitle="Xuất ma trận chuẩn đầu ra hoặc lập hồ sơ kiểm định cho phiên bản đã ban hành."
       />
       <FilterBar>
         <VersionPicker
           label="Chương trình"
-          issuedOnly
           {...pick}
           onChange={(next) => {
             setPick(next);
@@ -67,12 +69,16 @@ export default function AccreditationExportPage() {
           }}
         />
       </FilterBar>
-      {refused ? (
+      {visibleRefusal ? (
         <Alert
           type="warning"
           showIcon
-          title={refused.message}
-          description={`Học phần cần bổ sung: ${refused.courses.join(', ')}`}
+          title={visibleRefusal.message}
+          description={
+            visibleRefusal.courses.length > 0
+              ? `Học phần cần bổ sung: ${visibleRefusal.courses.join(', ')}`
+              : undefined
+          }
         />
       ) : null}
       <Flex gap="middle" wrap>
@@ -83,7 +89,7 @@ export default function AccreditationExportPage() {
               đang lưu.
             </Typography.Text>
             <Button
-              disabled={!pick.versionId}
+              disabled={!version || busy !== null}
               loading={busy === 'matrices'}
               onClick={() => void run('matrices')}
             >
@@ -99,9 +105,14 @@ export default function AccreditationExportPage() {
               lập khi còn học phần thiếu đề cương ban hành hoặc thành phần đánh
               giá.
             </Typography.Text>
+            {version?.status === 'DRAFT' ? (
+              <Typography.Text type="secondary">
+                Chọn phiên bản đã ban hành để tải hồ sơ.
+              </Typography.Text>
+            ) : null}
             <Button
               type="primary"
-              disabled={!pick.versionId}
+              disabled={!version || version.status === 'DRAFT' || busy !== null}
               loading={busy === 'accreditation'}
               onClick={() => void run('accreditation')}
             >

@@ -1,8 +1,10 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
 import { Select, Spin } from 'antd';
 import { useState } from 'react';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
+import { nextPageNumber } from '../api/pagination';
 import type { components } from '../api/schema';
+import { selectPaginationProps } from '../design-system/selectPagination';
 import {
   courseOptionLabel,
   courseSearchQueryKey,
@@ -52,15 +54,15 @@ function useCourseOptions(
 ) {
   const [term, setTerm] = useState('');
   const debounced = useDebouncedValue(term.trim(), COURSE_SELECT_DEBOUNCE_MS);
-  const [known, setKnown] = useState<Record<string, string>>({
-    ...initialLabels,
-  });
-  const { data, isFetching } = useQuery({
+  const [known, setKnown] = useState<Record<string, string>>({});
+  const list = useInfiniteQuery({
     queryKey: courseSearchQueryKey(debounced, statuses),
-    queryFn: () => searchCourses(debounced, statuses),
+    initialPageParam: 1,
+    queryFn: ({ pageParam }) => searchCourses(debounced, statuses, pageParam),
+    getNextPageParam: nextPageNumber,
     placeholderData: keepPreviousData,
   });
-  const found = (data?.items ?? [])
+  const found = (list.data?.pages.flatMap((page) => page.items ?? []) ?? [])
     .filter((course) => !excludeIds.includes(course.id))
     .map((course) => ({
       value: course.id,
@@ -68,7 +70,7 @@ function useCourseOptions(
     }));
   const kept = selected
     .filter((id) => !found.some((option) => option.value === id))
-    .map((id) => ({ value: id, label: known[id] ?? id }));
+    .map((id) => ({ value: id, label: known[id] ?? initialLabels[id] ?? id }));
   const remember = (chosen: LabelledOption | LabelledOption[] | undefined) => {
     const entries = [chosen ?? []]
       .flat()
@@ -82,7 +84,8 @@ function useCourseOptions(
   };
   return {
     options: [...kept, ...found],
-    isFetching,
+    isFetching: list.isFetching,
+    pagination: selectPaginationProps(list),
     onSearch: setTerm,
     remember,
   };
@@ -97,14 +100,11 @@ export function CourseSelect({
   statuses = DEFAULT_SEARCH_STATUSES,
   initialLabels,
 }: CourseSelectProps) {
-  const { options, isFetching, onSearch, remember } = useCourseOptions(
-    excludeIds,
-    value ? [value] : [],
-    statuses,
-    initialLabels,
-  );
+  const { options, isFetching, onSearch, remember, pagination } =
+    useCourseOptions(excludeIds, value ? [value] : [], statuses, initialLabels);
   return (
     <Select
+      {...pagination}
       id={id}
       showSearch
       allowClear
@@ -132,13 +132,11 @@ export function CourseMultiSelect({
   placeholder = DEFAULT_PLACEHOLDER,
   statuses = DEFAULT_SEARCH_STATUSES,
 }: CourseMultiSelectProps) {
-  const { options, isFetching, onSearch, remember } = useCourseOptions(
-    excludeIds,
-    value,
-    statuses,
-  );
+  const { options, isFetching, onSearch, remember, pagination } =
+    useCourseOptions(excludeIds, value, statuses);
   return (
     <Select
+      {...pagination}
       id={id}
       mode="multiple"
       showSearch

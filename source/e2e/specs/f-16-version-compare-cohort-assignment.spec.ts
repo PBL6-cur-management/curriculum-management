@@ -143,6 +143,27 @@ test.describe("F-16 So sánh và gán phiên bản", () => {
       ).toBe(true);
   });
   test.use(asRole("R1"));
+  test("F16-TC_020 Mở danh sách chương trình để gán phiên bản từ trang học kỳ", async ({
+    page,
+  }) => {
+    await page.goto("/semesters");
+    const main = page.getByRole("main");
+    await main.getByRole("link", { name: "Gán phiên bản cho khóa" }).click();
+    await expect(page).toHaveURL(/\/cohort-versions$/);
+    await expect(
+      main.getByRole("heading", { name: "Chọn chương trình để gán phiên bản" }),
+    ).toBeVisible();
+
+    await main
+      .getByRole("link", { name: "Gán phiên bản cho khóa" })
+      .first()
+      .click();
+    await expect(page).toHaveURL(/\/programs\/[^/]+\/cohort-versions$/);
+    await expect(
+      main.getByRole("heading", { name: "Gán phiên bản cho khóa", exact: true }),
+    ).toBeVisible();
+  });
+
   test("F16-TC_001 So sánh không liền kề, mở hai pin và quay lại đúng cặp", async ({
     page,
     browser,

@@ -694,6 +694,14 @@ export const router = createBrowserRouter([
             ),
           },
           {
+            path: ROUTES.cohortVersionAssignmentStart,
+            element: (
+              <RequirePermission code={PERMISSIONS.versionAssignCohort}>
+                <CohortVersionAssignmentsPage />
+              </RequirePermission>
+            ),
+          },
+          {
             path: ROUTES.versionRelease,
             element: (
               <RequirePermission code={PERMISSIONS.versionPublish}>
@@ -923,14 +931,6 @@ export const router = createBrowserRouter([
               },
               {
                 path: ROUTES.cohortVersionAssignments,
-                element: (
-                  <RequirePermission code={PERMISSIONS.versionAssignCohort}>
-                    <CohortVersionAssignmentsPage />
-                  </RequirePermission>
-                ),
-              },
-              {
-                path: ROUTES.cohortVersionAssignmentStart,
                 element: (
                   <RequirePermission code={PERMISSIONS.versionAssignCohort}>
                     <CohortVersionAssignmentsPage />

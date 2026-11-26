@@ -10,6 +10,12 @@
   - FE vitest `features/reports` 5/5; `tsc -b` 0; oxlint sạch (BE và FE).
   - Chạy thử trên `ctdt_real` bằng `ui.viewer`: so sánh 53 chung / 11 / 9; phân bổ phát hiện yêu cầu 122 TC ≠ công bố 130 TC; hồ sơ bị chặn `REPORT_GRADING_UNAVAILABLE` vì học phần thật chưa có thành phần đánh giá. Ảnh MH-60/61/44 1280px đã xem.
 
+## Sửa báo cáo sau rà soát demo (2026-11-26)
+
+- MH-62 cho chọn bản nháp thông thường để tải ma trận. Nút **Tải hồ sơ** mở cho phiên bản đã ban hành. API trả `409 REPORT_CURRICULUM_EMPTY` khi phiên bản đã ban hành có khung rỗng. Giao diện hiện lý do ở phiên bản đang chọn.
+- Khi có nhóm tự chọn chỉ quy định theo số học phần, MH-61 và Excel ghi rõ tổng yêu cầu mới tính được một phần theo tín chỉ. Bảng nhóm tự chọn hiện cả ngưỡng tín chỉ lẫn ngưỡng số học phần. Cảnh báo chênh tổng công bố dùng khi có thể tính đầy đủ tổng yêu cầu theo tín chỉ.
+- BE e2e `test/reports.e2e-spec.ts` đạt 7/7 trên cơ sở dữ liệu kiểm thử. Các ca mới xác minh xuất ma trận bản nháp, từ chối hồ sơ bản nháp hoặc khung rỗng và ghi đúng phần yêu cầu tính được trong Excel.
+
 ## Bảng tổng hợp
 
 | ID | File | Kiểm chứng |
@@ -26,7 +32,7 @@
 - **Đồng bộ thay vì hàng đợi.** Plan đề xuất xuất qua BullMQ và bảng `ReportExport` lưu bản ghi hoàn tất (US-108 AC4). Bản build tạo file ngay trong yêu cầu (vài trăm dòng mỗi phiên bản, dưới 1 giây trên dữ liệu thật) và **không** lưu bản ghi hoàn tất. Nếu Khoa cần lịch sử xuất hồ sơ, thêm bảng và hàng đợi ở bước sau — đã ghi vào cổng mở.
 - **Hồ sơ chỉ lập cho phiên bản đã ban hành** (Chờ hiệu lực/Đang hiệu lực/Lịch sử) và **bị chặn** (`409 REPORT_GRADING_UNAVAILABLE`, `details[].field` = mã học phần) khi có dòng chưa ghim đề cương ban hành hoặc đề cương chưa có thành phần đánh giá — hồ sơ thiếu không được trông như đủ.
 - **Tương đương**: cùng `courseId` là học phần chung; hai học phần khác nhau cùng một nhóm tương đương ghép cặp theo thứ tự mã học phần ở mỗi bên; phần dư là riêng.
-- **Phân bổ**: mọi dòng được tính một lần ở mỗi bảng (khối/học kỳ/loại), tổng mỗi bảng = `allRows`. Tối thiểu nhóm tự chọn chỉ cộng vào "yêu cầu tốt nghiệp", không chia vào học kỳ (BR-04). Nhóm thiếu tối thiểu → `requiredIsPartial`.
+- **Phân bổ**: mọi dòng được tính một lần ở mỗi bảng (khối/học kỳ/loại), tổng mỗi bảng = `allRows`. Tối thiểu nhóm tự chọn chỉ cộng vào "yêu cầu tốt nghiệp", không chia vào học kỳ (BR-04). `requiredIsPartial` báo có nhóm không có ngưỡng tín chỉ, gồm trường hợp nhóm đã quy định theo số học phần.
 - **Thời gian xử lý**: một lượt = một cấp đã ra quyết định trong một vòng nộp; bắt đầu khi vòng được nộp (cấp đầu) hoặc khi cấp trước quyết định; kết thúc ở lần trả lại/từ chối đầu tiên, nếu không thì lần duyệt cuối. Cấp bỏ qua, cấp còn người song song đang chờ, `updatedAt` không được dùng.
 - **Mẫu tổng quát**: trang `ThongTin` ghi rõ "Mẫu tổng quát — chưa phải biểu mẫu chính thức". Biểu mẫu chính thức của Trường là cổng Khoa.
 
@@ -34,4 +40,6 @@
 
 - E1: biểu mẫu hồ sơ kiểm định chính thức (cột, thứ tự trang).
 - E2: có cần lưu lịch sử các lần xuất hồ sơ (US-108 AC4) không.
-- E3: dữ liệu thật — các học phần chưa có thành phần đánh giá nên hồ sơ của mọi phiên bản thật hiện đều bị chặn; khối kiến thức chưa được gán cho dòng của dữ liệu nhập.
+- E3: theo rà soát Oracle demo ngày 2026-11-26, 42/44 phiên bản đang hiệu lực thiếu đề cương ban hành được ghim hoặc thành phần đánh giá. Cả 44 chưa có PLO. Cần dữ liệu đánh giá, chuẩn đầu ra và liên kết ma trận học phần–PLO, CLO–PLO. Khối kiến thức của các dòng nhập là mục đối soát từ đợt triển khai ban đầu.
+- E4: cần xác nhận `K2027` là bản thử hay cần bổ sung khung. Có 12 phiên bản còn chênh ngoài nhóm tính theo số học phần. Nhóm `CNTT-KS-K26*` tính được 36–40 TC so với 150 TC công bố.
+- E5: cần lịch chính thức cho năm học kỳ đang dùng ngày bắt đầu ước tính `1421`, `1521`, `1621`, `1721`, `2021`.

@@ -1,6 +1,7 @@
 import { Select, Spin } from 'antd';
 import { useState } from 'react';
 import { CourseSelect } from '../../../shared/courses/CourseSelect';
+import { selectPaginationProps } from '../../../shared/design-system/selectPagination';
 import { useDebouncedValue } from '../../../shared/hooks/useDebouncedValue';
 import type { ChangeTargetType, TargetOption } from '../api/changeRequests';
 import { TARGET_SEARCH_DEBOUNCE_MS } from '../constants/changeRequestLimits';
@@ -14,8 +15,7 @@ interface TargetSelectProps {
   targetType: ChangeTargetType;
   value?: string;
   onChange?: (targetId: string | undefined) => void;
-  // "CODE — name" of a value the form starts with, which no search has returned yet.
-  initialLabel?: string;
+  selectedLabel?: { id: string; label: string };
 }
 
 const optionLabel = (option: TargetOption) => `${option.code} — ${option.name}`;
@@ -26,8 +26,10 @@ export function TargetSelect({
   targetType,
   value,
   onChange,
-  initialLabel,
+  selectedLabel,
 }: TargetSelectProps) {
+  const initialLabel =
+    selectedLabel?.id === value ? selectedLabel?.label : undefined;
   if (targetType === 'COURSE')
     return (
       <CourseSelect
@@ -82,10 +84,12 @@ function ProgramSelect({ id, value, onChange, initialLabel }: KindSelectProps) {
   const [term, setTerm] = useState('');
   const [known, setKnown] = useState<Record<string, string>>({});
   const debounced = useDebouncedValue(term.trim(), TARGET_SEARCH_DEBOUNCE_MS);
-  const { data = [], isFetching } = useProgramOptions(debounced, true);
+  const programs = useProgramOptions(debounced);
+  const options = programs.data?.pages.flatMap((page) => page.items) ?? [];
   const currentLabel = (value && (known[value] || initialLabel)) || undefined;
   return (
     <Select
+      {...selectPaginationProps(programs)}
       id={id}
       showSearch
       allowClear
@@ -101,10 +105,12 @@ function ProgramSelect({ id, value, onChange, initialLabel }: KindSelectProps) {
       }}
       onSearch={setTerm}
       filterOption={false}
-      loading={isFetching}
-      options={withSelected(data, value, currentLabel)}
+      loading={programs.isFetching}
+      options={withSelected(options, value, currentLabel)}
       placeholder="Tìm theo mã hoặc tên chương trình"
-      notFoundContent={isFetching ? <Spin size="small" /> : 'Không tìm thấy'}
+      notFoundContent={
+        programs.isFetching ? <Spin size="small" /> : 'Không tìm thấy'
+      }
     />
   );
 }

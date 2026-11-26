@@ -76,7 +76,7 @@ function SortableDataRow(props: SortableRowProps & { 'data-row-key': string }) {
   );
   return (
     <RowContext.Provider value={context}>
-      <tr {...props} ref={setNodeRef} style={style} />
+      <tr {...props} ref={setNodeRef} style={style} data-sortable-row="" />
     </RowContext.Provider>
   );
 }

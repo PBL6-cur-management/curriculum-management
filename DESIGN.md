@@ -218,7 +218,7 @@ Mỗi ô là một dấu 10 px + chữ ngắn 12 px, đọc được không cầ
 Drawer 720 px, tiêu đề "Quyền của {mã} · {tên}". Nhóm chức năng với tiêu đề cấp 5; mỗi quyền một dòng (tên + mã 12 px bên trái, `Segmented` nhỏ bên phải với đúng bốn nhãn ngắn của ô và "Không"). Dòng đã sửa nền `primary-soft` và bo 8 px. Dòng khóa hiện ổ khóa, trạng thái hiện tại và "đã khóa", không có điều khiển. Chân drawer: số thay đổi chưa áp dụng bên trái, "Hủy" và "Áp dụng thay đổi" (disabled khi chưa có thay đổi) bên phải. Áp dụng qua hộp xác nhận liệt kê từng thay đổi "cũ → mới" và nêu hiệu lực ngay.
 
 ### Motion
-Thời lượng 120 / 160 / 200 ms (fast/mid/slow), một easing `cubic-bezier(0.4, 0, 0.2, 1)`. Không gắn keyframe lên component AntD (chạy hai lần gây nháy). `prefers-reduced-motion` ép về ~0 ms.
+Thời lượng 120 / 160 / 200 ms (fast/mid/slow), một easing `cubic-bezier(0.4, 0, 0.2, 1)`. AntD xử lý chuyển động của component. Khi `prefers-reduced-motion` bật, `ConfigProvider` đặt token `motion: false` để AntD vẫn căn đúng vị trí popup. CSS cho hiệu ứng riêng xử lý tùy chọn này trong phạm vi component.
 
 ## Do's and Don'ts
 

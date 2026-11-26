@@ -11,6 +11,7 @@ test.describe("F-09 Nhập, xuất Excel", () => {
   test("F09-TC_001 Kiểm tra tải hai tệp mẫu được cấp quyền", async ({
     page,
   }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/imports");
     await expect(
       page.getByRole("heading", { name: "Nhập liệu Excel", exact: true }),

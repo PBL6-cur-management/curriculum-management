@@ -12,8 +12,6 @@ interface VersionPickerProps {
   programId: string;
   versionId: string;
   onChange: (value: { programId: string; versionId: string }) => void;
-  /** Only Pending/Active/Historical — the accreditation dossier never covers a Draft. */
-  issuedOnly?: boolean;
 }
 
 // Program first, then one of its versions; the program's current version is picked by default.
@@ -22,7 +20,6 @@ export function VersionPicker({
   programId,
   versionId,
   onChange,
-  issuedOnly = false,
 }: VersionPickerProps) {
   const [term, setTerm] = useState('');
   const search = useDebouncedValue(term.trim(), 300);
@@ -32,9 +29,7 @@ export function VersionPicker({
     q: search || undefined,
   });
   const program = useProgram(programId);
-  const versions = (program.data?.versions ?? []).filter(
-    (version) => !issuedOnly || version.status !== 'DRAFT',
-  );
+  const versions = program.data?.versions ?? [];
   return (
     <Flex gap="small" wrap>
       <Select
@@ -51,10 +46,7 @@ export function VersionPicker({
           const current = summary?.currentVersion;
           onChange({
             programId: next,
-            versionId:
-              current && (!issuedOnly || current.status !== 'DRAFT')
-                ? current.id
-                : '',
+            versionId: current?.id ?? '',
           });
         }}
         options={(programs.data?.items ?? []).map((item) => ({

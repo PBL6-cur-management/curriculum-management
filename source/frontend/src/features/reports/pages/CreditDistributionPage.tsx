@@ -75,7 +75,20 @@ function BucketCard({ title, rows }: { title: string; rows: CreditBucket[] }) {
 
 function DistributionResult({ data }: { data: CreditDistribution }) {
   const { totals } = data;
-  const mismatch = totals.required !== totals.declaredTotal;
+  const { requiredIsPartial } = totals;
+  const mismatch =
+    !requiredIsPartial && totals.required !== totals.declaredTotal;
+  const partialExceedsDeclared =
+    requiredIsPartial && Number(totals.required) > Number(totals.declaredTotal);
+  const groupsWithoutCreditMinimum = data.electiveGroups.filter(
+    (group) => group.minCredits === null,
+  );
+  const hasCourseMinimum = groupsWithoutCreditMinimum.some(
+    (group) => group.minCourses !== null,
+  );
+  const hasMissingMinimum = groupsWithoutCreditMinimum.some(
+    (group) => group.minCourses === null,
+  );
   return (
     <Flex vertical gap="middle">
       <SummaryStrip
@@ -83,18 +96,24 @@ function DistributionResult({ data }: { data: CreditDistribution }) {
           { label: 'Bắt buộc (TC)', value: totals.compulsory },
           { label: 'Tự chọn được mở (TC)', value: totals.electiveOffered },
           {
-            label: 'Yêu cầu tốt nghiệp (TC)',
+            label: requiredIsPartial
+              ? 'Yêu cầu tốt nghiệp · phần tính được (TC)'
+              : 'Yêu cầu tốt nghiệp (TC)',
             value: totals.required,
-            tone: mismatch ? 'warning' : 'default',
+            tone: requiredIsPartial || mismatch ? 'warning' : 'default',
           },
           { label: 'Tổng công bố (TC)', value: totals.declaredTotal },
         ]}
       />
-      {totals.requiredIsPartial || mismatch ? (
+      {requiredIsPartial || mismatch ? (
         <Alert
           type="warning"
           showIcon
-          title="Số tín chỉ yêu cầu chưa khớp tổng công bố"
+          title={
+            requiredIsPartial
+              ? 'Tổng yêu cầu mới tính được một phần theo tín chỉ'
+              : 'Số tín chỉ yêu cầu chưa khớp tổng công bố'
+          }
           description={
             <ul style={{ margin: 0, paddingInlineStart: 20 }}>
               {mismatch ? (
@@ -103,11 +122,20 @@ function DistributionResult({ data }: { data: CreditDistribution }) {
                   TC, tổng công bố của phiên bản là {totals.declaredTotal} TC.
                 </li>
               ) : null}
-              {totals.requiredIsPartial ? (
+              {partialExceedsDeclared ? (
                 <li>
-                  Có nhóm tự chọn chưa khai báo tối thiểu tín chỉ nên chưa tính
-                  được vào yêu cầu.
+                  Phần đã tính là {totals.required} TC, đã vượt tổng công bố{' '}
+                  {totals.declaredTotal} TC.
                 </li>
+              ) : null}
+              {hasCourseMinimum ? (
+                <li>
+                  Nhóm tự chọn theo số học phần có yêu cầu riêng trong bảng bên
+                  dưới và chưa được quy đổi sang tín chỉ trong tổng trên.
+                </li>
+              ) : null}
+              {hasMissingMinimum ? (
+                <li>Có nhóm tự chọn chưa khai báo ngưỡng tối thiểu.</li>
               ) : null}
             </ul>
           }
@@ -140,6 +168,12 @@ function DistributionResult({ data }: { data: CreditDistribution }) {
                   key: 'min',
                   align: 'right',
                   render: (_, group) => formatEmpty(group.minCredits),
+                },
+                {
+                  title: 'Tối thiểu số HP',
+                  key: 'minCourses',
+                  align: 'right',
+                  render: (_, group) => formatEmpty(group.minCourses),
                 },
                 {
                   title: 'TC được mở',

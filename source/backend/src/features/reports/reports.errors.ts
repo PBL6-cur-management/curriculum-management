@@ -17,6 +17,12 @@ export const REPORT_ERRORS = {
     message:
       'Hồ sơ kiểm định chỉ lập cho phiên bản đã ban hành (chờ hiệu lực, đang hiệu lực hoặc lịch sử).',
   },
+  CURRICULUM_EMPTY: {
+    status: HttpStatus.CONFLICT,
+    code: 'REPORT_CURRICULUM_EMPTY',
+    message:
+      'Phiên bản chưa có học phần trong khung chương trình. Bổ sung khung chương trình trước khi lập hồ sơ kiểm định.',
+  },
   GRADING_UNAVAILABLE: {
     status: HttpStatus.CONFLICT,
     code: 'REPORT_GRADING_UNAVAILABLE',

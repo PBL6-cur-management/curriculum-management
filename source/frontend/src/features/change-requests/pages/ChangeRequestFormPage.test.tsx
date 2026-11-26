@@ -1,5 +1,6 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { RequestHeaderCard } from '../components/RequestHeaderCard';
 import { ME, conflict, detail } from '../testFixtures';
 import { json, renderRequestPage } from '../testRender';
 import { ChangeRequestFormPage } from './ChangeRequestFormPage';
@@ -55,6 +56,99 @@ describe('ChangeRequestFormPage', () => {
     expect(
       await screen.findByText('1024034 — Kỹ thuật máy tính'),
     ).toBeInTheDocument();
+  });
+
+  it('resolves the label of a prefilled course outside the first page and restores it after changing kind', async () => {
+    const courseId = 'course-outside-first-page';
+    const { writes } = renderForm(
+      `/change-requests/new?type=OUTCOME&targetType=COURSE&targetId=${courseId}`,
+      {
+        [`/api/courses/${courseId}`]: {
+          id: courseId,
+          courseCode: 'HP021',
+          courseName: 'Cấu trúc dữ liệu',
+        },
+        '/api/courses?pageSize=20&status=ACTIVE&status=DISCONTINUED': {
+          items: [],
+          page: 1,
+          pageSize: 20,
+          total: 0,
+        },
+      },
+    );
+    await fillHeader();
+    const label = 'HP021 — Cấu trúc dữ liệu';
+    expect(await screen.findByText(label)).toBeInTheDocument();
+    fireEvent.click(
+      screen
+        .getByRole('radio', { name: 'Chương trình đào tạo' })
+        .closest('label')!,
+    );
+    expect(
+      await screen.findByRole('combobox', { name: 'Chương trình đào tạo' }),
+    ).toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole('radio', { name: 'Học phần' }).closest('label')!,
+    );
+    expect(await screen.findByText(label)).toBeInTheDocument();
+    expect(screen.queryByText(courseId)).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Tạo đề xuất' }));
+    expect(await screen.findByText('Bàn soạn đề xuất')).toBeInTheDocument();
+    expect(writes[0].body).toMatchObject({
+      targetType: 'COURSE',
+      targetId: courseId,
+    });
+  });
+
+  it('loads another program page and keeps the new target label and id when switching types', async () => {
+    const nextProgram = {
+      id: 'p2',
+      programCode: 'CNTT-02',
+      programName: 'Công nghệ thông tin',
+    };
+    const { writes } = renderForm(PREFILLED, {
+      '/api/programs?pageSize=20': {
+        items: [PROGRAM],
+        page: 1,
+        pageSize: 20,
+        total: 21,
+      },
+      '/api/programs?page=2&pageSize=20': {
+        items: [nextProgram],
+        page: 2,
+        pageSize: 20,
+        total: 21,
+      },
+      '/api/programs/p2': nextProgram,
+    });
+    await fillHeader();
+    await screen.findByText('1024034 — Kỹ thuật máy tính');
+    fireEvent.mouseDown(
+      screen.getByRole('combobox', { name: 'Chương trình đào tạo' }),
+    );
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Tải thêm lựa chọn' }),
+    );
+    const label = 'CNTT-02 — Công nghệ thông tin';
+    fireEvent.click(await screen.findByText(label));
+
+    const type = screen.getByRole('combobox', { name: 'Loại đề xuất' });
+    fireEvent.mouseDown(type);
+    fireEvent.click(await screen.findByText('Nội dung đề cương'));
+    fireEvent.mouseDown(type);
+    fireEvent.click(await screen.findByText('Khung chương trình'));
+    expect(await screen.findByText(label)).toBeInTheDocument();
+    expect(
+      screen.queryByText('1024034 — Kỹ thuật máy tính'),
+    ).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Tạo đề xuất' }));
+    expect(await screen.findByText('Bàn soạn đề xuất')).toBeInTheDocument();
+    expect(writes[0].body).toMatchObject({
+      targetType: 'PROGRAM',
+      targetId: 'p2',
+    });
   });
 
   it('preserves the prefilled target when changing request type to PROGRAM_INFO', async () => {
@@ -251,5 +345,19 @@ describe('ChangeRequestFormPage', () => {
     await screen.findByText('1024034 — Kỹ thuật máy tính');
     fireEvent.click(screen.getByRole('button', { name: 'Tạo đề xuất' }));
     expect(await screen.findByText(/hãy sửa trực tiếp/)).toBeInTheDocument();
+  });
+});
+
+describe('RequestHeaderCard', () => {
+  it('displays the course label while editing the draft header', async () => {
+    renderRequestPage({
+      path: '/',
+      entry: '/',
+      element: <RequestHeaderCard request={detail()} />,
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Sửa' }));
+    const target = await screen.findByLabelText('Học phần');
+    expect(target).toBeDisabled();
+    expect(target).toHaveValue('IT001 — Nhập môn');
   });
 });

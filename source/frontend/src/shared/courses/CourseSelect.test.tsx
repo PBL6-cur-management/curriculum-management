@@ -7,7 +7,7 @@ import {
   CourseSelect,
 } from './CourseSelect';
 
-const page = (codes: string[]) =>
+const page = (codes: string[], pageNumber = 1, total = codes.length) =>
   new Response(
     JSON.stringify({
       items: codes.map((code) => ({
@@ -17,17 +17,19 @@ const page = (codes: string[]) =>
         credits: '3',
         status: 'ACTIVE',
       })),
-      total: codes.length,
-      page: 1,
+      total,
+      page: pageNumber,
       pageSize: 20,
     }),
   );
 
-function setup(ui: React.ReactElement) {
-  vi.useFakeTimers();
-  const fetchMock = vi.fn((_input: RequestInfo | URL) =>
+function setup(
+  ui: React.ReactElement,
+  fetchPage = (_input: RequestInfo | URL) =>
     Promise.resolve(page(['IT001', 'IT002'])),
-  );
+) {
+  vi.useFakeTimers();
+  const fetchMock = vi.fn(fetchPage);
   vi.stubGlobal('fetch', fetchMock);
   render(
     <QueryClientProvider
@@ -79,6 +81,57 @@ describe('CourseSelect', () => {
     expect(
       screen.getByText('IT002 — Học phần IT002 (3 TC)'),
     ).toBeInTheDocument();
+  });
+
+  it('loads later pages even when the first page is excluded and restarts for a new search', async () => {
+    const fetchMock = setup(
+      <CourseSelect excludeIds={['it001']} />,
+      (input) => {
+        const query = new URL(String(input), 'http://localhost').searchParams;
+        if (query.has('q')) return Promise.resolve(page(['IT999']));
+        return Promise.resolve(
+          query.get('page') === '2'
+            ? page(['IT021'], 2, 21)
+            : page(['IT001'], 1, 21),
+        );
+      },
+    );
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
+    const control = screen.getByRole('combobox');
+    fireEvent.mouseDown(control);
+    expect(
+      screen.getByRole('button', { name: 'Tải thêm lựa chọn' }),
+    ).toBeInTheDocument();
+    fireEvent.keyDown(control, { key: 'PageDown' });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
+    expect(
+      screen.getByText('IT021 — Học phần IT021 (3 TC)'),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Tải thêm lựa chọn' }),
+    ).not.toBeInTheDocument();
+
+    fireEvent.change(control, { target: { value: 'IT999' } });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(COURSE_SELECT_DEBOUNCE_MS);
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1);
+    });
+    expect(fetchMock).toHaveBeenLastCalledWith(
+      '/api/courses?q=IT999&pageSize=20&status=ACTIVE',
+      expect.anything(),
+    );
+    expect(
+      screen.getByText('IT999 — Học phần IT999 (3 TC)'),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText('IT021 — Học phần IT021 (3 TC)'),
+    ).not.toBeInTheDocument();
   });
 });
 

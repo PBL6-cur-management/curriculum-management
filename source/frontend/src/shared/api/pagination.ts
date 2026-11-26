@@ -5,3 +5,11 @@ export interface PageParams {
   page: number;
   pageSize: number;
 }
+
+export function nextPageNumber({
+  page,
+  pageSize,
+  total,
+}: PageParams & { total: number }) {
+  return page * pageSize < total ? page + 1 : undefined;
+}

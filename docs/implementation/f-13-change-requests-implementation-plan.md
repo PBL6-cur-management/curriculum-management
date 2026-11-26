@@ -2,6 +2,12 @@
 
 This plan builds the authoring half of EP-13 (FR-55, FR-56, FR-60, FR-68, FR-108, FR-109): the rule that released data is changed only through a change request, now with a way through (US-053); creating, editing and deleting a request of one of six types on a working copy of the released data (MH-39, US-054); the origin and basis document number (US-055); scanned supporting documents (US-056); submitting with automatic routing to the coordinators, program directors and academic office that must approve it, and a preview of who that is (US-057); the conflict warning when another open request targets the same object (US-058); withdrawing (US-059); the organisational request of R2 and R4 that goes straight to the academic office (MH-40, US-060); the request list (MH-38) and the read-only detail page (MH-41).
 
+### Sửa bộ chọn đối tượng trên demo
+
+- MH-39/MH-40 đọc nhãn mã và tên theo đúng loại và ID đang được chọn, gồm đối tượng điền sẵn hoặc khôi phục khi đổi loại. Khi đang tải hoặc tải lỗi, hiển thị trạng thái đọc được.
+- Bộ chọn học phần và chương trình giữ tìm kiếm phía máy chủ. Dùng phân trang của các API danh mục hiện có để tải tiếp bằng cuộn hoặc nút tải thêm, giữ phạm vi và bộ lọc trạng thái của từng API.
+- Xác minh đối tượng ngoài trang đầu, kết quả tìm kiếm, đổi loại rồi quay lại và dữ liệu gửi đi vẫn là ID đúng đối tượng.
+
 It deliberately excludes every approval action — approve, return, reject, override, comments, the per-round history view, the "waiting for me" queue (MH-42) and notifications (F-14); final approval, applying a request to released data and creating the new version (MH-43, F-15); the grading-formula request type and the "CLO not assessed" submit block (F-12, after the MVP); importing a curriculum from Excel into a request's working copy (F-09, after the MVP); delegation (B6); and digital signatures (F13-05).
 
 > **Companion documents**

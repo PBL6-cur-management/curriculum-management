@@ -268,7 +268,9 @@ export class ReportWorkbooksService {
         ['Bắt buộc', Number(totals.compulsory)],
         ['Tự chọn được mở', Number(totals.electiveOffered)],
         [
-          `Yêu cầu tốt nghiệp (bắt buộc + tối thiểu tự chọn)${totals.requiredIsPartial ? ' — có nhóm chưa khai báo tối thiểu' : ''}`,
+          totals.requiredIsPartial
+            ? 'Yêu cầu tốt nghiệp (phần tính được theo tín chỉ)'
+            : 'Yêu cầu tốt nghiệp (bắt buộc + tối thiểu tự chọn)',
           Number(totals.required),
         ],
         ['Tổng công bố của phiên bản', Number(totals.declaredTotal)],
@@ -396,6 +398,9 @@ export class ReportWorkbooksService {
         issuedOnly: true,
       },
     );
+    if (version.items.length === 0)
+      throw new AppException(REPORT_ERRORS.CURRICULUM_EMPTY);
+
     const pinIds = version.items.flatMap((item) =>
       item.syllabusId ? [item.syllabusId] : [],
     );

@@ -3,7 +3,7 @@ import { App as AntApp, ConfigProvider } from 'antd';
 import viVN from 'antd/locale/vi_VN';
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
-import { StrictMode } from 'react';
+import { StrictMode, useSyncExternalStore } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router/dom';
 import { router } from './router';
@@ -40,14 +40,45 @@ window.addEventListener('error', (event) => {
   }
 });
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <ConfigProvider locale={viVN} theme={appTheme}>
+const reducedMotionPreference = window.matchMedia(
+  '(prefers-reduced-motion: reduce)',
+);
+const reducedMotionTheme = {
+  ...appTheme,
+  token: { ...appTheme.token, motion: false },
+};
+
+function subscribeToMotionPreference(onChange: () => void) {
+  reducedMotionPreference.addEventListener('change', onChange);
+  return () => reducedMotionPreference.removeEventListener('change', onChange);
+}
+
+function getMotionPreference() {
+  return reducedMotionPreference.matches;
+}
+
+function Application() {
+  const reduceMotion = useSyncExternalStore(
+    subscribeToMotionPreference,
+    getMotionPreference,
+  );
+
+  return (
+    <ConfigProvider
+      locale={viVN}
+      theme={reduceMotion ? reducedMotionTheme : appTheme}
+    >
       <AntApp>
         <QueryClientProvider client={queryClient}>
           <RouterProvider router={router} />
         </QueryClientProvider>
       </AntApp>
     </ConfigProvider>
+  );
+}
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <Application />
   </StrictMode>,
 );

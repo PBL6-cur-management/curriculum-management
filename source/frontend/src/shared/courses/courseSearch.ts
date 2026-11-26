@@ -20,10 +20,12 @@ export const courseSearchQueryKey = (
 export const searchCourses = (
   q: string,
   statuses: readonly CourseStatus[] = DEFAULT_SEARCH_STATUSES,
+  page = 1,
 ) =>
   getJson<CoursePage>(
     withQuery(COURSE_SEARCH_PATH, {
       q,
+      page: page === 1 ? undefined : page,
       pageSize: COURSE_SEARCH_PAGE_SIZE,
       status: statuses,
     }),

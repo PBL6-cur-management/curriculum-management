@@ -1,6 +1,7 @@
 import type request from 'supertest';
 import ExcelJS from 'exceljs';
 import { createAccount, loginAgent } from './fixtures/accounts.js';
+import { createProgram } from './fixtures/programs.js';
 import {
   graduationHarness,
   seedGraduationFixture,
@@ -124,6 +125,64 @@ describe('Accreditation reports (F-23)', () => {
       'DanhGia',
       'LoHong',
     ]);
+  });
+
+  it('exports draft matrices and refuses dossiers for drafts or empty issued curricula', async () => {
+    const draft = await createProgram(harness.app, {
+      programCode: 'REPORT-DRAFT',
+    });
+    const issued = await createProgram(harness.app, {
+      programCode: 'REPORT-EMPTY',
+      versionNumber: '1.0',
+      versionStatus: 'ACTIVE',
+    });
+    const draftPath = `/api/reports/versions/${draft.versions[0].id}`;
+    await bytes(harness.office.get(`${draftPath}/matrices/export`))
+      .expect(200)
+      .expect('Content-Type', XLSX);
+    await harness.office
+      .get(`${draftPath}/accreditation/export`)
+      .expect(409)
+      .expect((r) => expect(r.body.code).toBe('REPORT_VERSION_NOT_ISSUED'));
+    await harness.office
+      .get(
+        `/api/reports/versions/${issued.versions[0].id}/accreditation/export`,
+      )
+      .expect(409)
+      .expect((r) => expect(r.body.code).toBe('REPORT_CURRICULUM_EMPTY'));
+  });
+
+  it('labels the credit subtotal as partial in Excel for a course-count group', async () => {
+    const fixture = await seedGraduationFixture(harness.app, harness.office, {
+      minCredits: null,
+      minCourses: 2,
+    });
+    const query = { versionId: fixture.versionId };
+    await harness.office
+      .get('/api/reports/credit-distribution')
+      .query(query)
+      .expect(200)
+      .expect((r) => {
+        expect(r.body.totals).toMatchObject({
+          required: '3',
+          requiredIsPartial: true,
+        });
+        expect(r.body.electiveGroups[0]).toMatchObject({
+          minCredits: null,
+          minCourses: 2,
+        });
+      });
+    const file = await bytes(
+      harness.office
+        .get('/api/reports/credit-distribution/export')
+        .query(query),
+    ).expect(200);
+    const book = new ExcelJS.Workbook();
+    await book.xlsx.load(file.body as ArrayBuffer);
+    expect(book.getWorksheet('TongHop')?.getCell('A5').value).toBe(
+      'Yêu cầu tốt nghiệp (phần tính được theo tín chỉ)',
+    );
+    expect(book.getWorksheet('NhomTuChon')?.getCell('D2').value).toBe(2);
   });
 
   it('counts proposals in the interval and rejects a reversed interval (US-109)', async () => {

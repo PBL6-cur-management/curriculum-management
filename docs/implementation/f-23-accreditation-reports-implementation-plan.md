@@ -2,6 +2,13 @@
 
 This plan builds EP-23 over the curriculum, outcome and approval data already shipped: cross-program comparison, credit-distribution tables and charts, generic Excel matrix exports, a version-scoped accreditation workbook, and proposal-processing statistics (FR-43, FR-102..104, FR-107). It covers both independent applications and their API contract. It does not implement new-regulation reporting (F23-01 A), institutional AUN-QA/MOET forms, student attainment, PDF publication, import workflows, or a general audit subsystem. The full accreditation workbook has an explicit F-12 grading-data dependency; unavailable data must never become an apparently complete workbook.
 
+## Sửa lỗi đã xác nhận trên demo
+
+- MH-62 dùng cùng bộ chọn phiên bản cho hai thao tác. Cho phép chọn bản nháp thường để tải ma trận. Nút tải hồ sơ chỉ mở khi chọn phiên bản đã ban hành.
+- API trả `REPORT_CURRICULUM_EMPTY` (409) khi yêu cầu hồ sơ của phiên bản chưa có dòng khung. Giao diện hiển thị lý do cùng phiên bản đã chọn.
+- MH-61 và Excel ghi rõ khi tổng yêu cầu chỉ tính được một phần theo tín chỉ. Hiển thị cả ngưỡng số học phần trong bảng nhóm tự chọn. Giữ công thức BR-04 và kiểm tra chênh lệch khi tổng đã tính đủ.
+- Xác minh bản nháp xuất được ma trận, bản đã ban hành có khung rỗng bị từ chối, hồ sơ đủ dữ liệu tải thành công và báo cáo tín chỉ thể hiện đúng từng loại ngưỡng.
+
 > **Companion documents**
 > - Scope and defaults: `docs/planning/feature-questions.md:326` (F23-01/F23-02; blank answer = A), `docs/planning/epics.md:212` (EP-23 and B6 scenarios 4–6), `docs/planning/user-stories.md:1279` (US-105..109).
 > - Requirements: `docs/requirement/REQUIREMENTS.md:489`, `docs/requirement/REQUIREMENTS.md:596`, BR-01..05, BR-09, BR-17..21, EC-18 and EC-41. Requirements override stale story/test wording about matrix derivation.

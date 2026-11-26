@@ -1,9 +1,11 @@
 import {
   keepPreviousData,
+  useInfiniteQuery,
   useMutation,
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
+import { nextPageNumber } from '../../../shared/api/pagination';
 import { CHANGE_REQUEST_QUERY_ROOT } from '../../../shared/change-requests/changeRequestQueryRoot';
 import {
   createChangeRequest,
@@ -107,11 +109,12 @@ export const useSubmitPreview = (id: string) =>
     gcTime: 0,
   });
 
-export const useProgramOptions = (q: string, enabled: boolean) =>
-  useQuery({
+export const useProgramOptions = (q: string) =>
+  useInfiniteQuery({
     queryKey: CHANGE_REQUEST_QUERY_KEYS.programs(q),
-    queryFn: () => searchPrograms(q),
-    enabled,
+    initialPageParam: 1,
+    queryFn: ({ pageParam }) => searchPrograms(q, pageParam),
+    getNextPageParam: nextPageNumber,
     placeholderData: keepPreviousData,
   });
 

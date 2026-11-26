@@ -178,15 +178,22 @@ export const downloadDocument = (document: ChangeRequestDocument) =>
   downloadFile(`${documentPath(document.id)}/file`, document.fileName);
 
 // The target pickers read other features' list endpoints directly; this feature never imports their code.
-export async function searchPrograms(q: string): Promise<TargetOption[]> {
-  const page = await getJson<Schemas['ProgramPageDto']>(
-    withQuery('/programs', { q, pageSize: TARGET_OPTIONS_PAGE_SIZE }),
+export async function searchPrograms(q: string, page = 1) {
+  const result = await getJson<Schemas['ProgramPageDto']>(
+    withQuery('/programs', {
+      q,
+      page: page === 1 ? undefined : page,
+      pageSize: TARGET_OPTIONS_PAGE_SIZE,
+    }),
   );
-  return page.items.map((program) => ({
-    id: program.id,
-    code: program.programCode,
-    name: program.programName,
-  }));
+  return {
+    ...result,
+    items: result.items.map((program): TargetOption => ({
+      id: program.id,
+      code: program.programCode,
+      name: program.programName,
+    })),
+  };
 }
 
 export async function listSubjectGroups(): Promise<TargetOption[]> {

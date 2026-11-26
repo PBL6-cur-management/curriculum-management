@@ -6,7 +6,6 @@ import type { ChangeRequestType } from '../api/changeRequests';
 import {
   useConflicts,
   useCreateChangeRequest,
-  useTargetLabel,
 } from '../hooks/useChangeRequests';
 import type { RequestHeaderValues } from '../schema/requestRules';
 import { applyRequestError } from '../utils/requestErrors';
@@ -27,10 +26,9 @@ export function CreateRequestPanel({
   const navigate = useNavigate();
   const [form] = Form.useForm<RequestHeaderValues>();
   const create = useCreateChangeRequest();
-  const targetType = Form.useWatch('targetType', form) ?? defaults.targetType;
-  const targetId = Form.useWatch('targetId', form) ?? defaults.targetId;
+  const targetType = Form.useWatch('targetType', form);
+  const targetId = Form.useWatch('targetId', form);
   const conflicts = useConflicts(targetType, targetId || undefined);
-  const prefilled = useTargetLabel(defaults.targetType, defaults.targetId);
   const onFinish = (values: RequestHeaderValues) =>
     create.mutate(
       {
@@ -61,7 +59,6 @@ export function CreateRequestPanel({
         mode="create"
         types={types}
         initialValues={defaults}
-        targetLabel={prefilled.data}
         onFinish={onFinish}
         submitting={create.isPending}
       />
