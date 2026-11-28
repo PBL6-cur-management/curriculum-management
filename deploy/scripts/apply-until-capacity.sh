@@ -36,9 +36,9 @@ guard_untracked_vm() {
   terraform -chdir="$TF_DIR" apply -refresh-only -auto-approve -input=false -no-color >/dev/null 2>&1 || return 0
   local ids
   ids="$(terraform -chdir="$TF_DIR" output -json demo_instances_in_oci 2>/dev/null | tr -d '[]" \n')"
-  if [[ -n "$ids" ]] && ! terraform -chdir="$TF_DIR" state list 2>/dev/null | grep -qx 'oci_core_instance.demo'; then
+  if [[ -n "$ids" ]] && ! terraform -chdir="$TF_DIR" state list 2>/dev/null | grep -qx 'oci_core_instance.demo\[0\]'; then
     echo "[$(now)] OCI có VM mà Terraform không theo dõi: $ids" >&2
-    echo "Nhập vào state rồi chạy lại: terraform -chdir=$TF_DIR import oci_core_instance.demo <ocid>" >&2
+    echo "Nhập vào state rồi chạy lại: terraform -chdir=$TF_DIR import 'oci_core_instance.demo[0]' <ocid>" >&2
     exit 1
   fi
 }
@@ -58,10 +58,10 @@ while ((deadline == 0 || $(date +%s) < deadline)); do
   attempt=$((attempt + 1))
 
   if terraform -chdir="$TF_DIR" apply -auto-approve -input=false -no-color -refresh=false \
-    -target=oci_core_instance.demo -var "ocpus=$ocpus" -var "memory_gb=$memory" -var 'fault_domain=' >"$LOG" 2>&1; then
+    -target='oci_core_instance.demo[0]' -var 'enable_a1_vm=true' -var "ocpus=$ocpus" -var "memory_gb=$memory" -var 'fault_domain=' >"$LOG" 2>&1; then
     echo "[$(now)] Lần $attempt: CÓ MÁY — $ocpus OCPU / $memory GB."
     terraform -chdir="$TF_DIR" apply -auto-approve -input=false -no-color \
-      -var "ocpus=$ocpus" -var "memory_gb=$memory" >/dev/null
+      -var 'enable_a1_vm=true' -var "ocpus=$ocpus" -var "memory_gb=$memory" >/dev/null
     echo "Ghi ocpus = $ocpus, memory_gb = $memory vào terraform.tfvars để các lần apply sau khớp."
     terraform -chdir="$TF_DIR" output
     exit 0

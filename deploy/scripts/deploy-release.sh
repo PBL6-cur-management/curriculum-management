@@ -23,17 +23,11 @@ flock -n 9 || { echo "Một lần deploy khác đang chạy." >&2; exit 1; }
 PUBLIC_HOST="$(grep -E '^PUBLIC_HOST=' "$ENV_FILE" | cut -d= -f2-)"
 PREVIOUS_DIR="$(readlink -f "$ROOT/current" 2>/dev/null || true)"
 
-# Scale-out (deploy/scale-out/README.md): when the override exists, PostgreSQL/Redis keep their private
-# ports for VM2 and Caddy keeps the :8080 site the load balancer calls. Without it a deploy would cut VM2 off.
-SCALE_OVERRIDE="$ROOT/scale-out/compose.vm1.override.yaml"
-
 dc() {
   local dir="$1"
   shift
-  local files=(-f "$dir/deploy/compose.yaml")
-  if [[ -f "$SCALE_OVERRIDE" ]]; then files+=(-f "$SCALE_OVERRIDE"); fi
   RELEASE_TAG="$(basename "$dir")" docker compose -p "$PROJECT" \
-    "${files[@]}" --env-file "$ENV_FILE" "$@"
+    -f "$dir/deploy/compose.yaml" --env-file "$ENV_FILE" "$@"
 }
 
 healthy_through_caddy() {
@@ -60,22 +54,6 @@ dc "$RELEASE_DIR" run --rm migrate
 if dc "$RELEASE_DIR" up -d --no-deps --wait --wait-timeout 180 api caddy && healthy_through_caddy; then
   ln -sfn "$RELEASE_DIR" "$ROOT/current"
   echo "==> OK: https://$PUBLIC_HOST chạy $SHA"
-  # Publish this release for pool VMs (read-only NFS export, read by deploy/scale-out/pool-sync.sh on boot).
-  EXPORT="$ROOT/release-export"
-  if [[ -d "$EXPORT" ]]; then
-    tar -czf "$EXPORT/release-$SHA.tgz.tmp" -C "$RELEASE_DIR" source deploy \
-      && mv "$EXPORT/release-$SHA.tgz.tmp" "$EXPORT/release-$SHA.tgz" \
-      && echo "$SHA" > "$EXPORT/current.sha.tmp" && mv "$EXPORT/current.sha.tmp" "$EXPORT/current.sha" \
-      && ls -1t "$EXPORT"/release-*.tgz | tail -n +3 | xargs -r rm -f \
-      || echo "==> Cảnh báo: không xuất được release cho pool." >&2
-    # Re-bake the autoscale image on this release in the background (log: /srv/ctdt/rebake.log).
-    REBAKE="$RELEASE_DIR/deploy/scale-out/rebake-image.sh"
-    if [[ -x /opt/oci-cli/bin/oci && -f "$REBAKE" ]]; then
-      cp "$REBAKE" "$ROOT/rebake-image.sh" && chmod +x "$ROOT/rebake-image.sh"
-      nohup setsid flock -n "$ROOT/rebake.lock" "$ROOT/rebake-image.sh" >> "$ROOT/rebake.log" 2>&1 < /dev/null &
-      echo "==> Đang chụp lại image autoscale ở nền (xem $ROOT/rebake.log)."
-    fi
-  fi
 else
   echo "==> Health không đạt cho $SHA." >&2
   dc "$RELEASE_DIR" logs --tail 80 api caddy >&2 || true
