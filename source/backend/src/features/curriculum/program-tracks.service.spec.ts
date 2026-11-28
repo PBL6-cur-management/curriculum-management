@@ -138,7 +138,7 @@ describe('ProgramTracksService.bulkAssign', () => {
   it('rejects non-draft versions', async () => {
     findVersion.mockResolvedValue({
       ...VERSION,
-      status: ProgramVersionStatus.PUBLISHED,
+      status: ProgramVersionStatus.ACTIVE,
     });
     await expect(
       service.bulkAssign(
