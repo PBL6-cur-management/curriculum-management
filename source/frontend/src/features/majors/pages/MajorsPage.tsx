@@ -145,7 +145,7 @@ export function MajorsPage() {
     {
       title: 'CTĐT',
       key: 'programCount',
-      width: 150,
+      width: 135,
       align: 'right',
       render: (_, row) => {
         const programsUrl = withQuery(ROUTES.programs, {
@@ -177,7 +177,7 @@ export function MajorsPage() {
     {
       title: 'Sinh viên',
       key: 'studentCount',
-      width: 105,
+      width: 90,
       align: 'right',
       render: (_, row) => {
         const count = row.studentCount ?? 0;
@@ -192,7 +192,7 @@ export function MajorsPage() {
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
-      width: 130,
+      width: 120,
       render: (val: MajorStatus) => (
         <Tag color={MAJOR_STATUS_COLORS[val]}>{MAJOR_STATUS_LABELS[val]}</Tag>
       ),
@@ -200,7 +200,8 @@ export function MajorsPage() {
     {
       title: 'Thao tác',
       key: 'actions',
-      width: canManage ? 245 : 130,
+      width: canManage ? 245 : 135,
+      fixed: 'right',
       render: (_: unknown, row: MajorItemExtended) => {
         const detailUrl = generatePath(ROUTES.majorDetail, { majorId: row.id });
         const programsUrl = withQuery(ROUTES.programs, {
@@ -208,7 +209,7 @@ export function MajorsPage() {
           status: 'ALL',
         });
         return (
-          <Space size="small" wrap>
+          <Space size={4}>
             <Link to={detailUrl}>
               <Button size="small">Chi tiết</Button>
             </Link>
