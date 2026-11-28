@@ -63,7 +63,7 @@ export class CoursesService {
       this.prisma.course.findMany({
         where,
         include: COURSE_INCLUDE,
-        orderBy: [{ [query.sort]: query.order }, { courseCode: 'asc' }],
+        orderBy: [{ [query.sort]: query.order }, { id: 'desc' }],
         ...toSkipTake(query),
       }),
       this.prisma.course.count({ where }),

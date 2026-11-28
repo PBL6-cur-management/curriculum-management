@@ -31,14 +31,14 @@ export class SemestersService {
 
   async listSemesters(): Promise<SemesterDto[]> {
     const rows = await this.prisma.semester.findMany({
-      orderBy: [{ academicYear: 'desc' }, { termInYear: 'asc' }],
+      orderBy: [{ academicYear: 'desc' }, { termInYear: 'desc' }],
     });
     return rows.map(toSemesterDto);
   }
 
   async listCohorts(): Promise<CohortDto[]> {
     const rows = await this.prisma.cohort.findMany({
-      orderBy: [{ intakeYear: 'desc' }, { cohortCode: 'asc' }],
+      orderBy: [{ intakeYear: 'desc' }, { createdAt: 'desc' }],
     });
     return rows.map(toCohortDto);
   }

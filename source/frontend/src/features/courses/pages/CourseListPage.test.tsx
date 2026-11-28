@@ -181,9 +181,9 @@ describe('toCourseQuery', () => {
     ).toMatchObject({ page: 2, pageSize: 50, sort: 'credits', order: 'desc' });
   });
 
-  it('falls back to code ascending when the sort is cleared', () => {
+  it('clears sort and order when the sort is cleared so backend default applies', () => {
     expect(toCourseQuery(base, { current: 3, pageSize: 50 }, {})).toMatchObject(
-      { sort: 'courseCode', order: 'asc' },
+      { sort: undefined, order: undefined },
     );
   });
 });

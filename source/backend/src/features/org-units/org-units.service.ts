@@ -31,7 +31,7 @@ export class OrgUnitsService {
           ? { isExternal: query.isExternal }
           : undefined,
       select: ORG_UNIT_SELECT,
-      orderBy: { unitName: 'asc' },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
     });
     return rows.map(toOrgUnitDto);
   }

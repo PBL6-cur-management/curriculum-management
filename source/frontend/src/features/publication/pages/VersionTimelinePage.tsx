@@ -94,6 +94,7 @@ export default function VersionTimelinePage() {
   return (
     <Flex vertical gap="middle">
       <PageHeader
+        compact
         title="Dòng thời gian phiên bản"
         subtitle={`${data.programCode} — ${data.programName}. Chỉ các phiên bản đã ban hành; khóa tuyển sinh là lịch gán đã lưu, không phải số sinh viên.`}
         actions={

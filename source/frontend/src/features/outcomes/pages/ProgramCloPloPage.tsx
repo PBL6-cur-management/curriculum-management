@@ -111,6 +111,7 @@ export function ProgramCloPloPage() {
   return (
     <Flex vertical gap="middle">
       <PageHeader
+        compact
         title={
           <>
             Ma trận CLO–PLO — {version.programName} ({versionLabel(version)})

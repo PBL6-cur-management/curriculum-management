@@ -12,6 +12,8 @@ export interface CurriculumFilters {
   blockSymbol: string | null | undefined;
   kind: CurriculumKind;
   trackFilter?: CurriculumTrackFilter;
+  // When a specific track is selected: true (default) includes common-frame courses (Khung chung + chuyên ngành).
+  trackIncludeCommon?: boolean;
 }
 
 export const EMPTY_CURRICULUM_FILTERS: CurriculumFilters = {
@@ -20,6 +22,7 @@ export const EMPTY_CURRICULUM_FILTERS: CurriculumFilters = {
   blockSymbol: undefined,
   kind: 'all',
   trackFilter: 'ALL',
+  trackIncludeCommon: true,
 };
 
 const lower = (text: string) => text.toLocaleLowerCase('vi');
@@ -27,9 +30,13 @@ const lower = (text: string) => text.toLocaleLowerCase('vi');
 function matchesTrack(
   item: CurriculumItem,
   trackFilter: CurriculumTrackFilter | undefined,
+  trackIncludeCommon: boolean | undefined,
 ): boolean {
   if (!trackFilter || trackFilter === 'ALL') return true;
   if (trackFilter === 'COMMON') return item.track === null;
+  if (trackIncludeCommon !== false) {
+    return item.track === null || item.track.id === trackFilter;
+  }
   return item.track?.id === trackFilter;
 }
 
@@ -50,7 +57,7 @@ export function applyCurriculumFilters(
         item.blockSymbol === filters.blockSymbol) &&
       (filters.kind === 'all' ||
         item.isElective === (filters.kind === 'elective')) &&
-      matchesTrack(item, filters.trackFilter),
+      matchesTrack(item, filters.trackFilter, filters.trackIncludeCommon),
   );
 }
 

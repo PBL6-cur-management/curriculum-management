@@ -236,13 +236,13 @@ describe('CoursesService', () => {
       },
     );
 
-    it('sorts with the code as tie-breaker and returns the page', async () => {
+    it('sorts with id desc as tie-breaker and returns the page', async () => {
       const page = await service.list(
         query({ sort: 'credits', order: 'desc', page: 2, pageSize: 10 }),
         R1,
       );
       expect(course.findMany.mock.calls[0][0]).toMatchObject({
-        orderBy: [{ credits: 'desc' }, { courseCode: 'asc' }],
+        orderBy: [{ credits: 'desc' }, { id: 'desc' }],
         skip: 10,
         take: 10,
         include: COURSE_INCLUDE,

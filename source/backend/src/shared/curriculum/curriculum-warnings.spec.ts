@@ -215,6 +215,40 @@ describe('curriculumWarnings', () => {
     expect(warnings).toEqual([]);
   });
 
+  it('does not cross-check requisite semester against a different track row', () => {
+    const rows = [
+      // course-A is semester 6 in track-1 (valid) and semester 8 in track-2 (later)
+      item('A', 6, [], { id: 't1-a', trackId: 'track-1' }),
+      item('A', 8, [], { id: 't2-a', trackId: 'track-2' }),
+      item('B', 7, [needs('A', CourseRelationType.PREREQUISITE)], {
+        id: 't1-b',
+        trackId: 'track-1',
+      }),
+      item('C', 7, [needs('A', CourseRelationType.PREREQUISITE)], {
+        id: 't2-c',
+        trackId: 'track-2',
+      }),
+      // course-D only exists in track-2 at semester 8; track-1 item at semester 6 should not cross-check it
+      item('D', 8, [], { id: 't2-d', trackId: 'track-2' }),
+      item('E', 6, [needs('D', CourseRelationType.PRIOR)], {
+        id: 't1-e',
+        trackId: 'track-1',
+      }),
+      // common-core requisite is still checked for track items
+      item('CORE', 7, [], { id: 'common-core', trackId: null }),
+      item('F', 6, [needs('CORE', CourseRelationType.PREREQUISITE)], {
+        id: 't1-f',
+        trackId: 'track-1',
+      }),
+    ];
+
+    const warnings = only(
+      CURRICULUM_WARNING.REQUISITE_NOT_EARLIER,
+      run(8, rows),
+    );
+    expect(warnings.map((w) => w.itemId)).toEqual(['t1-f', 't2-c']);
+  });
+
   it('orders errors, then high, then info', () => {
     const rows = [
       item('A', 1, [needs('X', CourseRelationType.PREREQUISITE)]),

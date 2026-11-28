@@ -159,6 +159,7 @@ export default function ProgramHealthPage() {
   return (
     <Flex vertical gap="middle">
       <PageHeader
+        compact
         title="Rà soát chất lượng CTĐT"
         actions={
           <PdfExportButton programId={programId} versionId={versionId} />

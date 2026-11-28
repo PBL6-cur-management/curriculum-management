@@ -82,7 +82,6 @@ export const APP_MENU: readonly AppMenuItem[] = [
   {
     label: 'Đề xuất và phê duyệt',
     icon: <AuditOutlined />,
-    defaultOpen: true,
     children: [
       {
         path: ROUTES.approvalQueue,

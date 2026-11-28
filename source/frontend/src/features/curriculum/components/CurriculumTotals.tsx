@@ -1,5 +1,11 @@
-import { Card, Col, Descriptions, Row, Table, Tag } from 'antd';
+import {
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+  InfoCircleOutlined,
+} from '@ant-design/icons';
+import { Card, Col, Flex, Row, Table, Tag, Tooltip, Typography } from 'antd';
 import type { TableColumnsType } from 'antd';
+import { palette, radius } from '../../../shared/design-system/tokens';
 import type { BlockTotal, Curriculum, SemesterTotal } from '../api/curriculum';
 import { NO_BLOCK_LABEL } from '../constants/curriculumLabels';
 
@@ -22,29 +28,81 @@ export function ProgramCreditsLine({
 }: {
   credits: Curriculum['programCredits'];
 }) {
-  const { computed, declared } = credits;
+  const { computed, declared, mismatch } = credits;
   return (
-    <Descriptions
-      size="small"
-      bordered
-      column={{ xs: 1, md: 3 }}
-      title="Tổng tín chỉ chương trình (nhóm tự chọn tính theo mức tối thiểu) — tính từ khung / khai báo"
+    <Flex
+      wrap
+      align="center"
+      justify="space-between"
+      gap={12}
+      className="tabular"
+      style={{
+        background: palette.white,
+        border: `1px solid ${palette.slate200}`,
+        borderRadius: radius.md,
+        padding: '8px 14px',
+      }}
     >
-      <Descriptions.Item label="Bắt buộc">
-        {computed.compulsory} / {declared.compulsory}
-      </Descriptions.Item>
-      <Descriptions.Item label="Tự chọn">
-        {computed.elective} / {declared.elective}
-      </Descriptions.Item>
-      <Descriptions.Item label="Tổng">
-        {computed.total} / {declared.total}
-        {credits.mismatch && (
-          <Tag color="warning" style={{ marginLeft: 8 }}>
-            Lệch so với khai báo
+      <Flex wrap align="center" gap={16}>
+        <Typography.Text style={{ fontSize: 13 }}>
+          <Typography.Text type="secondary">Tổng TC: </Typography.Text>
+          <Typography.Text strong>
+            {computed.total} / {declared.total}
+          </Typography.Text>
+        </Typography.Text>
+        <Typography.Text
+          type="secondary"
+          aria-hidden="true"
+          style={{ fontSize: 12 }}
+        >
+          ·
+        </Typography.Text>
+        <Typography.Text style={{ fontSize: 13 }}>
+          <Typography.Text type="secondary">Bắt buộc: </Typography.Text>
+          <Typography.Text strong>
+            {computed.compulsory} / {declared.compulsory}
+          </Typography.Text>
+        </Typography.Text>
+        <Typography.Text
+          type="secondary"
+          aria-hidden="true"
+          style={{ fontSize: 12 }}
+        >
+          ·
+        </Typography.Text>
+        <Typography.Text style={{ fontSize: 13 }}>
+          <Typography.Text type="secondary">Tự chọn: </Typography.Text>
+          <Typography.Text strong>
+            {computed.elective} / {declared.elective}
+          </Typography.Text>
+        </Typography.Text>
+      </Flex>
+      <Flex align="center" gap={8}>
+        {mismatch ? (
+          <Tag
+            color="warning"
+            icon={<ExclamationCircleOutlined />}
+            style={{ marginInlineEnd: 0 }}
+          >
+            Lệch khai báo
+          </Tag>
+        ) : (
+          <Tag
+            color="success"
+            icon={<CheckCircleOutlined />}
+            style={{ marginInlineEnd: 0 }}
+          >
+            Khớp khai báo
           </Tag>
         )}
-      </Descriptions.Item>
-    </Descriptions>
+        <Tooltip title="Tổng tín chỉ tính từ khung / khai báo (nhóm tự chọn tính theo mức tối thiểu)">
+          <InfoCircleOutlined
+            aria-label="Giải thích cách tính tín chỉ"
+            style={{ color: palette.slate400, fontSize: 13, cursor: 'help' }}
+          />
+        </Tooltip>
+      </Flex>
+    </Flex>
   );
 }
 

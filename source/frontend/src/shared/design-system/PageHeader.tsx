@@ -18,27 +18,50 @@ interface PageHeaderProps {
   subtitle?: ReactNode;
   /** Các nút hành động, hiển thị ở bên phải */
   actions?: ReactNode;
+  /** Chế độ gọn dùng trong tab workspace đã có tiêu đề chính ở trên */
+  compact?: boolean;
 }
 
-export function PageHeader({ title, subtitle, actions }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  subtitle,
+  actions,
+  compact = false,
+}: PageHeaderProps) {
   return (
-    <Flex
-      justify="space-between"
-      align="center"
-      wrap
-      gap="small"
-      style={{ marginBottom: 16 }}
-    >
-      <Flex vertical gap={4}>
-        <Typography.Title level={2} style={{ margin: 0 }}>
-          {title}
-        </Typography.Title>
+    <Flex justify="space-between" align="center" wrap gap="small">
+      <Flex vertical gap={2}>
+        {compact ? (
+          <Typography.Title
+            level={4}
+            style={{
+              margin: 0,
+              fontSize: 16,
+              fontWeight: 600,
+              lineHeight: 1.4,
+            }}
+          >
+            {title}
+          </Typography.Title>
+        ) : (
+          <Typography.Title
+            level={2}
+            style={{
+              margin: 0,
+              fontSize: 22,
+              lineHeight: 1.3,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            {title}
+          </Typography.Title>
+        )}
         {subtitle && (
           <Typography.Text type="secondary">{subtitle}</Typography.Text>
         )}
       </Flex>
       {actions && (
-        <Flex wrap gap={8}>
+        <Flex wrap gap={8} align="center">
           {actions}
         </Flex>
       )}

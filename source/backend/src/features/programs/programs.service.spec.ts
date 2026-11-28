@@ -294,11 +294,11 @@ describe('ProgramsService', () => {
       });
     });
 
-    it('loads only the directors active today and pages by code', async () => {
+    it('loads only the directors active today and pages newest first', async () => {
       const page = await service.list(query({ page: 2, pageSize: 10 }), R1);
       const call = program.findMany.mock.calls[0][0];
       expect(call).toMatchObject({
-        orderBy: { programCode: 'asc' },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
         skip: 10,
         take: 10,
       });

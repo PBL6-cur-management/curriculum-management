@@ -143,14 +143,16 @@ export class CurriculumReadService {
     const creditRows =
       tracks.length > 0
         ? rows.filter(
-            (row) => row.trackId === null || row.trackId === tracks[0]!.id,
+            (row) =>
+              (row.trackId ?? null) === null || row.trackId === tracks[0]!.id,
           )
         : rows;
     const creditGroups =
       tracks.length > 0
         ? groups.filter(
             (group) =>
-              group.trackId === null || group.trackId === tracks[0]!.id,
+              (group.trackId ?? null) === null ||
+              group.trackId === tracks[0]!.id,
           )
         : groups;
     const computed = programCredits(

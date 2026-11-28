@@ -228,6 +228,21 @@ export class StudentPortalService {
           versionNumber: true,
           decisionNumber: true,
           totalCredits: true,
+          compulsoryCredits: true,
+          electiveCredits: true,
+          tracks: {
+            orderBy: [{ sortOrder: 'asc' }, { trackCode: 'asc' }],
+            select: {
+              id: true,
+              trackCode: true,
+              trackName: true,
+              englishName: true,
+              description: true,
+              compulsoryCredits: true,
+              electiveCredits: true,
+              _count: { select: { curriculumItems: true } },
+            },
+          },
           curriculumItems: {
             orderBy: [{ plannedSemester: 'asc' }, { sortOrder: 'asc' }],
             select: {
@@ -239,6 +254,9 @@ export class StudentPortalService {
               courseNameSnapshot: true,
               creditsSnapshot: true,
               electiveGroup: { select: { groupName: true } },
+              track: {
+                select: { id: true, trackCode: true, trackName: true },
+              },
               course: {
                 select: {
                   id: true,
@@ -251,6 +269,19 @@ export class StudentPortalService {
           },
         },
       });
+      const enrollment = tx.programEnrollment?.findFirst
+        ? await tx.programEnrollment.findFirst({
+            where: {
+              studentId: lookup.studentId,
+              programId: lookup.programId,
+              ...(answer.context.enrollmentId
+                ? { id: answer.context.enrollmentId }
+                : {}),
+            },
+            orderBy: { createdAt: 'desc' },
+            select: { trackId: true },
+          })
+        : null;
       const terms = new Map<number, PortalCourseDto[]>();
       const termCredits = new Map<number, Prisma.Decimal>();
       for (const item of version.curriculumItems) {
@@ -276,6 +307,9 @@ export class StudentPortalService {
             isElective: item.isElective,
             groupName: item.electiveGroup?.groupName ?? null,
             blockSymbol: item.blockSymbol,
+            trackId: item.track?.id ?? null,
+            trackCode: item.track?.trackCode ?? null,
+            trackName: item.track?.trackName ?? null,
             state,
             attemptCount: facts?.attempts.length ?? 0,
             score10: shown?.score10 ?? null,
@@ -293,16 +327,28 @@ export class StudentPortalService {
           );
         }
       }
+      const zero = new Prisma.Decimal(0);
       return {
         programName: version.programName,
         versionNumber: version.versionNumber,
         decisionNumber: version.decisionNumber,
         totalCredits: toWireDecimal(version.totalCredits),
+        compulsoryCredits: toWireDecimal(version.compulsoryCredits ?? zero),
+        electiveCredits: toWireDecimal(version.electiveCredits ?? zero),
+        enrolledTrackId: enrollment?.trackId ?? null,
+        tracks: (version.tracks ?? []).map((track) => ({
+          id: track.id,
+          trackCode: track.trackCode,
+          trackName: track.trackName,
+          englishName: track.englishName,
+          description: track.description,
+          itemCount: track._count.curriculumItems,
+          compulsoryCredits: toWireDecimal(track.compulsoryCredits ?? zero),
+          electiveCredits: toWireDecimal(track.electiveCredits ?? zero),
+        })),
         terms: [...terms.entries()].map(([plannedSemester, courses]) => ({
           plannedSemester,
-          credits: toWireDecimal(
-            termCredits.get(plannedSemester) ?? new Prisma.Decimal(0),
-          ),
+          credits: toWireDecimal(termCredits.get(plannedSemester) ?? zero),
           courses,
         })),
       };

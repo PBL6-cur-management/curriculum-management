@@ -32,7 +32,7 @@ export function ListPageLayout({
   table,
 }: ListPageLayoutProps) {
   return (
-    <Flex vertical gap="middle">
+    <Flex vertical gap={14}>
       {header}
       <FilterBar>{filters}</FilterBar>
       {table}

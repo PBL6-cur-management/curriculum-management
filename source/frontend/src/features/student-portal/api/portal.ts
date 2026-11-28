@@ -4,8 +4,39 @@ import type { components } from '../../../shared/api/schema';
 type Schemas = components['schemas'];
 export type PortalMe = Schemas['PortalMeDto'];
 export type PortalProgram = Schemas['PortalProgramDto'];
-export type PortalCurriculum = Schemas['PortalCurriculumDto'];
-export type PortalCourse = Schemas['PortalCourseDto'];
+
+export interface PortalTrack {
+  id: string;
+  trackCode: string;
+  trackName: string;
+  englishName: string | null;
+  description: string | null;
+  itemCount: number;
+  compulsoryCredits: string;
+  electiveCredits: string;
+}
+
+export type PortalCourse = Schemas['PortalCourseDto'] & {
+  trackId?: string | null;
+  trackCode?: string | null;
+  trackName?: string | null;
+};
+
+export type PortalTerm = Omit<Schemas['PortalTermDto'], 'courses'> & {
+  courses: PortalCourse[];
+};
+
+export type PortalCurriculum = Omit<
+  Schemas['PortalCurriculumDto'],
+  'terms'
+> & {
+  compulsoryCredits?: string;
+  electiveCredits?: string;
+  enrolledTrackId?: string | null;
+  tracks?: PortalTrack[];
+  terms: PortalTerm[];
+};
+
 export type PortalCourseState = Schemas['PortalCourseState'];
 export type PortalPlo = Schemas['PortalPloDto'];
 export type PortalSyllabus = Schemas['PortalSyllabusDto'];

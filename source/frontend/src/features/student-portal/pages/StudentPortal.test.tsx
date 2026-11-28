@@ -220,6 +220,149 @@ describe('student portal', () => {
     expect(await screen.findByText('Phân tích bài toán')).toBeInTheDocument();
   });
 
+  it('explores full base program, filters by track/orientation, and switches to structure view', async () => {
+    stub({
+      '/api/portal/me': ME,
+      '/api/semesters': [],
+      '/api/portal/plos': [],
+      '/api/portal/curriculum': {
+        programName: 'Công nghệ thông tin',
+        versionNumber: '2023.1',
+        decisionNumber: 'QĐ-01',
+        totalCredits: '150',
+        compulsoryCredits: '120',
+        electiveCredits: '30',
+        enrolledTrackId: null,
+        tracks: [
+          {
+            id: 'tr-cnpm',
+            trackCode: 'CNPM',
+            trackName: 'Công nghệ phần mềm',
+            englishName: 'Software Engineering',
+            description: 'Phát triển hệ thống phần mềm.',
+            itemCount: 1,
+            compulsoryCredits: '18',
+            electiveCredits: '6',
+          },
+          {
+            id: 'tr-httt',
+            trackCode: 'HTTT',
+            trackName: 'Hệ thống thông tin',
+            englishName: null,
+            description: null,
+            itemCount: 1,
+            compulsoryCredits: '15',
+            electiveCredits: '9',
+          },
+        ],
+        terms: [
+          {
+            plannedSemester: 1,
+            credits: '3',
+            courses: [
+              course({
+                itemId: 'i-common',
+                courseId: 'c-common',
+                courseCode: '1020010',
+                courseName: 'Nhập môn lập trình',
+                credits: '3',
+                state: 'PASSED',
+                attemptCount: 1,
+                trackId: null,
+                trackCode: null,
+                trackName: null,
+              }),
+            ],
+          },
+          {
+            plannedSemester: 6,
+            credits: '6',
+            courses: [
+              course({
+                itemId: 'i-cnpm',
+                courseId: 'c-cnpm',
+                courseCode: '1020210',
+                courseName: 'Kiến trúc phần mềm',
+                credits: '3',
+                state: 'IN_PROGRESS',
+                attemptCount: 1,
+                trackId: 'tr-cnpm',
+                trackCode: 'CNPM',
+                trackName: 'Công nghệ phần mềm',
+              }),
+              course({
+                itemId: 'i-httt',
+                courseId: 'c-httt',
+                courseCode: '1020310',
+                courseName: 'Kho dữ liệu',
+                credits: '3',
+                state: 'NOT_TAKEN',
+                attemptCount: 0,
+                trackId: 'tr-httt',
+                trackCode: 'HTTT',
+                trackName: 'Hệ thống thông tin',
+              }),
+            ],
+          },
+        ],
+      },
+    });
+
+    renderAt(<PortalCurriculumPage />, '/student/curriculum');
+
+    // Full base program view by default when enrolledTrackId is null
+    expect(
+      await screen.findByText('2 định hướng / chuyên ngành'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('150 TC')).toBeInTheDocument();
+    expect(screen.getByText('120 TC')).toBeInTheDocument();
+    expect(screen.getByText('30 TC')).toBeInTheDocument();
+    expect(screen.getByText('Đã đạt 3 / 150 TC')).toBeInTheDocument();
+    expect(screen.getByText('1020010 — Nhập môn lập trình')).toBeInTheDocument();
+    expect(screen.getByText('1020210 — Kiến trúc phần mềm')).toBeInTheDocument();
+    expect(screen.getByText('1020310 — Kho dữ liệu')).toBeInTheDocument();
+
+    // Select CNPM track -> default mode shows common + CNPM, hides HTTT
+    fireEvent.click(screen.getByRole('button', { name: /CNPM/ }));
+    expect(
+      await screen.findByText('CNPM — Công nghệ phần mềm'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('1020010 — Nhập môn lập trình')).toBeInTheDocument();
+    expect(screen.getByText('1020210 — Kiến trúc phần mềm')).toBeInTheDocument();
+    expect(
+      screen.queryByText('1020310 — Kho dữ liệu'),
+    ).not.toBeInTheDocument();
+
+    // Switch to TRACK_ONLY mode -> only CNPM course remains
+    fireEvent.click(screen.getByText('Chỉ học phần của định hướng'));
+    await waitFor(() =>
+      expect(
+        screen.queryByText('1020010 — Nhập môn lập trình'),
+      ).not.toBeInTheDocument(),
+    );
+    expect(screen.getByText('1020210 — Kiến trúc phần mềm')).toBeInTheDocument();
+
+    // Back to full base program & switch to Structure view
+    fireEvent.click(screen.getByRole('button', { name: /Toàn bộ CTĐT gốc/ }));
+    fireEvent.click(screen.getByText('Theo cấu trúc CTĐT'));
+    expect(
+      await screen.findByText('Khung kiến thức chung'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('CNPM — Công nghệ phần mềm')).toBeInTheDocument();
+    expect(screen.getByText('HTTT — Hệ thống thông tin')).toBeInTheDocument();
+
+    // Inline search filters courses
+    fireEvent.change(screen.getByPlaceholderText('Tìm mã hoặc tên học phần'), {
+      target: { value: 'Kho dữ liệu' },
+    });
+    await waitFor(() =>
+      expect(
+        screen.queryByText('1020210 — Kiến trúc phần mềm'),
+      ).not.toBeInTheDocument(),
+    );
+    expect(screen.getByText('1020310 — Kho dữ liệu')).toBeInTheDocument();
+  });
+
   it('splits advice into candidates and blocked courses with reasons and offers no register action (US-095)', async () => {
     const ref = (code: string) => ({
       id: code,

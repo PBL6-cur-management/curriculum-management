@@ -21,6 +21,7 @@ import { ApiError } from '../../../shared/api/client';
 import { useCan } from '../../../shared/auth/useCan';
 import { RequestStatusTag } from '../../../shared/change-requests/RequestStatusTag';
 import { BackLink } from '../../../shared/design-system';
+import { palette, radius } from '../../../shared/design-system/tokens';
 import { useSeesMatrices } from '../../../shared/outcomes/useSeesMatrices';
 import type { ProgramDetail } from '../api/programs';
 import {
@@ -265,8 +266,8 @@ export function ProgramWorkspaceLayout() {
     current && current.group.pages.length > 1 ? current.group.pages : null;
 
   return (
-    <Flex vertical gap={16}>
-      <Flex vertical gap={4}>
+    <Flex vertical gap={12}>
+      <Flex vertical gap={2}>
         {isProposalMode && sourceRequest ? (
           <BackLink
             to={generatePath(ROUTES.changeRequestEdit, {
@@ -279,9 +280,9 @@ export function ProgramWorkspaceLayout() {
         ) : (
           <BackToList />
         )}
-        <Flex align="center" justify="space-between" wrap gap={12}>
+        <Flex align="center" justify="space-between" wrap gap={8}>
           <Flex align="center" wrap gap={8} style={{ minWidth: 0 }}>
-            <Typography.Title level={3} style={{ margin: 0 }}>
+            <Typography.Title level={4} style={{ margin: 0, fontSize: 18 }}>
               {program.programCode} — {program.programName}
             </Typography.Title>
             {isProposalMode && sourceRequest ? (
@@ -303,6 +304,7 @@ export function ProgramWorkspaceLayout() {
           {isProposalMode && sourceRequest ? (
             <Flex align="center" gap={8}>
               <Button
+                size="small"
                 type="primary"
                 onClick={() =>
                   void navigate(
@@ -317,8 +319,11 @@ export function ProgramWorkspaceLayout() {
             </Flex>
           ) : (
             <Flex align="center" gap={8}>
-              <Typography.Text type="secondary">Phiên bản</Typography.Text>
+              <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+                Phiên bản
+              </Typography.Text>
               <Select
+                size="small"
                 aria-label="Phiên bản đang xem"
                 value={activeVersionId}
                 onChange={switchVersion}
@@ -339,39 +344,67 @@ export function ProgramWorkspaceLayout() {
         current.group.key === 'overview' ? null : (
           <nav aria-label="Các mục của đề xuất">
             <Tabs
+              size="small"
               activeKey={current.page.key}
               onChange={openPage}
               items={current.group.pages.map((page) => ({
                 key: page.key,
                 label: page.label,
               }))}
-              tabBarStyle={{ marginBottom: 12 }}
+              tabBarStyle={{ marginBottom: 4 }}
             />
           </nav>
         )
       ) : (
         <nav aria-label="Các mục của chương trình">
           <Tabs
+            size="small"
             activeKey={current?.group.key ?? ''}
             onChange={openGroup}
             items={groups.map((group) => ({
               key: group.key,
               label: group.label,
             }))}
-            tabBarStyle={{ marginBottom: subPages ? 12 : 0 }}
+            tabBarStyle={{ marginBottom: subPages ? 8 : 0 }}
           />
           {subPages && (
-            <Tabs
-              size="small"
-              type="card"
-              activeKey={current!.page.key}
-              onChange={openPage}
-              items={subPages.map((page) => ({
-                key: page.key,
-                label: page.label,
-              }))}
-              tabBarStyle={{ marginBottom: 0 }}
-            />
+            <Flex
+              wrap
+              gap={6}
+              align="center"
+              role="tablist"
+              aria-label="Mục con trong nhóm"
+            >
+              {subPages.map((page) => {
+                const active = current?.page.key === page.key;
+                return (
+                  <button
+                    key={page.key}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => openPage(page.key)}
+                    style={{
+                      appearance: 'none',
+                      border: `1px solid ${active ? palette.brand : 'transparent'}`,
+                      background: active ? palette.brandSoft : 'transparent',
+                      color: active ? palette.brandStrong : palette.slate600,
+                      fontWeight: active ? 600 : 400,
+                      fontSize: 13,
+                      lineHeight: '20px',
+                      padding: '4px 12px',
+                      borderRadius: radius.md,
+                      cursor: 'pointer',
+                      fontFamily: 'inherit',
+                      transition:
+                        'background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1), border-color 150ms cubic-bezier(0.4, 0, 0.2, 1)',
+                    }}
+                  >
+                    {page.label}
+                  </button>
+                );
+              })}
+            </Flex>
           )}
         </nav>
       )}

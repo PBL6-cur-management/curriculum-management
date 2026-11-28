@@ -96,6 +96,7 @@ export default function CourseGraphPage() {
   return (
     <Flex vertical gap="middle">
       <PageHeader
+        compact
         title="Cây chương trình đào tạo"
         actions={
           <PdfExportButton programId={programId} versionId={versionId} />

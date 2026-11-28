@@ -38,6 +38,7 @@ export function ConsistencyPage() {
   return (
     <Flex vertical gap="middle">
       <PageHeader
+        compact
         title="Kiểm tra nhất quán"
         subtitle={`Kiểm tra lúc ${dayjs(report.checkedAt).format('DD/MM/YYYY HH:mm:ss')}`}
         actions={

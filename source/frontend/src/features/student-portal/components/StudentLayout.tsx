@@ -92,7 +92,7 @@ export function StudentLayout() {
       >
         <Flex
           gap={4}
-          style={{ paddingInline: 8, maxWidth: 960, margin: '0 auto' }}
+          style={{ paddingInline: 8, maxWidth: 1120, margin: '0 auto' }}
         >
           {PORTAL_NAV.map((item) => (
             <NavLink
@@ -116,7 +116,7 @@ export function StudentLayout() {
         style={{
           padding: '16px 16px 48px',
           width: '100%',
-          maxWidth: 960,
+          maxWidth: 1120,
           margin: '0 auto',
           minWidth: 0,
         }}

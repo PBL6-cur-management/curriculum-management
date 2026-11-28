@@ -40,6 +40,26 @@ describe('parseTrackAssignments', () => {
             true,
           ),
         ).toEqual([
+          { trackCode: 'CNPM', isElective: true },
+          { trackCode: 'HTTT', isElective: true },
+        ]);
+        expect(
+          parseTrackAssignments(
+            programCode,
+            'Công nghệ PM, tự chọn HTTT',
+            false,
+          ),
+        ).toEqual([
+          { trackCode: 'CNPM', isElective: false },
+          { trackCode: 'HTTT', isElective: true },
+        ]);
+        expect(
+          parseTrackAssignments(
+            programCode,
+            'Công nghệ PM bắt buộc, tự chọn HTTT',
+            true,
+          ),
+        ).toEqual([
           { trackCode: 'CNPM', isElective: false },
           { trackCode: 'HTTT', isElective: true },
         ]);
@@ -63,7 +83,7 @@ describe('parseTrackAssignments', () => {
         expect(
           parseTrackAssignments(programCode, 'Mạng, Tự chọn ATTT', true),
         ).toEqual([
-          { trackCode: 'MANG', isElective: false },
+          { trackCode: 'MANG', isElective: true },
           { trackCode: 'ATTT', isElective: true },
         ]);
         expect(parseTrackAssignments(programCode, 'Mạng', true)).toEqual([

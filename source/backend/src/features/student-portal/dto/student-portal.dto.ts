@@ -58,6 +58,17 @@ export class PortalMeDto {
   @ApiProperty({ type: [PortalProgramDto] }) programs!: PortalProgramDto[];
 }
 
+export class PortalTrackDto {
+  @ApiProperty() id!: string;
+  @ApiProperty() trackCode!: string;
+  @ApiProperty() trackName!: string;
+  @ApiProperty({ type: String, nullable: true }) englishName!: string | null;
+  @ApiProperty({ type: String, nullable: true }) description!: string | null;
+  @ApiProperty() itemCount!: number;
+  @ApiProperty() compulsoryCredits!: string;
+  @ApiProperty() electiveCredits!: string;
+}
+
 export class PortalCourseDto {
   @ApiProperty() itemId!: string;
   @ApiProperty() courseId!: string;
@@ -67,6 +78,9 @@ export class PortalCourseDto {
   @ApiProperty() isElective!: boolean;
   @ApiProperty({ type: String, nullable: true }) groupName!: string | null;
   @ApiProperty({ type: String, nullable: true }) blockSymbol!: string | null;
+  @ApiProperty({ type: String, nullable: true }) trackId!: string | null;
+  @ApiProperty({ type: String, nullable: true }) trackCode!: string | null;
+  @ApiProperty({ type: String, nullable: true }) trackName!: string | null;
   @ApiProperty({ enum: PORTAL_COURSE_STATES, enumName: 'PortalCourseState' })
   state!: PortalCourseState;
   @ApiProperty() attemptCount!: number;
@@ -87,6 +101,11 @@ export class PortalCurriculumDto {
   @ApiProperty({ type: String, nullable: true }) versionNumber!: string | null;
   @ApiProperty({ type: String, nullable: true }) decisionNumber!: string | null;
   @ApiProperty() totalCredits!: string;
+  @ApiProperty() compulsoryCredits!: string;
+  @ApiProperty() electiveCredits!: string;
+  @ApiProperty({ type: String, nullable: true })
+  enrolledTrackId!: string | null;
+  @ApiProperty({ type: [PortalTrackDto] }) tracks!: PortalTrackDto[];
   @ApiProperty({ type: [PortalTermDto] }) terms!: PortalTermDto[];
 }
 

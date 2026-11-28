@@ -50,7 +50,7 @@ export class SubjectGroupsService {
         ...scopeWhere(scope),
       },
       include: summaryInclude(todayDate()),
-      orderBy: { groupName: 'asc' },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
     });
     return rows.map(toSubjectGroupSummaryDto);
   }

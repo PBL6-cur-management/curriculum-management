@@ -123,7 +123,11 @@ export class StudentsReadService {
         tx.student.findMany({
           where,
           include: STUDENT_SUMMARY_INCLUDE,
-          orderBy: [{ fullName: 'asc' }, { id: 'asc' }],
+          orderBy: [
+            { cohort: { intakeYear: 'desc' } },
+            { createdAt: 'desc' },
+            { id: 'desc' },
+          ],
           ...toSkipTake(query),
         }),
         tx.student.count({ where }),
@@ -161,9 +165,9 @@ export class StudentsReadService {
         },
         include: ENROLLMENT_INCLUDE,
         orderBy: [
-          { fromSemester: { startDate: 'asc' } },
-          { createdAt: 'asc' },
-          { id: 'asc' },
+          { fromSemester: { startDate: 'desc' } },
+          { createdAt: 'desc' },
+          { id: 'desc' },
         ],
       });
       return toStudentDetailDto(student, {

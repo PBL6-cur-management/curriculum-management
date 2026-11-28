@@ -1,3 +1,4 @@
+import { UserSwitchOutlined } from '@ant-design/icons';
 import { Button, Alert, Flex, Result, Segmented, Skeleton, Space } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -15,7 +16,6 @@ import {
 } from '../../../routes';
 import { PERMISSIONS } from '../../../shared/auth/permissions';
 import { useCan } from '../../../shared/auth/useCan';
-import { PageHeader } from '../../../shared/design-system';
 import { errorMessage } from '../../../shared/forms/applyFieldErrors';
 import { ApiError } from '../../../shared/api/client';
 import { RequestDraftBanner } from '../../../shared/change-requests/RequestDraftBanner';
@@ -81,6 +81,7 @@ export function CurriculumPage() {
     null,
   );
   const [requisitesOf, setRequisitesOf] = useState<CurriculumItem | null>(null);
+  const [eligibilityBarOpen, setEligibilityBarOpen] = useState(false);
   const navigate = useNavigate();
   const { data: me } = useMe();
   const canViewEligibility = useCan(
@@ -201,7 +202,8 @@ export function CurriculumPage() {
       return next;
     });
   };
-  const contextBar = staff ? (
+  const showEligibilityBar = staff && (studentMode || eligibilityBarOpen);
+  const contextBar = showEligibilityBar ? (
     <EligibilityContextBar
       key={programId}
       programId={programId}
@@ -339,44 +341,63 @@ export function CurriculumPage() {
   }
   const { version } = curriculum;
   const canSelect = !studentMode && curriculum.canEditStructure;
+  const includeCommon = filters.trackIncludeCommon ?? true;
   return (
-    <Flex vertical gap="middle">
+    <Flex vertical gap={12}>
       <RequestDraftBanner request={version.sourceRequest} />
-      <PageHeader
-        title="Khung chương trình"
-        actions={
-          <Space wrap>
-            {canImportExport && (
-              <>
-                <Button
-                  loading={exportExcel.isPending}
-                  onClick={() => exportExcel.mutate()}
+      <Flex wrap align="center" justify="space-between" gap={8}>
+        <Flex wrap align="center" gap={8}>
+          <Segmented<CurriculumView>
+            options={VIEW_OPTIONS}
+            value={view}
+            onChange={setView}
+          />
+          {staff && (
+            <Button
+              size="small"
+              type={showEligibilityBar ? 'primary' : 'default'}
+              ghost={showEligibilityBar}
+              icon={<UserSwitchOutlined />}
+              aria-expanded={showEligibilityBar}
+              onClick={() => {
+                if (studentMode) {
+                  changeContext(undefined);
+                  setEligibilityBarOpen(false);
+                } else {
+                  setEligibilityBarOpen((open) => !open);
+                }
+              }}
+            >
+              Kiểm tra ĐK SV
+            </Button>
+          )}
+        </Flex>
+        <Space wrap size={8}>
+          {canImportExport && (
+            <>
+              <Button
+                loading={exportExcel.isPending}
+                onClick={() => exportExcel.mutate()}
+              >
+                Xuất Excel
+              </Button>
+              {version.status === 'DRAFT' && !version.sourceRequest && (
+                <Link
+                  to={`${ROUTES.imports}?${new URLSearchParams({ [IMPORT_TYPE_PARAM]: 'CURRICULUM', [IMPORT_VERSION_PARAM]: versionId })}`}
                 >
-                  Xuất Excel
-                </Button>
-                {version.status === 'DRAFT' && !version.sourceRequest && (
-                  <Link
-                    to={`${ROUTES.imports}?${new URLSearchParams({ [IMPORT_TYPE_PARAM]: 'CURRICULUM', [IMPORT_VERSION_PARAM]: versionId })}`}
-                  >
-                    <Button>Nhập từ Excel</Button>
-                  </Link>
-                )}
-              </>
-            )}
-            <Segmented<CurriculumView>
-              options={VIEW_OPTIONS}
-              value={view}
-              onChange={setView}
+                  <Button>Nhập từ Excel</Button>
+                </Link>
+              )}
+            </>
+          )}
+          {!studentMode && (
+            <CurriculumAddButton
+              curriculum={curriculum}
+              onAdd={() => setEditing('new')}
             />
-            {!studentMode && (
-              <CurriculumAddButton
-                curriculum={curriculum}
-                onAdd={() => setEditing('new')}
-              />
-            )}
-          </Space>
-        }
-      />
+          )}
+        </Space>
+      </Flex>
       {exportExcel.error && (
         <Alert
           type="error"
@@ -419,6 +440,10 @@ export function CurriculumPage() {
         <ProgramTrackBar
           curriculum={curriculum}
           value={filters.trackFilter ?? 'ALL'}
+          includeCommon={includeCommon}
+          onToggleIncludeCommon={(next) =>
+            setFilters({ ...filters, trackIncludeCommon: next })
+          }
           canEdit={curriculum.canEditStructure}
           programId={programId}
           canProposeChange={version.status === 'ACTIVE'}
@@ -434,6 +459,10 @@ export function CurriculumPage() {
         <ProgramTrackBar
           curriculum={curriculum}
           value={filters.trackFilter ?? 'ALL'}
+          includeCommon={includeCommon}
+          onToggleIncludeCommon={(next) =>
+            setFilters({ ...filters, trackIncludeCommon: next })
+          }
           canEdit={false}
           onChange={(trackFilter) =>
             setFilters({ ...filters, trackFilter })

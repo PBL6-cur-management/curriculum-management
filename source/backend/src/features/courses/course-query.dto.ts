@@ -17,6 +17,7 @@ export const COURSE_SORT_FIELDS = [
   'courseCode',
   'courseName',
   'credits',
+  'createdAt',
   'updatedAt',
 ] as const;
 export type CourseSortField = (typeof COURSE_SORT_FIELDS)[number];
@@ -64,13 +65,13 @@ export class CourseQueryDto extends PageQueryDto {
   @IsBoolean()
   foreign?: boolean;
 
-  @ApiPropertyOptional({ enum: COURSE_SORT_FIELDS, default: 'courseCode' })
+  @ApiPropertyOptional({ enum: COURSE_SORT_FIELDS, default: 'createdAt' })
   @IsOptional()
   @IsIn(COURSE_SORT_FIELDS)
-  sort: CourseSortField = 'courseCode';
+  sort: CourseSortField = 'createdAt';
 
-  @ApiPropertyOptional({ enum: SORT_ORDERS, default: 'asc' })
+  @ApiPropertyOptional({ enum: SORT_ORDERS, default: 'desc' })
   @IsOptional()
   @IsIn(SORT_ORDERS)
-  order: SortOrder = 'asc';
+  order: SortOrder = 'desc';
 }

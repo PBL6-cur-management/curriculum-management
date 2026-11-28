@@ -250,12 +250,8 @@ describe('CurriculumPage', () => {
   });
   it('lists the rows in TT order with every Excel column and the exact totals', async () => {
     renderPage();
-    expect(
-      await screen.findByRole('heading', {
-        name: 'Khung chương trình',
-      }),
-    ).toBeInTheDocument();
-    const table = screen.getAllByRole('table')[1];
+    await screen.findByText('MAT101');
+    const table = screen.getAllByRole('table')[0];
     const rows = within(table).getAllByRole('row').slice(1);
     expect(rows).toHaveLength(3);
     expect(rows[0]).toHaveTextContent('MAT101');
@@ -278,7 +274,7 @@ describe('CurriculumPage', () => {
     expect(await screen.findByText('Tín chỉ theo học kỳ')).toBeInTheDocument();
     // The program line counts the elective group by its minimum, not every row (US-029 AC1).
     expect(screen.getByText(/11\.5 \/ 150/)).toBeInTheDocument();
-    expect(screen.getByText('Lệch so với khai báo')).toBeInTheDocument();
+    expect(screen.getByText('Lệch khai báo')).toBeInTheDocument();
     expect(screen.getByText('Tín chỉ theo khối kiến thức')).toBeInTheDocument();
   });
 
@@ -529,13 +525,19 @@ describe('CurriculumPage', () => {
         ],
       }),
     );
-    expect(await screen.findByText('CNPM')).toBeInTheDocument();
+    expect(await screen.findByText('CNPM', { selector: 'strong' })).toBeInTheDocument();
     expect(courseCodes()).toEqual(['MAT101', 'IT301']);
 
-    fireEvent.click(screen.getByText('Khung chung'));
+    fireEvent.click(screen.getByRole('button', { name: /Khung chung/ }));
     expect(courseCodes()).toEqual(['MAT101']);
 
-    fireEvent.click(screen.getByText('CNPM — Công nghệ phần mềm'));
+    fireEvent.click(screen.getByRole('button', { name: /CNPM/ }));
+    // Default includes common-frame courses alongside the selected track.
+    expect(courseCodes()).toEqual(['MAT101', 'IT301']);
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Chỉ môn chuyên ngành' }),
+    );
     expect(courseCodes()).toEqual(['IT301']);
 
     const fetchMock = vi.mocked(fetch);
@@ -590,9 +592,14 @@ describe('CurriculumPage', () => {
 
   it('pre-filters the table by the ?track= URL param', async () => {
     const cnpm = trackFixture();
+    const httt = trackFixture({
+      id: 't-httt',
+      trackCode: 'HTTT',
+      trackName: 'Hệ thống thông tin',
+    });
     renderPage(
       fixture({
-        tracks: [cnpm],
+        tracks: [cnpm, httt],
         items: [
           item('MAT101', 'Giải tích 1', { track: null }),
           item('IT301', 'Mạng máy tính', {
@@ -602,13 +609,41 @@ describe('CurriculumPage', () => {
               trackName: 'Công nghệ phần mềm',
             },
           }),
+          item('PHY101', 'Vật lý 1', {
+            track: {
+              id: 't-httt',
+              trackCode: 'HTTT',
+              trackName: 'Hệ thống thông tin',
+            },
+          }),
         ],
       }),
       200,
       '?track=t-cnpm',
     );
     await screen.findByText('Mạng máy tính');
+    // Shows common-frame + CNPM by default, excluding HTTT.
+    expect(courseCodes()).toEqual(['MAT101', 'IT301']);
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Chỉ môn chuyên ngành' }),
+    );
     expect(courseCodes()).toEqual(['IT301']);
+  });
+
+  it('collapses the eligibility context bar by default and opens it via the toolbar toggle', async () => {
+    renderPage(
+      fixture(),
+      200,
+      '',
+      ['student.viewRegistrationEligibility'],
+      ['R1'],
+    );
+    const toggle = await screen.findByRole('button', {
+      name: /Kiểm tra ĐK SV/,
+    });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
   });
 
   it('bulk-assigns selected items to a track', async () => {
@@ -616,7 +651,7 @@ describe('CurriculumPage', () => {
     renderPage(fixture({ tracks: [cnpm] }));
     fireEvent.click(
       await screen.findByRole('button', {
-        name: /Gán học phần vào chuyên ngành/,
+        name: /Gán học phần/,
       }),
     );
     const dialog = await screen.findByRole('dialog');
