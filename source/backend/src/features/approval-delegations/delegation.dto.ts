@@ -12,7 +12,7 @@ import { PageQueryDto } from '../../shared/pagination/page-query.dto.js';
 
 export const DELEGATION_DIRECTIONS = ['OUTGOING', 'INCOMING'] as const;
 export type DelegationDirection = (typeof DELEGATION_DIRECTIONS)[number];
-export const DELEGABLE_LEVELS = [1, 2] as const;
+export const DELEGABLE_LEVELS = [1, 2, 3] as const;
 
 export class DelegationUserOptionDto {
   @ApiProperty() id!: string;

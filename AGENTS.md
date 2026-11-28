@@ -54,10 +54,10 @@ cd source/frontend && pnpm dev   # → http://localhost:5173
 
 | Mã | Vai trò | Cấp duyệt |
 |----|---------|-----------|
-| R1 | Phòng Đào tạo | Cấp 3 (cuối) |
-| R2 | Ban lãnh đạo khoa | Giám sát (không duyệt) |
-| R3 | Giám đốc CTĐT | Cấp 2 |
-| R4 | Điều phối nhóm chuyên môn | Cấp 1 |
+| R1 | Phòng Đào tạo | Cấp 4 (cuối — Pool) |
+| R2 | Ban lãnh đạo khoa | Cấp 3 (Pool theo Khoa) |
+| R3 | Giám đốc CTĐT | Cấp 2 (song song; tạo ĐX nhánh CTĐT) |
+| R4 | Điều phối nhóm chuyên môn | Cấp 1 (nhánh HP/ĐCCT) |
 | R5 | Giảng viên | Người đề xuất |
 | R6 | Sinh viên | Chỉ đọc |
 

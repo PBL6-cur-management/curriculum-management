@@ -20,15 +20,18 @@ export class VersionContentCopier {
     toVersionId: string,
     { carryRelease = true }: CopyOptions = {},
   ): Promise<void> {
+    const trackIds = await this.copyTracks(tx, fromVersionId, toVersionId);
     const groupIds = await this.copyElectiveGroups(
       tx,
       fromVersionId,
       toVersionId,
+      trackIds,
     );
     const itemIds = await this.copyCurriculumItems(
       tx,
       fromVersionId,
       toVersionId,
+      trackIds,
       groupIds,
       carryRelease,
     );
@@ -38,11 +41,57 @@ export class VersionContentCopier {
     await this.copyCloPloLinks(tx, itemIds, ploIds, carryRelease);
   }
 
+  private async copyTracks(
+    tx: Prisma.TransactionClient,
+    from: string,
+    to: string,
+  ): Promise<Map<string, string>> {
+    const tracks = tx.programTrack
+      ? await tx.programTrack.findMany({ where: { versionId: from } })
+      : [];
+    if (tracks.length === 0) {
+      return new Map();
+    }
+    await tx.programTrack.createMany({
+      data: tracks.map(
+        ({
+          trackCode,
+          trackName,
+          englishName,
+          description,
+          sortOrder,
+          compulsoryCredits,
+          electiveCredits,
+        }) => ({
+          versionId: to,
+          trackCode,
+          trackName,
+          englishName,
+          description,
+          sortOrder,
+          compulsoryCredits,
+          electiveCredits,
+        }),
+      ),
+    });
+    const created = await tx.programTrack.findMany({
+      where: { versionId: to },
+      select: { id: true, trackCode: true },
+    });
+    const newIdByCode = new Map(
+      created.map((track) => [track.trackCode, track.id]),
+    );
+    return new Map(
+      tracks.map((track) => [track.id, newIdByCode.get(track.trackCode)!]),
+    );
+  }
+
   // Returns old id -> new id, matched back through the natural key (groupCode) because createMany returns no rows.
   private async copyElectiveGroups(
     tx: Prisma.TransactionClient,
     from: string,
     to: string,
+    trackIds: ReadonlyMap<string, string>,
   ): Promise<Map<string, string>> {
     const groups = await tx.electiveGroup.findMany({
       where: { versionId: from },
@@ -51,13 +100,16 @@ export class VersionContentCopier {
       return new Map();
     }
     await tx.electiveGroup.createMany({
-      data: groups.map(({ groupCode, groupName, minCredits, minCourses }) => ({
-        versionId: to,
-        groupCode,
-        groupName,
-        minCredits,
-        minCourses,
-      })),
+      data: groups.map(
+        ({ groupCode, groupName, minCredits, minCourses, trackId }) => ({
+          versionId: to,
+          trackId: trackId ? (trackIds.get(trackId) ?? null) : null,
+          groupCode,
+          groupName,
+          minCredits,
+          minCourses,
+        }),
+      ),
     });
     const created = await tx.electiveGroup.findMany({
       where: { versionId: to },
@@ -71,11 +123,12 @@ export class VersionContentCopier {
     );
   }
 
-  // Returns old id -> new id, matched back through the natural key (courseId).
+  // Returns old id -> new id, matched back through the natural key (trackId + courseId).
   private async copyCurriculumItems(
     tx: Prisma.TransactionClient,
     from: string,
     to: string,
+    trackIds: ReadonlyMap<string, string>,
     groupIds: ReadonlyMap<string, string>,
     carryRelease: boolean,
   ): Promise<Map<string, string>> {
@@ -88,6 +141,7 @@ export class VersionContentCopier {
     await tx.curriculumItem.createMany({
       data: items.map((item) => ({
         versionId: to,
+        trackId: item.trackId ? (trackIds.get(item.trackId) ?? null) : null,
         plannedSemester: item.plannedSemester,
         sortOrder: item.sortOrder,
         courseId: item.courseId,
@@ -110,13 +164,19 @@ export class VersionContentCopier {
     });
     const created = await tx.curriculumItem.findMany({
       where: { versionId: to },
-      select: { id: true, courseId: true },
+      select: { id: true, trackId: true, courseId: true },
     });
-    const newIdByCourse = new Map(
-      created.map((item) => [item.courseId, item.id]),
+    const keyOf = (tId: string | null, cId: string) => `${tId ?? ''}::${cId}`;
+    const newIdByKey = new Map(
+      created.map((item) => [keyOf(item.trackId, item.courseId), item.id]),
     );
     return new Map(
-      items.map((item) => [item.id, newIdByCourse.get(item.courseId)!]),
+      items.map((item) => {
+        const mappedTrack = item.trackId
+          ? (trackIds.get(item.trackId) ?? null)
+          : null;
+        return [item.id, newIdByKey.get(keyOf(mappedTrack, item.courseId))!];
+      }),
     );
   }
 

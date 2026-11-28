@@ -6,12 +6,15 @@ import {
   FRESHNESS_LABELS,
   TRIGGER_LABELS,
 } from '../constants/graduationLabels';
-import { displayTime } from './graduationPresentation';
+import { displayGpa, displayTime } from './graduationPresentation';
 
 interface GraduationAuditSummaryProps {
   audit: GraduationAudit;
 }
 export function GraduationAuditSummary({ audit }: GraduationAuditSummaryProps) {
+  const hasGpa =
+    audit.result.cumulativeGpa !== undefined ||
+    audit.result.minGraduationGpa !== undefined;
   return (
     <>
       <Alert
@@ -43,6 +46,18 @@ export function GraduationAuditSummary({ audit }: GraduationAuditSummaryProps) {
             label: 'Nguồn',
             children: TRIGGER_LABELS[audit.trigger],
           },
+          ...(hasGpa
+            ? [
+                {
+                  key: 'gpa',
+                  label: 'GPA khi lưu',
+                  children: displayGpa(
+                    audit.result.cumulativeGpa,
+                    audit.result.minGraduationGpa,
+                  ),
+                },
+              ]
+            : []),
         ]}
       />
     </>

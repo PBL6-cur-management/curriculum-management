@@ -45,11 +45,12 @@ function compare(left: string, right: string): number {
   return left < right ? -1 : left > right ? 1 : 0;
 }
 
+// A CONDITIONAL course that is also elective is evaluated inside its group.
 function category(row: GraduationFrameFact): GraduationRecognition['category'] {
-  return row.courseType === 'CONDITIONAL'
-    ? 'CONDITIONAL_COURSE'
-    : row.isElective
-      ? 'ELECTIVE_GROUP'
+  return row.isElective
+    ? 'ELECTIVE_GROUP'
+    : row.courseType === 'CONDITIONAL'
+      ? 'CONDITIONAL_COURSE'
       : 'MANDATORY_COURSE';
 }
 
@@ -67,12 +68,6 @@ export function allocateGraduationCredits(
   value: GraduationInputSnapshot,
 ): GraduationAllocation {
   const input = decodeGraduationInput(value as unknown as Prisma.JsonValue);
-  if (
-    input.frame.some(
-      (row) => row.courseType === 'CONDITIONAL' && row.isElective,
-    )
-  )
-    throw new AppException(GRADUATION_ERRORS.POLICY_UNCONFIRMED);
   const result: GraduationAllocation = {
     recognitions: [],
     freeCredits: [],
@@ -107,10 +102,14 @@ export function allocateGraduationCredits(
     ).map((fact) => [fact.courseId, fact]),
   );
   for (const fact of allFacts) {
-    if (!fact.hasPassedAttempt) continue;
+    if (!fact.hasPassedAttempt && !fact.isExempt) continue;
+    // EXEMPT counts as completed for credits (never for GPA).
+    const exempt = fact.attempts.filter((row) => row.status === 'EXEMPT');
     const completion: Completion = {
       course: courses.get(fact.courseId)!,
-      attempt: passedFacts.get(fact.courseId)!.bestScoredAttempt!,
+      attempt: fact.hasPassedAttempt
+        ? passedFacts.get(fact.courseId)!.bestScoredAttempt!
+        : exempt[exempt.length - 1],
     };
     const key = graduationClassKey(completion.course);
     completedByClass.set(key, [
@@ -161,7 +160,8 @@ export function allocateGraduationCredits(
         studiedCourse: completion.course.course,
         attemptId: completion.attempt.id,
         attemptRevision: completion.attempt.revision,
-        completionStatus: 'PASSED',
+        completionStatus:
+          completion.attempt.status === 'EXEMPT' ? 'EXEMPT' : 'PASSED',
         viaEquivalence,
         equivalenceGroupId: completion.course.equivalenceGroupId,
         requiredCredits: row.credits,

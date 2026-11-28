@@ -17,10 +17,21 @@ import {
 } from '../legacy-mapping.js';
 import type { MIRROR_TABLES, MirrorRow } from './mirror-tables.js';
 
+export const LEGACY_EXTERNAL_UNIT_GROUP = '198';
+
+export function standardizeLegacyUnitName(rawName: string): string {
+  return rawName
+    .trim()
+    .replace(/\s+/g, ' ')
+    .replace(/^K\.\s*/u, 'Khoa ')
+    .replace(/^P\.\s*/u, 'Phòng ');
+}
+
 export interface DutUnit {
   unitCode: string;
   unitName: string;
   unitType: OrgUnitType;
+  isExternal?: boolean;
 }
 export interface DutCourse {
   courseCode: string;
@@ -108,11 +119,12 @@ export function extractCatalog(input: {
       ownerUnitCode = `${LEGACY_UNIT_CODE_PREFIX}${owner.code}`;
       units.set(ownerUnitCode, {
         unitCode: ownerUnitCode,
-        unitName: unit.TenDV,
+        unitName: standardizeLegacyUnitName(unit.TenDV),
         unitType:
           unit.MaBP === LEGACY_OFFICE_GROUP
             ? OrgUnitType.OFFICE
             : OrgUnitType.FACULTY,
+        isExternal: unit.MaBP === LEGACY_EXTERNAL_UNIT_GROUP,
       });
     }
     result.courses.push({

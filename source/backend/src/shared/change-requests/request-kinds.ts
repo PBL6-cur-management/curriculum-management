@@ -60,7 +60,7 @@ export function editPermissionsFor(
       return [PERMISSIONS.SYLLABUS_EDIT];
     case ChangeRequestType.OUTCOME:
       return targetType === ChangeTargetType.PROGRAM
-        ? [PERMISSIONS.PLO_EDIT, PERMISSIONS.CLO_EDIT]
+        ? [PERMISSIONS.PLO_EDIT]
         : [PERMISSIONS.CLO_EDIT];
     case ChangeRequestType.CURRICULUM:
       return [PERMISSIONS.CURRICULUM_EDIT];
@@ -79,6 +79,7 @@ export function editPermissionsFor(
 export const OPEN_REQUEST_STATUSES: readonly ChangeRequestStatus[] = [
   ChangeRequestStatus.PENDING_COORDINATOR,
   ChangeRequestStatus.PENDING_DIRECTOR,
+  ChangeRequestStatus.PENDING_FACULTY_LEADERSHIP,
   ChangeRequestStatus.PENDING_ACADEMIC_OFFICE,
   ChangeRequestStatus.APPROVED,
 ];

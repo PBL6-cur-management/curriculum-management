@@ -40,7 +40,11 @@ function access(code: PermissionCode, all: boolean) {
     },
   ]);
 }
-const STUDENT_TYPES = [ImportType.STUDENT_LIST, ImportType.ACADEMIC_RESULT];
+const STUDENT_TYPES = [
+  ImportType.STUDENT_LIST,
+  ImportType.ACADEMIC_RESULT,
+  ImportType.PROGRAM_TRANSFER,
+];
 const VERSION: ImportVersionRow = {
   id: 'version',
   programId: 'program',

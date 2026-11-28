@@ -260,7 +260,7 @@ describe('FinalApprovalService', () => {
         });
       });
 
-      it('refuses a semester that has begun unless the academic office made the request and said so', async () => {
+      it('refuses a semester that has begun unless R1 confirms allowPastSemester', async () => {
         db.semester.findUnique.mockResolvedValue({
           id: 'sem',
           semesterCode: 'old',
@@ -270,10 +270,17 @@ describe('FinalApprovalService', () => {
         await expect(service.approve('r1', dto, OFFICE)).rejects.toMatchObject({
           code: 'SEMESTER_ALREADY_STARTED',
         });
-        await expect(
-          service.approve('r1', { ...dto, allowPastSemester: true }, OFFICE),
-        ).rejects.toMatchObject({ code: 'SEMESTER_ALREADY_STARTED' });
         expect(applier.apply).not.toHaveBeenCalled();
+
+        await service.approve(
+          'r1',
+          { ...dto, allowPastSemester: true },
+          OFFICE,
+        );
+        expect(applier.apply).toHaveBeenCalled();
+        expect(
+          db.changeRequest.update.mock.calls[0][0].data.pastSemesterAllowed,
+        ).toBe(true);
       });
 
       it('takes a past semester for a request the academic office created, and records that it did', async () => {
@@ -298,7 +305,7 @@ describe('FinalApprovalService', () => {
         ).toBe(true);
       });
 
-      it('refuses a started semester for grading changes even from the academic office with the flag set', async () => {
+      it('allows a started semester for grading changes only when R1 confirms allowPastSemester', async () => {
         db.semester.findUnique.mockResolvedValue({
           id: 'sem',
           semesterCode: 'old',
@@ -311,16 +318,15 @@ describe('FinalApprovalService', () => {
         });
         db.changeItem.count.mockResolvedValue(2);
 
-        await expect(
-          service.approve('r1', { ...dto, allowPastSemester: true }, OFFICE),
-        ).rejects.toMatchObject({ code: 'SEMESTER_ALREADY_STARTED' });
-        expect(applier.apply).not.toHaveBeenCalled();
-        expect(db.changeItem.count).toHaveBeenCalledWith({
-          where: {
-            changeRequestId: 'r1',
-            entityType: { in: ['FORMULA', 'COMPONENT', 'CLO_MAPPING'] },
-          },
+        await expect(service.approve('r1', dto, OFFICE)).rejects.toMatchObject({
+          code: 'SEMESTER_ALREADY_STARTED',
         });
+        await service.approve(
+          'r1',
+          { ...dto, allowPastSemester: true },
+          OFFICE,
+        );
+        expect(applier.apply).toHaveBeenCalled();
       });
 
       it('lets a grading change into a future semester', async () => {

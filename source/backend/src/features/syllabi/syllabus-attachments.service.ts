@@ -3,7 +3,6 @@ import path from 'node:path';
 import type { Readable } from 'node:stream';
 import { Injectable, Logger } from '@nestjs/common';
 import type { AccessContext } from '../../shared/authz/access-context.js';
-import { REQUEST_DRAFT_ERRORS } from '../../shared/change-requests/change-request.errors.js';
 import { AppException } from '../../shared/exception/app.exception.js';
 import {
   detectAttachmentType,
@@ -54,14 +53,11 @@ export class SyllabusAttachmentsService {
       where: { id: syllabusId },
       select: SYLLABUS_ACCESS_SELECT,
     });
-    // A published revision only ever gains signed files (US-077); a Draft takes the ordinary write rules.
+    // A published revision only ever gains signed files (US-077); a Draft (or CR working copy) takes the ordinary write rules.
     const revision =
       found && found.status !== SyllabusStatus.DRAFT
         ? this.assertCanAttach(found, access)
         : await assertDraftWrite(this.prisma, access, found);
-    if (revision.sourceRequest) {
-      throw new AppException(REQUEST_DRAFT_ERRORS.COPY_HAS_NO_ATTACHMENTS);
-    }
     if (!file) {
       throw new AppException(SYLLABUS_ERRORS.ATTACHMENT_FILE_REQUIRED);
     }
@@ -155,10 +151,7 @@ export class SyllabusAttachmentsService {
     if (row.syllabus.status !== SyllabusStatus.DRAFT) {
       throw new AppException(SYLLABUS_ERRORS.ATTACHMENT_LOCKED);
     }
-    const revision = await assertDraftWrite(this.prisma, access, row.syllabus);
-    if (revision.sourceRequest) {
-      throw new AppException(REQUEST_DRAFT_ERRORS.COPY_HAS_NO_ATTACHMENTS);
-    }
+    await assertDraftWrite(this.prisma, access, row.syllabus);
     if (row.uploadedById !== access.userId) {
       throw new AppException(SYLLABUS_ERRORS.ATTACHMENT_NOT_UPLOADER);
     }

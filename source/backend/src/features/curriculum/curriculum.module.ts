@@ -5,6 +5,8 @@ import { CurriculumRequisitesService } from './curriculum-requisites.service.js'
 import { CurriculumService } from './curriculum.service.js';
 import { ElectiveGroupsController } from './elective-groups.controller.js';
 import { ElectiveGroupsService } from './elective-groups.service.js';
+import { ProgramTracksController } from './program-tracks.controller.js';
+import { ProgramTracksService } from './program-tracks.service.js';
 import { ProgramVersionsCurriculumController } from './program-versions-curriculum.controller.js';
 
 @Module({
@@ -12,12 +14,14 @@ import { ProgramVersionsCurriculumController } from './program-versions-curricul
     ProgramVersionsCurriculumController,
     CurriculumItemsController,
     ElectiveGroupsController,
+    ProgramTracksController,
   ],
   providers: [
     CurriculumReadService,
     CurriculumService,
     CurriculumRequisitesService,
     ElectiveGroupsService,
+    ProgramTracksService,
   ],
 })
 export class CurriculumModule {}

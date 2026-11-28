@@ -26,7 +26,10 @@ import {
   BYTES_PER_MB,
 } from '../../shared/files/attachment-types.js';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
+import { HOME_FACULTY_CODE } from '../../shared/org-units/home-faculty.js';
 import { programTarget } from '../../shared/programs/program-target.js';
+import { toSemesterDto } from '../../shared/releases/semester.dto.js';
+import { toIsoDay } from '../../shared/time/today.js';
 import { revisionForItems } from '../../shared/syllabi/revision-for-items.js';
 import { mapUniqueViolation } from '../../shared/prisma/unique-violation.js';
 import { sanitizeRichText } from '../../shared/rich-text/sanitize-rich-text.js';
@@ -46,6 +49,7 @@ import {
   toSyllabusDto,
   type CourseSyllabusDto,
   type SyllabusDto,
+  type SyllabusHistoryItemDto,
 } from './syllabus.dto.js';
 import { SYLLABUS_ERRORS, SYLLABUS_LIMITS } from './syllabus.errors.js';
 import {
@@ -96,10 +100,17 @@ export class SyllabiService {
     const copy = requestId
       ? await this.findCopy(courseId, requestId, access)
       : null;
+    const isForeign = course.ownerFaculty.unitCode !== HOME_FACULTY_CODE;
     const copyEditable = (permission: PermissionCode) =>
       copy !== null &&
       copy.sourceRequest !== null &&
-      canEditCopy(access, permission, courseTarget(course), copy.sourceRequest);
+      canEditCopy(
+        access,
+        permission,
+        courseTarget(course),
+        copy.sourceRequest,
+        isForeign,
+      );
     const state = await syllabusEditState(this.prisma, course);
     const editPath = copy
       ? copyEditable(PERMISSIONS.SYLLABUS_EDIT)
@@ -223,6 +234,68 @@ export class SyllabiService {
         versionNumber: version.versionNumber,
       },
     };
+  }
+
+  // All revisions of a course (newest first), excluding unmerged CR working copies.
+  async history(
+    courseId: string,
+    access: AccessContext,
+  ): Promise<SyllabusHistoryItemDto[]> {
+    const course = await this.prisma.course.findUnique({
+      where: { id: courseId },
+      select: SYLLABUS_COURSE_SELECT,
+    });
+    assertCourseVisible(course, access);
+    const rows = await this.prisma.syllabus.findMany({
+      where: {
+        courseId,
+        sourceRequestId: null,
+        ...(!seesDrafts(access) && { status: { not: SyllabusStatus.DRAFT } }),
+      },
+      include: {
+        effectiveSemester: true,
+        _count: { select: { attachments: true } },
+      },
+      orderBy: [
+        { revisionNumber: { sort: 'desc', nulls: 'last' } },
+        { createdAt: 'desc' },
+        { id: 'desc' },
+      ],
+    });
+    return rows.map((row) => ({
+      id: row.id,
+      revisionNumber: row.revisionNumber,
+      status: row.status,
+      effectiveSemester: row.effectiveSemester
+        ? toSemesterDto(row.effectiveSemester)
+        : null,
+      documentNumber: row.documentNumber ?? null,
+      signedDate: row.signedDate ? toIsoDay(row.signedDate) : null,
+      publishedAt: row.publishedAt?.toISOString() ?? null,
+      originRequestId: row.originRequestId ?? null,
+      attachmentCount: row._count.attachments,
+    }));
+  }
+
+  // Fetch a specific syllabus revision (including HISTORICAL) by id for a course.
+  async revision(
+    courseId: string,
+    syllabusId: string,
+    access: AccessContext,
+  ): Promise<SyllabusDto> {
+    const course = await this.prisma.course.findUnique({
+      where: { id: courseId },
+      select: SYLLABUS_COURSE_SELECT,
+    });
+    assertCourseVisible(course, access);
+    const row = await this.prisma.syllabus.findFirst({
+      where: { id: syllabusId, courseId },
+      include: SYLLABUS_INCLUDE,
+    });
+    if (!row || (row.status === SyllabusStatus.DRAFT && !seesDrafts(access))) {
+      throw new AppException(SYLLABUS_ERRORS.SYLLABUS_NOT_FOUND);
+    }
+    return toSyllabusDto(row, () => false);
   }
 
   // DC-01: the first revision, as a Draft. Any existing revision makes this a conflict.

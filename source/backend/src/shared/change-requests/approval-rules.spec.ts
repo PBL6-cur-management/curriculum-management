@@ -17,7 +17,11 @@ describe('approval rules', () => {
 
   it('maps a pending status to its level and others to null', () => {
     expect(levelOfStatus(ChangeRequestStatus.PENDING_COORDINATOR)).toBe(1);
-    expect(levelOfStatus(ChangeRequestStatus.PENDING_ACADEMIC_OFFICE)).toBe(3);
+    expect(levelOfStatus(ChangeRequestStatus.PENDING_DIRECTOR)).toBe(2);
+    expect(levelOfStatus(ChangeRequestStatus.PENDING_FACULTY_LEADERSHIP)).toBe(
+      3,
+    );
+    expect(levelOfStatus(ChangeRequestStatus.PENDING_ACADEMIC_OFFICE)).toBe(4);
     expect(levelOfStatus(ChangeRequestStatus.DRAFT)).toBeNull();
   });
 

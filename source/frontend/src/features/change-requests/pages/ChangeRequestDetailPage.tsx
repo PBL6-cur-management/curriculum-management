@@ -6,6 +6,7 @@ import {
   Flex,
   Popconfirm,
   Result,
+  Tag,
   App,
 } from 'antd';
 import { generatePath, Link, useParams } from 'react-router';
@@ -13,6 +14,7 @@ import { ROUTES } from '../../../routes';
 import { ApiError } from '../../../shared/api/client';
 import { RequestStatusTag } from '../../../shared/change-requests/RequestStatusTag';
 import { errorMessage } from '../../../shared/forms/applyFieldErrors';
+import { semesterLabel } from '../../../shared/releases/semesters';
 import type { ChangeRequestDetail } from '../api/changeRequests';
 import { ApprovalHistory } from '../components/ApprovalHistory';
 import { ApprovalPanel } from '../components/ApprovalPanel';
@@ -147,10 +149,26 @@ export function ChangeRequestDetailPage() {
             {ORIGIN_LABELS[request.origin]}
           </Descriptions.Item>
           {request.basisDocumentNumber && (
-            <Descriptions.Item label="Số văn bản căn cứ">
+            <Descriptions.Item label="Số văn bản">
               {request.basisDocumentNumber}
             </Descriptions.Item>
           )}
+          <Descriptions.Item label="Học kỳ hiệu lực dự kiến">
+            {request.effectiveSemester
+              ? semesterLabel(request.effectiveSemester)
+              : '—'}
+          </Descriptions.Item>
+          <Descriptions.Item label="Các khóa áp dụng dự kiến">
+            {request.targetCohorts.length > 0 ? (
+              <Flex gap={4} wrap>
+                {request.targetCohorts.map((cohort) => (
+                  <Tag key={cohort.id}>{cohort.cohortCode}</Tag>
+                ))}
+              </Flex>
+            ) : (
+              '—'
+            )}
+          </Descriptions.Item>
           <Descriptions.Item label="Người tạo">
             {request.createdBy.fullName}
           </Descriptions.Item>

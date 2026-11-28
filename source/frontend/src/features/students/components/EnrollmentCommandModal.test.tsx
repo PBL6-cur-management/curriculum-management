@@ -224,4 +224,68 @@ describe('EnrollmentCommandModal', () => {
     await waitFor(() => expect(reload).toHaveBeenCalledTimes(1));
     expect(writes).toHaveLength(1);
   });
+
+  it('includes optional trackId when transferring into a version with tracks', async () => {
+    const onClose = vi.fn();
+    const { writes } = renderStudentPage({
+      element: (
+        <EnrollmentCommandModal
+          student={student}
+          sourceEnrollment={student.enrollments[0]}
+          operation="TRANSFER"
+          open
+          onClose={onClose}
+          onReload={vi.fn()}
+        />
+      ),
+      responses: new Map<string, unknown>([
+        [
+          '/api/students/st1/enrollment-targets?programId=p1&semesterId=s1',
+          [
+            {
+              program,
+              version: { id: 'v2', versionNumber: '2.0', status: 'ACTIVE' },
+              effectiveSemester: semester,
+            },
+          ],
+        ],
+        [
+          '/api/program-versions/v2/tracks',
+          [
+            {
+              id: 'tr1',
+              trackCode: 'AI',
+              trackName: 'Trí tuệ nhân tạo',
+              englishName: null,
+              description: null,
+              sortOrder: 1,
+              compulsoryCredits: null,
+              electiveCredits: null,
+              itemCount: 2,
+            },
+          ],
+        ],
+      ]),
+    });
+    await choose('Học kỳ bắt đầu', '2025-1 · 2025-08-01');
+    await choose('Chương trình đích', 'CT01 — Chương trình tổng hợp');
+    await choose('Phiên bản đã ban hành', '2.0 · 2025-1');
+    await choose('Định hướng / Chuyên ngành con', 'AI — Trí tuệ nhân tạo');
+    fireEvent.change(screen.getByLabelText('Căn cứ / số quyết định'), {
+      target: { value: 'QĐ định hướng' },
+    });
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Xem lại và xác nhận' }),
+    );
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Xác nhận ghi danh' }),
+    );
+    await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+    expect(writes[0].body).toMatchObject({
+      operation: 'TRANSFER',
+      targetVersionId: 'v2',
+      trackId: 'tr1',
+      basisDecision: 'QĐ định hướng',
+    });
+  });
 });

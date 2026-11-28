@@ -23,5 +23,7 @@ export const INTEGRATION_RESOURCES = [
   'PROGRESS',
   'ELIGIBILITY',
   'GRADUATION',
+  'COURSE_CATALOG',
+  'COURSE_DETAIL',
 ] as const;
 export type IntegrationResource = (typeof INTEGRATION_RESOURCES)[number];

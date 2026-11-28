@@ -118,10 +118,26 @@ export class CorrectionsService {
         tx,
         original.effectiveSemesterId!,
       );
-      await tx.programVersion.update({
-        where: { id: original.id },
-        data: { status: ProgramVersionStatus.HISTORICAL },
-      });
+      const isHistorical = original.status === ProgramVersionStatus.HISTORICAL;
+      let targetStatus: ReleasedStatus = original.status as ReleasedStatus;
+      if (isHistorical) {
+        const hasNewerActive = await tx.programVersion.findFirst({
+          where: {
+            programId,
+            status: ProgramVersionStatus.ACTIVE,
+            id: { not: original.id },
+          },
+          select: { id: true },
+        });
+        targetStatus = hasNewerActive
+          ? ProgramVersionStatus.HISTORICAL
+          : ProgramVersionStatus.ACTIVE;
+      } else {
+        await tx.programVersion.update({
+          where: { id: original.id },
+          data: { status: ProgramVersionStatus.HISTORICAL },
+        });
+      }
       const released = await this.publisher.promote(tx, {
         versionId: draft.id,
         programId,
@@ -130,7 +146,7 @@ export class CorrectionsService {
         signedDate: original.signedDate,
         effectiveSemesterId: semester.id,
         effectiveStart: semester.startDate,
-        statusOverride: original.status as ReleasedStatus,
+        statusOverride: targetStatus,
         publisherId: access.userId,
         now: new Date(),
         today: todayDate(),
@@ -145,6 +161,12 @@ export class CorrectionsService {
           where: { programVersionId: original.id },
           data: { programVersionId: released.id },
         });
+        if (isHistorical && tx.programEnrollment) {
+          await tx.programEnrollment.updateMany({
+            where: { appliedVersionId: original.id, untilSemesterId: null },
+            data: { appliedVersionId: released.id },
+          });
+        }
       }
       // A correction of a Pending version whose semester has begun since is activated now, not tomorrow.
       if (released.status === ProgramVersionStatus.PENDING) {
@@ -177,7 +199,7 @@ export class CorrectionsService {
   }
 }
 
-// Active or Pending only: a Historical or Draft version is not what is (or is about to be) in force.
+// Active, Pending, or Historical versions that are still in use (have assigned CohortVersion or active ProgramEnrollment rows).
 async function correctableVersion(
   tx: Prisma.TransactionClient,
   programId: string,
@@ -188,12 +210,27 @@ async function correctableVersion(
   });
   if (!version) throw new AppException(RELEASE_ERRORS.VERSION_NOT_FOUND);
   if (
-    version.status !== ProgramVersionStatus.ACTIVE &&
-    version.status !== ProgramVersionStatus.PENDING
+    version.status === ProgramVersionStatus.ACTIVE ||
+    version.status === ProgramVersionStatus.PENDING
   ) {
-    throw new AppException(RELEASE_ERRORS.VERSION_NOT_CORRECTABLE);
+    return version;
   }
-  return version;
+  if (version.status === ProgramVersionStatus.HISTORICAL) {
+    const cohortCount =
+      typeof tx.cohortVersion?.count === 'function'
+        ? await tx.cohortVersion.count({ where: { programVersionId: version.id } })
+        : 0;
+    const enrollmentCount =
+      typeof tx.programEnrollment?.count === 'function'
+        ? await tx.programEnrollment.count({
+            where: { appliedVersionId: version.id, untilSemesterId: null },
+          })
+        : 0;
+    if (cohortCount > 0 || enrollmentCount > 0) {
+      return version;
+    }
+  }
+  throw new AppException(RELEASE_ERRORS.VERSION_NOT_CORRECTABLE);
 }
 
 async function correctionDraft(

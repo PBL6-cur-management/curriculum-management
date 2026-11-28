@@ -9,6 +9,7 @@ import {
 } from '../graduation/graduation-access.js';
 import { PERMISSIONS } from '../authz/permission-codes.js';
 import { integrationAccess } from './integration-access.js';
+import { INTEGRATION_RESOURCES } from './integration.constants.js';
 import {
   generateIntegrationKey,
   hashIntegrationKey,
@@ -66,5 +67,10 @@ describe('integration access (F-21 BE-04)', () => {
     expect(first.key).not.toBe(second.key);
     expect(first.keyHash).toMatch(/^[0-9a-f]{64}$/);
     expect(hashIntegrationKey(first.key)).toBe(first.keyHash);
+  });
+
+  it('includes COURSE_CATALOG and COURSE_DETAIL in allowed integration resources', () => {
+    expect(INTEGRATION_RESOURCES).toContain('COURSE_CATALOG');
+    expect(INTEGRATION_RESOURCES).toContain('COURSE_DETAIL');
   });
 });

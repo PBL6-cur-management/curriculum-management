@@ -159,3 +159,33 @@ describe('CourseUsageReader.inReleasedVersion', () => {
     expect(query).toHaveBeenCalledOnce();
   });
 });
+
+describe('CourseUsageReader.hasStudyResults', () => {
+  it('returns true when academicResult.count > 0 and false when 0', async () => {
+    const count = vi.fn().mockResolvedValueOnce(2).mockResolvedValueOnce(0);
+    const reader = new CourseUsageReader({
+      academicResult: { count },
+    } as unknown as PrismaService);
+
+    await expect(reader.hasStudyResults('course-1')).resolves.toBe(true);
+    expect(count).toHaveBeenCalledWith({ where: { courseId: 'course-1' } });
+
+    await expect(reader.hasStudyResults('course-2')).resolves.toBe(false);
+  });
+
+  it('reads through a supplied transaction client', async () => {
+    const count = vi.fn().mockResolvedValue(0);
+    const txCount = vi.fn().mockResolvedValue(1);
+    const reader = new CourseUsageReader({
+      academicResult: { count },
+    } as unknown as PrismaService);
+
+    await expect(
+      reader.hasStudyResults('course-tx', {
+        academicResult: { count: txCount },
+      } as never),
+    ).resolves.toBe(true);
+    expect(txCount).toHaveBeenCalledWith({ where: { courseId: 'course-tx' } });
+    expect(count).not.toHaveBeenCalled();
+  });
+});

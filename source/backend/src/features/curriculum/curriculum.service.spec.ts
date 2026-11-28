@@ -82,7 +82,7 @@ const DTO = { courseId: 'c1', plannedSemester: 3, isElective: false };
 
 describe('CurriculumService', () => {
   let curriculumItem: Record<
-    'findUnique' | 'findMany' | 'create' | 'update' | 'delete' | 'aggregate',
+    'findFirst' | 'findMany' | 'create' | 'update' | 'delete' | 'aggregate',
     ReturnType<typeof vi.fn>
   >;
   let course: { findUnique: ReturnType<typeof vi.fn> };
@@ -96,7 +96,7 @@ describe('CurriculumService', () => {
 
   beforeEach(() => {
     curriculumItem = {
-      findUnique: vi.fn().mockResolvedValue(null),
+      findFirst: vi.fn().mockResolvedValue(null),
       findMany: vi.fn().mockResolvedValue([]),
       create: vi.fn().mockResolvedValue({ id: 'i1' }),
       update: vi.fn().mockResolvedValue({}),
@@ -157,7 +157,7 @@ describe('CurriculumService', () => {
     });
 
     it('refuses a course already listed, naming its semester (KB-015)', async () => {
-      curriculumItem.findUnique.mockResolvedValue({ plannedSemester: 3 });
+      curriculumItem.findFirst.mockResolvedValue({ plannedSemester: 3 });
       await expect(service.createItem('v1', DTO, R1)).rejects.toMatchObject({
         code: 'COURSE_ALREADY_IN_CURRICULUM',
         message: expect.stringMatching(/ở học kỳ 3\.$/),

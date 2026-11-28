@@ -2,7 +2,7 @@ import type { PrismaClient } from '../../src/generated/prisma/client.js';
 import { APPROVAL_LEVEL } from '../../src/shared/change-requests/approval.constants.js';
 import { ROLE_CODES, type RoleCode } from './roles.js';
 
-// Level 1 = subject-group coordinator (R4), level 2 = program director (R3), level 3 = academic office (R1).
+// Level 1 = subject-group coordinator (R4), level 2 = program director (R3), level 3 = faculty leadership (R2), level 4 = academic office (R1).
 export const SEED_APPROVAL_LEVELS: readonly {
   approvalLevel: number;
   levelName: string;
@@ -17,6 +17,11 @@ export const SEED_APPROVAL_LEVELS: readonly {
     approvalLevel: APPROVAL_LEVEL.DIRECTOR,
     levelName: 'Giám đốc CTĐT',
     roleCode: ROLE_CODES.R3,
+  },
+  {
+    approvalLevel: APPROVAL_LEVEL.FACULTY_LEADERSHIP,
+    levelName: 'Ban lãnh đạo khoa',
+    roleCode: ROLE_CODES.R2,
   },
   {
     approvalLevel: APPROVAL_LEVEL.ACADEMIC_OFFICE,

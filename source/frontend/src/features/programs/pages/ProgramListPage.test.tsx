@@ -90,10 +90,31 @@ function mockFetch(permissions: string[] = ['program.view']) {
                 unitCode: 'KHOA_CNTT',
                 unitName: 'Khoa CNTT',
                 unitType: 'FACULTY',
+                isExternal: false,
                 status: 'ACTIVE',
               },
             ])
-          : url.startsWith('/api/programs')
+          : url.startsWith('/api/majors')
+            ? json({
+                items: [
+                  {
+                    id: 'm1',
+                    majorCode: '7480201',
+                    majorName: 'Công nghệ Thông tin',
+                    englishName: null,
+                    degreeGroup: 'CD01',
+                    faculty: FACULTY,
+                    status: 'ACTIVE',
+                    programCount: 1,
+                    createdAt: '2026-10-01T00:00:00.000Z',
+                    updatedAt: '2026-10-01T00:00:00.000Z',
+                  },
+                ],
+                total: 1,
+                page: 1,
+                pageSize: 100,
+              })
+            : url.startsWith('/api/programs')
             ? json(page)
             : json({}),
     );
@@ -159,8 +180,8 @@ describe('ProgramListPage', () => {
       'href',
       '/programs/p2/versions/v3/curriculum',
     );
-    expect(current.parentElement).toHaveTextContent('đang áp dụng');
-    expect(old.parentElement).not.toHaveTextContent('đang áp dụng');
+    expect(current.parentElement).toHaveTextContent('mới nhất');
+    expect(old.parentElement).not.toHaveTextContent('mới nhất');
   });
 
   it('links each cohort to the newest version it follows', async () => {
@@ -208,6 +229,19 @@ describe('ProgramListPage', () => {
       expect(
         programRequests(fetchMock).at(-1)?.searchParams.get('facultyId'),
       ).toBe('f1'),
+    );
+  });
+
+  it('sends the major filter in query params', async () => {
+    const fetchMock = mockFetch();
+    renderPage();
+    await screen.findByText('Kỹ thuật máy tính');
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Ngành đào tạo' }));
+    fireEvent.click(await screen.findByTitle('7480201 — Công nghệ Thông tin'));
+    await waitFor(() =>
+      expect(
+        programRequests(fetchMock).at(-1)?.searchParams.get('majorId'),
+      ).toBe('m1'),
     );
   });
 

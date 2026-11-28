@@ -39,6 +39,9 @@ function fixture() {
     })),
   };
   const db = {
+    programEnrollment: {
+      findUnique: vi.fn().mockResolvedValue({ trackId: null }),
+    },
     programVersion: { findFirst: vi.fn().mockResolvedValue(version) },
     semester: {
       findUnique: vi.fn().mockResolvedValue({

@@ -130,7 +130,7 @@ describe('copySyllabusRevision', () => {
     expect(data).not.toHaveProperty('previousVersionId');
   });
 
-  it('re-points each week CLO link at the copy CLO with the same code and leaves attachments behind', async () => {
+  it('re-points each week CLO link at the copy CLO with the same code and includes attachments', async () => {
     const { tx, cLO, weeklyContent, weeklyContentCLO, syllabus } = setup();
     await copySyllabusRevision(tx, 'base', { sourceRequestId: 'cr1' });
     expect(cLO.createManyAndReturn.mock.calls[0][0].data).toEqual([
@@ -152,7 +152,7 @@ describe('copySyllabusRevision', () => {
     });
     expect(
       JSON.stringify(syllabus.findUniqueOrThrow.mock.calls[0][0]),
-    ).not.toContain('attachments');
+    ).toContain('attachments');
   });
 
   it('copies the grade formula and re-points each assessment link at the copy CLO', async () => {

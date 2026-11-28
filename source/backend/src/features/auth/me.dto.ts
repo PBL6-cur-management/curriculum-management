@@ -37,8 +37,8 @@ export class MeDto {
   @ApiProperty() canApprove: boolean;
 }
 
-// Roles whose holders are named on approval steps (R4 level 1, R3 level 2) or act on level 3 (R1).
-export const APPROVER_ROLE_CODES: readonly string[] = ['R1', 'R3', 'R4'];
+// Roles whose holders are named on approval steps (R4 level 1, R3 level 2) or act on pools (R2 level 3, R1 level 4).
+export const APPROVER_ROLE_CODES: readonly string[] = ['R1', 'R2', 'R3', 'R4'];
 
 export function toMeDto(
   user: AuthenticatedUser,

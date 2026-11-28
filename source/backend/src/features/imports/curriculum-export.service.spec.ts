@@ -120,7 +120,7 @@ describe('CurriculumExportService', () => {
   });
   it.each([
     { score: '2.5', errorRows: 0 },
-    { score: '5', errorRows: 1 },
+    { score: '11', errorRows: 1 },
   ])(
     'round-trips real workbook cells with transfer score $score through the validator',
     async ({ score, errorRows }) => {

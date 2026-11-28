@@ -18,6 +18,7 @@ enum ImportType {
   CURRICULUM
   STUDENT_LIST
   ACADEMIC_RESULT
+  PROGRAM_TRANSFER
 }
 
 enum ImportBatchStatus {
@@ -68,6 +69,13 @@ enum CourseStatus {
 enum DegreeLevel {
   ENGINEER
   BACHELOR
+  MASTER
+  DOCTORATE
+}
+
+enum MajorStatus {
+  ACTIVE
+  INACTIVE
 }
 
 enum ProgramStatus {
@@ -138,6 +146,7 @@ enum ChangeRequestStatus {
   DRAFT
   PENDING_COORDINATOR
   PENDING_DIRECTOR
+  PENDING_FACULTY_LEADERSHIP
   PENDING_ACADEMIC_OFFICE
   APPROVED
   EFFECTIVE
@@ -185,23 +194,44 @@ enum ChangeDocumentType {
 }
 
 model OrgUnit {
-  id              String           @id @default(cuid(2))
-  unitCode        String           @unique
-  unitName        String
-  unitType        OrgUnitType
-  parentUnitId    String?
-  parentUnit      OrgUnit?         @relation("OrgUnitTree", fields: [parentUnitId], references: [id], onDelete: Restrict)
-  childUnits      OrgUnit[]        @relation("OrgUnitTree")
-  status          OrgUnitStatus    @default(ACTIVE)
-  users           User[]
-  roleAssignments RoleAssignment[]
-  subjectGroups   SubjectGroup[]
-  ownedCourses    Course[]         @relation("CourseOwnerFaculty")
-  programs        Program[]        @relation("ProgramFaculty")
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  id                   String           @id @default(cuid(2))
+  unitCode             String           @unique
+  unitName             String
+  unitType             OrgUnitType
+  isExternal           Boolean          @default(false)
+  parentUnitId         String?
+  parentUnit           OrgUnit?         @relation("OrgUnitTree", fields: [parentUnitId], references: [id], onDelete: Restrict)
+  childUnits           OrgUnit[]        @relation("OrgUnitTree")
+  status               OrgUnitStatus    @default(ACTIVE)
+  users                User[]
+  roleAssignments      RoleAssignment[]
+  subjectGroups        SubjectGroup[]
+  ownedCourses         Course[]         @relation("CourseOwnerFaculty")
+  programs             Program[]        @relation("ProgramFaculty")
+  majors               Major[]          @relation("MajorFaculty")
+  facultyApprovalSteps ApprovalStep[]   @relation("ApprovalStepFaculty")
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
 
   @@index([parentUnitId])
+}
+
+// Level 0 academic major managed by Phòng Đào tạo (e.g. 7480201 Công nghệ Thông tin, 8480101 Khoa học máy tính).
+model Major {
+  id          String      @id @default(cuid(2))
+  majorCode   String      @unique
+  majorName   String
+  englishName String?
+  degreeGroup String?
+  facultyId   String?
+  faculty     OrgUnit?    @relation("MajorFaculty", fields: [facultyId], references: [id], onDelete: Restrict)
+  status      MajorStatus @default(ACTIVE)
+  programs    Program[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([facultyId])
+  @@index([status])
 }
 
 model User {
@@ -366,6 +396,8 @@ model Program {
   programCode          String                      @unique
   facultyId            String
   faculty              OrgUnit                     @relation("ProgramFaculty", fields: [facultyId], references: [id], onDelete: Restrict)
+  majorId              String?
+  major                Major?                      @relation(fields: [majorId], references: [id], onDelete: Restrict)
   degreeLevel          DegreeLevel
   status               ProgramStatus               @default(ACTIVE)
   clonedFromId         String?
@@ -378,6 +410,7 @@ model Program {
   updatedAt            DateTime                    @updatedAt
 
   @@index([facultyId])
+  @@index([majorId])
 }
 
 // Identity lives in Program; the description (name, major, semesters, credits) lives here so a released version keeps its own (M-3).
@@ -400,6 +433,7 @@ model ProgramVersion {
   totalCredits                Decimal              @db.Decimal(5, 2)
   compulsoryCredits           Decimal              @db.Decimal(5, 2)
   electiveCredits             Decimal              @db.Decimal(5, 2)
+  minGraduationGpa            Decimal?             @db.Decimal(3, 2)
   creditMismatchReason        String?
   creditMismatchCompulsoryGap Decimal?             @db.Decimal(5, 2)
   creditMismatchElectiveGap   Decimal?             @db.Decimal(5, 2)
@@ -407,6 +441,7 @@ model ProgramVersion {
   creditMismatchAcceptedBy    User?                @relation("CreditMismatchAcceptedBy", fields: [creditMismatchAcceptedById], references: [id], onDelete: Restrict)
   creditMismatchAcceptedAt    DateTime?
   clones                      Program[]            @relation("ProgramClonedFrom")
+  tracks                      ProgramTrack[]
   electiveGroups              ElectiveGroup[]
   curriculumItems             CurriculumItem[]
   plos                        PLO[]
@@ -498,6 +533,7 @@ model Semester {
   startDateEstimated     Boolean                  @default(false)
   effectiveVersions      ProgramVersion[]         @relation("EffectiveSemester")
   effectiveRequests      ChangeRequest[]          @relation("RequestEffectiveSemester")
+  effectiveSyllabi       Syllabus[]               @relation("SyllabusEffectiveSemester")
   startingCohortVersions CohortVersion[]          @relation("CohortStartSemester")
   createdAt              DateTime                 @default(now())
   updatedAt              DateTime                 @updatedAt
@@ -506,14 +542,15 @@ model Semester {
 }
 
 model Cohort {
-  students    Student[]
-  enrollments ProgramEnrollment[]
-  id          String              @id @default(cuid(2))
-  cohortCode  String              @unique
-  intakeYear  Int
-  versions    CohortVersion[]
-  createdAt   DateTime            @default(now())
-  updatedAt   DateTime            @updatedAt
+  students         Student[]
+  enrollments      ProgramEnrollment[]
+  id               String                @id @default(cuid(2))
+  cohortCode       String                @unique
+  intakeYear       Int
+  versions         CohortVersion[]
+  proposedRequests ChangeRequestCohort[]
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
 }
 
 // Which version a cohort studies under, from which semester (F-16 reassigns; F-15 writes at release and correction).
@@ -636,12 +673,37 @@ model KnowledgeBlock {
   updatedAt       DateTime @updatedAt
 }
 
+// Specialization / concentration branch inside one ProgramVersion (e.g. CNPM, HTTT, ATTT, Mạng/KTMT).
+// Cloned along with the ProgramVersion when creating a new version or cloning a program.
+model ProgramTrack {
+  id                String              @id @default(cuid(2))
+  versionId         String
+  version           ProgramVersion      @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  trackCode         String
+  trackName         String
+  englishName       String?
+  description       String?
+  sortOrder         Int                 @default(0)
+  compulsoryCredits Decimal?            @db.Decimal(5, 2)
+  electiveCredits   Decimal?            @db.Decimal(5, 2)
+  curriculumItems   CurriculumItem[]
+  electiveGroups    ElectiveGroup[]
+  enrollments       ProgramEnrollment[]
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  @@unique([versionId, trackCode])
+  @@index([versionId, sortOrder])
+}
+
 // With both minimums set, a student must meet both. Deleting a group leaves its rows elective with no group.
 // A CHECK (at least one minimum) is added by hand in the migration: see database_and_models.md.
 model ElectiveGroup {
   id         String           @id @default(cuid(2))
   versionId  String
   version    ProgramVersion   @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  trackId    String?
+  track      ProgramTrack?    @relation(fields: [trackId], references: [id], onDelete: Cascade)
   groupCode  String
   groupName  String
   minCredits Decimal?         @db.Decimal(5, 2)
@@ -651,14 +713,17 @@ model ElectiveGroup {
   updatedAt  DateTime         @updatedAt
 
   @@unique([versionId, groupCode])
+  @@index([trackId])
 }
 
 // sortOrder orders rows inside one semester; the "TT" number is derived. Credits and names are read live from Course until F-15 snapshots them.
-// Five CHECK constraints are added by hand in the migration (not modelled by Prisma): see database_and_models.md.
+// Five CHECK constraints and the partial unique index for common-core (trackId IS NULL) are added by hand in the migration.
 model CurriculumItem {
   id                 String                @id @default(cuid(2))
   versionId          String
   version            ProgramVersion        @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  trackId            String?
+  track              ProgramTrack?         @relation(fields: [trackId], references: [id], onDelete: Cascade)
   plannedSemester    Int
   sortOrder          Int
   courseId           String
@@ -683,11 +748,12 @@ model CurriculumItem {
   createdAt          DateTime              @default(now())
   updatedAt          DateTime              @updatedAt
 
-  @@unique([versionId, courseId])
+  @@unique([versionId, trackId, courseId])
   @@index([versionId, plannedSemester, sortOrder])
   @@index([courseId])
   @@index([electiveGroupId])
   @@index([syllabusId])
+  @@index([trackId])
 }
 
 // Per-curriculum requisites, seeded from CourseRelation when the row is added and edited for this curriculum only.
@@ -743,6 +809,10 @@ model Syllabus {
   previousVersionId    String?               @unique
   previousVersion      Syllabus?             @relation("SyllabusLineage", fields: [previousVersionId], references: [id], onDelete: Restrict)
   nextVersion          Syllabus?             @relation("SyllabusLineage")
+  effectiveSemesterId  String?
+  effectiveSemester    Semester?             @relation("SyllabusEffectiveSemester", fields: [effectiveSemesterId], references: [id], onDelete: Restrict)
+  documentNumber       String?
+  signedDate           DateTime?             @db.Date
   publishedAt          DateTime?
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
@@ -912,6 +982,7 @@ model ChangeRequest {
   signedDate              DateTime?                  @db.Date
   effectiveSemesterId     String?
   effectiveSemester       Semester?                  @relation("RequestEffectiveSemester", fields: [effectiveSemesterId], references: [id], onDelete: Restrict)
+  targetCohorts           ChangeRequestCohort[]
   pastSemesterAllowed     Boolean                    @default(false)
   originatedVersions      ProgramVersion[]           @relation("ProgramVersionOrigin")
   originatedSyllabi       Syllabus[]                 @relation("SyllabusOrigin")
@@ -923,6 +994,18 @@ model ChangeRequest {
   @@index([courseId])
   @@index([programId])
   @@index([subjectGroupId])
+}
+
+model ChangeRequestCohort {
+  id              String        @id @default(cuid(2))
+  changeRequestId String
+  changeRequest   ChangeRequest @relation(fields: [changeRequestId], references: [id], onDelete: Cascade)
+  cohortId        String
+  cohort          Cohort        @relation(fields: [cohortId], references: [id], onDelete: Restrict)
+  createdAt       DateTime      @default(now())
+
+  @@unique([changeRequestId, cohortId])
+  @@index([cohortId])
 }
 
 // Stored at submit (workspace types) or authored while Draft (course and organisational types).
@@ -967,6 +1050,8 @@ model ApprovalStep {
   forSubjectGroup   SubjectGroup?       @relation(fields: [forSubjectGroupId], references: [id], onDelete: Restrict)
   forProgramId      String?
   forProgram        Program?            @relation(fields: [forProgramId], references: [id], onDelete: Restrict)
+  forFacultyId      String?
+  forFaculty        OrgUnit?            @relation("ApprovalStepFaculty", fields: [forFacultyId], references: [id], onDelete: Restrict)
   action            ApprovalAction      @default(PENDING)
   remark            String?
   recordedAt        DateTime?
@@ -983,6 +1068,7 @@ model ApprovalStep {
   @@index([changeRequestId, submissionRound, approvalLevel])
   @@index([approverId, action])
   @@index([delegationId])
+  @@index([forFacultyId])
 }
 
 enum ApprovalDelegationStatus {
@@ -1216,6 +1302,8 @@ model ProgramEnrollment {
   appliedVersion       ProgramVersion        @relation("EnrollmentAppliedVersion", fields: [appliedVersionId], references: [id], onDelete: Restrict)
   admissionVersionId   String
   admissionVersion     ProgramVersion        @relation("EnrollmentAdmissionVersion", fields: [admissionVersionId], references: [id], onDelete: Restrict)
+  trackId              String?
+  track                ProgramTrack?         @relation(fields: [trackId], references: [id], onDelete: Restrict)
   cohortAssignmentId   String?
   cohortAssignment     CohortVersion?        @relation(fields: [cohortAssignmentId], references: [id], onDelete: Restrict)
   fromSemesterId       String
@@ -1236,6 +1324,7 @@ model ProgramEnrollment {
 
   @@index([studentId, programId])
   @@index([programId, cohortId, status, isException])
+  @@index([trackId])
 }
 
 model AcademicResult {

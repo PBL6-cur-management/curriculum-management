@@ -7,6 +7,8 @@ import {
   STUDENT_ENROLLMENT_QUEUE,
 } from './enrollment-reconciliation.scheduler.js';
 import { StudentEnrollmentsService } from './student-enrollments.service.js';
+import { StudentTransferExportService } from './student-transfer-export.service.js';
+import { StudentTransfersService } from './student-transfers.service.js';
 import { StudentsController } from './students.controller.js';
 import { StudentsReadService } from './students-read.service.js';
 
@@ -19,6 +21,8 @@ import { StudentsReadService } from './students-read.service.js';
   providers: [
     StudentsReadService,
     StudentEnrollmentsService,
+    StudentTransfersService,
+    StudentTransferExportService,
     EnrollmentReconciliationScheduler,
     EnrollmentReconciliationProcessor,
   ],

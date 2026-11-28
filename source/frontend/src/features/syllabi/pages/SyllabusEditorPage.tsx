@@ -146,10 +146,8 @@ export function SyllabusEditorPage() {
     onDirtyChange,
     onNavigateTab: (tabKey) => goTo(tabKey),
   };
-  // A request's copy carries no attachments; the request has its own documents.
-  const shownTabs = EDITOR_TABS.filter(
-    (tab) => !(draft.sourceRequest && tab.key === 'attachments'),
-  );
+  // Working copies of change requests also support syllabus attachments.
+  const shownTabs = EDITOR_TABS;
   const isEnabled = (tab: EditorTab) =>
     tab.enabled ? tab.enabled(tabProps) : true;
   // A link that names a tab the caller cannot use lands on the first one they can.

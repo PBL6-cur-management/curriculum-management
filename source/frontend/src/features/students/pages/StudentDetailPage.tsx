@@ -13,6 +13,7 @@ import type { EnrollmentCommand, StudentEnrollment } from '../api/students';
 import { AcademicResultsTable } from '../components/AcademicResultsTable';
 import { EnrollmentCommandModal } from '../components/EnrollmentCommandModal';
 import { EnrollmentHistoryTable } from '../components/EnrollmentHistoryTable';
+import { EnrollmentTrackModal } from '../components/EnrollmentTrackModal';
 import { StudentFilters } from '../components/StudentFilters';
 import { StudentInfoCard } from '../components/StudentInfoCard';
 import {
@@ -40,6 +41,9 @@ export function StudentDetailPage() {
     operation: EnrollmentCommand['operation'];
     source: StudentEnrollment | null;
   } | null>(null);
+  const [trackTarget, setTrackTarget] = useState<StudentEnrollment | null>(
+    null,
+  );
   const isR1 = me?.roles.some((role) => role.roleCode === 'R1') ?? false;
   const student = detail.isError ? undefined : detail.data;
   const canManage = Boolean(
@@ -56,6 +60,7 @@ export function StudentDetailPage() {
       else next.delete(key);
     }
     setCommand(null);
+    setTrackTarget(null);
     setSearch(next);
   }
   return (
@@ -239,6 +244,7 @@ export function StudentDetailPage() {
                     onTransfer={(source) =>
                       setCommand({ operation: 'TRANSFER', source })
                     }
+                    onSelectTrack={(source) => setTrackTarget(source)}
                   />
                 ),
               },
@@ -272,6 +278,15 @@ export function StudentDetailPage() {
                 const result = await detail.refetch();
                 return result.isError ? null : (result.data ?? null);
               }}
+            />
+          )}
+          {trackTarget && canManage && (
+            <EnrollmentTrackModal
+              key={`${studentId}-${trackTarget.id}-${trackTarget.updatedAt}`}
+              studentId={studentId}
+              enrollment={trackTarget}
+              open
+              onClose={() => setTrackTarget(null)}
             />
           )}
         </>

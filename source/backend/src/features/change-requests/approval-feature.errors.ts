@@ -23,6 +23,6 @@ export const APPROVAL_FEATURE_ERRORS = {
     status: HttpStatus.CONFLICT,
     code: 'OVERRIDE_LEVEL',
     message:
-      'Chỉ duyệt thay được khi đề xuất đang chờ cấp Điều phối hoặc Giám đốc CTĐT.',
+      'Chỉ duyệt thay được khi đề xuất đang chờ cấp Điều phối, Giám đốc CTĐT hoặc Ban lãnh đạo khoa.',
   },
 } as const satisfies Record<string, ErrorDefinition>;

@@ -1,6 +1,7 @@
-import { App, Button, Card, Descriptions, Form } from 'antd';
+import { App, Button, Card, Descriptions, Flex, Form, Tag } from 'antd';
 import { useState } from 'react';
 import { errorMessage } from '../../../shared/forms/applyFieldErrors';
+import { semesterLabel } from '../../../shared/releases/semesters';
 import type { ChangeRequestDetail } from '../api/changeRequests';
 import {
   ORIGIN_LABELS,
@@ -30,6 +31,8 @@ export function RequestHeaderCard({ request }: RequestHeaderCardProps) {
         reason: values.reason,
         origin: values.origin,
         basisDocumentNumber: values.basisDocumentNumber ?? null,
+        effectiveSemesterId: values.effectiveSemesterId ?? null,
+        cohortIds: values.cohortIds ?? [],
       },
       {
         onSuccess: () => setEditing(false),
@@ -57,6 +60,8 @@ export function RequestHeaderCard({ request }: RequestHeaderCardProps) {
             reason: request.reason,
             origin: request.origin,
             basisDocumentNumber: request.basisDocumentNumber ?? undefined,
+            effectiveSemesterId: request.effectiveSemester?.id ?? undefined,
+            cohortIds: request.targetCohorts.map((cohort) => cohort.id),
           }}
           targetLabel={targetLabel}
           onFinish={onFinish}
@@ -79,8 +84,22 @@ export function RequestHeaderCard({ request }: RequestHeaderCardProps) {
             {ORIGIN_LABELS[request.origin]}
           </Descriptions.Item>
           {request.basisDocumentNumber && (
-            <Descriptions.Item label="Số văn bản căn cứ">
+            <Descriptions.Item label="Số văn bản">
               {request.basisDocumentNumber}
+            </Descriptions.Item>
+          )}
+          {request.effectiveSemester && (
+            <Descriptions.Item label="Học kỳ hiệu lực dự kiến">
+              {semesterLabel(request.effectiveSemester)}
+            </Descriptions.Item>
+          )}
+          {request.targetCohorts.length > 0 && (
+            <Descriptions.Item label="Các khóa áp dụng dự kiến">
+              <Flex gap={4} wrap>
+                {request.targetCohorts.map((cohort) => (
+                  <Tag key={cohort.id}>{cohort.cohortCode}</Tag>
+                ))}
+              </Flex>
             </Descriptions.Item>
           )}
         </Descriptions>

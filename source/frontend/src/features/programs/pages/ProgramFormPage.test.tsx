@@ -48,9 +48,32 @@ function renderForm(
     write?: () => Response;
   } = {},
 ) {
-  const fetchMock = vi.fn((_input: RequestInfo | URL, init?: RequestInit) => {
+  const fetchMock = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+    const url = String(input);
     if (init?.method === 'POST' || init?.method === 'PATCH')
       return Promise.resolve((options.write ?? (() => json(PROGRAM, 201)))());
+    if (url.startsWith('/api/majors'))
+      return Promise.resolve(
+        json({
+          items: [
+            {
+              id: 'm1',
+              majorCode: '7480201',
+              majorName: 'Công nghệ Thông tin',
+              englishName: null,
+              degreeGroup: 'CD01',
+              faculty: null,
+              status: 'ACTIVE',
+              programCount: 1,
+              createdAt: '2026-10-01T00:00:00.000Z',
+              updatedAt: '2026-10-01T00:00:00.000Z',
+            },
+          ],
+          total: 1,
+          page: 1,
+          pageSize: 100,
+        }),
+      );
     return Promise.resolve(json(options.program ?? PROGRAM));
   });
   vi.stubGlobal('fetch', fetchMock);
@@ -175,6 +198,28 @@ describe('ProgramFormPage', () => {
       programName: 'Tên đã sửa',
       totalCredits: '150',
       semesterCount: 10,
+    });
+  });
+
+  it('selects a major, auto-fills empty majorCode and majorName, and sends majorId', async () => {
+    const fetchMock = renderForm(EDIT_PATH);
+    await openFilled();
+    fill('Mã ngành', '');
+    fill('Tên ngành', '');
+    fireEvent.mouseDown(screen.getByLabelText('Ngành đào tạo'));
+    fireEvent.click(await screen.findByTitle('7480201 — Công nghệ Thông tin'));
+    expect(screen.getByLabelText('Mã ngành')).toHaveValue('7480201');
+    expect(screen.getByLabelText('Tên ngành')).toHaveValue(
+      'Công nghệ Thông tin',
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Lưu' }));
+    await waitFor(() => expect(writes(fetchMock)).toHaveLength(1));
+    const [, init] = writes(fetchMock)[0];
+    const body = JSON.parse(String(init?.body));
+    expect(body).toMatchObject({
+      majorId: 'm1',
+      majorCode: '7480201',
+      majorName: 'Công nghệ Thông tin',
     });
   });
 

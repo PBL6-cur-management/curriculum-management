@@ -81,7 +81,10 @@ function Curriculum({
       />
     );
   }
-  const data = curriculum.data;
+  const data = curriculum.data as typeof curriculum.data & {
+    track?: { trackCode: string; trackName: string } | null;
+    minGraduationGpa?: string | null;
+  };
   const hasResults = data.terms.some((term) =>
     term.courses.some((c) => c.attemptCount > 0),
   );
@@ -95,6 +98,9 @@ function Curriculum({
           Phiên bản {data.versionNumber ?? '—'}
           {data.decisionNumber && ` · QĐ ${data.decisionNumber}`} ·{' '}
           {data.totalCredits} tín chỉ
+          {data.track &&
+            ` · Định hướng ${data.track.trackCode} — ${data.track.trackName}`}
+          {data.minGraduationGpa && ` · GPA chuẩn ${data.minGraduationGpa}`}
         </Typography.Text>
       </div>
       {!hasResults && (

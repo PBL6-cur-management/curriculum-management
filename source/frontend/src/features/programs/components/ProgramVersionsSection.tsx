@@ -6,7 +6,7 @@ import { useCan } from '../../../shared/auth/useCan';
 import type { ProgramDetail, ProgramVersionRef } from '../api/programs';
 import {
   VERSION_STATUS_LABELS,
-  versionLabel,
+  versionWithDecision,
 } from '../constants/programLabels';
 
 interface ProgramVersionsSectionProps {
@@ -59,7 +59,7 @@ export function ProgramVersionsSection({
                   { programId: program.id, versionId: version.id },
                 )}
               >
-                {versionLabel(version)}
+                {versionWithDecision(version)}
               </Link>
             ),
           },

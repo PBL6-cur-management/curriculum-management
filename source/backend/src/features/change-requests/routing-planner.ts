@@ -22,6 +22,11 @@ import {
   otherAcademicOfficeHolderExists,
 } from '../../shared/change-requests/academic-office.js';
 import {
+  hasFacultyLeadershipHolder,
+  isFacultyLeadershipHolder,
+  otherFacultyLeadershipHolderExists,
+} from '../../shared/change-requests/faculty-leadership.js';
+import {
   SNAPSHOT_ENTITY,
   type ChangeItemDraft,
 } from '../../shared/change-requests/diff/snapshot-entry.js';
@@ -40,6 +45,7 @@ export interface PlannedStep {
   approverId: string | null;
   forSubjectGroupId: string | null;
   forProgramId: string | null;
+  forFacultyId: string | null;
   isSkipped: boolean;
   skipReason: string | null;
   // Display only (the submit preview); not stored.
@@ -51,6 +57,7 @@ export interface AffectedProgram {
   id: string;
   programCode: string;
   programName: string;
+  facultyId?: string;
 }
 
 export interface RoutingPlan {
@@ -66,6 +73,7 @@ export interface RoutingSubject {
   course: {
     id: string;
     ownerGroupId: string | null;
+    ownerFacultyId?: string;
     ownerFacultyCode: string;
   } | null;
 }
@@ -73,6 +81,7 @@ export interface RoutingSubject {
 interface RoutedCourse {
   id: string;
   ownerGroupId: string | null;
+  ownerFacultyId?: string;
 }
 
 const COURSE_BEARING_ENTITIES: readonly string[] = [
@@ -91,7 +100,10 @@ function skipped(
   approvalLevel: ApprovalLevel,
   reason: string,
   scope: Partial<
-    Pick<PlannedStep, 'forSubjectGroupId' | 'forProgramId' | 'scopeLabel'>
+    Pick<
+      PlannedStep,
+      'forSubjectGroupId' | 'forProgramId' | 'forFacultyId' | 'scopeLabel'
+    >
   > = {},
 ): PlannedStep {
   return {
@@ -99,6 +111,7 @@ function skipped(
     approverId: null,
     forSubjectGroupId: null,
     forProgramId: null,
+    forFacultyId: null,
     isSkipped: true,
     skipReason: reason,
     approverName: null,
@@ -107,8 +120,22 @@ function skipped(
   };
 }
 
+function isProgramWorkflow(request: RoutingSubject): boolean {
+  return (
+    request.requestType === ChangeRequestType.CURRICULUM ||
+    request.requestType === ChangeRequestType.PROGRAM_INFO ||
+    (request.requestType === ChangeRequestType.OUTCOME &&
+      request.programId !== null &&
+      request.courseId === null)
+  );
+}
+
 // Who must approve a request, level by level, fixed at submit (D6). A pure function of the database and the items,
 // so the preview and the submit cannot disagree. Every row at a level must approve (D7).
+// Two workflows:
+//  - Workflow A (Course / Syllabus / Grading / Course-Outcome / Course-Relation): L1 (R4) -> L2 (R3) -> L3 (R2 Pool) -> L4 (R1 Pool).
+//  - Workflow B (Program / Curriculum / PLO / ProgramInfo): L3 (R2 Pool) -> L4 (R1 Pool).
+//  - ORGANIZATION: L4 (R1 Pool).
 @Injectable()
 export class RoutingPlanner {
   async plan(
@@ -122,10 +149,32 @@ export class RoutingPlanner {
       request.createdById,
       today,
     );
-    // Organisational requests never had levels 1 and 2 (D16): no "skipped" history is written.
+    // Organisational requests never had lower levels (D16): no "skipped" history is written.
     if (request.requestType === ChangeRequestType.ORGANIZATION) {
       return { steps: [academicOffice], affectedPrograms: [] };
     }
+    const creatorSelfApproves = await maySelfApprove(db, request.createdById);
+    // Workflow B: Program / Curriculum / PLO / ProgramInfo -> R2 (L3) -> R1 (L4) directly.
+    if (isProgramWorkflow(request)) {
+      const programs = request.programId
+        ? await this.programById(db, request.programId)
+        : [];
+      const facultyIds = [
+        ...new Set(programs.flatMap((p) => (p.facultyId ? [p.facultyId] : []))),
+      ];
+      const facultySteps = await this.facultyLeadershipSteps(
+        db,
+        facultyIds,
+        request.createdById,
+        creatorSelfApproves,
+        today,
+      );
+      return {
+        steps: [...facultySteps, academicOffice],
+        affectedPrograms: programs,
+      };
+    }
+    // Workflow A: Course-level requests.
     // A relation also concerns the course at its other end, so a foreign request course is not enough to skip.
     const relationRouting =
       request.requestType === ChangeRequestType.COURSE_RELATION;
@@ -141,6 +190,10 @@ export class RoutingPlanner {
         steps: [
           skipped(APPROVAL_LEVEL.COORDINATOR, SKIP_REASONS.FOREIGN_COURSE),
           skipped(APPROVAL_LEVEL.DIRECTOR, SKIP_REASONS.FOREIGN_COURSE),
+          skipped(
+            APPROVAL_LEVEL.FACULTY_LEADERSHIP,
+            SKIP_REASONS.FOREIGN_COURSE,
+          ),
           academicOffice,
         ],
         affectedPrograms: [],
@@ -153,6 +206,15 @@ export class RoutingPlanner {
       : relationRouting
         ? await this.programsUsingAny(db, courses)
         : await this.programsUsing(db, request.courseId!);
+    const facultyIds = [
+      ...new Set([
+        ...(request.course?.ownerFacultyId
+          ? [request.course.ownerFacultyId]
+          : []),
+        ...courses.flatMap((c) => (c.ownerFacultyId ? [c.ownerFacultyId] : [])),
+        ...programs.flatMap((p) => (p.facultyId ? [p.facultyId] : [])),
+      ]),
+    ];
     const steps = [
       ...(await this.coordinatorSteps(
         db,
@@ -167,9 +229,15 @@ export class RoutingPlanner {
         request.course !== null,
         today,
       )),
+      ...(await this.facultyLeadershipSteps(
+        db,
+        facultyIds,
+        request.createdById,
+        creatorSelfApproves,
+        today,
+      )),
       academicOffice,
     ];
-    const creatorSelfApproves = await maySelfApprove(db, request.createdById);
     return {
       steps: steps.map((step) =>
         // FR-61, BR-27: nobody approves their own request; the row stays as a record. Demo accounts excepted.
@@ -183,7 +251,69 @@ export class RoutingPlanner {
     };
   }
 
-  // Level 3 is an office, not a person: the row has no approver and any other active R1 acts on it (D8, F13-01).
+  // Level 3 is a pool per faculty: any active R2 holder of that faculty acts on the step.
+  private async facultyLeadershipSteps(
+    db: Db,
+    facultyIds: readonly string[],
+    creatorId: string,
+    creatorSelfApproves: boolean,
+    today: Date,
+  ): Promise<PlannedStep[]> {
+    if (facultyIds.length === 0) return [];
+    const faculties = await db.orgUnit.findMany({
+      where: { id: { in: [...facultyIds] } },
+      select: { id: true, unitCode: true },
+      orderBy: { unitCode: 'asc' },
+    });
+    const steps: PlannedStep[] = [];
+    for (const faculty of faculties) {
+      const hasHolder = await hasFacultyLeadershipHolder(db, faculty.id, today);
+      if (!hasHolder) {
+        throw new AppException({
+          ...SUBMISSION_ERRORS.NO_FACULTY_LEADERSHIP,
+          message: `${SUBMISSION_ERRORS.NO_FACULTY_LEADERSHIP.message} Mã khoa: ${faculty.unitCode}.`,
+        });
+      }
+      const creatorIsHolder = await isFacultyLeadershipHolder(
+        db,
+        creatorId,
+        faculty.id,
+        today,
+      );
+      if (
+        creatorIsHolder &&
+        !creatorSelfApproves &&
+        !(await otherFacultyLeadershipHolderExists(
+          db,
+          faculty.id,
+          creatorId,
+          today,
+        ))
+      ) {
+        steps.push(
+          skipped(APPROVAL_LEVEL.FACULTY_LEADERSHIP, SKIP_REASONS.CREATOR, {
+            forFacultyId: faculty.id,
+            scopeLabel: faculty.unitCode,
+          }),
+        );
+        continue;
+      }
+      steps.push({
+        approvalLevel: APPROVAL_LEVEL.FACULTY_LEADERSHIP,
+        approverId: null,
+        forSubjectGroupId: null,
+        forProgramId: null,
+        forFacultyId: faculty.id,
+        isSkipped: false,
+        skipReason: null,
+        approverName: null,
+        scopeLabel: faculty.unitCode,
+      });
+    }
+    return steps;
+  }
+
+  // Level 4 is an office, not a person: the row has no approver and any other active R1 acts on it (D8, F13-01).
   private async academicOfficeStep(
     db: Db,
     creatorId: string,
@@ -201,6 +331,7 @@ export class RoutingPlanner {
       approverId: null,
       forSubjectGroupId: null,
       forProgramId: null,
+      forFacultyId: null,
       isSkipped: false,
       skipReason: null,
       approverName: null,
@@ -223,14 +354,18 @@ export class RoutingPlanner {
           id: { in: [...ids] },
           ownerFaculty: { unitCode: HOME_FACULTY_CODE },
         },
-        select: { id: true, ownerGroupId: true },
+        select: { id: true, ownerGroupId: true, ownerFacultyId: true },
       });
       return { courses, touchesCourses: true };
     }
     if (request.course) {
       return {
         courses: [
-          { id: request.course.id, ownerGroupId: request.course.ownerGroupId },
+          {
+            id: request.course.id,
+            ownerGroupId: request.course.ownerGroupId,
+            ownerFacultyId: request.course.ownerFacultyId,
+          },
         ],
         touchesCourses: true,
       };
@@ -336,6 +471,7 @@ export class RoutingPlanner {
           approverId: member.lecturerId,
           forSubjectGroupId: group.id,
           forProgramId: null,
+          forFacultyId: null,
           isSkipped: false,
           skipReason: null,
           approverName: member.lecturer.fullName,
@@ -388,6 +524,7 @@ export class RoutingPlanner {
           approverId: row.directorId,
           forSubjectGroupId: null,
           forProgramId: program.id,
+          forFacultyId: null,
           isSkipped: false,
           skipReason: null,
           approverName: row.director.fullName,
@@ -450,6 +587,7 @@ export class RoutingPlanner {
 const PROGRAM_NAME_SELECT = {
   id: true,
   programCode: true,
+  facultyId: true,
   versions: {
     where: { sourceRequestId: null },
     orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
@@ -461,11 +599,13 @@ const PROGRAM_NAME_SELECT = {
 function toAffected(program: {
   id: string;
   programCode: string;
+  facultyId?: string;
   versions: { programName: string }[];
 }): AffectedProgram {
   return {
     id: program.id,
     programCode: program.programCode,
     programName: program.versions[0]?.programName ?? program.programCode,
+    ...(program.facultyId !== undefined && { facultyId: program.facultyId }),
   };
 }

@@ -22,6 +22,7 @@ import { IMPORT_ERRORS } from './import-errors.js';
 export const STUDENT_IMPORT_TYPES: readonly ImportType[] = [
   ImportType.STUDENT_LIST,
   ImportType.ACADEMIC_RESULT,
+  ImportType.PROGRAM_TRANSFER,
 ];
 export const isStudentImportType = (importType: ImportType): boolean =>
   STUDENT_IMPORT_TYPES.includes(importType);
@@ -31,6 +32,7 @@ export const IMPORT_TYPE_SUPPORT = {
   CURRICULUM: { enabled: true, needsVersion: true },
   STUDENT_LIST: { enabled: true, needsVersion: false },
   ACADEMIC_RESULT: { enabled: true, needsVersion: false },
+  PROGRAM_TRANSFER: { enabled: true, needsVersion: false },
 } as const satisfies Record<
   ImportType,
   { enabled: boolean; needsVersion: boolean }
@@ -40,6 +42,7 @@ export const IMPORT_PERMISSION = {
   CURRICULUM: PERMISSIONS.CURRICULUM_IMPORT_EXPORT_EXCEL,
   STUDENT_LIST: PERMISSIONS.DATA_IMPORT_EXCEL,
   ACADEMIC_RESULT: PERMISSIONS.DATA_IMPORT_EXCEL,
+  PROGRAM_TRANSFER: PERMISSIONS.DATA_IMPORT_EXCEL,
 } as const satisfies Record<ImportType, PermissionCode>;
 
 export function assertSupported(importType: ImportType): void {

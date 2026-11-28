@@ -102,7 +102,13 @@ describe('programCodeFor', () => {
 });
 
 describe('degreeLevelFor', () => {
-  it('reads LoaiCTDT first, then the name, then the semester count', () => {
+  it('reads CapDT graduate levels, then LoaiCTDT, then the name, then the semester count', () => {
+    expect(degreeLevelFor(frame({ CapDT: 'CD02', SoHK: '4' }))).toBe(
+      DegreeLevel.MASTER,
+    );
+    expect(degreeLevelFor(frame({ CapDT: 'CD03', SoHK: '6' }))).toBe(
+      DegreeLevel.DOCTORATE,
+    );
     expect(degreeLevelFor(frame({ LoaiCTDT: 'CN', SoHK: '10' }))).toBe(
       DegreeLevel.BACHELOR,
     );
@@ -114,6 +120,19 @@ describe('degreeLevelFor', () => {
     );
     expect(degreeLevelFor(frame({ SoHK: '9' }))).toBe(DegreeLevel.ENGINEER);
     expect(degreeLevelFor(frame({ SoHK: '8' }))).toBe(DegreeLevel.BACHELOR);
+  });
+
+  it('builds distinct program codes for master and doctorate frames', () => {
+    expect(
+      programCodeFor(
+        frame({ CapDT: 'CD02', TenNganh: 'Khoa học máy tính', SoHK: '4' }),
+      ),
+    ).toBe('CNTT-THS');
+    expect(
+      programCodeFor(
+        frame({ CapDT: 'CD03', TenNganh: 'Khoa học máy tính', SoHK: '6' }),
+      ),
+    ).toBe('CNTT-TS');
   });
 });
 
@@ -138,6 +157,23 @@ describe('selectFrameScope', () => {
     expect(scope.excluded).toEqual([
       { frameCode: '1022001', level: 'CD02', students: 17 },
     ]);
+  });
+
+  it('includes CD02 and CD03 frames when includeGraduate is enabled', () => {
+    const scope = selectFrameScope(
+      [
+        frame({ MaNganh: '1024001', CapDT: 'CD01' }),
+        frame({ MaNganh: '1022001', CapDT: 'CD02' }),
+        frame({ MaNganh: '1023001', CapDT: 'CD03' }),
+      ],
+      new Map([
+        ['1022001', 17],
+        ['1023001', 5],
+      ]),
+      { includeGraduate: true },
+    );
+    expect(scope.frameCodes).toEqual(['1022001', '1023001', '1024001']);
+    expect(scope.excluded).toEqual([]);
   });
 });
 

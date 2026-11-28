@@ -26,5 +26,6 @@ export const UPLOAD_STATUSES: readonly ChangeRequestStatus[] = [
   ChangeRequestStatus.DRAFT,
   ChangeRequestStatus.PENDING_COORDINATOR,
   ChangeRequestStatus.PENDING_DIRECTOR,
+  ChangeRequestStatus.PENDING_FACULTY_LEADERSHIP,
   ChangeRequestStatus.PENDING_ACADEMIC_OFFICE,
 ];

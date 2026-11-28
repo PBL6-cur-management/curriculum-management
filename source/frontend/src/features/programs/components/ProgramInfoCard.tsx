@@ -6,7 +6,7 @@ import type { ProgramDetail } from '../api/programs';
 import {
   DEGREE_LEVEL_LABELS,
   VERSION_STATUS_LABELS,
-  versionLabel,
+  versionWithDecision,
 } from '../constants/programLabels';
 
 interface ProgramInfoCardProps {
@@ -28,13 +28,26 @@ export function ProgramInfoCard({ program, actions }: ProgramInfoCardProps) {
           {program.programCode}
         </Descriptions.Item>
         <Descriptions.Item label="Phiên bản">
-          {versionLabel(info)} <Tag>{VERSION_STATUS_LABELS[info.status]}</Tag>
+          {versionWithDecision(info)}{' '}
+          <Tag>{VERSION_STATUS_LABELS[info.status]}</Tag>
         </Descriptions.Item>
         <Descriptions.Item label="Tên chương trình">
           {info.programName}
         </Descriptions.Item>
         <Descriptions.Item label="Trình độ">
           {DEGREE_LEVEL_LABELS[program.degreeLevel]}
+        </Descriptions.Item>
+        <Descriptions.Item label="Ngành đào tạo">
+          {program.major ? (
+            <Tag color="blue">
+              {program.major.majorCode} — {program.major.majorName}
+            </Tag>
+          ) : (
+            EMPTY
+          )}
+        </Descriptions.Item>
+        <Descriptions.Item label="GPA tốt nghiệp tối thiểu">
+          {info.minGraduationGpa ?? EMPTY}
         </Descriptions.Item>
         <Descriptions.Item label="Mã ngành">{info.majorCode}</Descriptions.Item>
         <Descriptions.Item label="Tên ngành">
@@ -65,7 +78,7 @@ export function ProgramInfoCard({ program, actions }: ProgramInfoCardProps) {
               >
                 {source.programCode}
               </Link>{' '}
-              — {versionLabel(source.version)}
+              — {versionWithDecision(source.version)}
             </>
           ) : (
             EMPTY

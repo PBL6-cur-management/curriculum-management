@@ -266,6 +266,85 @@ describe('SyllabusPage', () => {
     ).toBeInTheDocument();
   });
 
+  it('shows revision history tab and opens historical revision details in a drawer', async () => {
+    renderPage(
+      courseSyllabus({
+        published: syllabus({
+          id: 's2',
+          revisionNumber: 2,
+          status: 'PUBLISHED',
+          publishedAt: '2026-09-01T00:00:00.000Z',
+          effectiveSemester: {
+            id: 'sem2',
+            semesterCode: '2026-2027-1',
+            academicYear: '2026-2027',
+            termInYear: 1,
+            startDate: '2026-09-01',
+            startDateEstimated: false,
+          },
+          documentNumber: 'QĐ-202/ĐHBK',
+          signedDate: '2026-08-20',
+        }),
+        draft: null,
+      }),
+      (url) => {
+        if (url === '/api/courses/c1/syllabi/history')
+          return json([
+            {
+              id: 's2',
+              revisionNumber: 2,
+              status: 'PUBLISHED',
+              effectiveSemester: {
+                id: 'sem2',
+                semesterCode: '2026-2027-1',
+                academicYear: '2026-2027',
+                termInYear: 1,
+                startDate: '2026-09-01',
+                startDateEstimated: false,
+              },
+              documentNumber: 'QĐ-202/ĐHBK',
+              signedDate: '2026-08-20',
+              publishedAt: '2026-09-01T00:00:00.000Z',
+              originRequestId: 'r2',
+              attachmentCount: 1,
+            },
+            {
+              id: 's1',
+              revisionNumber: 1,
+              status: 'HISTORICAL',
+              effectiveSemester: null,
+              documentNumber: 'QĐ-100/ĐHBK',
+              signedDate: '2025-08-15',
+              publishedAt: '2025-09-01T00:00:00.000Z',
+              originRequestId: null,
+              attachmentCount: 0,
+            },
+          ]);
+        if (url === '/api/courses/c1/syllabi/s1')
+          return json(
+            syllabus({
+              id: 's1',
+              revisionNumber: 1,
+              status: 'HISTORICAL',
+              courseDescription: '<p>Nội dung phiên bản cũ</p>',
+              documentNumber: 'QĐ-100/ĐHBK',
+              signedDate: '2025-08-15',
+              publishedAt: '2025-09-01T00:00:00.000Z',
+            }),
+          );
+        return undefined;
+      },
+    );
+    expect(await screen.findByText(/QĐ-202\/ĐHBK/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('tab', { name: 'Lịch sử phiên bản' }));
+    expect(await screen.findByText('QĐ-100/ĐHBK')).toBeInTheDocument();
+    const oldRow = screen.getByText('QĐ-100/ĐHBK').closest('tr')!;
+    fireEvent.click(within(oldRow).getByRole('button', { name: 'Xem chi tiết' }));
+    expect(
+      await screen.findByText('Nội dung phiên bản cũ'),
+    ).toBeInTheDocument();
+  });
+
   it('answers with a result when the course is missing', async () => {
     renderPage(json({ code: 'COURSE_NOT_FOUND', message: 'x' }, 404));
     expect(

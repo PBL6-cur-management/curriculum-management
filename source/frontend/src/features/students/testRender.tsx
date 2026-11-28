@@ -47,6 +47,7 @@ export const student = {
       cohort,
       appliedVersion: { id: 'v1', versionNumber: '1.0', status: 'ACTIVE' },
       admissionVersionId: 'v1',
+      track: null,
       cohortAssignmentId: 'ca1',
       fromSemester: semester,
       untilSemester: null,
@@ -95,6 +96,7 @@ interface RenderStudentOptions {
   path?: string;
   route?: string;
   roleCodes?: string[];
+  permissions?: components['schemas']['PermissionCode'][];
   responses?: ReadonlyMap<string, unknown>;
   writeResponse?: (path: string, body: unknown) => Response;
 }
@@ -111,7 +113,8 @@ export function renderStudentPage(options: RenderStudentOptions) {
           options.writeResponse?.(path, body) ?? json(student.enrollments[0])
         );
       }
-      if (path === '/api/auth/me') return json(syntheticMe(options.roleCodes));
+      if (path === '/api/auth/me')
+        return json(syntheticMe(options.roleCodes, options.permissions));
       if (path === '/api/semesters')
         return json([
           semester,
@@ -120,6 +123,8 @@ export function renderStudentPage(options: RenderStudentOptions) {
       if (path === '/api/cohorts') return json([cohort]);
       if (path.startsWith('/api/students/program-options'))
         return json(options.responses?.get(path) ?? [program]);
+      if (path.startsWith('/api/program-versions/') && path.endsWith('/tracks'))
+        return json(options.responses?.get(path) ?? []);
       const response = options.responses?.get(path);
       return response instanceof Response
         ? response.clone()

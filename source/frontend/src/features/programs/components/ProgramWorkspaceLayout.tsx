@@ -125,13 +125,13 @@ function useWorkspaceGroups(): WorkspaceGroup[] {
       pages: [
         {
           key: ROUTES.courseGraph,
-          label: 'Đồ thị học phần',
+          label: 'Cây chương trình đào tạo',
           scope: 'version',
           visible: seesMatrices,
         },
         {
           key: ROUTES.programHealth,
-          label: 'Sức khỏe chương trình',
+          label: 'Rà soát chất lượng CTĐT',
           scope: 'version',
           visible: seesMatrices,
         },
@@ -323,7 +323,7 @@ export function ProgramWorkspaceLayout() {
                   label:
                     version.status === 'DRAFT'
                       ? 'Bản nháp'
-                      : `${versionLabel(version)} · ${VERSION_STATUS_LABELS[version.status]}`,
+                      : `${versionLabel(version)}${'decisionNumber' in version && version.decisionNumber ? ` (${String(version.decisionNumber)})` : ''} · ${VERSION_STATUS_LABELS[version.status]}`,
                 }))}
               />
             </Flex>

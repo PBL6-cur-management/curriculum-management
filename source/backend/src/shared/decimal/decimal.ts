@@ -14,3 +14,7 @@ export function toWireDecimal(value: Prisma.Decimal): string {
 export const GRADE_POINT_PATTERN = /^(4(\.0{1,2})?|[0-3](\.\d{1,2})?)$/;
 export const GRADE_POINT_MESSAGE =
   'Ngưỡng điểm theo thang 4: từ 0 đến 4, tối đa 2 chữ số thập phân (ví dụ 2 hoặc 2.5).';
+
+// 10-point scale, Decimal(4,2): 0 to 10 with at most two decimals (DEC-11 fix: prerequisite thresholds are 10-point).
+export const SCORE10_PATTERN = /^(10(\.0{1,2})?|\d(\.\d{1,2})?)$/;
+export const SCORE10_MESSAGE = 'Điểm phải từ 0 đến 10';

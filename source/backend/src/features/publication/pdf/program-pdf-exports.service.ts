@@ -44,22 +44,36 @@ export interface PdfJobData {
 const STATUS_LABELS: Record<ProgramVersionStatus, string> = {
   DRAFT: 'Nháp',
   PENDING: 'Chờ hiệu lực',
-  ACTIVE: 'Đang hiệu lực',
+  ACTIVE: 'Mới nhất',
   HISTORICAL: 'Lịch sử',
 };
 const DEGREE_LABELS: Record<string, string> = {
   ENGINEER: 'Kỹ sư',
   BACHELOR: 'Cử nhân',
+  MASTER: 'Thạc sĩ',
+  DOCTORATE: 'Tiến sĩ',
 };
 const SAFE_NAME = /[^A-Za-z0-9._-]+/g;
 
 export const pdfPath = (exportId: string) => `${PDF_FILE_DIR}/${exportId}.pdf`;
 
 export function snapshotOf(
-  version: PublicationVersion,
+  version: PublicationVersion & {
+    cohortVersions?: readonly { cohort: { cohortCode: string } }[];
+  },
   degreeLevel: string,
   capturedAt: Date,
+  assignedCohorts?: readonly string[],
 ): ProgramPdfSnapshot {
+  const cohorts =
+    assignedCohorts ??
+    version.cohortVersions?.map((row) => row.cohort.cohortCode) ??
+    [];
+  const baseStatus = STATUS_LABELS[version.status];
+  const statusLabel =
+    cohorts.length > 0
+      ? `${baseStatus} (Khóa áp dụng: ${cohorts.join(', ')})`
+      : baseStatus;
   const bySemester = new Map<number, PublicationVersion['curriculumItems']>();
   for (const item of version.curriculumItems)
     bySemester.set(item.plannedSemester, [
@@ -74,7 +88,7 @@ export function snapshotOf(
     majorName: version.majorName,
     degreeLevel: DEGREE_LABELS[degreeLevel] ?? degreeLevel,
     versionNumber: version.versionNumber,
-    statusLabel: STATUS_LABELS[version.status],
+    statusLabel,
     decisionNumber: version.decisionNumber,
     signedDate: version.signedDate?.toISOString().slice(0, 10) ?? null,
     effectiveSemester: version.effectiveSemester?.semesterCode ?? null,
@@ -134,10 +148,18 @@ export class ProgramPdfExportsService {
     versionId: string,
   ): Promise<ProgramPdfExportDto> {
     const version = await this.source.read(access, programId, versionId);
-    const program = await this.prisma.program.findUniqueOrThrow({
-      where: { id: programId },
-      select: { degreeLevel: true },
-    });
+    const [program, cohortLinks] = await Promise.all([
+      this.prisma.program.findUniqueOrThrow({
+        where: { id: programId },
+        select: { degreeLevel: true },
+      }),
+      this.prisma.cohortVersion.findMany({
+        where: { programVersionId: version.id },
+        select: { cohort: { select: { cohortCode: true } } },
+        orderBy: { cohort: { intakeYear: 'asc' } },
+      }),
+    ]);
+    const assignedCohorts = cohortLinks.map((row) => row.cohort.cohortCode);
     const now = new Date();
     const exportId = randomUUID();
     const label = version.versionNumber ? `v${version.versionNumber}` : 'nhap';
@@ -152,7 +174,7 @@ export class ProgramPdfExportsService {
       ),
       draft: version.status === ProgramVersionStatus.DRAFT,
       requestedAt: now.toISOString(),
-      snapshot: snapshotOf(version, program.degreeLevel, now),
+      snapshot: snapshotOf(version, program.degreeLevel, now, assignedCohorts),
     };
     await this.sweepExpired().catch((error: unknown) =>
       this.logger.warn(`PDF sweep failed: ${String(error)}`),

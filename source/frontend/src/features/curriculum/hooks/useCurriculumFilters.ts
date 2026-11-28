@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 import type { CurriculumItem } from '../api/curriculum';
 
 export type CurriculumKind = 'all' | 'compulsory' | 'elective';
+// 'ALL' = all items; 'COMMON' = items with track === null; otherwise specific trackId.
+export type CurriculumTrackFilter = 'ALL' | 'COMMON' | (string & {});
 
 export interface CurriculumFilters {
   search: string;
@@ -9,6 +11,7 @@ export interface CurriculumFilters {
   // `undefined` = any block; `null` = rows with no symbol.
   blockSymbol: string | null | undefined;
   kind: CurriculumKind;
+  trackFilter?: CurriculumTrackFilter;
 }
 
 export const EMPTY_CURRICULUM_FILTERS: CurriculumFilters = {
@@ -16,9 +19,19 @@ export const EMPTY_CURRICULUM_FILTERS: CurriculumFilters = {
   semester: null,
   blockSymbol: undefined,
   kind: 'all',
+  trackFilter: 'ALL',
 };
 
 const lower = (text: string) => text.toLocaleLowerCase('vi');
+
+function matchesTrack(
+  item: CurriculumItem,
+  trackFilter: CurriculumTrackFilter | undefined,
+): boolean {
+  if (!trackFilter || trackFilter === 'ALL') return true;
+  if (trackFilter === 'COMMON') return item.track === null;
+  return item.track?.id === trackFilter;
+}
 
 // Pure so it is tested without rendering (D16): filtering runs over the whole loaded curriculum, at most 200 rows.
 export function applyCurriculumFilters(
@@ -36,7 +49,8 @@ export function applyCurriculumFilters(
       (filters.blockSymbol === undefined ||
         item.blockSymbol === filters.blockSymbol) &&
       (filters.kind === 'all' ||
-        item.isElective === (filters.kind === 'elective')),
+        item.isElective === (filters.kind === 'elective')) &&
+      matchesTrack(item, filters.trackFilter),
   );
 }
 
@@ -45,7 +59,8 @@ export function isFiltering(filters: CurriculumFilters): boolean {
     filters.search.trim() !== '' ||
     filters.semester !== null ||
     filters.blockSymbol !== undefined ||
-    filters.kind !== 'all'
+    filters.kind !== 'all' ||
+    (filters.trackFilter !== undefined && filters.trackFilter !== 'ALL')
   );
 }
 

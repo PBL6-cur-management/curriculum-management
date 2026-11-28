@@ -109,12 +109,19 @@ export function CurriculumTable({
     {
       title: 'Loại',
       render: (_value, item) => (
-        <>
-          {item.isElective
-            ? ELECTIVE_KIND_LABELS.elective
-            : ELECTIVE_KIND_LABELS.compulsory}{' '}
+        <Space size={4} wrap>
+          <span>
+            {item.isElective
+              ? ELECTIVE_KIND_LABELS.elective
+              : ELECTIVE_KIND_LABELS.compulsory}
+          </span>
           {item.electiveGroup && <Tag>{item.electiveGroup.groupCode}</Tag>}
-        </>
+          {item.track && (
+            <Tooltip title={item.track.trackName}>
+              <Tag color="geekblue">{item.track.trackCode}</Tag>
+            </Tooltip>
+          )}
+        </Space>
       ),
     },
     {

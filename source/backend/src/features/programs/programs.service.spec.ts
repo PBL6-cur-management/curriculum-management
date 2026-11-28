@@ -48,6 +48,8 @@ function version(patch: Partial<VersionInfoRow> = {}): VersionInfoRow {
     totalCredits: new Prisma.Decimal('150'),
     compulsoryCredits: new Prisma.Decimal('140'),
     electiveCredits: new Prisma.Decimal('10'),
+    minGraduationGpa: new Prisma.Decimal('2.00'),
+    decisionNumber: null,
     updatedAt: NOW,
     signedDate: null,
     publishedAt: null,
@@ -62,6 +64,8 @@ function row(patch: Partial<ProgramRow> = {}): ProgramRow {
     programCode: '1024034',
     facultyId: FACULTY.id,
     faculty: FACULTY,
+    majorId: null,
+    major: null,
     degreeLevel: DegreeLevel.ENGINEER,
     status: ProgramStatus.ACTIVE,
     clonedFromId: null,
@@ -368,6 +372,7 @@ describe('ProgramsService', () => {
             id: 'src',
             versionNumber: null,
             status: ProgramVersionStatus.DRAFT,
+            decisionNumber: null,
             program: { id: 'p0', programCode: '1024033' },
           },
         }),
@@ -376,7 +381,12 @@ describe('ProgramsService', () => {
       expect(detail.clonedFrom).toEqual({
         programId: 'p0',
         programCode: '1024033',
-        version: { id: 'src', versionNumber: null, status: 'DRAFT' },
+        version: {
+          id: 'src',
+          versionNumber: null,
+          status: 'DRAFT',
+          decisionNumber: null,
+        },
       });
     });
 

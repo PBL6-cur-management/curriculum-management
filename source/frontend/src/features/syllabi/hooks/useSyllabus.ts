@@ -11,6 +11,8 @@ import {
   deleteWeek,
   downloadAttachment,
   fetchCourseSyllabus,
+  fetchSyllabusHistory,
+  fetchSyllabusRevision,
   reorderClos,
   reorderWeeks,
   updateClo,
@@ -31,6 +33,9 @@ export const SYLLABUS_QUERY_KEYS = {
   courseRoot: (courseId: string) => ['syllabi', courseId] as const,
   course: (courseId: string, requestId?: string, versionId?: string) =>
     ['syllabi', courseId, requestId ?? null, versionId ?? null] as const,
+  history: (courseId: string) => ['syllabi', courseId, 'history'] as const,
+  revision: (courseId: string, syllabusId: string) =>
+    ['syllabi', courseId, 'revision', syllabusId] as const,
 };
 
 // With a version id the answer is the revision that released version pins (F-15), not the course's current one.
@@ -43,6 +48,25 @@ export function useCourseSyllabus(
     queryKey: SYLLABUS_QUERY_KEYS.course(courseId, requestId, versionId),
     queryFn: () => fetchCourseSyllabus(courseId, requestId, versionId),
     enabled: Boolean(courseId),
+  });
+}
+
+export function useSyllabusHistory(courseId: string, enabled = true) {
+  return useQuery({
+    queryKey: SYLLABUS_QUERY_KEYS.history(courseId),
+    queryFn: () => fetchSyllabusHistory(courseId),
+    enabled: Boolean(courseId) && enabled,
+  });
+}
+
+export function useSyllabusRevision(
+  courseId: string,
+  syllabusId: string | null,
+) {
+  return useQuery({
+    queryKey: SYLLABUS_QUERY_KEYS.revision(courseId, syllabusId ?? ''),
+    queryFn: () => fetchSyllabusRevision(courseId, syllabusId!),
+    enabled: Boolean(courseId) && Boolean(syllabusId),
   });
 }
 

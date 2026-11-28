@@ -8,9 +8,7 @@ interface RequireStudentStaffProps {
 }
 export function RequireStudentStaff({ children }: RequireStudentStaffProps) {
   const { data: me } = useMe();
-  if (
-    !me?.roles.some((role) => role.roleCode === 'R1' || role.roleCode === 'R3')
-  )
+  if (!me?.roles.some((role) => role.roleCode !== 'R6'))
     return (
       <Result
         status="403"

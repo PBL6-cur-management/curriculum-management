@@ -48,13 +48,14 @@ const item = {
 };
 
 const step = (
-  level: 1 | 2 | 3,
+  level: 1 | 2 | 3 | 4,
   patch: Partial<PlannedStep> = {},
 ): PlannedStep => ({
   approvalLevel: level,
-  approverId: level === 3 ? null : `u${level}`,
+  approverId: level >= 3 ? null : `u${level}`,
   forSubjectGroupId: null,
   forProgramId: null,
+  forFacultyId: null,
   isSkipped: false,
   skipReason: null,
   approverName: null,
@@ -177,7 +178,7 @@ describe('SubmissionService', () => {
         steps: [
           step(1, { approverId: null, isSkipped: true, skipReason: 'x' }),
           step(2, { isSkipped: true, skipReason: 'y' }),
-          step(3),
+          step(4),
         ],
         affectedPrograms: [],
       });
@@ -197,7 +198,7 @@ describe('SubmissionService', () => {
       expect(notifier.arrived).toHaveBeenCalledWith(
         tx,
         expect.anything(),
-        3,
+        4,
         'u1',
       );
     });

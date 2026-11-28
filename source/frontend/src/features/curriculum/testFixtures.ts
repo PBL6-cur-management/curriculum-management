@@ -2,6 +2,7 @@ import type {
   Curriculum,
   CurriculumItem,
   ElectiveGroup,
+  ProgramTrack,
 } from './api/curriculum';
 
 // Shared by the curriculum page and dialog tests: a small 4-semester curriculum shaped like the server's answer.
@@ -28,6 +29,7 @@ export function item(
     blockName: null,
     isElective: false,
     electiveGroup: null,
+    track: null,
     htDa: false,
     tqDa: false,
     minStudiedScore: null,
@@ -44,10 +46,28 @@ export function group(patch: Partial<ElectiveGroup> = {}): ElectiveGroup {
     id: 'g1',
     groupCode: 'TC1',
     groupName: 'Tự chọn chuyên ngành',
+    trackId: null,
     minCredits: '6',
     minCourses: null,
     itemIds: [],
     listedCredits: '0',
+    itemCount: 0,
+    ...patch,
+  };
+}
+
+export function trackFixture(
+  patch: Partial<ProgramTrack> = {},
+): ProgramTrack {
+  return {
+    id: 't-cnpm',
+    trackCode: 'CNPM',
+    trackName: 'Công nghệ phần mềm',
+    englishName: 'Software Engineering',
+    description: null,
+    sortOrder: 1,
+    compulsoryCredits: '8',
+    electiveCredits: '6',
     itemCount: 0,
     ...patch,
   };
@@ -125,6 +145,7 @@ export function curriculum(patch: Partial<Curriculum> = {}): Curriculum {
     electiveGroups: [
       group({ itemIds: ['i-IT301'], listedCredits: '3', itemCount: 1 }),
     ],
+    tracks: [],
     programCredits: {
       computed: { compulsory: '5.5', elective: '6', total: '11.5' },
       declared: { compulsory: '100', elective: '50', total: '150' },

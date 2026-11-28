@@ -19,7 +19,9 @@ describe('ImportsReader', () => {
         OR: [
           {
             performedById: 'user',
-            importType: { notIn: ['STUDENT_LIST', 'ACADEMIC_RESULT'] },
+            importType: {
+              notIn: ['STUDENT_LIST', 'ACADEMIC_RESULT', 'PROGRAM_TRANSFER'],
+            },
           },
         ],
       },

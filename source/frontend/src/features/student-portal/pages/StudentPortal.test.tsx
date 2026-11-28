@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { PortalCourse, PortalMe } from '../api/portal';
 import { HomeGate } from '../components/HomeGate';
 import { PortalCurriculumPage } from './PortalCurriculumPage';
+import { PortalGraduationPage } from './PortalGraduationPage';
 import { PortalHomePage } from './PortalHomePage';
 import { PortalRegistrationPage } from './PortalRegistrationPage';
 
@@ -98,6 +99,7 @@ function renderAt(element: ReactNode, entry: string, roles: string[] = ['R6']) {
       { path: '/student', element: <div>Cổng sinh viên mở</div> },
       { path: '/student/curriculum', element },
       { path: '/student/registration', element },
+      { path: '/student/graduation', element },
     ],
     { initialEntries: [entry] },
   );
@@ -289,5 +291,67 @@ describe('student portal', () => {
     expect(
       screen.queryByRole('button', { name: /Đăng ký/ }),
     ).not.toBeInTheDocument();
+  });
+
+  it('displays GPA and track selection warning on PortalGraduationPage', async () => {
+    stub({
+      '/api/portal/me': ME,
+      '/api/semesters': [],
+      '/api/students/s1/graduation': {
+        status: 'REVIEWED',
+        error: null,
+        result: {
+          schemaVersion: 1,
+          ruleVersion: 'graduation-v1',
+          evaluatedAt: '2026-10-31T00:00:00.000Z',
+          context: {
+            studentId: 's1',
+            programId: 'p1',
+            semesterId: 'sem1',
+            enrollmentId: 'en1',
+            studentCode: 'SYN00001',
+            fullName: 'Sinh viên Tổng hợp',
+            programCode: 'CNTT',
+            programName: 'Công nghệ thông tin',
+            cohortId: 'c1',
+            cohortCode: 'K2023',
+            programVersionId: 'v1',
+            versionNumber: '2023',
+            semesterCode: '2026-2027-1',
+            semesterStartDate: '2026-09-01',
+            versionSource: 'COHORT',
+            cohortAssignmentId: 'ca1',
+          },
+          conclusion: 'NOT_ELIGIBLE',
+          cumulativeGpa: '3.15',
+          minGraduationGpa: '2.00',
+          shortfalls: [
+            {
+              code: 'TRACK_NOT_SELECTED',
+              category: 'TRACK',
+              message: 'Chưa đăng ký định hướng chuyên ngành.',
+            },
+          ],
+          warnings: [],
+          credits: {
+            requiredTotal: '150',
+            recognizedTotal: '120',
+            missingTotal: '30',
+            compulsory: '90',
+            elective: '30',
+            free: '0',
+          },
+          electiveGroups: [],
+          knowledgeBlocks: [],
+          recognitions: [],
+          freeCredits: [],
+        },
+      },
+    });
+    renderAt(<PortalGraduationPage />, '/student/graduation');
+    expect(await screen.findByText('3.15 / 2.00')).toBeInTheDocument();
+    expect(
+      screen.getByText('Chưa ghi nhận định hướng / chuyên ngành con'),
+    ).toBeInTheDocument();
   });
 });

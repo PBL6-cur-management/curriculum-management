@@ -11,19 +11,26 @@ import {
   releaseOptionKeys,
 } from '../../../shared/releases/semesters';
 import {
+  bulkTransferStudents,
   createStudentEnrollment,
+  downloadTransferExport,
   fetchAppliedVersion,
   fetchEnrollmentTargets,
   fetchStudent,
   fetchStudentPrograms,
   fetchStudentResults,
   fetchStudents,
+  fetchVersionTracks,
   reconcileStudent,
+  setEnrollmentTrack,
+  type BulkTransferInput,
   type EnrollmentCommand,
+  type SetEnrollmentTrackInput,
   type StudentContext,
   type StudentDetailContext,
   type StudentListParams,
   type StudentResultParams,
+  type TransferExportParams,
 } from '../api/students';
 
 export const studentKeys = {
@@ -40,6 +47,8 @@ export const studentKeys = {
     [...STUDENT_QUERY_ROOT, 'applied', studentId, context] as const,
   targets: (studentId: string, context: StudentContext) =>
     [...STUDENT_QUERY_ROOT, 'targets', studentId, context] as const,
+  tracks: (versionId: string) =>
+    [...STUDENT_QUERY_ROOT, 'tracks', versionId] as const,
 };
 const hasContext = (context: StudentContext) =>
   Boolean(context.programId && context.semesterId);
@@ -116,6 +125,14 @@ export function useEnrollmentTargets(
     enabled: enabled && Boolean(studentId) && hasContext(context),
   });
 }
+export function useVersionTracks(versionId: string, enabled = true) {
+  return useQuery({
+    queryKey: studentKeys.tracks(versionId),
+    queryFn: () => fetchVersionTracks(versionId),
+    enabled: enabled && Boolean(versionId),
+    retry: false,
+  });
+}
 export function useCreateStudentEnrollment(studentId: string) {
   const client = useQueryClient();
   return useMutation({
@@ -123,6 +140,34 @@ export function useCreateStudentEnrollment(studentId: string) {
       createStudentEnrollment(studentId, body),
     retry: false,
     onSuccess: () => client.invalidateQueries({ queryKey: STUDENT_QUERY_ROOT }),
+  });
+}
+export function useSetEnrollmentTrack(studentId: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      enrollmentId,
+      body,
+    }: {
+      enrollmentId: string;
+      body: SetEnrollmentTrackInput;
+    }) => setEnrollmentTrack(studentId, enrollmentId, body),
+    retry: false,
+    onSuccess: () => client.invalidateQueries({ queryKey: STUDENT_QUERY_ROOT }),
+  });
+}
+export function useBulkTransferStudents() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (body: BulkTransferInput) => bulkTransferStudents(body),
+    retry: false,
+    onSuccess: () => client.invalidateQueries({ queryKey: STUDENT_QUERY_ROOT }),
+  });
+}
+export function useExportTransfers() {
+  return useMutation({
+    mutationFn: (params: TransferExportParams) => downloadTransferExport(params),
+    retry: false,
   });
 }
 export function useReconcileStudent(studentId: string) {

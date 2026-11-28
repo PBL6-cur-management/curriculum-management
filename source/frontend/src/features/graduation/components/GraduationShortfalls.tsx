@@ -1,7 +1,10 @@
 import { Collapse, List, Typography } from 'antd';
 import { EmptyState } from '../../../shared/design-system';
 import type { GraduationResult } from '../schema/graduation';
-import { SHORTFALL_LABELS } from '../constants/graduationLabels';
+import {
+  EXTRA_SHORTFALL_CODE_LABELS,
+  SHORTFALL_LABELS,
+} from '../constants/graduationLabels';
 import { displayCredits } from './graduationPresentation';
 
 interface GraduationShortfallsProps {
@@ -12,8 +15,12 @@ const SECTIONS = [
   { category: 'ELECTIVE_GROUP', label: 'Nhóm tự chọn' },
   { category: 'TOTAL_CREDITS', label: 'Tổng tín chỉ' },
   { category: 'CONDITIONAL_COURSE', label: 'Học phần điều kiện' },
+  { category: 'GPA', label: 'Điểm trung bình tích lũy' },
+  { category: 'TRACK', label: 'Định hướng / chuyên ngành con' },
 ] as const;
-function shortfallDetail(item: GraduationResult['shortfalls'][number]): string {
+function shortfallDetail(
+  item: GraduationResult['shortfalls'][number],
+): string {
   switch (item.code) {
     case 'MANDATORY_COURSE_MISSING':
     case 'CONDITIONAL_COURSE_MISSING':
@@ -24,6 +31,10 @@ function shortfallDetail(item: GraduationResult['shortfalls'][number]): string {
       return `${item.groupCode} — ${item.groupName}: yêu cầu ${item.requiredCourses}, đã đạt ${item.earnedCourses}, còn thiếu ${item.missingCourses} học phần. ${item.message}`;
     case 'TOTAL_CREDITS_MISSING':
       return `Yêu cầu ${displayCredits(item.requiredCredits)}, đã đạt ${displayCredits(item.earnedCredits)}, còn thiếu ${displayCredits(item.missingCredits)} tín chỉ. ${item.message}`;
+    case 'LOW_GPA':
+      return `GPA tích lũy đạt ${item.actualGpa}, yêu cầu tối thiểu ${item.requiredGpa}. ${item.message}`;
+    case 'TRACK_NOT_SELECTED':
+      return item.message;
   }
 }
 export function GraduationShortfalls({
@@ -52,7 +63,11 @@ export function GraduationShortfalls({
               renderItem={(item) => (
                 <List.Item>
                   <List.Item.Meta
-                    title={SHORTFALL_LABELS[item.code]}
+                    title={
+                      SHORTFALL_LABELS[item.code] ??
+                      EXTRA_SHORTFALL_CODE_LABELS[item.code] ??
+                      item.code
+                    }
                     description={shortfallDetail(item)}
                   />
                 </List.Item>

@@ -41,6 +41,7 @@ export class ProgramCloneService {
           data: {
             programCode: dto.programCode,
             facultyId: source.facultyId,
+            majorId: source.majorId,
             degreeLevel: source.degreeLevel,
             clonedFromId: version.id,
             versions: {

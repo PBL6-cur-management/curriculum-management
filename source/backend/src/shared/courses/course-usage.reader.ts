@@ -45,8 +45,11 @@ export class CourseUsageReader {
     return new Set(rows.map((row) => row.courseId));
   }
 
-  async hasStudyResults(_courseId: string): Promise<boolean> {
-    return false;
+  async hasStudyResults(
+    courseId: string,
+    client: Pick<Prisma.TransactionClient, 'academicResult'> = this.prisma,
+  ): Promise<boolean> {
+    return (await client.academicResult.count({ where: { courseId } })) > 0;
   }
 
   // Versions still in play (Draft, Pending, Active) of programs in use; one entry per row, so one per program version.

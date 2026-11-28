@@ -13,6 +13,7 @@ const ROOT = {
   unitCode: 'ROOT',
   unitName: 'Root',
   unitType: OrgUnitType.UNIVERSITY,
+  isExternal: false,
   parentUnitId: null,
   status: OrgUnitStatus.ACTIVE,
 };
@@ -32,6 +33,7 @@ const DTO: CreateOrgUnitDto = {
 
 describe('OrgUnitsService', () => {
   let findUnique: ReturnType<typeof vi.fn>;
+  let findMany: ReturnType<typeof vi.fn>;
   let create: ReturnType<typeof vi.fn>;
   let update: ReturnType<typeof vi.fn>;
   let countChildren: ReturnType<typeof vi.fn>;
@@ -40,6 +42,7 @@ describe('OrgUnitsService', () => {
 
   beforeEach(() => {
     findUnique = vi.fn().mockResolvedValue(ROOT);
+    findMany = vi.fn().mockResolvedValue([]);
     create = vi.fn().mockResolvedValue(UNIT);
     update = vi.fn().mockResolvedValue(UNIT);
     countChildren = vi.fn().mockResolvedValue(0);
@@ -50,7 +53,7 @@ describe('OrgUnitsService', () => {
         create,
         update,
         count: countChildren,
-        findMany: vi.fn().mockResolvedValue([]),
+        findMany,
       },
       subjectGroup: { count: countGroups },
     } as unknown as PrismaService);
@@ -121,5 +124,56 @@ describe('OrgUnitsService', () => {
     await expect(service.activate(UNIT.id, 'actor')).rejects.toMatchObject({
       code: 'PARENT_INACTIVE',
     });
+  });
+
+  it('supports isExternal on create/update/list and normalizes extra spaces', async () => {
+    const externalUnit = { ...UNIT, isExternal: true, unitName: 'ĐH Ngoại ngữ' };
+    create.mockResolvedValueOnce(externalUnit);
+    const created = await service.create(
+      {
+        ...DTO,
+        unitName: '  ĐH   Ngoại ngữ  ',
+        isExternal: true,
+      },
+      'actor',
+    );
+    expect(created.isExternal).toBe(true);
+    expect(create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          unitCode: 'NEW',
+          unitName: 'ĐH Ngoại ngữ',
+          isExternal: true,
+        }),
+      }),
+    );
+
+    findMany.mockResolvedValueOnce([externalUnit]);
+    const listed = await service.list({ isExternal: true });
+    expect(listed).toEqual([externalUnit]);
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { isExternal: true },
+      }),
+    );
+
+    findUnique.mockResolvedValueOnce(UNIT);
+    update.mockResolvedValueOnce(externalUnit);
+    const updated = await service.update(
+      UNIT.id,
+      { unitName: '  ĐH   Ngoại ngữ ', isExternal: true },
+      'actor',
+    );
+    expect(updated.isExternal).toBe(true);
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: UNIT.id },
+        data: {
+          unitName: 'ĐH Ngoại ngữ',
+          isExternal: true,
+          parentUnitId: undefined,
+        },
+      }),
+    );
   });
 });

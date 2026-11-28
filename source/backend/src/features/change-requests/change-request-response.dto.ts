@@ -13,8 +13,11 @@ import {
   APPROVAL_STEP_KINDS,
   type ApprovalStepKind,
 } from '../../shared/change-requests/approval.constants.js';
-import { UserRefDto } from '../../shared/dtos/ref.dto.js';
-import { SemesterDto } from '../../shared/releases/semester.dto.js';
+import { OrgUnitRefDto, UserRefDto } from '../../shared/dtos/ref.dto.js';
+import {
+  CohortDto,
+  SemesterDto,
+} from '../../shared/releases/semester.dto.js';
 
 export const WORKSPACE_KINDS = ['PROGRAM_VERSION', 'SYLLABUS'] as const;
 export const AUTHORED_ENTITY_TYPES = [
@@ -52,6 +55,9 @@ export class ChangeRequestSummaryDto {
   })
   levelEnteredAt!: string | null;
   @ApiProperty({ nullable: true, type: Number }) daysWaiting!: number | null;
+  @ApiProperty({ type: SemesterDto, nullable: true })
+  effectiveSemester!: SemesterDto | null;
+  @ApiProperty({ type: [CohortDto] }) targetCohorts!: CohortDto[];
   @ApiProperty({ type: UserRefDto }) createdBy!: UserRefDto;
   @ApiProperty() createdAt!: string;
   @ApiProperty() updatedAt!: string;
@@ -123,7 +129,7 @@ export class StepDelegationRefDto {
 
 export class ApprovalStepDto {
   @ApiProperty() id!: string;
-  @ApiProperty({ enum: [1, 2, 3] }) approvalLevel!: number;
+  @ApiProperty({ enum: [1, 2, 3, 4] }) approvalLevel!: number;
   @ApiProperty() levelName!: string;
   @ApiProperty({ type: UserRefDto, nullable: true })
   approver!: UserRefDto | null;
@@ -131,6 +137,8 @@ export class ApprovalStepDto {
   forSubjectGroup!: StepGroupRefDto | null;
   @ApiProperty({ type: StepProgramRefDto, nullable: true })
   forProgram!: StepProgramRefDto | null;
+  @ApiProperty({ type: OrgUnitRefDto, nullable: true })
+  forFaculty!: OrgUnitRefDto | null;
   @ApiProperty({ enum: ApprovalAction, enumName: 'ApprovalAction' })
   action!: ApprovalAction;
   @ApiProperty() isSkipped!: boolean;

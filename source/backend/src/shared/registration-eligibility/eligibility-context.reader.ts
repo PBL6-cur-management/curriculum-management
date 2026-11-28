@@ -21,6 +21,10 @@ const invalid = () => new AppException(ELIGIBILITY_ERRORS.DATA_INVALID);
 function validScore(value: Prisma.Decimal | null): boolean {
   return value === null || (value.isFinite() && value.gte(0) && value.lte(4));
 }
+// Thresholds are 10-point (DEC-11): a minimum of 4 means D, not 4.0/4.0.
+function validThreshold(value: Prisma.Decimal | null): boolean {
+  return value === null || (value.isFinite() && value.gte(0) && value.lte(10));
+}
 function attemptScore(value: string | null): Prisma.Decimal | null {
   if (value === null) return null;
   try {
@@ -55,9 +59,20 @@ export async function readEligibilityContext(
   });
   if (!version) throw invalid();
   issuedVersionFact(version);
+  const enrollment = await tx.programEnrollment.findUnique({
+    where: { id: resolution.enrollmentId },
+    select: { trackId: true },
+  });
+  const studentTrackId = enrollment?.trackId ?? null;
+  // Common-core items always apply; track items only for the chosen track.
+  const frameItems = version.curriculumItems.filter(
+    (item) =>
+      (item.trackId ?? null) === null ||
+      (studentTrackId !== null && item.trackId === studentTrackId),
+  );
   const semester = await requireSemesterStart(tx, resolution.semesterId);
   const ids = new Set(attempts.map((attempt) => attempt.courseId));
-  for (const row of version.curriculumItems) {
+  for (const row of frameItems) {
     ids.add(row.courseId);
     row.requisites.forEach((edge) => ids.add(edge.sourceCourseId));
   }
@@ -117,11 +132,11 @@ export async function readEligibilityContext(
           .sort(compareCodepoints) ?? [],
     }),
   );
-  const rows: EligibilityRowFact[] = version.curriculumItems.map((row) => {
+  const rows: EligibilityRowFact[] = frameItems.map((row) => {
     if (row.courseNameSnapshot === null || row.creditsSnapshot === null)
       throw new AppException(ELIGIBILITY_ERRORS.SNAPSHOT_INCOMPLETE);
     if (
-      !validScore(row.minStudiedScore) ||
+      !validThreshold(row.minStudiedScore) ||
       !row.creditsSnapshot.isFinite() ||
       row.creditsSnapshot.lt(0)
     )
@@ -141,12 +156,15 @@ export async function readEligibilityContext(
       plannedSemester: row.plannedSemester,
       sortOrder: row.sortOrder,
       minStudiedScore: row.minStudiedScore,
+      courseType: row.course.courseType,
+      htDa: row.htDa ?? false,
+      tqDa: row.tqDa ?? false,
       requisites: row.requisites.map((edge) => {
         if (
           edge.sourceCourseId === row.courseId ||
           edge.relationType === 'REPLACEMENT' ||
           (edge.relationType !== 'PREREQUISITE' && edge.minScore !== null) ||
-          !validScore(edge.minScore)
+          !validThreshold(edge.minScore)
         )
           throw invalid();
         return {
@@ -183,7 +201,8 @@ export async function readEligibilityContext(
       attemptIds.has(attempt.id) ||
       !Number.isFinite(attempt.semesterStart.getTime()) ||
       attempt.semesterStart > semester.startDate ||
-      !validScore(attemptScore(attempt.score4))
+      !validScore(attemptScore(attempt.score4)) ||
+      !validThreshold(attemptScore(attempt.score10))
     )
       throw invalid();
     attemptIds.add(attempt.id);

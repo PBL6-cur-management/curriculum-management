@@ -64,7 +64,8 @@ export const RELATION_TYPE_LABELS: Record<CourseRelationType, string> = {
   REPLACEMENT: 'Thay thế',
 };
 
-export const MIN_SCORE_HINT = 'Thang 4, để trống nếu không yêu cầu điểm.';
+export const MIN_SCORE_HINT =
+  'Thang 10 (0–10), để trống nếu không yêu cầu điểm.';
 export const NO_EQUIVALENT_GROUP_TEXT = 'Chưa thuộc nhóm tương đương nào';
 
 // A corequisite reads the same from both ends.

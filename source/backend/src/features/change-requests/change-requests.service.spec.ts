@@ -211,6 +211,39 @@ describe('ChangeRequestsService', () => {
     });
 
     describe('on a programme', () => {
+      const director = new AccessContext('u-dir', [
+        {
+          assignmentId: null,
+          roleId: 'r3',
+          roleCode: 'R3',
+          roleName: 'R3',
+          scopeSource: ScopeSource.NONE,
+          scopeType: ScopeType.ASSIGNMENT,
+          scopeUnit: null,
+          scope: {
+            all: false,
+            orgUnitIds: new Set(),
+            subjectGroupIds: new Set(),
+            programIds: new Set(['p1']),
+            studentIds: new Set(),
+          },
+          permissions: new Map([
+            [
+              PERMISSIONS.CHANGE_REQUEST_CREATE,
+              { mode: 'DIRECT', scope: 'ALL' },
+            ],
+            [
+              PERMISSIONS.CURRICULUM_EDIT,
+              { mode: 'VIA_REQUEST', scope: 'SCOPED' },
+            ],
+            [PERMISSIONS.PLO_EDIT, { mode: 'VIA_REQUEST', scope: 'SCOPED' }],
+            [
+              PERMISSIONS.PROGRAM_EDIT_INFO,
+              { mode: 'DIRECT', scope: 'SCOPED' },
+            ],
+          ]),
+        },
+      ]);
       const lecturer = access(
         'u4',
         [
@@ -240,66 +273,33 @@ describe('ChangeRequestsService', () => {
         });
       });
 
-      it('lets a lecturer file a curriculum request when a listed course is in their group', async () => {
-        prisma.curriculumItem.findMany.mockResolvedValue([
-          { course: { ownerGroupId: 'g1' } },
-        ]);
-        await service.create(programDto, lecturer);
-        expect(tx.changeRequest.create).toHaveBeenCalledOnce();
-      });
-
-      it('refuses a lecturer when no listed course is in their group', async () => {
-        prisma.curriculumItem.findMany.mockResolvedValue([
-          { course: { ownerGroupId: 'g2' } },
-        ]);
-        await expect(
-          service.create(programDto, lecturer),
-        ).rejects.toMatchObject({ code: 'OUT_OF_SCOPE' });
-      });
-
-      it('lets a CLO editor file a programme outcome request', async () => {
-        const cloEditor = access(
-          'u5',
-          [
-            {
-              code: PERMISSIONS.CHANGE_REQUEST_CREATE,
-              mode: 'DIRECT',
-              all: true,
-            },
-            { code: PERMISSIONS.CLO_EDIT, mode: 'VIA_REQUEST' },
-          ],
-          ['g1'],
-        );
-        prisma.curriculumItem.findMany.mockResolvedValue([
-          { course: { ownerGroupId: 'g1' } },
-        ]);
+      it('lets an assigned program director (R3) file a curriculum or outcome request', async () => {
+        await service.create(programDto, director);
         await service.create(
           { ...programDto, requestType: ChangeRequestType.OUTCOME },
-          cloEditor,
+          director,
         );
-        expect(tx.changeRequest.create).toHaveBeenCalledOnce();
+        expect(tx.changeRequest.create).toHaveBeenCalledTimes(2);
       });
 
-      it('does not widen a programme-info request to the lecturer groups', async () => {
-        const infoEditor = access(
-          'u6',
-          [
-            {
-              code: PERMISSIONS.CHANGE_REQUEST_CREATE,
-              mode: 'DIRECT',
-              all: true,
-            },
-            { code: PERMISSIONS.PROGRAM_EDIT_INFO, mode: 'VIA_REQUEST' },
-          ],
-          ['g1'],
-        );
-        prisma.curriculumItem.findMany.mockResolvedValue([
-          { course: { ownerGroupId: 'g1' } },
-        ]);
+      it('refuses a lecturer/coordinator (non-R1/R3) from creating program change requests', async () => {
+        await expect(
+          service.create(programDto, lecturer),
+        ).rejects.toMatchObject({ code: 'PROGRAM_CREATOR_RESTRICTED' });
+      });
+
+      it('refuses a director assigned to another program with OUT_OF_SCOPE', async () => {
+        targets.resolve.mockResolvedValue({
+          targetType: ChangeTargetType.PROGRAM,
+          id: 'p2',
+          code: 'P2',
+          name: 'Other Program',
+          scope: { programIds: ['p2'], orgUnitIds: ['f1'] },
+        });
         await expect(
           service.create(
-            { ...programDto, requestType: ChangeRequestType.PROGRAM_INFO },
-            infoEditor,
+            { ...programDto, targetId: 'p2' },
+            director,
           ),
         ).rejects.toMatchObject({ code: 'OUT_OF_SCOPE' });
       });

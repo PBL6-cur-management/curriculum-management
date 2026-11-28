@@ -34,12 +34,13 @@ describe('ApprovalQueueReader', () => {
   const stepsFindMany = vi.fn();
   const requestsFindMany = vi.fn();
   const roleFindFirst = vi.fn();
+  const roleFindMany = vi.fn();
   const userFindUnique = vi.fn();
   const prisma = {
     approvalDelegation: { findMany: vi.fn().mockResolvedValue([]) },
     approvalStep: { findMany: stepsFindMany },
     changeRequest: { findMany: requestsFindMany },
-    roleAssignment: { findFirst: roleFindFirst },
+    roleAssignment: { findFirst: roleFindFirst, findMany: roleFindMany },
     user: { findUnique: userFindUnique },
   };
   const reader = new ApprovalQueueReader(prisma as unknown as PrismaService);
@@ -50,6 +51,7 @@ describe('ApprovalQueueReader', () => {
     stepsFindMany.mockResolvedValue([]);
     requestsFindMany.mockResolvedValue([]);
     roleFindFirst.mockResolvedValue(null);
+    roleFindMany.mockResolvedValue([]);
     userFindUnique.mockResolvedValue({ canSelfApprove: false });
   });
 
@@ -114,7 +116,7 @@ describe('ApprovalQueueReader', () => {
     ]);
     const items = await reader.read({}, access);
     expect(items.map((item) => item.requestCode)).toEqual(['DX-2', 'DX-1']);
-    expect(items[0]).toMatchObject({ approvalLevel: 3, standsFor: null });
+    expect(items[0]).toMatchObject({ approvalLevel: 4, standsFor: null });
   });
 
   it('gives a non-holder no level-3 query and passes the type filter to both queries', async () => {

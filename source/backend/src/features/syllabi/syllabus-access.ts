@@ -108,6 +108,7 @@ export async function assertDraftWrite(
     courseTarget(row.course),
     row.sourceRequest,
     () => syllabusEditState(prisma, row.course),
+    row.course.ownerFaculty.unitCode !== HOME_FACULTY_CODE,
   );
   if (row.status !== SyllabusStatus.DRAFT) {
     throw new AppException(SYLLABUS_ERRORS.SYLLABUS_NOT_DRAFT);

@@ -115,4 +115,45 @@ describe('read-only graduation presentation without staff providers', () => {
       '12345678901234567890,123456789',
     );
   });
+  it('renders cumulative GPA vs minimum GPA and LOW_GPA / TRACK_NOT_SELECTED shortfalls', () => {
+    render(
+      <GraduationResultView
+        result={{
+          ...eligibleGraduation,
+          conclusion: 'NOT_ELIGIBLE',
+          cumulativeGpa: '1.85',
+          minGraduationGpa: '2.00',
+          shortfalls: [
+            {
+              code: 'LOW_GPA',
+              category: 'GPA',
+              actualGpa: '1.85',
+              requiredGpa: '2.00',
+              message: 'Điểm trung bình tích lũy thấp hơn chuẩn tốt nghiệp.',
+            },
+            {
+              code: 'TRACK_NOT_SELECTED',
+              category: 'TRACK',
+              message: 'Sinh viên chưa đăng ký chuyên ngành con.',
+            },
+          ],
+        }}
+      />,
+    );
+    expect(screen.getByText('1.85 / 2.00')).toBeInTheDocument();
+    expect(
+      screen.getByText('GPA tích lũy chưa đạt mức tối thiểu'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /GPA tích lũy đạt 1.85, yêu cầu tối thiểu 2.00\. Điểm trung bình tích lũy thấp hơn chuẩn tốt nghiệp\./,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Chưa chọn định hướng / chuyên ngành con'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Sinh viên chưa đăng ký chuyên ngành con.'),
+    ).toBeInTheDocument();
+  });
 });

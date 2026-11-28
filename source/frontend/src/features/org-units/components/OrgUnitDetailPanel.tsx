@@ -8,6 +8,7 @@ import {
 } from '../hooks/useOrgUnitAdmin';
 import {
   ALLOWED_PARENT_TYPES,
+  EXTERNAL_UNIT_TAG_LABEL,
   UNIT_STATUS_LABELS,
   UNIT_TYPE_LABELS,
 } from '../constants/orgUnitLabels';
@@ -47,7 +48,14 @@ export function OrgUnitDetailPanel({
     });
   }
   return (
-    <Card title={unit.unitName}>
+    <Card
+      title={unit.unitName}
+      extra={
+        unit.isExternal ? (
+          <Tag color="orange">{EXTERNAL_UNIT_TAG_LABEL}</Tag>
+        ) : undefined
+      }
+    >
       <Descriptions
         column={1}
         items={[
@@ -56,6 +64,15 @@ export function OrgUnitDetailPanel({
             key: 'type',
             label: 'Loại',
             children: UNIT_TYPE_LABELS[unit.unitType],
+          },
+          {
+            key: 'scope',
+            label: 'Phạm vi',
+            children: unit.isExternal ? (
+              <Tag color="orange">{EXTERNAL_UNIT_TAG_LABEL}</Tag>
+            ) : (
+              'Nội bộ trường'
+            ),
           },
           {
             key: 'status',

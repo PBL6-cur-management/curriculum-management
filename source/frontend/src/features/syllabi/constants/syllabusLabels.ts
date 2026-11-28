@@ -23,6 +23,13 @@ export const SYLLABUS_STATUS_LABELS: Record<Syllabus['status'], string> = {
   PUBLISHED: 'Ban hành',
   HISTORICAL: 'Lịch sử',
 };
+export const SYLLABUS_STATUS_COLORS: Record<Syllabus['status'], string> = {
+  DRAFT: 'processing',
+  PUBLISHED: 'success',
+  HISTORICAL: 'default',
+};
+export const HISTORY_TAB_LABEL = 'Lịch sử phiên bản';
+export const NO_HISTORY = 'Chưa có lịch sử phiên bản';
 export const ATTACHMENT_TYPE_LABELS: Record<AttachmentFileType, string> = {
   PDF: 'PDF',
   DOCX: 'Word',

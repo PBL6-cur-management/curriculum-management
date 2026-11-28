@@ -58,14 +58,14 @@ describe('RequestNotifier', () => {
     expect(sent().content).toContain('Giám đốc CTĐT');
   });
 
-  it('tells every academic-office holder but the creator at level 3', async () => {
+  it('tells every academic-office holder but the creator at level 4', async () => {
     const { notifier, tx, db, sent } = setup();
     db.roleAssignment.findMany.mockResolvedValue([
       { userId: 'o1' },
       { userId: 'o2' },
       { userId: 'o1' },
     ]);
-    await notifier.arrived(tx, request, 3, 'creator');
+    await notifier.arrived(tx, request, 4, 'creator');
     expect(sent().recipientIds).toEqual(['o1', 'o2']);
     expect(db.roleAssignment.findMany.mock.calls[0][0].where.userId).toEqual({
       not: 'creator',

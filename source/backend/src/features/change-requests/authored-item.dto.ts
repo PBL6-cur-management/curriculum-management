@@ -23,8 +23,8 @@ import {
   type CourseRequestField,
 } from '../../shared/change-requests/authored-item.types.js';
 import {
-  GRADE_POINT_MESSAGE,
-  GRADE_POINT_PATTERN,
+  SCORE10_MESSAGE,
+  SCORE10_PATTERN,
 } from '../../shared/decimal/decimal.js';
 import { emptyToNull } from '../../shared/dtos/transforms.js';
 import { CHANGE_REQUEST_LIMITS } from './change-request.constants.js';
@@ -59,7 +59,7 @@ export class AddRelationInput extends AuthoredItemInputBase {
   relationType!: CourseRelationType;
   @ApiPropertyOptional({ nullable: true, type: String })
   @IsOptional()
-  @Matches(GRADE_POINT_PATTERN, { message: GRADE_POINT_MESSAGE })
+  @Matches(SCORE10_PATTERN, { message: SCORE10_MESSAGE })
   minScore!: string | null;
 }
 
@@ -68,7 +68,7 @@ export class UpdateRelationInput extends AuthoredItemInputBase {
   @ApiProperty() @IsString() relationId!: string;
   @ApiPropertyOptional({ nullable: true, type: String })
   @IsOptional()
-  @Matches(GRADE_POINT_PATTERN, { message: GRADE_POINT_MESSAGE })
+  @Matches(SCORE10_PATTERN, { message: SCORE10_MESSAGE })
   minScore!: string | null;
 }
 

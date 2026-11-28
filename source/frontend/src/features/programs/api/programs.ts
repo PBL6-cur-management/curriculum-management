@@ -4,6 +4,9 @@ import type { components, operations } from '../../../shared/api/schema';
 export type ProgramSummary = components['schemas']['ProgramSummaryDto'];
 export type ProgramDetail = components['schemas']['ProgramDetailDto'];
 export type ProgramPage = components['schemas']['ProgramPageDto'];
+export type MajorOption = components['schemas']['MajorDto'];
+export type MajorOptionPage = components['schemas']['MajorPageDto'];
+export type MajorRef = components['schemas']['MajorRefDto'];
 export type ProgramVersionRef = components['schemas']['ProgramVersionRefDto'];
 export type ProgramReleasedVersion =
   components['schemas']['ProgramReleasedVersionDto'];
@@ -40,6 +43,10 @@ export type ProgramStatusAction =
 
 export const fetchPrograms = (query: ProgramQuery) =>
   getJson<ProgramPage>(withQuery(PROGRAMS_PATH, { ...query }));
+export const fetchMajorOptions = () =>
+  getJson<MajorOptionPage>(
+    withQuery('/majors', { page: 1, pageSize: 100, status: 'ACTIVE' }),
+  );
 export const fetchProgram = (programId: string) =>
   getJson<ProgramDetail>(programPath(programId));
 export const updateProgram = (programId: string, body: UpdateProgramRequest) =>

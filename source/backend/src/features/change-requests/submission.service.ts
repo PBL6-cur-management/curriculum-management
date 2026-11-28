@@ -182,6 +182,7 @@ export class SubmissionService {
           approverId: step.approverId,
           forSubjectGroupId: step.forSubjectGroupId,
           forProgramId: step.forProgramId,
+          forFacultyId: step.forFacultyId,
           isSkipped: step.isSkipped,
           skipReason: step.skipReason,
           // Skipped rows are settled at submit; only PENDING rows wait for someone (US-059 AC3 reads isSkipped).
@@ -299,6 +300,7 @@ async function routingSubject(
           select: {
             id: true,
             ownerGroupId: true,
+            ownerFacultyId: true,
             ownerFaculty: { select: { unitCode: true } },
           },
         })
@@ -311,6 +313,7 @@ async function routingSubject(
     course: course && {
       id: course.id,
       ownerGroupId: course.ownerGroupId,
+      ownerFacultyId: course.ownerFacultyId,
       ownerFacultyCode: course.ownerFaculty.unitCode,
     },
   };

@@ -227,9 +227,7 @@ describe('ChangeRequestFormPage', () => {
     fireEvent.click(screen.getByLabelText('Theo yêu cầu của Trường'));
     await waitFor(() =>
       expect(
-        screen
-          .getByText('Số văn bản căn cứ')
-          .closest('.ant-form-item-required'),
+        screen.getByText('Số văn bản').closest('.ant-form-item-required'),
       ).not.toBeNull(),
     );
     fireEvent.click(screen.getByRole('button', { name: 'Tạo đề xuất' }));
@@ -241,7 +239,7 @@ describe('ChangeRequestFormPage', () => {
       ),
     ).toBeInTheDocument();
     expect(writes).toEqual([]);
-    fireEvent.change(screen.getByLabelText('Số văn bản căn cứ'), {
+    fireEvent.change(screen.getByLabelText('Số văn bản'), {
       target: { value: '123/QĐ-ĐHBK' },
     });
     fireEvent.click(screen.getByRole('button', { name: 'Tạo đề xuất' }));
@@ -302,6 +300,43 @@ describe('ChangeRequestFormPage', () => {
     expect(
       screen.getByText('Khung chương trình').closest('.ant-select-item'),
     ).toHaveClass('ant-select-item-option-disabled');
+  });
+
+  it('disables program-level request types for non-R1/R3 users and displays the hint', async () => {
+    renderRequestPage({
+      path: '/change-requests/new',
+      entry: '/change-requests/new',
+      element: <ChangeRequestFormPage />,
+      me: {
+        ...ME,
+        roles: [
+          {
+            roleCode: 'R5',
+            roleName: 'Giảng viên',
+            scopeType: 'UNIT',
+            scopeUnit: null,
+            derived: false,
+          },
+        ],
+      },
+    });
+    expect(
+      await screen.findByText(
+        'Chỉ Giám đốc CTĐT hoặc Phòng Đào tạo được đề xuất thay đổi cấp Chương trình đào tạo.',
+      ),
+    ).toBeInTheDocument();
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Loại đề xuất' }));
+    expect(
+      (await screen.findByText('Khung chương trình')).closest(
+        '.ant-select-item',
+      ),
+    ).toHaveClass('ant-select-item-option-disabled');
+    expect(
+      screen.getByText('Thông tin chương trình').closest('.ant-select-item'),
+    ).toHaveClass('ant-select-item-option-disabled');
+    expect(
+      screen.getByText('Nội dung đề cương').closest('.ant-select-item'),
+    ).not.toHaveClass('ant-select-item-option-disabled');
   });
 
   it('shows the conflicting request with its code, creator and status, and still allows saving (US-058 AC1)', async () => {

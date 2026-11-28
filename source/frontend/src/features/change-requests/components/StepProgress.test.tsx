@@ -18,7 +18,15 @@ describe('StepProgress', () => {
             approver: { id: 'b', fullName: 'Điều phối Bình' },
             forSubjectGroup: { id: 'g', groupCode: 'G1', groupName: 'Nhóm 1' },
           }),
-          step('3', 3, { approver: null }),
+          step('3', 3, {
+            approver: null,
+            forFaculty: {
+              id: 'f1',
+              unitCode: 'KHOA_CNTT',
+              unitName: 'Khoa CNTT',
+            },
+          }),
+          step('4', 4, { approver: null }),
         ]}
       />,
     );
@@ -28,9 +36,27 @@ describe('StepProgress', () => {
     expect(screen.getByText('Điều phối An')).toBeInTheDocument();
     expect(screen.getByText('Điều phối Bình')).toBeInTheDocument();
     expect(screen.getAllByText('(G1)')).toHaveLength(2);
+    expect(screen.getByText('Cấp 3 — Ban lãnh đạo khoa')).toBeInTheDocument();
+    expect(screen.getByText('Khoa CNTT')).toBeInTheDocument();
+    expect(screen.getByText('(KHOA_CNTT)')).toBeInTheDocument();
     expect(
       screen.getByText('Phòng Đào tạo', { selector: 'span' }),
     ).toBeInTheDocument();
+    expect(screen.queryByText(/Cấp 2/)).not.toBeInTheDocument();
+  });
+
+  it('renders 2-level program branch (L3 -> L4) cleanly without empty L1/L2 errors', () => {
+    render(
+      <StepProgress
+        steps={[
+          step('3', 3, { approver: null }),
+          step('4', 4, { approver: null }),
+        ]}
+      />,
+    );
+    expect(screen.getByText('Cấp 3 — Ban lãnh đạo khoa')).toBeInTheDocument();
+    expect(screen.getByText('Cấp 4 — Phòng Đào tạo')).toBeInTheDocument();
+    expect(screen.queryByText(/Cấp 1/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Cấp 2/)).not.toBeInTheDocument();
   });
 

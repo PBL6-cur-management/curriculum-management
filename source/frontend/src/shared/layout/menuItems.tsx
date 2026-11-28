@@ -54,6 +54,12 @@ export const APP_MENU: readonly AppMenuItem[] = [
     defaultOpen: true,
     children: [
       {
+        path: ROUTES.majors,
+        label: 'Ngành đào tạo',
+        permission: PERMISSIONS.programView,
+        hideForRoles: [STUDENT_ROLE_CODE],
+      },
+      {
         path: ROUTES.programs,
         label: 'Danh sách chương trình',
         permission: PERMISSIONS.programView,

@@ -1,4 +1,4 @@
-import { App, Form, Input, Modal, Radio } from 'antd';
+import { App, Checkbox, Form, Input, Modal, Radio } from 'antd';
 import { useEffect } from 'react';
 import { ApiError } from '../../../shared/api/client';
 import { OrgUnitSelect } from '../../../shared/org-units/OrgUnitSelect';
@@ -7,6 +7,7 @@ import { useCreateOrgUnit, useUpdateOrgUnit } from '../hooks/useOrgUnitAdmin';
 import {
   ALLOWED_PARENT_TYPES,
   CREATABLE_UNIT_TYPES,
+  EXTERNAL_UNIT_CHECKBOX_LABEL,
   UNIT_TYPE_LABELS,
 } from '../constants/orgUnitLabels';
 import { UNIT_CODE_RULES, UNIT_NAME_RULES } from '../schema/orgUnitRules';
@@ -30,13 +31,15 @@ export function OrgUnitFormModal({
   const create = useCreateOrgUnit();
   const update = useUpdateOrgUnit();
   const unitType = Form.useWatch('unitType', form) as
-    OrgUnit['unitType'] | undefined;
+    | OrgUnit['unitType']
+    | undefined;
   useEffect(() => {
     if (open)
       form.setFieldsValue({
         unitCode: unit?.unitCode,
         unitName: unit?.unitName,
         unitType: unit?.unitType ?? 'FACULTY',
+        isExternal: Boolean(unit?.isExternal),
         parentUnitId: parent?.id ?? unit?.parentUnitId,
       });
     else form.resetFields();
@@ -45,6 +48,7 @@ export function OrgUnitFormModal({
     unitCode?: string;
     unitName: string;
     unitType?: 'FACULTY' | 'OFFICE';
+    isExternal?: boolean;
     parentUnitId?: string;
   }) {
     try {
@@ -53,6 +57,7 @@ export function OrgUnitFormModal({
           unitCode: values.unitCode ?? '',
           unitName: values.unitName,
           unitType: values.unitType ?? 'FACULTY',
+          isExternal: Boolean(values.isExternal),
           parentUnitId: values.parentUnitId ?? parent?.id ?? '',
         });
       else
@@ -60,6 +65,9 @@ export function OrgUnitFormModal({
           unitId: unit?.id ?? '',
           body: {
             unitName: values.unitName,
+            ...(unit?.unitType !== 'UNIVERSITY'
+              ? { isExternal: Boolean(values.isExternal) }
+              : {}),
             ...(values.parentUnitId
               ? { parentUnitId: values.parentUnitId }
               : {}),
@@ -111,6 +119,11 @@ export function OrgUnitFormModal({
               value={UNIT_TYPE_LABELS[unit?.unitType ?? 'UNIVERSITY']}
               disabled
             />
+          </Form.Item>
+        )}
+        {(mode === 'create' || unit?.unitType !== 'UNIVERSITY') && (
+          <Form.Item name="isExternal" valuePropName="checked">
+            <Checkbox>{EXTERNAL_UNIT_CHECKBOX_LABEL}</Checkbox>
           </Form.Item>
         )}
         {(mode === 'create' || Boolean(unit?.parentUnitId)) && (

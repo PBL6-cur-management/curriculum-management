@@ -6,6 +6,8 @@ import { STEP_COLORS, STEP_KIND_LABELS } from '../constants/approvalLabels';
 import {
   ACADEMIC_OFFICE_LABEL,
   ACTION_LABELS,
+  APPROVAL_LEVEL_LABELS,
+  FACULTY_LEADERSHIP_LABEL,
 } from '../constants/changeRequestLabels';
 import { formatDateTime } from '../utils/format';
 
@@ -24,16 +26,28 @@ const NO_APPROVER_LABEL = 'Không có người duyệt';
 export function StepLine({ step, scopes }: StepLineProps) {
   const who =
     step.approver?.fullName ??
-    (step.approvalLevel === 3 ? ACADEMIC_OFFICE_LABEL : NO_APPROVER_LABEL);
+    (step.approvalLevel === 4
+      ? ACADEMIC_OFFICE_LABEL
+      : step.approvalLevel === 3
+        ? (step.forFaculty?.unitName ?? FACULTY_LEADERSHIP_LABEL)
+        : NO_APPROVER_LABEL);
   const own =
-    step.forSubjectGroup?.groupCode ?? step.forProgram?.programCode ?? null;
+    step.forSubjectGroup?.groupCode ??
+    step.forProgram?.programCode ??
+    step.forFaculty?.unitCode ??
+    null;
+  const noun = step.forSubjectGroup
+    ? 'nhóm'
+    : step.forFaculty
+      ? 'khoa'
+      : 'CTĐT';
   return (
     <Flex vertical gap={2}>
       <Flex gap="small" align="center" wrap>
         <Typography.Text delete={step.isSkipped}>{who}</Typography.Text>
         <ScopeCodes
           codes={scopes ?? (own ? [own] : [])}
-          noun={step.forSubjectGroup ? 'nhóm' : 'CTĐT'}
+          noun={noun}
           parenthesised
         />
         {step.isSkipped ? (
@@ -75,11 +89,16 @@ export function StepLine({ step, scopes }: StepLineProps) {
 // One column per level and one line per approver, so two coordinators show two lines (EC-22) while one director
 // standing for six programmes shows one line naming the six.
 export function StepProgress({ steps }: StepProgressProps) {
+  const groups = groupByLevel(steps);
+  const mdSpan = groups.length <= 2 ? 12 : groups.length === 3 ? 8 : 6;
   return (
     <Row gutter={[16, 16]}>
-      {groupByLevel(steps).map(({ approvalLevel, levelName, rows }) => (
-        <Col key={approvalLevel} xs={24} md={8}>
-          <Card size="small" title={`Cấp ${approvalLevel} — ${levelName}`}>
+      {groups.map(({ approvalLevel, levelName, rows }) => (
+        <Col key={approvalLevel} xs={24} md={mdSpan}>
+          <Card
+            size="small"
+            title={`Cấp ${approvalLevel} — ${levelName || APPROVAL_LEVEL_LABELS[approvalLevel as 1 | 2 | 3 | 4]}`}
+          >
             <Flex vertical gap="small">
               {mergeSameApprover(rows).map(({ step, scopes }) => (
                 <StepLine key={step.id} step={step} scopes={scopes} />

@@ -29,7 +29,6 @@ import type {
   FinalApprovalPreviewDto,
   FinalApproveDto,
 } from './final-approval.dto.js';
-import { hasGradingChanges } from './grading-changes.js';
 import { FinalApprovalPreviewReader } from './final-approval.preview.js';
 import { blocksSelfApproval } from '../../shared/change-requests/self-approval.js';
 import { findVisibleRequest } from './request-visibility.js';
@@ -78,19 +77,35 @@ export class FinalApprovalService {
       if (await this.stale.isStale(tx, request)) {
         throw new AppException(SUBMISSION_ERRORS.STALE_BASE);
       }
-      const semester = await requireSemesterStart(tx, dto.effectiveSemesterId);
+      const effectiveSemesterId =
+        dto.effectiveSemesterId ?? request.effectiveSemesterId;
+      if (!effectiveSemesterId) {
+        throw new AppException(RELEASE_ERRORS.SEMESTER_NOT_FOUND);
+      }
+      const semester = await requireSemesterStart(tx, effectiveSemesterId);
       const today = todayDate();
       const pastUsed = this.assertSemesterAllowed(
-        request,
         dto,
         semester.startDate,
         today,
-        await hasGradingChanges(tx, request.id),
       );
+      let cohortIds = dto.cohortIds;
+      if (cohortIds === undefined && tx.changeRequestCohort) {
+        const proposed = await tx.changeRequestCohort.findMany({
+          where: { changeRequestId: id },
+          select: { cohortId: true },
+        });
+        cohortIds = proposed.map((row) => row.cohortId);
+      }
+      const effectiveDto: FinalApproveDto = {
+        ...dto,
+        effectiveSemesterId: semester.id,
+        cohortIds: cohortIds ?? [],
+      };
       await lockRequisiteGraph(tx);
       const now = new Date();
       const released = await this.applier.apply(tx, request, {
-        dto,
+        dto: effectiveDto,
         semester,
         actorId: access.userId,
         now,
@@ -140,21 +155,14 @@ export class FinalApprovalService {
     return this.details.read(id, access);
   }
 
-  // A semester that has begun is for the academic office's own requests only, and only when it says so (F15-03);
-  // a started semester is never taken silently, nor a future one marked as past. Grade formula changes have no
-  // such exception: a class already running keeps its formula, whoever filed the request.
+  // Any R1 final approver may release into a started/past semester when explicitly confirmed via allowPastSemester.
   private assertSemesterAllowed(
-    request: ChangeRequest,
     dto: FinalApproveDto,
     startDate: Date,
     today: Date,
-    changesGrading: boolean,
   ): boolean {
     if (startDate > today) return false;
-    if (changesGrading) {
-      throw new AppException(RELEASE_ERRORS.SEMESTER_ALREADY_STARTED);
-    }
-    if (dto.allowPastSemester && request.createdByAcademicOffice) return true;
+    if (dto.allowPastSemester) return true;
     throw new AppException(RELEASE_ERRORS.SEMESTER_ALREADY_STARTED);
   }
 

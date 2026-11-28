@@ -18,9 +18,10 @@ import {
 import { AppException } from '../../shared/exception/app.exception.js';
 import { COMMON_ERRORS } from '../../shared/exception/error-codes.js';
 import { FileStorageService } from '../../shared/files/file-storage.service.js';
+import { HOME_FACULTY_CODE } from '../../shared/org-units/home-faculty.js';
 import { toPage, toSkipTake, type Page } from '../../shared/pagination/page.js';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
-import { programContentTarget } from '../../shared/programs/program-content-target.js';
+import { assertCohortsExist } from '../../shared/releases/semester-start.js';
 import { waitingBefore } from '../../shared/time/days-since.js';
 import { todayDate } from '../../shared/time/today.js';
 import { ChangeRequestDetailReader } from './change-request-detail.reader.js';
@@ -119,6 +120,9 @@ export class ChangeRequestsService {
     );
     const today = todayDate();
     const id = await this.prisma.$transaction(async (tx) => {
+      if (dto.cohortIds && dto.cohortIds.length > 0) {
+        await assertCohortsExist(tx, dto.cohortIds);
+      }
       const request = await tx.changeRequest.create({
         data: {
           requestCode: await nextRequestCode(tx),
@@ -131,6 +135,9 @@ export class ChangeRequestsService {
           reason: dto.reason,
           origin: dto.origin,
           basisDocumentNumber: dto.basisDocumentNumber ?? null,
+          ...(dto.effectiveSemesterId !== undefined && {
+            effectiveSemesterId: dto.effectiveSemesterId ?? null,
+          }),
           // Stored now: F-15 decides who may release into a started semester from the day of creation, not from today's roles.
           createdByAcademicOffice: await isAcademicOfficeHolder(
             tx,
@@ -146,6 +153,14 @@ export class ChangeRequestsService {
           courseId: true,
         },
       });
+      if (dto.cohortIds && dto.cohortIds.length > 0) {
+        await tx.changeRequestCohort.createMany({
+          data: dto.cohortIds.map((cohortId) => ({
+            changeRequestId: request.id,
+            cohortId,
+          })),
+        });
+      }
       await this.copies.create(tx, request);
       return request.id;
     });
@@ -169,17 +184,47 @@ export class ChangeRequestsService {
     if (origin === RequestOrigin.UNIVERSITY && !basis) {
       throw new AppException(CHANGE_REQUEST_ERRORS.BASIS_REQUIRED);
     }
-    const { count } = await this.prisma.changeRequest.updateMany({
-      where: { id, status: ChangeRequestStatus.DRAFT },
-      data: {
-        title: dto.title,
-        reason: dto.reason,
-        origin,
-        basisDocumentNumber: basis,
-      },
-    });
-    if (count === 0) {
-      throw new AppException(REQUEST_DRAFT_ERRORS.NOT_DRAFT);
+    const updateData: Prisma.ChangeRequestUpdateManyMutationInput = {
+      title: dto.title,
+      reason: dto.reason,
+      origin,
+      basisDocumentNumber: basis,
+      ...(dto.effectiveSemesterId !== undefined && {
+        effectiveSemesterId: dto.effectiveSemesterId ?? null,
+      }),
+    };
+    if (dto.cohortIds !== undefined) {
+      await this.prisma.$transaction(async (tx) => {
+        if (dto.cohortIds!.length > 0) {
+          await assertCohortsExist(tx, dto.cohortIds!);
+        }
+        const { count } = await tx.changeRequest.updateMany({
+          where: { id, status: ChangeRequestStatus.DRAFT },
+          data: updateData,
+        });
+        if (count === 0) {
+          throw new AppException(REQUEST_DRAFT_ERRORS.NOT_DRAFT);
+        }
+        await tx.changeRequestCohort.deleteMany({
+          where: { changeRequestId: id },
+        });
+        if (dto.cohortIds!.length > 0) {
+          await tx.changeRequestCohort.createMany({
+            data: dto.cohortIds!.map((cohortId) => ({
+              changeRequestId: id,
+              cohortId,
+            })),
+          });
+        }
+      });
+    } else {
+      const { count } = await this.prisma.changeRequest.updateMany({
+        where: { id, status: ChangeRequestStatus.DRAFT },
+        data: updateData,
+      });
+      if (count === 0) {
+        throw new AppException(REQUEST_DRAFT_ERRORS.NOT_DRAFT);
+      }
     }
     return this.details.read(id, access);
   }
@@ -266,7 +311,7 @@ function assertMayCreate(access: AccessContext, type: ChangeRequestType): void {
 // An organisational request needs its own permission on the group / program; a data request needs the right to edit
 // the target through either path. assertCan reports OUT_OF_SCOPE when the caller holds the permission elsewhere.
 async function assertCanCreate(
-  db: PrismaService,
+  _db: PrismaService,
   access: AccessContext,
   type: ChangeRequestType,
   targetType: ChangeTargetType,
@@ -280,25 +325,52 @@ async function assertCanCreate(
     return;
   }
   access.assertCan(PERMISSIONS.CHANGE_REQUEST_CREATE, {});
+  // Workflow B: Program / Curriculum / PLO / ProgramInfo — only active R3 (assigned to program) or R1 may create.
+  if (isProgramChangeRequest(type, targetType)) {
+    const isR1 = access.assignments.some((a) => a.roleCode === 'R1');
+    const isR3 = access.assignments.some((a) => a.roleCode === 'R3');
+    if (!isR1 && !isR3) {
+      throw new AppException(CHANGE_REQUEST_ERRORS.PROGRAM_CREATOR_RESTRICTED);
+    }
+    if (!isR1) {
+      const assigned = access.assignments.some(
+        (a) =>
+          a.roleCode === 'R3' &&
+          (a.scope.all || a.scope.programIds.has(target.id)),
+      );
+      if (!assigned) {
+        throw new AppException(COMMON_ERRORS.OUT_OF_SCOPE);
+      }
+    }
+    const codes = editPermissionsFor(type, targetType);
+    if (!codes.some((code) => access.modeFor(code, target.scope) !== null)) {
+      access.assertCan(codes[0], target.scope);
+    }
+    return;
+  }
   const codes = editPermissionsFor(type, targetType);
-  // Lecturers edit a programme's rows through their subject group, so the check sees the groups it lists.
-  const scope = editsProgramContent(type, targetType)
-    ? await programContentTarget(db, {
-        id: target.id,
-        facultyId: target.scope.orgUnitIds?.[0] ?? '',
-      })
-    : target.scope;
-  if (!codes.some((code) => access.modeFor(code, scope) !== null)) {
-    access.assertCan(codes[0], scope);
+  // EC-24 unlock: allow home-faculty staff (R3/R4/R5 holding the edit permission) to create course-level CRs
+  // targeting foreign-faculty courses; routing sends them straight to R1 via FOREIGN_COURSE.
+  if (
+    targetType === ChangeTargetType.COURSE &&
+    target.ownerFacultyCode &&
+    target.ownerFacultyCode !== HOME_FACULTY_CODE &&
+    codes.some((code) => access.has(code))
+  ) {
+    return;
+  }
+  if (!codes.some((code) => access.modeFor(code, target.scope) !== null)) {
+    access.assertCan(codes[0], target.scope);
   }
 }
 
-function editsProgramContent(
+function isProgramChangeRequest(
   type: ChangeRequestType,
   targetType: ChangeTargetType,
 ): boolean {
   return (
     type === ChangeRequestType.CURRICULUM ||
+    type === ChangeRequestType.PROGRAM_INFO ||
     (type === ChangeRequestType.OUTCOME &&
       targetType === ChangeTargetType.PROGRAM)
   );

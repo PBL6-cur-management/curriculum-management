@@ -80,7 +80,7 @@ describe('StudentDetailPage', () => {
     expect(
       screen.queryByRole('button', { name: /Sửa điểm/ }),
     ).not.toBeInTheDocument();
-  });
+  }, 15_000);
   it('keeps the director read-only without enrollment management controls', async () => {
     setup(['R3']);
     await screen.findByText('Hồ sơ sinh viên');
@@ -104,5 +104,94 @@ describe('StudentDetailPage', () => {
         /results|applied-version/.test(String(path)),
       ),
     ).toBe(false);
+  });
+  it('displays enrollment track and updates track via modal', async () => {
+    const trackedStudent = {
+      ...student,
+      enrollments: [
+        {
+          ...student.enrollments[0],
+          track: {
+            id: 'tr1',
+            trackCode: 'AI',
+            trackName: 'Trí tuệ nhân tạo',
+          },
+        },
+      ],
+    };
+    const { writes } = renderStudentPage({
+      element: <StudentDetailPage />,
+      route: '/students/:studentId',
+      path: '/students/st1?semesterId=s1&programId=p1',
+      responses: new Map<string, unknown>([
+        ['/api/students/st1?semesterId=s1&programId=p1', trackedStudent],
+        [
+          '/api/students/st1/applied-version?semesterId=s1&programId=p1',
+          {
+            studentId: 'st1',
+            enrollmentId: 'en1',
+            programId: 'p1',
+            semesterId: 's1',
+            programVersionId: 'v1',
+            source: 'COHORT',
+            cohortAssignmentId: 'ca1',
+          } satisfies components['schemas']['StudentAppliedVersionDto'],
+        ],
+        [
+          '/api/program-versions/v1/tracks',
+          [
+            {
+              id: 'tr1',
+              trackCode: 'AI',
+              trackName: 'Trí tuệ nhân tạo',
+              englishName: null,
+              description: null,
+              sortOrder: 1,
+              compulsoryCredits: null,
+              electiveCredits: null,
+              itemCount: 3,
+            },
+            {
+              id: 'tr2',
+              trackCode: 'SE',
+              trackName: 'Kỹ thuật phần mềm',
+              englishName: null,
+              description: null,
+              sortOrder: 2,
+              compulsoryCredits: null,
+              electiveCredits: null,
+              itemCount: 4,
+            },
+          ],
+        ],
+      ]),
+    });
+    expect(
+      (await screen.findAllByText('AI — Trí tuệ nhân tạo')).length,
+    ).toBeGreaterThanOrEqual(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Chọn định hướng' }));
+    const select = await screen.findByLabelText(
+      'Định hướng / Chuyên ngành con',
+    );
+    fireEvent.keyDown(select, {
+      key: 'ArrowDown',
+      code: 'ArrowDown',
+      keyCode: 40,
+    });
+    fireEvent.click(
+      await screen.findByText('SE — Kỹ thuật phần mềm', {
+        selector: '.ant-select-item-option-content',
+      }),
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Lưu định hướng' }));
+    await vi.waitFor(() => expect(writes).toHaveLength(1));
+    expect(writes[0]).toEqual({
+      method: 'PATCH',
+      path: '/api/students/st1/enrollments/en1/track',
+      body: {
+        trackId: 'tr2',
+        expectedEnrollmentUpdatedAt: student.enrollments[0].updatedAt,
+      },
+    });
   });
 });

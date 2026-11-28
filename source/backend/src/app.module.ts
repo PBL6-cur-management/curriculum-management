@@ -19,6 +19,7 @@ import { SubjectGroupsModule } from './features/subject-groups/subject-groups.mo
 import { CoursesModule } from './features/courses/courses.module.js';
 import { CourseRelationsModule } from './features/course-relations/course-relations.module.js';
 import { EquivalenceGroupsModule } from './features/equivalence-groups/equivalence-groups.module.js';
+import { MajorsModule } from './features/majors/majors.module.js';
 import { ProgramsModule } from './features/programs/programs.module.js';
 import { ConsistencyModule } from './features/consistency/consistency.module.js';
 import { CurriculumModule } from './features/curriculum/curriculum.module.js';
@@ -59,6 +60,7 @@ import { StudentPortalModule } from './features/student-portal/student-portal.mo
     CoursesModule,
     CourseRelationsModule,
     EquivalenceGroupsModule,
+    MajorsModule,
     ProgramsModule,
     CurriculumModule,
     ConsistencyModule,

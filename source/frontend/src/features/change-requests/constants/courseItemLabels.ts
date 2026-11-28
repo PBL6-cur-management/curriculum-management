@@ -80,5 +80,8 @@ export const RELATION_CHOICES = [
   label: string;
 }[];
 
-export const MIN_SCORE_HINT = 'Thang 4, để trống nếu không yêu cầu điểm.';
+export const SCORE_SCALE_10_PATTERN = /^(10(\.0{1,2})?|[0-9](\.\d{1,2})?)$/;
+export const SCORE_SCALE_10_MESSAGE =
+  'Ngưỡng điểm theo thang 10: từ 0 đến 10, tối đa 2 chữ số thập phân (ví dụ 4 hoặc 5.5).';
+export const MIN_SCORE_HINT = 'Thang 10, để trống nếu không yêu cầu điểm.';
 export const BLANK_MEANS_UNCHANGED = 'Để trống nếu không đổi.';

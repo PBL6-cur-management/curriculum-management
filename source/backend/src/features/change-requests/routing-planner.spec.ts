@@ -15,9 +15,10 @@ const TODAY = new Date('2026-10-19T00:00:00.000Z');
 const COURSE_A = { id: 'cA', ownerGroupId: 'gA' };
 const COURSE_B = { id: 'cB', ownerGroupId: 'gB' };
 
-const program = (id: string) => ({
+const program = (id: string, facultyId = 'f1') => ({
   id,
   programCode: id.toUpperCase(),
+  facultyId,
   versions: [{ programName: `Chương trình ${id}` }],
 });
 const coordinator = (groupId: string, id: string) => ({
@@ -33,6 +34,8 @@ const director = (programId: string, id: string) => ({
 
 interface World {
   holders?: string[];
+  facultyLeaders?: string[];
+  faculties?: { id: string; unitCode: string }[];
   courses?: { id: string; ownerGroupId: string | null }[];
   groups?: string[];
   members?: ReturnType<typeof coordinator>[];
@@ -43,15 +46,31 @@ interface World {
 
 function world(state: World) {
   const holders = state.holders ?? ['office1', 'office2'];
+  const facultyLeaders = state.facultyLeaders ?? ['dean1', 'dean2'];
+  const faculties = state.faculties ?? [{ id: 'f1', unitCode: 'KHOA_CNTT' }];
   return {
+    orgUnit: {
+      findMany: vi.fn().mockResolvedValue(faculties),
+    },
     roleAssignment: {
       findFirst: vi.fn(
-        ({ where }: { where: { userId: string | { not: string } } }) => {
+        ({
+          where,
+        }: {
+          where: {
+            userId?: string | { not: string };
+            role?: { roleCode?: string };
+          };
+        }) => {
+          const pool =
+            where.role?.roleCode === 'R2' ? facultyLeaders : holders;
           const wanted = where.userId;
           const found =
-            typeof wanted === 'string'
-              ? holders.includes(wanted)
-              : holders.some((holder) => holder !== wanted.not);
+            wanted === undefined
+              ? pool.length > 0
+              : typeof wanted === 'string'
+                ? pool.includes(wanted)
+                : pool.some((holder) => holder !== wanted.not);
           return Promise.resolve(found ? { id: 'ra' } : null);
         },
       ),
@@ -132,7 +151,7 @@ describe('RoutingPlanner', () => {
     n: number,
   ) => plan.steps.filter((step) => step.approvalLevel === n);
 
-  it('routes a course to the coordinator of its own group only (KB-040)', async () => {
+  it('routes a course through 4 levels: coordinator, director, faculty leadership, academic office (KB-040)', async () => {
     const db = world({
       courses: [COURSE_A],
       groups: ['gA'],
@@ -152,24 +171,28 @@ describe('RoutingPlanner', () => {
       expect.objectContaining({ approverId: 'dir1', forProgramId: 'p1' }),
     ]);
     expect(level(plan, 3)).toEqual([
+      expect.objectContaining({
+        approverId: null,
+        forFacultyId: 'f1',
+        isSkipped: false,
+      }),
+    ]);
+    expect(level(plan, 4)).toEqual([
       expect.objectContaining({ approverId: null, isSkipped: false }),
     ]);
     expect(plan.affectedPrograms).toEqual([
-      { id: 'p1', programCode: 'P1', programName: 'Chương trình p1' },
+      {
+        id: 'p1',
+        programCode: 'P1',
+        programName: 'Chương trình p1',
+        facultyId: 'f1',
+      },
     ]);
   });
 
-  it('needs every coordinator of every group of a program copy (KB-041, EC-22)', async () => {
+  it('routes a program/curriculum request directly through Workflow B: R2 (L3) -> R1 (L4) with no L1/L2', async () => {
     const db = world({
-      courses: [COURSE_A, COURSE_B],
-      groups: ['gA', 'gB'],
-      members: [
-        coordinator('gA', 'c1'),
-        coordinator('gB', 'c2'),
-        coordinator('gB', 'c3'),
-      ],
       programs: [program('p1')],
-      directors: [director('p1', 'dir1')],
     });
     const plan = await planner.plan(
       db,
@@ -177,17 +200,17 @@ describe('RoutingPlanner', () => {
       [curriculumItem('IT1'), curriculumItem('IT2')],
       TODAY,
     );
-    expect(level(plan, 1).map((step) => step.approverId)).toEqual([
-      'c1',
-      'c2',
-      'c3',
-    ]);
-    expect(level(plan, 2)).toEqual([
+    expect(level(plan, 1)).toEqual([]);
+    expect(level(plan, 2)).toEqual([]);
+    expect(level(plan, 3)).toEqual([
       expect.objectContaining({
-        approverId: 'dir1',
-        isSkipped: true,
-        skipReason: 'Người duyệt là người tạo đề xuất',
+        approverId: null,
+        forFacultyId: 'f1',
+        isSkipped: false,
       }),
+    ]);
+    expect(level(plan, 4)).toEqual([
+      expect.objectContaining({ approverId: null, isSkipped: false }),
     ]);
   });
 
@@ -212,7 +235,7 @@ describe('RoutingPlanner', () => {
     expect(plan.affectedPrograms).toHaveLength(3);
   });
 
-  it('skips levels 1 and 2 for a course of another faculty (KB-043)', async () => {
+  it('skips levels 1, 2 and 3 for a course of another faculty (KB-043)', async () => {
     const db = world({});
     const plan = await planner.plan(
       db,
@@ -222,16 +245,17 @@ describe('RoutingPlanner', () => {
       [],
       TODAY,
     );
-    expect(plan.steps).toHaveLength(3);
+    expect(plan.steps).toHaveLength(4);
     expect(
       plan.steps
-        .slice(0, 2)
+        .slice(0, 3)
         .every(
           (step) =>
             step.isSkipped && step.skipReason?.startsWith('Không áp dụng'),
         ),
     ).toBe(true);
-    expect(plan.steps[2].isSkipped).toBe(false);
+    expect(plan.steps[3].approvalLevel).toBe(4);
+    expect(plan.steps[3].isSkipped).toBe(false);
     expect(plan.affectedPrograms).toEqual([]);
   });
 
@@ -253,32 +277,6 @@ describe('RoutingPlanner', () => {
     );
     expect(level(noGroup, 2)[0].skipReason).toBe(
       'Học phần chưa thuộc chương trình đào tạo nào',
-    );
-    const noCourse = await planner.plan(
-      world({
-        programs: [program('p1')],
-        directors: [director('p1', 'dir1')],
-      }),
-      programRequest(),
-      [],
-      TODAY,
-    );
-    expect(level(noCourse, 1)[0].skipReason).toBe(
-      'Đề xuất không thay đổi học phần nào',
-    );
-    // A curriculum change that only moves another faculty's course (e.g. mathematics) is not "no course".
-    const foreignOnly = await planner.plan(
-      world({
-        courses: [],
-        programs: [program('p1')],
-        directors: [director('p1', 'dir1')],
-      }),
-      programRequest(),
-      [curriculumItem('3190141')],
-      TODAY,
-    );
-    expect(level(foreignOnly, 1)[0].skipReason).toBe(
-      'Không áp dụng — học phần của khoa khác',
     );
   });
 
@@ -471,7 +469,7 @@ describe('RoutingPlanner', () => {
       [],
       TODAY,
     );
-    expect(level(plan, 3)).toHaveLength(1);
+    expect(level(plan, 4)).toHaveLength(1);
   });
 
   it('sends an organisational request to the academic office alone', async () => {
@@ -483,7 +481,7 @@ describe('RoutingPlanner', () => {
       TODAY,
     );
     expect(plan.steps).toHaveLength(1);
-    expect(plan.steps[0].approvalLevel).toBe(3);
+    expect(plan.steps[0].approvalLevel).toBe(4);
   });
 
   it('refuses an academic-office creator when nobody else holds the role (F13-01)', async () => {

@@ -16,6 +16,7 @@ import { CurriculumWarningDto } from '../../shared/curriculum/curriculum-warning
 import { CreditBreakdownDto } from '../../shared/curriculum/credit-breakdown.dto.js';
 import { rowCourse } from '../../shared/curriculum/row-course.js';
 import { ElectiveGroupDto } from './elective-group.dto.js';
+import { ProgramTrackDto, ProgramTrackRefDto } from './program-track.dto.js';
 import {
   CURRICULUM_REQUISITE_TYPES,
   type CurriculumRequisiteType,
@@ -73,6 +74,8 @@ export class CurriculumItemDto {
   @ApiProperty() isElective!: boolean;
   @ApiProperty({ type: CurriculumElectiveGroupRefDto, nullable: true })
   electiveGroup!: CurriculumElectiveGroupRefDto | null;
+  @ApiProperty({ type: ProgramTrackRefDto, nullable: true })
+  track!: ProgramTrackRefDto | null;
   @ApiProperty() htDa!: boolean;
   @ApiProperty() tqDa!: boolean;
   @ApiProperty({ nullable: true, type: String, example: '2' })
@@ -126,6 +129,8 @@ export class CurriculumDto {
   knowledgeBlocks!: KnowledgeBlockDto[];
   @ApiProperty({ type: [ElectiveGroupDto] })
   electiveGroups!: ElectiveGroupDto[];
+  @ApiProperty({ type: [ProgramTrackDto] })
+  tracks!: ProgramTrackDto[];
   @ApiProperty({ type: ProgramCreditsDto }) programCredits!: ProgramCreditsDto;
   @ApiProperty({ type: [CurriculumWarningDto] })
   warnings!: CurriculumWarningDto[];
@@ -145,6 +150,7 @@ export const ITEM_INCLUDE = {
     },
   },
   electiveGroup: { select: { id: true, groupCode: true } },
+  track: { select: { id: true, trackCode: true, trackName: true } },
   requisites: {
     include: { sourceCourse: { select: RELATED_COURSE_SELECT } },
     orderBy: [
@@ -189,6 +195,7 @@ export function toCurriculumItemDto(
       : null,
     isElective: row.isElective,
     electiveGroup: row.electiveGroup,
+    track: row.track ?? null,
     htDa: row.htDa,
     tqDa: row.tqDa,
     minStudiedScore:

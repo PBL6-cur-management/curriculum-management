@@ -36,6 +36,7 @@ export class GraduationInputReader {
             orderBy: { id: 'asc' },
           },
           electiveGroups: { orderBy: { id: 'asc' } },
+          tracks: { select: { id: true } },
         },
       }),
     ]);
@@ -64,12 +65,33 @@ export class GraduationInputReader {
       if (!row.courseNameSnapshot?.trim() || row.creditsSnapshot === null)
         throw new AppException(GRADUATION_ERRORS.SNAPSHOT_INCOMPLETE);
     }
+    // Track-aware frame: common core plus the chosen track only.
+    const versionTracks = version.tracks ?? [];
+    const trackId =
+      enrollment.trackId &&
+      versionTracks.some((track) => track.id === enrollment.trackId)
+        ? enrollment.trackId
+        : null;
+    const frameItems = version.curriculumItems.filter(
+      (row) => (row.trackId ?? null) === null || row.trackId === trackId,
+    );
+    const frameGroupIds = new Set(
+      frameItems.flatMap((row) =>
+        row.electiveGroupId ? [row.electiveGroupId] : [],
+      ),
+    );
+    const frameGroups = version.electiveGroups.filter(
+      (group) =>
+        (group.trackId ?? null) === null ||
+        group.trackId === trackId ||
+        frameGroupIds.has(group.id),
+    );
     const attempts = await capability.attempts(tx);
     if (attempts.some((attempt) => attempt.studentId !== resolved.studentId))
       throw new AppException(GRADUATION_ERRORS.INPUT_INVALID);
     const courseIds = [
       ...new Set([
-        ...version.curriculumItems.map((row) => row.courseId),
+        ...frameItems.map((row) => row.courseId),
         ...attempts.map((attempt) => attempt.courseId),
       ]),
     ];
@@ -93,9 +115,7 @@ export class GraduationInputReader {
       }),
       tx.knowledgeBlock.findMany({ orderBy: { blockCode: 'asc' } }),
     ]);
-    const frameByCourse = new Map(
-      version.curriculumItems.map((row) => [row.courseId, row]),
-    );
+    const frameByCourse = new Map(frameItems.map((row) => [row.courseId, row]));
     const courses = new Map(
       [...catalog, ...members].map((course) => [course.id, course]),
     );
@@ -124,8 +144,14 @@ export class GraduationInputReader {
         totalCredits: version.totalCredits.toString(),
         compulsoryCredits: version.compulsoryCredits.toString(),
         electiveCredits: version.electiveCredits.toString(),
+        ...(version.minGraduationGpa
+          ? { minGraduationGpa: version.minGraduationGpa.toString() }
+          : {}),
       },
-      frame: version.curriculumItems.map((row) => ({
+      ...(versionTracks.length > 0
+        ? { tracks: { hasTracks: true as const, selectedTrackId: trackId } }
+        : {}),
+      frame: frameItems.map((row) => ({
         id: row.id,
         course: {
           id: row.courseId,
@@ -140,7 +166,7 @@ export class GraduationInputReader {
         plannedSemester: row.plannedSemester,
         sortOrder: row.sortOrder,
       })),
-      groups: version.electiveGroups.map((group) => ({
+      groups: frameGroups.map((group) => ({
         id: group.id,
         groupCode: group.groupCode,
         groupName: group.groupName,

@@ -34,6 +34,12 @@ function object(value: unknown, keys: string[]): Record<string, unknown> {
   return record;
 }
 
+function optionalKeys(value: unknown, optional: string[]): string[] {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? optional.filter((key) => Object.hasOwn(value, key))
+    : [];
+}
+
 function text(value: unknown): asserts value is string {
   if (typeof value !== 'string' || value.trim().length === 0) invalid();
 }
@@ -96,6 +102,7 @@ export function decodeGraduationInput(
     'blocks',
     'courses',
     'attempts',
+    ...optionalKeys(value, ['tracks']),
   ]);
   if (
     root.schemaVersion !== GRADUATION_SCHEMA_VERSION ||
@@ -133,8 +140,18 @@ export function decodeGraduationInput(
     'totalCredits',
     'compulsoryCredits',
     'electiveCredits',
+    ...optionalKeys(root.version, ['minGraduationGpa']),
   ]);
-  Object.values(version).forEach((field) => decimal(field));
+  for (const [key, field] of Object.entries(version)) {
+    if (key === 'minGraduationGpa') {
+      if (field !== null) decimal(field, '4');
+    } else decimal(field);
+  }
+  if (root.tracks !== undefined) {
+    const tracks = object(root.tracks, ['hasTracks', 'selectedTrackId']);
+    if (tracks.hasTracks !== true) invalid();
+    nullableText(tracks.selectedTrackId);
+  }
   array(root.frame, (entry) => {
     const row = object(entry, [
       'id',

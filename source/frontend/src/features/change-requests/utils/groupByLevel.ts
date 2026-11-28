@@ -29,7 +29,10 @@ export interface MergedStep {
 }
 
 const scopeOf = (step: ApprovalStep) =>
-  step.forSubjectGroup?.groupCode ?? step.forProgram?.programCode ?? null;
+  step.forSubjectGroup?.groupCode ??
+  step.forProgram?.programCode ??
+  step.forFaculty?.unitCode ??
+  null;
 
 // One person standing for many programmes (a director of six CNPM variants) has one row per programme (US-057 AC3).
 // Rows that read the same apart from that code become one line listing every code.
@@ -44,7 +47,11 @@ export function mergeSameApprover(rows: readonly ApprovalStep[]): MergedStep[] {
       step.kind,
       step.performedBy?.id ?? null,
       step.remark,
-      step.forSubjectGroup ? 'group' : 'program',
+      step.forSubjectGroup
+        ? 'group'
+        : step.forFaculty
+          ? 'faculty'
+          : 'program',
     ]);
     const scope = scopeOf(step);
     const held = merged.get(key);

@@ -39,6 +39,8 @@ export function CreateRequestPanel({
         reason: values.reason,
         origin: values.origin,
         basisDocumentNumber: values.basisDocumentNumber?.trim() || null,
+        effectiveSemesterId: values.effectiveSemesterId ?? null,
+        cohortIds: values.cohortIds ?? [],
       },
       {
         onSuccess: (detail) =>

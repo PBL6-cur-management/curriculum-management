@@ -267,4 +267,73 @@ describe('SubjectGroupMembersService', () => {
       }),
     );
   });
+
+  it('promotes a non-member lecturer to coordinator in 1 step by creating both MEMBER and COORDINATOR rows', async () => {
+    findFirst.mockResolvedValue(null);
+    const promoted = await service.promoteCoordinator(
+      'group',
+      'lecturer',
+      { validFrom: '2026-01-01' },
+      'actor',
+    );
+    expect(promoted.memberRole).toBe(SubjectGroupMemberRole.COORDINATOR);
+    expect(transaction).toHaveBeenCalledOnce();
+    expect(create).toHaveBeenCalledTimes(2);
+    expect(create.mock.calls[0][0].data).toMatchObject({
+      subjectGroupId: 'group',
+      lecturerId: 'lecturer',
+      memberRole: SubjectGroupMemberRole.MEMBER,
+    });
+    expect(create.mock.calls[1][0].data).toMatchObject({
+      subjectGroupId: 'group',
+      lecturerId: 'lecturer',
+      memberRole: SubjectGroupMemberRole.COORDINATOR,
+    });
+  });
+
+  it('promotes an existing covering member without duplicating the MEMBER row', async () => {
+    findFirst
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(MEMBER);
+    const promoted = await service.promoteCoordinator(
+      'group',
+      'lecturer',
+      { validFrom: '2026-01-01' },
+      'actor',
+    );
+    expect(promoted.memberRole).toBe(SubjectGroupMemberRole.COORDINATOR);
+    expect(create).toHaveBeenCalledOnce();
+    expect(create.mock.calls[0][0].data.memberRole).toBe(
+      SubjectGroupMemberRole.COORDINATOR,
+    );
+  });
+
+  it('demotes an active coordinator while keeping membership intact', async () => {
+    findMany.mockResolvedValueOnce([
+      {
+        ...MEMBER,
+        id: 'coord-past',
+        memberRole: SubjectGroupMemberRole.COORDINATOR,
+        validFrom: fromIsoDay('2025-01-01'),
+      },
+      {
+        ...MEMBER,
+        id: 'coord-future',
+        memberRole: SubjectGroupMemberRole.COORDINATOR,
+        validFrom: fromIsoDay('2099-01-01'),
+      },
+    ]);
+    const demoted = await service.demoteCoordinator(
+      'group',
+      'lecturer',
+      {},
+      'actor',
+    );
+    expect(demoted).toHaveLength(2);
+    expect(demoted[0].state).toBe('EXPIRED');
+    expect(demoted[1].state).toBe('REVOKED');
+    await expect(
+      service.demoteCoordinator('group', 'lecturer', {}, 'actor'),
+    ).rejects.toMatchObject({ code: 'MEMBER_NOT_FOUND' });
+  });
 });

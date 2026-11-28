@@ -54,6 +54,11 @@ export function CorrectionPage() {
       <BackLink to={back}>
         Phiên bản{' '}
         {versionLabel(draft.data.correctionOf ?? { versionNumber: null })}
+        {draft.data.correctionOf &&
+        'decisionNumber' in draft.data.correctionOf &&
+        draft.data.correctionOf.decisionNumber
+          ? ` (${String(draft.data.correctionOf.decisionNumber)})`
+          : ''}
       </BackLink>
       <PageHeader title="Ban hành đính chính" />
       <Alert

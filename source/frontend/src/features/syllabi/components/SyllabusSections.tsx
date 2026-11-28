@@ -1,5 +1,6 @@
-import { Flex, Space, Tag, Typography } from 'antd';
+import { App, Flex, Space, Tag, Typography } from 'antd';
 import { RichTextView } from '../../../shared/components/rich-text/RichTextView';
+import { errorMessage } from '../../../shared/forms/applyFieldErrors';
 import type {
   AttachmentRules,
   Syllabus,
@@ -10,10 +11,12 @@ import {
   CLO_SECTION_LABEL,
   EMPTY_SECTION,
   NOT_TRANSLATED,
+  REQUEST_COPY_TAB_LABEL,
   SECTION_LABELS,
   WEEKLY_SECTION_LABEL,
   type SyllabusLanguage,
 } from '../constants/syllabusLabels';
+import { useDeleteAttachment } from '../hooks/useSyllabus';
 import { formatDate, formatDateTime } from '../utils/formatDateTime';
 import { translated } from '../utils/syllabusLanguage';
 import { AttachmentList } from './AttachmentList';
@@ -25,8 +28,12 @@ import { WeeklyContentView } from './WeeklyContentView';
 interface SyllabusSectionsProps {
   syllabus: Syllabus;
   language: SyllabusLanguage;
-  // Set when the caller may add a signed file to this published revision (no delete is ever offered).
-  attachTo?: { courseId: string; attachmentRules: AttachmentRules };
+  // Set when the caller may add files (signed files on published revisions, or attachments on a CR working copy).
+  attachTo?: {
+    courseId: string;
+    attachmentRules: AttachmentRules;
+    allowDelete?: boolean;
+  };
 }
 
 interface SectionProps {
@@ -53,6 +60,8 @@ export function SyllabusSections({
   language,
   attachTo,
 }: SyllabusSectionsProps) {
+  const { message } = App.useApp();
+  const removeAttachment = useDeleteAttachment(attachTo?.courseId ?? '');
   const description = translated(
     language,
     syllabus.courseDescription,
@@ -66,9 +75,18 @@ export function SyllabusSections({
   return (
     <Flex vertical gap="middle">
       <Typography.Text type="secondary">
-        {`Bản số ${syllabus.revisionNumber} · Cập nhật lúc ${formatDateTime(syllabus.updatedAt)}`}
+        {syllabus.revisionNumber !== null
+          ? `Bản số ${syllabus.revisionNumber}`
+          : REQUEST_COPY_TAB_LABEL}
+        {` · Cập nhật lúc ${formatDateTime(syllabus.updatedAt)}`}
         {syllabus.publishedAt &&
           ` · Ban hành ngày ${formatDate(syllabus.publishedAt)}`}
+        {syllabus.effectiveSemester &&
+          ` · Học kỳ hiệu lực: ${syllabus.effectiveSemester.semesterCode}`}
+        {syllabus.documentNumber &&
+          ` · Số văn bản: ${syllabus.documentNumber}`}
+        {syllabus.signedDate &&
+          ` · Ngày ký: ${formatDate(syllabus.signedDate)}`}
       </Typography.Text>
       <Section
         title={SECTION_LABELS.courseDescription}
@@ -99,7 +117,20 @@ export function SyllabusSections({
               attachmentRules={attachTo.attachmentRules}
             />
           )}
-          <AttachmentList attachments={syllabus.attachments} />
+          <AttachmentList
+            attachments={syllabus.attachments}
+            onDelete={
+              attachTo?.allowDelete
+                ? (attachment) =>
+                    removeAttachment.mutate(attachment.id, {
+                      onError: (reason) =>
+                        void message.error(
+                          errorMessage(reason, 'Không gỡ được tệp.'),
+                        ),
+                    })
+                : undefined
+            }
+          />
         </Flex>
       </Section>
     </Flex>

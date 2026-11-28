@@ -33,6 +33,11 @@ export const INTEGRATION_ERRORS = {
     code: 'API_PROGRAM_VERSION_NOT_FOUND',
     message: 'Không tìm thấy phiên bản chương trình đã ban hành.',
   },
+  COURSE_NOT_FOUND: {
+    status: HttpStatus.NOT_FOUND,
+    code: 'API_COURSE_NOT_FOUND',
+    message: 'Không tìm thấy học phần.',
+  },
   COURSE_NOT_IN_PROGRAM: {
     status: HttpStatus.NOT_FOUND,
     code: 'API_COURSE_NOT_IN_PROGRAM',

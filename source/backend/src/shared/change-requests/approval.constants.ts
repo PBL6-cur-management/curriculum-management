@@ -3,7 +3,8 @@ import { ChangeRequestStatus } from '../../generated/prisma/client.js';
 export const APPROVAL_LEVEL = {
   COORDINATOR: 1,
   DIRECTOR: 2,
-  ACADEMIC_OFFICE: 3,
+  FACULTY_LEADERSHIP: 3,
+  ACADEMIC_OFFICE: 4,
 } as const;
 export type ApprovalLevel =
   (typeof APPROVAL_LEVEL)[keyof typeof APPROVAL_LEVEL];
@@ -11,7 +12,8 @@ export type ApprovalLevel =
 export const APPROVAL_LEVEL_NAMES: Record<ApprovalLevel, string> = {
   1: 'Điều phối nhóm chuyên môn',
   2: 'Giám đốc CTĐT',
-  3: 'Phòng Đào tạo',
+  3: 'Ban lãnh đạo khoa',
+  4: 'Phòng Đào tạo',
 };
 
 export const PENDING_STATUS_BY_LEVEL: Record<
@@ -20,7 +22,8 @@ export const PENDING_STATUS_BY_LEVEL: Record<
 > = {
   1: ChangeRequestStatus.PENDING_COORDINATOR,
   2: ChangeRequestStatus.PENDING_DIRECTOR,
-  3: ChangeRequestStatus.PENDING_ACADEMIC_OFFICE,
+  3: ChangeRequestStatus.PENDING_FACULTY_LEADERSHIP,
+  4: ChangeRequestStatus.PENDING_ACADEMIC_OFFICE,
 };
 
 export const PENDING_STATUSES: readonly ChangeRequestStatus[] = Object.values(

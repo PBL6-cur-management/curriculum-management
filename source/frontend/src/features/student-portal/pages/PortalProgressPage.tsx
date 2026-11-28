@@ -1,7 +1,10 @@
 import { Alert, Card, Flex, Progress, Skeleton, Typography } from 'antd';
 import { SummaryStrip } from '../../../shared/design-system';
 import { GraduationError } from '../../graduation/components/GraduationError';
-import { displayCredits } from '../../graduation/components/graduationPresentation';
+import {
+  displayCredits,
+  displayGpa,
+} from '../../graduation/components/graduationPresentation';
 import { AcademicResultsTable } from '../../students/components/AcademicResultsTable';
 import type { PortalContext } from '../api/portal';
 import { PortalContextGate } from '../components/PortalContextBar';
@@ -54,6 +57,18 @@ function Progression({ context }: { context: PortalContext }) {
             },
             { label: 'Bắt buộc', value: displayCredits(credits.compulsory) },
             { label: 'Tự chọn', value: displayCredits(credits.elective) },
+            ...(outcome.result.cumulativeGpa !== undefined ||
+            outcome.result.minGraduationGpa !== undefined
+              ? [
+                  {
+                    label: 'GPA tích lũy',
+                    value: displayGpa(
+                      outcome.result.cumulativeGpa,
+                      outcome.result.minGraduationGpa,
+                    ),
+                  },
+                ]
+              : []),
           ]}
         />
         <Typography.Text type="secondary" style={{ fontSize: 13 }}>

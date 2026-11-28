@@ -1,6 +1,9 @@
 import { ConfigService } from '@nestjs/config';
 import ExcelJS from 'exceljs';
-import { AccessContext, type ActiveAssignment } from '../../shared/authz/access-context.js';
+import {
+  AccessContext,
+  type ActiveAssignment,
+} from '../../shared/authz/access-context.js';
 import { PERMISSIONS } from '../../shared/authz/permission-codes.js';
 import {
   encryptStudentCredentials,
@@ -13,7 +16,9 @@ const NOW = new Date('2026-10-28T00:00:00.000Z');
 
 const office = {
   roleCode: 'R1',
-  permissions: new Map([[PERMISSIONS.DATA_IMPORT_EXCEL, { mode: 'DIRECT', scope: 'ALL' }]]),
+  permissions: new Map([
+    [PERMISSIONS.DATA_IMPORT_EXCEL, { mode: 'DIRECT', scope: 'ALL' }],
+  ]),
 } as unknown as ActiveAssignment;
 const access = new AccessContext('actor', [office]);
 const outsider = new AccessContext('actor', []);
@@ -25,14 +30,22 @@ const account = {
   temporaryPassword: 'Secret-Pass-1',
 };
 
-function setup(options: { key?: string | undefined; delivery?: Record<string, unknown> | null; batch?: unknown } = {}) {
+function setup(
+  options: {
+    key?: string | undefined;
+    delivery?: Record<string, unknown> | null;
+    batch?: unknown;
+  } = {},
+) {
   const hasKey = 'key' in options ? options.key : KEY.toString('base64');
   let delivery: Record<string, unknown> | null =
     options.delivery === undefined ? null : options.delivery;
   const tx = {
     $queryRaw: vi.fn().mockResolvedValue([]),
     importBatch: {
-      findFirst: vi.fn().mockResolvedValue('batch' in options ? options.batch : { id: 'b1' }),
+      findFirst: vi
+        .fn()
+        .mockResolvedValue('batch' in options ? options.batch : { id: 'b1' }),
     },
     studentCredentialDelivery: {
       create: vi.fn(async ({ data }: { data: Record<string, unknown> }) => {
@@ -47,13 +60,26 @@ function setup(options: { key?: string | undefined; delivery?: Record<string, un
       updateMany: vi.fn().mockResolvedValue({ count: 2 }),
     },
   };
-  const prisma = { ...tx, $transaction: (fn: (t: typeof tx) => unknown) => fn(tx) };
-  const config = { get: vi.fn().mockReturnValue(hasKey) } as unknown as ConfigService<never, true>;
-  return { tx, service: new StudentCredentialsService(prisma as never, config as never) };
+  const prisma = {
+    ...tx,
+    $transaction: (fn: (t: typeof tx) => unknown) => fn(tx),
+  };
+  const config = {
+    get: vi.fn().mockReturnValue(hasKey),
+  } as unknown as ConfigService<never, true>;
+  return {
+    tx,
+    service: new StudentCredentialsService(prisma as never, config as never),
+  };
 }
 
 const sealed = (owner = 'actor', key: Uint8Array = KEY) => {
-  const value = encryptStudentCredentials(new Uint8Array([1, 2, 3]), key, 'b1', owner);
+  const value = encryptStudentCredentials(
+    new Uint8Array([1, 2, 3]),
+    key,
+    'b1',
+    owner,
+  );
   return {
     batchId: 'b1',
     accountCount: 1,
@@ -70,9 +96,14 @@ describe('StudentCredentialsService', () => {
   it('answers 503 without a configured key, before and during storage', async () => {
     const { service, tx } = setup({ key: undefined });
     expect(() => service.assertConfigured()).toThrow(
-      expect.objectContaining({ code: 'STUDENT_CREDENTIALS_UNAVAILABLE', status: 503 }),
+      expect.objectContaining({
+        code: 'STUDENT_CREDENTIALS_UNAVAILABLE',
+        status: 503,
+      }),
     );
-    await expect(service.store(tx as never, 'b1', 'actor', [account])).rejects.toMatchObject({
+    await expect(
+      service.store(tx as never, 'b1', 'actor', [account]),
+    ).rejects.toMatchObject({
       code: 'STUDENT_CREDENTIALS_UNAVAILABLE',
     });
   });
@@ -80,10 +111,17 @@ describe('StudentCredentialsService', () => {
   it('stores an encrypted workbook with a 24 hour expiry and no plaintext', async () => {
     const { service, tx } = setup();
     await service.store(tx as never, 'b1', 'actor', [account], NOW);
-    const data = tx.studentCredentialDelivery.create.mock.calls[0]![0].data as Record<string, unknown>;
+    const data = tx.studentCredentialDelivery.create.mock.calls[0]![0]
+      .data as Record<string, unknown>;
     expect(data.accountCount).toBe(1);
-    expect(data.expiresAt).toEqual(new Date(NOW.getTime() + STUDENT_CREDENTIALS.TTL_MS));
-    expect(Buffer.from(data.ciphertext as Buffer).includes(Buffer.from(account.temporaryPassword))).toBe(false);
+    expect(data.expiresAt).toEqual(
+      new Date(NOW.getTime() + STUDENT_CREDENTIALS.TTL_MS),
+    );
+    expect(
+      Buffer.from(data.ciphertext as Buffer).includes(
+        Buffer.from(account.temporaryPassword),
+      ),
+    ).toBe(false);
     expect(JSON.stringify(data)).not.toContain(account.temporaryPassword);
   });
 
@@ -104,7 +142,12 @@ describe('StudentCredentialsService', () => {
     expect(JSON.stringify(rows)).toContain(account.temporaryPassword);
     expect(tx.studentCredentialDelivery.update).toHaveBeenCalledWith({
       where: { batchId: 'b1' },
-      data: expect.objectContaining({ ciphertext: null, iv: null, authTag: null, keyId: null }),
+      data: expect.objectContaining({
+        ciphertext: null,
+        iv: null,
+        authTag: null,
+        keyId: null,
+      }),
     });
     await expect(service.consume('b1', access, NOW)).rejects.toMatchObject({
       code: 'CREDENTIALS_ALREADY_DOWNLOADED',
@@ -113,34 +156,56 @@ describe('StudentCredentialsService', () => {
   });
 
   it('answers 410 when expired or purged', async () => {
-    const expired = setup({ delivery: { ...sealed(), expiresAt: new Date(NOW.getTime() - 1) } });
-    await expect(expired.service.consume('b1', access, NOW)).rejects.toMatchObject({ code: 'CREDENTIALS_EXPIRED' });
+    const expired = setup({
+      delivery: { ...sealed(), expiresAt: new Date(NOW.getTime() - 1) },
+    });
+    await expect(
+      expired.service.consume('b1', access, NOW),
+    ).rejects.toMatchObject({ code: 'CREDENTIALS_EXPIRED' });
     const purged = setup({ delivery: { ...sealed(), ciphertext: null } });
-    await expect(purged.service.consume('b1', access, NOW)).rejects.toMatchObject({ code: 'CREDENTIALS_EXPIRED' });
+    await expect(
+      purged.service.consume('b1', access, NOW),
+    ).rejects.toMatchObject({ code: 'CREDENTIALS_EXPIRED' });
   });
 
   it('keeps the payload when it cannot be decrypted', async () => {
     const wrongOwner = setup({ delivery: sealed('someone-else') });
-    await expect(wrongOwner.service.consume('b1', access, NOW)).rejects.toMatchObject({
+    await expect(
+      wrongOwner.service.consume('b1', access, NOW),
+    ).rejects.toMatchObject({
       code: 'CREDENTIALS_UNREADABLE',
     });
-    expect(wrongOwner.tx.studentCredentialDelivery.update).not.toHaveBeenCalled();
-    const rotated = setup({ delivery: sealed('actor', new Uint8Array(Buffer.alloc(32, 1))) });
-    await expect(rotated.service.consume('b1', access, NOW)).rejects.toMatchObject({
+    expect(
+      wrongOwner.tx.studentCredentialDelivery.update,
+    ).not.toHaveBeenCalled();
+    const rotated = setup({
+      delivery: sealed('actor', new Uint8Array(Buffer.alloc(32, 1))),
+    });
+    await expect(
+      rotated.service.consume('b1', access, NOW),
+    ).rejects.toMatchObject({
       code: 'CREDENTIALS_UNREADABLE',
     });
   });
 
   it('rechecks the import gate and batch ownership on every call', async () => {
     const denied = setup({ delivery: sealed() });
-    await expect(denied.service.consume('b1', outsider, NOW)).rejects.toBeDefined();
+    await expect(
+      denied.service.consume('b1', outsider, NOW),
+    ).rejects.toBeDefined();
     const notOwner = setup({ delivery: sealed(), batch: null });
-    await expect(notOwner.service.consume('b1', access, NOW)).rejects.toMatchObject({
+    await expect(
+      notOwner.service.consume('b1', access, NOW),
+    ).rejects.toMatchObject({
       code: 'IMPORT_BATCH_NOT_FOUND',
     });
     expect(notOwner.tx.importBatch.findFirst).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: expect.objectContaining({ performedById: 'actor', status: 'COMMITTED', importType: 'STUDENT_LIST' }),
+        where: expect.objectContaining({
+          performedById: 'actor',
+          status: 'COMMITTED',
+          importType: 'STUDENT_LIST',
+        }),
       }),
     );
   });

@@ -247,6 +247,10 @@ describe('FinalApprovalApplier', () => {
         'scopy',
         'r1',
         NOW,
+        expect.objectContaining({
+          effectiveSemesterId: 'sem',
+          documentNumber: 'QD',
+        }),
       );
       expect(released).toHaveLength(3);
       expect(copier.copy).toHaveBeenCalledTimes(3);
@@ -268,21 +272,22 @@ describe('FinalApprovalApplier', () => {
       expect(publisher.promote).not.toHaveBeenCalled();
     });
 
-    it('refuses cohorts when the change reaches no program or several', async () => {
+    it('applies cohorts to each affected program version when fanning out across multiple programs', async () => {
       const withCohort = { dto: { ...context.dto, cohortIds: ['k1'] } };
       db.cohort.count.mockResolvedValue(1);
-      db.programVersion.findMany.mockResolvedValue([]);
-      await expect(run(syllabusRequest, withCohort)).rejects.toMatchObject({
-        code: 'COHORTS_NOT_ALLOWED',
-      });
-      db.programVersion.findMany.mockResolvedValue([
-        target('pa'),
-        target('pb'),
-      ]);
-      await expect(run(syllabusRequest, withCohort)).rejects.toMatchObject({
-        code: 'COHORTS_NOT_ALLOWED',
-      });
-      expect(syllabi.publishFromRequest).not.toHaveBeenCalled();
+      db.programVersion.findMany.mockImplementation(
+        (args: { where: { sourceRequestId?: null } }) =>
+          Promise.resolve(
+            args.where.sourceRequestId === null
+              ? [target('pa'), target('pb')]
+              : [{ versionNumber: '1.0' }],
+          ),
+      );
+      const released = await run(syllabusRequest, withCohort);
+      expect(released).toHaveLength(2);
+      expect(publisher.promote).toHaveBeenCalledTimes(2);
+      expect(publisher.promote.mock.calls[0][1].cohortIds).toEqual(['k1']);
+      expect(publisher.promote.mock.calls[1][1].cohortIds).toEqual(['k1']);
     });
 
     it('rolls everything back when the third program fails its consistency check', async () => {

@@ -24,7 +24,7 @@ import {
   PROGRAM_STATUS_LABELS,
 } from '../constants/programLabels';
 import { ReleasedVersionLinks } from '../components/ReleasedVersionLinks';
-import { useProgramList } from '../hooks/usePrograms';
+import { useMajorOptions, useProgramList } from '../hooks/usePrograms';
 import { DataTable, PageHeader } from '../../../shared/design-system';
 
 export const PROGRAM_SEARCH_DEBOUNCE_MS = 300;
@@ -63,6 +63,7 @@ export function ProgramListPage() {
   const [query, setQuery] = useUrlQuery(INITIAL_QUERY, QUERY_KINDS);
   const filters = {
     facultyId: query.facultyId,
+    majorId: query.majorId,
     degreeLevel: query.degreeLevel,
     releaseYear: query.releaseYear,
     intakeYear: query.intakeYear,
@@ -78,6 +79,11 @@ export function ProgramListPage() {
     );
   }, [q, setQuery]);
   const { data, isFetching, isError } = useProgramList(query);
+  const { data: majorsPage } = useMajorOptions();
+  const majorOptions = (majorsPage?.items ?? []).map((major) => ({
+    value: major.id,
+    label: `${major.majorCode} — ${major.majorName}`,
+  }));
   const applyFilters = (next: typeof filters) =>
     setQuery((current) => ({ ...current, ...next, page: 1 }));
   const columns: TableColumnsType<ProgramSummary> = [
@@ -170,6 +176,17 @@ export function ProgramListPage() {
             }
           />
         </div>
+        <Select
+          allowClear
+          showSearch
+          optionFilterProp="label"
+          aria-label={PROGRAM_FILTER_LABELS.MAJOR}
+          placeholder={PROGRAM_FILTER_LABELS.MAJOR}
+          style={{ minWidth: 220 }}
+          value={filters.majorId}
+          options={majorOptions}
+          onChange={(majorId?: string) => applyFilters({ ...filters, majorId })}
+        />
         <Select
           allowClear
           aria-label={PROGRAM_FILTER_LABELS.DEGREE_LEVEL}

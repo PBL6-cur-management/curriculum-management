@@ -19,6 +19,7 @@ import { ApiError } from '../../../shared/api/client';
 import { errorMessage } from '../../../shared/forms/applyFieldErrors';
 import { CohortSelect } from '../../../shared/releases/CohortSelect';
 import { SemesterSelect } from '../../../shared/releases/SemesterSelect';
+import { useSemesters } from '../../../shared/releases/useReleaseOptions';
 import { FinalApprovalPreview } from '../components/FinalApprovalPreview';
 import {
   COURSE_CHANGE_NOTICE,
@@ -62,6 +63,7 @@ export function FinalApprovalPage() {
   const [form] = Form.useForm<Values>();
   const [confirming, setConfirming] = useState<Values | null>(null);
   const preview = useFinalApprovalPreview(requestId);
+  const { data: semesters = [] } = useSemesters();
   const approve = useFinalApprove(requestId);
   const back = generatePath(ROUTES.changeRequestDetail, { requestId });
 
@@ -128,7 +130,30 @@ export function FinalApprovalPage() {
         form={form}
         layout="vertical"
         style={{ maxWidth: 560 }}
-        initialValues={{ cohortIds: [] }}
+        initialValues={{
+          effectiveSemesterId: data.effectiveSemester?.id ?? undefined,
+          cohortIds: data.targetCohorts.map((cohort) => cohort.id),
+          allowPastSemester:
+            data.canAllowPastSemester &&
+            Boolean(
+              data.effectiveSemester?.startDate &&
+                data.effectiveSemester.startDate <
+                  new Date().toISOString().slice(0, 10),
+            ),
+        }}
+        onValuesChange={(changed: Partial<Values>) => {
+          if (changed.effectiveSemesterId && data.canAllowPastSemester) {
+            const picked = semesters.find(
+              (semester) => semester.id === changed.effectiveSemesterId,
+            );
+            if (
+              picked?.startDate &&
+              picked.startDate < new Date().toISOString().slice(0, 10)
+            ) {
+              form.setFieldValue('allowPastSemester', true);
+            }
+          }
+        }}
         onFinish={setConfirming}
       >
         <Form.Item

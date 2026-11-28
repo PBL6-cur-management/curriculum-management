@@ -32,20 +32,85 @@ describe('eligibility evaluator', () => {
       expected,
     );
   });
-  it.each([
-    ['0', 'ELIGIBLE'],
-    ['2.5', 'INELIGIBLE'],
-  ] as const)('does not invent exemption scores at %s', (score, expected) => {
-    const context = withAttempts(
-      withRequisites(eligibilityFixture(), [['A', 'B', 'PREREQUISITE', score]]),
-      [attempt('B', 'EXEMPT')],
-    );
-    const answer = evaluateEligibility(context, options);
-    expect(answer.items[0].eligibility).toBe(expected);
-    if (expected === 'INELIGIBLE')
-      expect(answer.items[0].reasons[0].code).toBe(
-        'PREREQUISITE_SCORE_MISSING',
+  it.each(['0', '2.5', '9'])(
+    'treats an EXEMPT prerequisite as satisfied without scores at %s',
+    (score) => {
+      const context = withAttempts(
+        withRequisites(eligibilityFixture(), [
+          ['A', 'B', 'PREREQUISITE', score],
+        ]),
+        [attempt('B', 'EXEMPT')],
       );
+      const answer = evaluateEligibility(context, options);
+      expect(answer.items[0].eligibility).toBe('ELIGIBLE');
+    },
+  );
+  it.each([
+    ['4.0', '4', 'ELIGIBLE'],
+    ['3.99', '4', 'INELIGIBLE'],
+    ['7', '6.5', 'ELIGIBLE'],
+  ] as const)(
+    'compares 10-point score %s against threshold %s (DEC-11)',
+    (score10, threshold, expected) => {
+      const context = withAttempts(
+        withRequisites(eligibilityFixture(), [
+          ['A', 'B', 'PREREQUISITE', threshold],
+        ]),
+        [attempt('B', 'PASSED', '1.0', 'r', score10)],
+      );
+      expect(evaluateEligibility(context, options).items[0].eligibility).toBe(
+        expected,
+      );
+    },
+  );
+  describe('capstone TQ ĐA / HT ĐA', () => {
+    function capstone(flags: { tqDa?: boolean; htDa?: boolean }) {
+      const base = eligibilityFixture();
+      const rows = base.rows.map((row) =>
+        row.course.id === 'A'
+          ? { ...row, courseType: 'CAPSTONE' as const }
+          : row.course.id === 'B'
+            ? { ...row, ...flags }
+            : row,
+      );
+      return { ...base, rows };
+    }
+    it('requires TQ ĐA items to be passed', () => {
+      const ctx = capstone({ tqDa: true });
+      expect(evaluateEligibility(ctx, options).items[0]).toMatchObject({
+        eligibility: 'INELIGIBLE',
+      });
+      expect(
+        evaluateEligibility(
+          withAttempts(ctx, [attempt('B', 'PASSED', '2')]),
+          options,
+        ).items[0].eligibility,
+      ).toBe('ELIGIBLE');
+    });
+    it('requires HT ĐA items to have a result', () => {
+      const ctx = capstone({ htDa: true });
+      expect(evaluateEligibility(ctx, options).items[0].reasons[0].code).toBe(
+        'PRIOR_RESULT_MISSING',
+      );
+      expect(
+        evaluateEligibility(
+          withAttempts(ctx, [attempt('B', 'FAILED', '0')]),
+          options,
+        ).items[0].eligibility,
+      ).toBe('ELIGIBLE');
+    });
+    it('ignores flags on non-capstone items', () => {
+      const base = eligibilityFixture();
+      const ctx = {
+        ...base,
+        rows: base.rows.map((row) =>
+          row.course.id === 'B' ? { ...row, tqDa: true, htDa: true } : row,
+        ),
+      };
+      expect(evaluateEligibility(ctx, options).items[0].eligibility).toBe(
+        'ELIGIBLE',
+      );
+    });
   });
   it('removes completed nodes even when their own requirements fail', () => {
     const context = withAttempts(

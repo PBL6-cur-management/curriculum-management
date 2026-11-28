@@ -15,8 +15,8 @@ import {
   Min,
 } from 'class-validator';
 import {
-  GRADE_POINT_MESSAGE,
-  GRADE_POINT_PATTERN,
+  SCORE10_MESSAGE,
+  SCORE10_PATTERN,
 } from '../../shared/decimal/decimal.js';
 import { emptyToNull } from '../../shared/dtos/transforms.js';
 
@@ -46,6 +46,16 @@ export class CreateCurriculumItemDto {
 
   @ApiProperty() @IsBoolean() isElective!: boolean;
 
+  @ApiPropertyOptional({
+    nullable: true,
+    type: String,
+    description: 'Định hướng / chuyên ngành con (null = khung chung).',
+  })
+  @Transform(emptyToNull)
+  @IsOptional()
+  @IsString()
+  trackId?: string | null;
+
   @ApiPropertyOptional() @IsOptional() @IsBoolean() htDa?: boolean;
   @ApiPropertyOptional() @IsOptional() @IsBoolean() tqDa?: boolean;
 
@@ -53,14 +63,14 @@ export class CreateCurriculumItemDto {
   @Transform(emptyToNull)
   @IsOptional()
   @IsString()
-  @Matches(GRADE_POINT_PATTERN, { message: GRADE_POINT_MESSAGE })
+  @Matches(SCORE10_PATTERN, { message: SCORE10_MESSAGE })
   minStudiedScore?: string | null;
 
   @ApiPropertyOptional({ nullable: true, type: String, example: '4' })
   @Transform(emptyToNull)
   @IsOptional()
   @IsString()
-  @Matches(GRADE_POINT_PATTERN, { message: GRADE_POINT_MESSAGE })
+  @Matches(SCORE10_PATTERN, { message: SCORE10_MESSAGE })
   minTransferScore?: string | null;
 
   @ApiPropertyOptional({

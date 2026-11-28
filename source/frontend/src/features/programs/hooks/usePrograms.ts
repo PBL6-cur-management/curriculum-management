@@ -11,6 +11,7 @@ import {
   cloneProgram,
   endDirector,
   fetchDirectors,
+  fetchMajorOptions,
   fetchProgram,
   fetchPrograms,
   fetchVersionInfo,
@@ -33,7 +34,18 @@ export const PROGRAM_QUERY_KEYS = {
     ['programs', 'directors', programId] as const,
   versionInfo: (versionId: string) =>
     ['programs', 'version-info', versionId] as const,
+  majors: ['majors', 'options'] as const,
 };
+
+const MAJORS_STALE_MS = 5 * 60 * 1000;
+
+export function useMajorOptions() {
+  return useQuery({
+    queryKey: PROGRAM_QUERY_KEYS.majors,
+    queryFn: fetchMajorOptions,
+    staleTime: MAJORS_STALE_MS,
+  });
+}
 
 export function useProgramList(query: ProgramQuery) {
   return useQuery({

@@ -1,4 +1,4 @@
-import { App, Button, Popconfirm, Space, Table, Tag } from 'antd';
+import { App, Button, Popconfirm, Space, Table, Tag, Tooltip, Typography } from 'antd';
 import type { TableColumnsType } from 'antd';
 import { compareDecimals } from '../../../shared/decimal/decimal';
 import { errorMessage } from '../../../shared/forms/applyFieldErrors';
@@ -46,9 +46,27 @@ export function ElectiveGroupTable({
   const { message } = App.useApp();
   const remove = useDeleteGroup(curriculum.version.id);
   const itemsById = new Map(curriculum.items.map((item) => [item.id, item]));
+  const tracksById = new Map(
+    curriculum.tracks.map((track) => [track.id, track]),
+  );
   const columns: TableColumnsType<ElectiveGroup> = [
     { title: 'Mã nhóm', dataIndex: 'groupCode' },
     { title: 'Tên nhóm', dataIndex: 'groupName' },
+    {
+      title: 'Định hướng',
+      render: (_value, group) => {
+        if (!group.trackId)
+          return <Typography.Text type="secondary">Khung chung</Typography.Text>;
+        const track = tracksById.get(group.trackId);
+        return track ? (
+          <Tooltip title={track.trackName}>
+            <Tag color="geekblue">{track.trackCode}</Tag>
+          </Tooltip>
+        ) : (
+          <Tag color="geekblue">{group.trackId}</Tag>
+        );
+      },
+    },
     {
       title: 'Yêu cầu tối thiểu',
       render: (_value, group) => minimumText(group),

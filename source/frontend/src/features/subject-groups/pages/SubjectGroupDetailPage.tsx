@@ -34,6 +34,14 @@ export function SubjectGroupDetailPage() {
     : group.members.filter(
         (row) => row.state === 'ACTIVE' || row.state === 'SCHEDULED',
       );
+  const activeCoordinatorIds = new Set([
+    ...group.activeCoordinators.map((user) => user.id),
+    ...group.members
+      .filter(
+        (row) => row.memberRole === 'COORDINATOR' && row.state === 'ACTIVE',
+      )
+      .map((row) => row.lecturer.id),
+  ]);
   return (
     <Flex vertical gap="middle">
       <Card
@@ -77,6 +85,7 @@ export function SubjectGroupDetailPage() {
           groupId={group.id}
           rows={visibleRows.filter((row) => row.memberRole === 'COORDINATOR')}
           canManage={canManage}
+          activeCoordinatorIds={activeCoordinatorIds}
         />
       </Card>
       <Card title="Thành viên">
@@ -84,6 +93,7 @@ export function SubjectGroupDetailPage() {
           groupId={group.id}
           rows={visibleRows.filter((row) => row.memberRole === 'MEMBER')}
           canManage={canManage}
+          activeCoordinatorIds={activeCoordinatorIds}
         />
       </Card>
       <AddMemberModal

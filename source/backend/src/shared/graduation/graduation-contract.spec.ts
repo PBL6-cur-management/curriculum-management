@@ -72,6 +72,18 @@ const shortfalls: GraduationShortfall[] = [
     reason: 'IN_PROGRESS',
     message: 'Chưa hoàn thành học phần điều kiện SYN101.',
   },
+  {
+    code: 'LOW_GPA',
+    category: 'GPA',
+    requiredGpa: '2',
+    actualGpa: '1.5',
+    message: 'Điểm trung bình tích lũy chưa đạt ngưỡng tối thiểu',
+  },
+  {
+    code: 'TRACK_NOT_SELECTED',
+    category: 'TRACK',
+    message: 'Sinh viên chưa chọn chuyên ngành / định hướng trong khung CTĐT',
+  },
 ];
 
 function resultFor(entries: GraduationShortfall[]): GraduationResult {
@@ -203,12 +215,12 @@ describe('graduation contract', () => {
     },
   );
 
-  it('has five public codes, four categories and type-safe course pairings', () => {
+  it('has seven public codes, six categories and type-safe course pairings', () => {
     expect(Object.keys(GRADUATION_SHORTFALL_CATEGORIES)).toEqual(
       shortfalls.map((entry) => entry.code),
     );
     expect(new Set(Object.values(GRADUATION_SHORTFALL_CATEGORIES)).size).toBe(
-      4,
+      6,
     );
     expectTypeOf<
       Extract<CourseShortfall, { code: 'MANDATORY_COURSE_MISSING' }>['category']

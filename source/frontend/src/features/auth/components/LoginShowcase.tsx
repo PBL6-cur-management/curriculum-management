@@ -178,7 +178,7 @@ function VersionScene() {
           <div className={styles.versionHead}>
             <b>{version.name}</b>
             <span>
-              {index === VERSIONS.length - 1 ? 'Đang áp dụng' : 'Đã ban hành'}
+              {index === VERSIONS.length - 1 ? 'Mới nhất' : 'Đã ban hành'}
             </span>
           </div>
           <div className={styles.versionBody}>

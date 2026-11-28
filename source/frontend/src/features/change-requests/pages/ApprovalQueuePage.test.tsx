@@ -39,7 +39,7 @@ describe('ApprovalQueuePage', () => {
           requestCode: 'DX-2026-0002',
           standsFor: null,
           status: 'PENDING_ACADEMIC_OFFICE',
-          approvalLevel: 3,
+          approvalLevel: 4,
           daysWaiting: 9,
         }),
       ],

@@ -24,9 +24,56 @@ import type {
   EligibilityEvaluationContext,
   EligibilityEvaluationOptions,
   EligibilityReason,
+  EligibilityRequisiteFact,
+  EligibilityRowFact,
   RegistrationEligibilityAnswer,
 } from './eligibility.types.js';
 
+// Capstone (Đồ án tốt nghiệp): every other item flagged TQ ĐA is a
+// prerequisite and every HT ĐA item must have been studied (prior).
+function effectiveRequisites(
+  row: EligibilityRowFact,
+  rows: readonly EligibilityRowFact[],
+): readonly EligibilityRequisiteFact[] {
+  if (row.courseType !== 'CAPSTONE') return row.requisites;
+  const known = new Set(
+    row.requisites.map((edge) => `${edge.relationType}:${edge.sourceCourseId}`),
+  );
+  const extra: EligibilityRequisiteFact[] = [];
+  for (const other of rows) {
+    if (other.course.id === row.course.id) continue;
+    const add = (relationType: 'PREREQUISITE' | 'PRIOR') => {
+      const key = `${relationType}:${other.course.id}`;
+      if (known.has(key)) return;
+      known.add(key);
+      extra.push({
+        id: `${row.course.id}-${relationType}-${other.course.id}`,
+        targetCourseId: row.course.id,
+        sourceCourseId: other.course.id,
+        relationType,
+        minScore: null,
+      });
+    };
+    if (other.tqDa) add('PREREQUISITE');
+    if (other.htDa) add('PRIOR');
+  }
+  return [...row.requisites, ...extra];
+}
+// DEC-11: thresholds are 10-point; EXEMPT always satisfies a prerequisite.
+function meetsThreshold(
+  candidate: AcademicEvidence,
+  threshold: Prisma.Decimal | null,
+): boolean {
+  if (candidate.attempt.status === 'EXEMPT') return true;
+  if (threshold === null || threshold.isZero()) return true;
+  const { score10, score4 } = candidate.attempt;
+  if (score10 !== null) return new Prisma.Decimal(score10).gte(threshold);
+  return (
+    score4 !== null &&
+    threshold.lte(4) &&
+    new Prisma.Decimal(score4).gte(threshold)
+  );
+}
 function evidenceFields(evidence: AcademicEvidence | null) {
   return {
     evidenceCourse: evidence?.course ?? null,
@@ -69,7 +116,7 @@ export function evaluateEligibility(
   for (const row of unfinished) {
     const direct: EligibilityReason[] = [];
     const concurrent = new Set<string>();
-    for (const edge of row.requisites) {
+    for (const edge of effectiveRequisites(row, rows)) {
       const source = context.courses.get(edge.sourceCourseId)!.course;
       const facts = {
         relationType: edge.relationType,
@@ -97,18 +144,15 @@ export function evaluateEligibility(
       } else {
         const candidates = prerequisiteCandidates(context, source.id);
         const threshold = prerequisiteThreshold(edge, rowsByCourse);
-        const sufficient = candidates.some(
-          (candidate) =>
-            threshold === null ||
-            threshold.isZero() ||
-            (candidate.attempt.score4 !== null &&
-              new Prisma.Decimal(candidate.attempt.score4).gte(threshold)),
+        const sufficient = candidates.some((candidate) =>
+          meetsThreshold(candidate, threshold),
         );
         if (sufficient) continue;
         const evidence = candidates[0] ?? null;
         const code = !evidence
           ? 'PREREQUISITE_NOT_PASSED'
-          : evidence.attempt.score4 === null
+          : evidence.attempt.score4 === null &&
+              evidence.attempt.score10 === null
             ? 'PREREQUISITE_SCORE_MISSING'
             : 'PREREQUISITE_SCORE_TOO_LOW';
         direct.push(

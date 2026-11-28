@@ -20,10 +20,12 @@ import { errorMessage } from '../../../shared/forms/applyFieldErrors';
 import { ApiError } from '../../../shared/api/client';
 import { RequestDraftBanner } from '../../../shared/change-requests/RequestDraftBanner';
 import { versionLabel } from '../../../shared/constants/versionLabels';
-import type { CurriculumItem } from '../api/curriculum';
+import type { CurriculumItem, ProgramTrack } from '../api/curriculum';
 import { CurriculumAddButton } from '../components/CurriculumAddButton';
 import { CurriculumFiltersBar } from '../components/CurriculumFiltersBar';
 import { CurriculumItemModal } from '../components/CurriculumItemModal';
+import { ProgramTrackBar } from '../components/ProgramTrackBar';
+import { ProgramTrackModal } from '../components/ProgramTrackModal';
 import { CurriculumTable } from '../components/CurriculumTable';
 import {
   CurriculumTotals,
@@ -70,6 +72,9 @@ export function CurriculumPage() {
     curriculum?.items ?? [],
   );
   const [editing, setEditing] = useState<CurriculumItem | 'new' | null>(null);
+  const [editingTrack, setEditingTrack] = useState<ProgramTrack | 'new' | null>(
+    null,
+  );
   const [requisitesOf, setRequisitesOf] = useState<CurriculumItem | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -405,6 +410,19 @@ export function CurriculumPage() {
           )}
         </>
       )}
+      {(curriculum.tracks.length > 0 ||
+        (!studentMode && curriculum.canEditStructure)) && (
+        <ProgramTrackBar
+          curriculum={curriculum}
+          value={filters.trackFilter ?? 'ALL'}
+          canEdit={!studentMode && curriculum.canEditStructure}
+          onChange={(trackFilter) =>
+            setFilters({ ...filters, trackFilter })
+          }
+          onAdd={() => setEditingTrack('new')}
+          onEdit={(track) => setEditingTrack(track)}
+        />
+      )}
       <CurriculumFiltersBar
         curriculum={curriculum}
         filters={filters}
@@ -453,6 +471,13 @@ export function CurriculumPage() {
           curriculum={curriculum}
           item={editing === 'new' ? null : editing}
           onClose={() => setEditing(null)}
+        />
+      )}
+      {!studentMode && editingTrack && (
+        <ProgramTrackModal
+          versionId={version.id}
+          track={editingTrack === 'new' ? null : editingTrack}
+          onClose={() => setEditingTrack(null)}
         />
       )}
       {!studentMode && requisitesOf && (

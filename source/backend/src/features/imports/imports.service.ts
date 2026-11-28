@@ -55,6 +55,11 @@ import {
 } from './sheets/academic-result.sheet.js';
 import { COURSE_CATALOG_SHEET } from './sheets/course-catalog.sheet.js';
 import { CURRICULUM_SHEET } from './sheets/curriculum.sheet.js';
+import {
+  PROGRAM_TRANSFER_IDENTITY_COLUMNS,
+  PROGRAM_TRANSFER_INSTRUCTIONS,
+  PROGRAM_TRANSFER_SHEET,
+} from './sheets/program-transfer.sheet.js';
 import { writeTemplate } from './sheets/sheet-writer.js';
 import {
   STUDENT_IDENTITY_COLUMNS,
@@ -90,6 +95,7 @@ export class ImportsService {
       types.push(
         { importType: ImportType.STUDENT_LIST, needsVersion: false },
         { importType: ImportType.ACADEMIC_RESULT, needsVersion: false },
+        { importType: ImportType.PROGRAM_TRANSFER, needsVersion: false },
       );
     return types;
   }
@@ -141,11 +147,17 @@ export class ImportsService {
                 STUDENT_IDENTITY_COLUMNS,
                 STUDENT_LIST_INSTRUCTIONS,
               )
-            : await writeIdentityTemplate(
-                ACADEMIC_RESULT_SHEET,
-                RESULT_IDENTITY_COLUMNS,
-                ACADEMIC_RESULT_INSTRUCTIONS,
-              ),
+            : importType === ImportType.PROGRAM_TRANSFER
+              ? await writeIdentityTemplate(
+                  PROGRAM_TRANSFER_SHEET,
+                  PROGRAM_TRANSFER_IDENTITY_COLUMNS,
+                  PROGRAM_TRANSFER_INSTRUCTIONS,
+                )
+              : await writeIdentityTemplate(
+                  ACADEMIC_RESULT_SHEET,
+                  RESULT_IDENTITY_COLUMNS,
+                  ACADEMIC_RESULT_INSTRUCTIONS,
+                ),
         fileName: `${importType}_mau${XLSX_EXTENSION}`,
       };
     }

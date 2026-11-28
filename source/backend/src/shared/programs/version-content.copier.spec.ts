@@ -158,6 +158,7 @@ describe('VersionContentCopier.copy', () => {
       data: [
         {
           versionId: 'to',
+          trackId: null,
           groupCode: 'TC1',
           groupName: 'Nhóm 1',
           minCredits: dec('6'),
@@ -165,6 +166,7 @@ describe('VersionContentCopier.copy', () => {
         },
         {
           versionId: 'to',
+          trackId: null,
           groupCode: 'TC2',
           groupName: 'Nhóm 2',
           minCredits: null,

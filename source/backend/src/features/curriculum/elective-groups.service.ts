@@ -59,6 +59,7 @@ export class ElectiveGroupsService {
       .create({
         data: {
           versionId,
+          trackId: dto.trackId ?? null,
           groupCode: dto.groupCode,
           groupName: dto.groupName,
           minCredits: dto.minCredits ?? null,
@@ -96,6 +97,7 @@ export class ElectiveGroupsService {
         data: {
           groupCode: dto.groupCode,
           groupName: dto.groupName,
+          trackId: dto.trackId,
           minCredits: dto.minCredits,
           minCourses: dto.minCourses,
         },

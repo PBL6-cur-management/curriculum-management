@@ -7,6 +7,8 @@ export type CurriculumRequisite =
   components['schemas']['CurriculumRequisiteDto'];
 export type CurriculumWarning = components['schemas']['CurriculumWarningDto'];
 export type ElectiveGroup = components['schemas']['ElectiveGroupDto'];
+export type ProgramTrack = components['schemas']['ProgramTrackDto'];
+export type ProgramTrackRef = components['schemas']['ProgramTrackRefDto'];
 export type SemesterTotal = components['schemas']['SemesterTotalDto'];
 export type BlockTotal = components['schemas']['BlockTotalDto'];
 export type KnowledgeBlock = components['schemas']['KnowledgeBlockDto'];
@@ -24,6 +26,10 @@ export type CreateElectiveGroupRequest =
   components['schemas']['CreateElectiveGroupDto'];
 export type UpdateElectiveGroupRequest =
   components['schemas']['UpdateElectiveGroupDto'];
+export type CreateProgramTrackRequest =
+  components['schemas']['CreateProgramTrackDto'];
+export type UpdateProgramTrackRequest =
+  components['schemas']['UpdateProgramTrackDto'];
 
 const versionPath = (versionId: string) =>
   `/program-versions/${encodeURIComponent(versionId)}`;
@@ -31,6 +37,8 @@ const itemPath = (itemId: string) =>
   `/curriculum-items/${encodeURIComponent(itemId)}`;
 const groupPath = (groupId: string) =>
   `/elective-groups/${encodeURIComponent(groupId)}`;
+const trackPath = (trackId: string) =>
+  `/program-tracks/${encodeURIComponent(trackId)}`;
 
 export const fetchCurriculum = (versionId: string) =>
   getJson<Curriculum>(`${versionPath(versionId)}/curriculum`);
@@ -77,3 +85,14 @@ export const deleteGroup = (groupId: string) =>
   sendJson<void>('DELETE', groupPath(groupId));
 export const assignGroupItems = (groupId: string, itemIds: string[]) =>
   sendJson<ElectiveGroup>('PUT', `${groupPath(groupId)}/items`, { itemIds });
+
+export const fetchTracks = (versionId: string) =>
+  getJson<ProgramTrack[]>(`${versionPath(versionId)}/tracks`);
+export const createTrack = (
+  versionId: string,
+  body: CreateProgramTrackRequest,
+) => sendJson<ProgramTrack>('POST', `${versionPath(versionId)}/tracks`, body);
+export const updateTrack = (trackId: string, body: UpdateProgramTrackRequest) =>
+  sendJson<ProgramTrack>('PATCH', trackPath(trackId), body);
+export const deleteTrack = (trackId: string) =>
+  sendJson<void>('DELETE', trackPath(trackId));

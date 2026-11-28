@@ -8,7 +8,11 @@ import {
   FREE_CREDIT_LABELS,
   WARNING_LABELS,
 } from '../constants/graduationLabels';
-import { displayCredits, displayTime } from './graduationPresentation';
+import {
+  displayCredits,
+  displayGpa,
+  displayTime,
+} from './graduationPresentation';
 import { GraduationShortfalls } from './GraduationShortfalls';
 
 interface GraduationResultViewProps {
@@ -71,6 +75,19 @@ export function GraduationResultView({ result }: GraduationResultViewProps) {
               label: 'Bắt buộc / tự chọn / tự do',
               children: `${displayCredits(result.credits.compulsory)} / ${displayCredits(result.credits.elective)} / ${displayCredits(result.credits.free)}`,
             },
+            ...(result.cumulativeGpa !== undefined ||
+            result.minGraduationGpa !== undefined
+              ? [
+                  {
+                    key: 'gpa',
+                    label: 'GPA tích lũy',
+                    children: displayGpa(
+                      result.cumulativeGpa,
+                      result.minGraduationGpa,
+                    ),
+                  },
+                ]
+              : []),
           ]}
         />
       </Card>

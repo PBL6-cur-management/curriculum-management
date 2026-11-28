@@ -64,7 +64,7 @@ export function VersionPicker({
         onChange={(next: string) => onChange({ programId, versionId: next })}
         options={versions.map((version) => ({
           value: version.id,
-          label: `${versionLabel(version)} · ${VERSION_STATUS_LABELS[version.status]}`,
+          label: `${versionLabel(version)}${'decisionNumber' in version && version.decisionNumber ? ` (${String(version.decisionNumber)})` : ''} · ${VERSION_STATUS_LABELS[version.status]}`,
         }))}
       />
     </Flex>

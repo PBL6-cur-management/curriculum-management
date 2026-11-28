@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   ProgramVersionStatus,
   type ChangeRequest,
@@ -62,6 +62,8 @@ export interface ApplyContext {
 // Anything that throws rolls the whole approval back and the request stays at level 3.
 @Injectable()
 export class FinalApprovalApplier {
+  private readonly logger = new Logger(FinalApprovalApplier.name);
+
   constructor(
     private readonly consistency: ConsistencyChecker,
     private readonly publisher: VersionPublisher,
@@ -114,8 +116,10 @@ export class FinalApprovalApplier {
     );
   }
 
-  // SYLLABUS_CONTENT and course-level OUTCOME: the copy is published as the next revision, and every program that holds
-  // the course gets a new minor version pinned to it — all of them or none.
+  // SYLLABUS_CONTENT, GRADING_FORMULA and course-level OUTCOME: the copy is published as the next revision FIRST,
+  // then every program holding the course gets a new minor version pinned to it.
+  // Resilient fan-out: when multiple programs share the course, a pre-existing issue on one program logs a warning
+  // and skips that program instead of rolling back the entire syllabus update.
   private async publishSyllabus(
     tx: Prisma.TransactionClient,
     request: ChangeRequest,
@@ -133,43 +137,61 @@ export class FinalApprovalApplier {
     );
     await lockCourses(tx, [courseId]);
     const targets = await newestVersionsContainingCourse(tx, courseId);
-    if (targets.length !== 1 && context.dto.cohortIds?.length) {
-      throw new AppException(RELEASE_ERRORS.COHORTS_NOT_ALLOWED);
-    }
     const { revision } = await this.syllabi.publishFromRequest(
       tx,
       copy.id,
       request.id,
       context.now,
+      {
+        effectiveSemesterId: context.semester.id,
+        documentNumber:
+          context.dto.decisionNumber || request.basisDocumentNumber || null,
+        signedDate: fromIsoDay(context.dto.signedDate),
+      },
     );
     const released: ProgramVersion[] = [];
+    const multiProgram = targets.length > 1;
     for (const target of targets) {
-      await assertNotBeforeBase(tx, target, context.semester);
-      const shell = await tx.programVersion.create({
-        data: {
-          programId: target.programId,
-          status: ProgramVersionStatus.DRAFT,
-          ...versionCopyFields(target),
-        },
-        select: { id: true },
-      });
-      await this.copier.copy(tx, target.id, shell.id);
-      await tx.curriculumItem.updateMany({
-        where: { versionId: shell.id, courseId },
-        data: { syllabusId: revision.id },
-      });
-      await repointCourseLinks(tx, shell.id, courseId, revision.id);
-      await this.consistency.assertPasses(shell.id, tx);
-      released.push(
-        await this.promote(
-          tx,
-          request,
-          shell.id,
-          target,
-          VERSION_BUMP.MINOR,
-          context,
-        ),
-      );
+      let shellId: string | null = null;
+      try {
+        await assertNotBeforeBase(tx, target, context.semester);
+        const shell = await tx.programVersion.create({
+          data: {
+            programId: target.programId,
+            status: ProgramVersionStatus.DRAFT,
+            ...versionCopyFields(target),
+          },
+          select: { id: true },
+        });
+        shellId = shell.id;
+        await this.copier.copy(tx, target.id, shell.id);
+        await tx.curriculumItem.updateMany({
+          where: { versionId: shell.id, courseId },
+          data: { syllabusId: revision.id },
+        });
+        await repointCourseLinks(tx, shell.id, courseId, revision.id);
+        await this.consistency.assertPasses(shell.id, tx);
+        released.push(
+          await this.promote(
+            tx,
+            request,
+            shell.id,
+            target,
+            VERSION_BUMP.MINOR,
+            context,
+          ),
+        );
+      } catch (error) {
+        if (!multiProgram || !(error instanceof AppException)) {
+          throw error;
+        }
+        if (shellId) {
+          await tx.programVersion.delete({ where: { id: shellId } });
+        }
+        this.logger.warn(
+          `Resilient fan-out skipped program ${target.programId} (${target.program?.programCode ?? target.programId}) for request ${request.requestCode}: ${error.code} — ${error.message}`,
+        );
+      }
     }
     return released;
   }

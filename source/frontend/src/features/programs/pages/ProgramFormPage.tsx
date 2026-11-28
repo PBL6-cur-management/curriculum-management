@@ -27,7 +27,11 @@ import type {
 } from '../api/programs';
 import { CreditsGapHint } from '../components/CreditsGapHint';
 import { DEGREE_LEVEL_LABELS } from '../constants/programLabels';
-import { useProgram, useUpdateProgram } from '../hooks/usePrograms';
+import {
+  useMajorOptions,
+  useProgram,
+  useUpdateProgram,
+} from '../hooks/usePrograms';
 import {
   PROGRAM_RULES,
   SEMESTERS_MAX,
@@ -46,6 +50,7 @@ function toFormValues(program: ProgramDetail): Partial<ProgramFormValues> {
   const draft = program.draftVersion;
   return {
     programCode: program.programCode,
+    majorId: program.major?.id,
     degreeLevel: program.degreeLevel,
     programName: draft?.programName,
     majorCode: draft?.majorCode,
@@ -64,10 +69,41 @@ export function ProgramFormPage() {
   const navigate = useNavigate();
   const [form] = Form.useForm<ProgramFormValues>();
   const { data: program, isPending } = useProgram(programId);
+  const { data: majorsPage } = useMajorOptions();
   const update = useUpdateProgram();
   const total = Form.useWatch('totalCredits', form);
   const compulsory = Form.useWatch('compulsoryCredits', form);
   const elective = Form.useWatch('electiveCredits', form);
+
+  const majors = majorsPage?.items ?? [];
+  const majorOptions = [
+    ...majors.map((major) => ({
+      value: major.id,
+      label: `${major.majorCode} — ${major.majorName}`,
+    })),
+    ...(program?.major && !majors.some((m) => m.id === program.major?.id)
+      ? [
+          {
+            value: program.major.id,
+            label: `${program.major.majorCode} — ${program.major.majorName}`,
+          },
+        ]
+      : []),
+  ];
+
+  const handleMajorChange = (nextMajorId?: string) => {
+    if (!nextMajorId) return;
+    const picked = majors.find((major) => major.id === nextMajorId);
+    if (!picked) return;
+    const currentCode = form.getFieldValue('majorCode');
+    const currentName = form.getFieldValue('majorName');
+    if (!currentCode || !String(currentCode).trim()) {
+      form.setFieldValue('majorCode', picked.majorCode);
+    }
+    if (!currentName || !String(currentName).trim()) {
+      form.setFieldValue('majorName', picked.majorName);
+    }
+  };
 
   const editable = program?.editPath === 'DIRECT';
   useEffect(() => {
@@ -93,8 +129,11 @@ export function ProgramFormPage() {
         void message.error(errorMessage(error, 'Không lưu được chương trình.'));
     };
     // The code is fixed after creation; the faculty is not editable here either.
-    const { programCode: _code, ...rest } = values;
-    const body: UpdateProgramRequest = rest;
+    const { programCode: _code, majorId, ...rest } = values;
+    const body: UpdateProgramRequest = {
+      ...rest,
+      ...(majorId ? { majorId } : {}),
+    };
     update.mutate({ programId, body }, { onSuccess, onError });
   };
 
@@ -155,6 +194,18 @@ export function ProgramFormPage() {
         </Row>
         <Typography.Title level={5}>Ngành</Typography.Title>
         <Row gutter={16}>
+          <Col xs={24} md={24}>
+            <Form.Item name="majorId" label="Ngành đào tạo">
+              <Select
+                allowClear
+                showSearch
+                optionFilterProp="label"
+                placeholder="Chọn ngành đào tạo (Cấp 0)"
+                options={majorOptions}
+                onChange={handleMajorChange}
+              />
+            </Form.Item>
+          </Col>
           <Col xs={24} md={8}>
             <Form.Item
               name="majorCode"

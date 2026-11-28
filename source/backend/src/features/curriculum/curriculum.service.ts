@@ -19,6 +19,7 @@ import {
   CURRICULUM_CONSTRAINT,
   CURRICULUM_ERRORS,
 } from './curriculum.errors.js';
+import { TRACK_ERRORS } from './program-tracks.service.js';
 import {
   CreateCurriculumItemDto,
   UpdateCurriculumItemDto,
@@ -62,12 +63,23 @@ export class CurriculumService {
       throw new AppException(CURRICULUM_ERRORS.COURSE_NOT_ACTIVE);
     }
     assertSemesterInRange(version, dto.plannedSemester);
-    await this.assertCourseNotListed(versionId, course);
+    const trackId = dto.trackId ?? null;
+    if (trackId) {
+      const track = await this.prisma.programTrack.findFirst({
+        where: { id: trackId, versionId },
+        select: { id: true },
+      });
+      if (!track) {
+        throw new AppException(TRACK_ERRORS.TRACK_NOT_FOUND);
+      }
+    }
+    await this.assertCourseNotListed(versionId, course, trackId);
     const item = await this.prisma
       .$transaction(async (tx) => {
         const created = await tx.curriculumItem.create({
           data: {
             versionId,
+            trackId,
             courseId: course.id,
             plannedSemester: dto.plannedSemester,
             sortOrder: await nextSortOrder(tx, versionId, dto.plannedSemester),
@@ -125,6 +137,7 @@ export class CurriculumService {
         where: { id: itemId },
         data: {
           plannedSemester: dto.plannedSemester,
+          trackId: dto.trackId,
           blockSymbol: dto.blockSymbol,
           isElective: dto.isElective,
           htDa: dto.htDa,
@@ -198,9 +211,10 @@ export class CurriculumService {
   private async assertCourseNotListed(
     versionId: string,
     course: { id: string },
+    trackId: string | null = null,
   ): Promise<void> {
-    const existing = await this.prisma.curriculumItem.findUnique({
-      where: { versionId_courseId: { versionId, courseId: course.id } },
+    const existing = await this.prisma.curriculumItem.findFirst({
+      where: { versionId, courseId: course.id, trackId },
       select: { plannedSemester: true },
     });
     if (!existing) {

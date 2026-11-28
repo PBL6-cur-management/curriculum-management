@@ -163,9 +163,19 @@ export class VersionHistoryReader {
         : null;
     const issuedCorrection =
       row.correctedBy !== null && draftCorrection === null;
+    const activeEnrollments =
+      row.status === ProgramVersionStatus.HISTORICAL &&
+      row.cohortVersions.length === 0 &&
+      this.prisma.programEnrollment
+        ? await this.prisma.programEnrollment.count({
+            where: { appliedVersionId: row.id, untilSemesterId: null },
+          })
+        : 0;
     const released =
       row.status === ProgramVersionStatus.ACTIVE ||
-      row.status === ProgramVersionStatus.PENDING;
+      row.status === ProgramVersionStatus.PENDING ||
+      (row.status === ProgramVersionStatus.HISTORICAL &&
+        (row.cohortVersions.length > 0 || activeEnrollments > 0));
     return Object.assign(toVersionRef(row), {
       programId: row.programId,
       programCode: program.programCode,

@@ -113,6 +113,20 @@ export class GraduationTotalCreditShortfallDto {
   @ApiProperty() message!: string;
 }
 
+export class GraduationLowGpaShortfallDto {
+  @ApiProperty({ enum: ['LOW_GPA'] }) code!: 'LOW_GPA';
+  @ApiProperty({ enum: ['GPA'] }) category!: 'GPA';
+  @ApiProperty({ type: String }) requiredGpa!: string;
+  @ApiProperty({ type: String }) actualGpa!: string;
+  @ApiProperty() message!: string;
+}
+
+export class GraduationTrackNotSelectedShortfallDto {
+  @ApiProperty({ enum: ['TRACK_NOT_SELECTED'] }) code!: 'TRACK_NOT_SELECTED';
+  @ApiProperty({ enum: ['TRACK'] }) category!: 'TRACK';
+  @ApiProperty() message!: string;
+}
+
 export class GraduationRecognitionDto {
   @ApiProperty() curriculumItemId!: string;
   @ApiProperty({ type: GraduationCourseRefDto })
@@ -200,6 +214,8 @@ const shortfallModels = [
   GraduationElectiveCreditShortfallDto,
   GraduationElectiveCourseShortfallDto,
   GraduationTotalCreditShortfallDto,
+  GraduationLowGpaShortfallDto,
+  GraduationTrackNotSelectedShortfallDto,
 ];
 
 @ApiExtraModels(...shortfallModels)
@@ -210,6 +226,9 @@ export class GraduationResultDto implements GraduationResult {
   @ApiProperty({ type: GraduationContextDto }) context!: GraduationContextDto;
   @ApiProperty({ enum: ['ELIGIBLE', 'NOT_ELIGIBLE'] })
   conclusion!: GraduationConclusion;
+  @ApiProperty({ type: String, nullable: true, required: false })
+  cumulativeGpa?: string | null;
+  @ApiProperty({ type: String, required: false }) minGraduationGpa?: string;
   @ApiProperty({
     type: 'array',
     items: {
@@ -231,6 +250,10 @@ export class GraduationResultDto implements GraduationResult {
           ),
           TOTAL_CREDITS_MISSING: getSchemaPath(
             GraduationTotalCreditShortfallDto,
+          ),
+          LOW_GPA: getSchemaPath(GraduationLowGpaShortfallDto),
+          TRACK_NOT_SELECTED: getSchemaPath(
+            GraduationTrackNotSelectedShortfallDto,
           ),
         },
       },

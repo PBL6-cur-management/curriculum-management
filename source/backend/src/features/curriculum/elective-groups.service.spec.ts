@@ -137,6 +137,7 @@ describe('ElectiveGroupsService', () => {
       );
       expect(electiveGroup.create.mock.calls[0][0].data).toEqual({
         versionId: 'v1',
+        trackId: null,
         groupCode: 'TC1',
         groupName: 'Tự chọn 1',
         minCredits: '6',

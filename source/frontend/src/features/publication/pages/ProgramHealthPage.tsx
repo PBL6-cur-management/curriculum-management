@@ -112,7 +112,7 @@ export default function ProgramHealthPage() {
       <Alert
         type="error"
         showIcon
-        title={errorMessage(health.error, 'Không đọc được báo cáo sức khỏe.')}
+        title={errorMessage(health.error, 'Không đọc được báo cáo rà soát chất lượng CTĐT.')}
       />
     );
   const data = health.data;
@@ -159,7 +159,7 @@ export default function ProgramHealthPage() {
   return (
     <Flex vertical gap="middle">
       <PageHeader
-        title="Sức khỏe chương trình"
+        title="Rà soát chất lượng CTĐT"
         actions={
           <PdfExportButton programId={programId} versionId={versionId} />
         }

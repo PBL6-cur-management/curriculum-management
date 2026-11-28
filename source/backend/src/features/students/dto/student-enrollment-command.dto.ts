@@ -52,6 +52,13 @@ export class StudentEnrollmentCommandDto {
   @MaxLength(ID_MAX)
   sourceEnrollmentId?: string;
 
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(ID_MAX)
+  trackId?: string;
+
   @ApiProperty() @IsISO8601() expectedStudentUpdatedAt!: string;
 
   @ApiPropertyOptional()

@@ -10,7 +10,12 @@ import { App } from 'antd';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Curriculum } from '../api/curriculum';
-import { curriculum as fixture, group, item } from '../testFixtures';
+import {
+  curriculum as fixture,
+  group,
+  item,
+  trackFixture,
+} from '../testFixtures';
 import { ElectiveGroupsPage } from './ElectiveGroupsPage';
 
 const json = (body: unknown, status = 200) =>
@@ -220,9 +225,41 @@ describe('ElectiveGroupsPage', () => {
       body: {
         groupCode: 'TC9',
         groupName: 'Nhóm 9',
+        trackId: null,
         minCredits: '6',
         minCourses: null,
       },
+    });
+  });
+
+  it('displays the track tag on a track-scoped group and submits trackId', async () => {
+    const { writes } = renderPage(
+      fixture({
+        tracks: [trackFixture()],
+        electiveGroups: [group({ trackId: 't-cnpm' })],
+      }),
+    );
+    expect(await screen.findByText('CNPM')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Thêm nhóm' }));
+    const dialog = await screen.findByRole('dialog');
+    fireEvent.change(within(dialog).getByLabelText('Mã nhóm'), {
+      target: { value: 'TC-CNPM' },
+    });
+    fireEvent.change(within(dialog).getByLabelText('Tên nhóm'), {
+      target: { value: 'Tự chọn CNPM' },
+    });
+    fireEvent.mouseDown(
+      within(dialog).getByLabelText('Định hướng / Chuyên ngành'),
+    );
+    fireEvent.click(await screen.findByText('CNPM — Công nghệ phần mềm'));
+    fireEvent.change(within(dialog).getByLabelText('Số tín chỉ tối thiểu'), {
+      target: { value: '6' },
+    });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Lưu' }));
+    await waitFor(() => expect(writes).toHaveLength(1));
+    expect(writes[0].body).toMatchObject({
+      groupCode: 'TC-CNPM',
+      trackId: 't-cnpm',
     });
   });
 });

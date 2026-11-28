@@ -46,6 +46,16 @@ export class CreateElectiveGroupDto {
   @IsInt()
   @Min(1)
   minCourses?: number | null;
+
+  @ApiPropertyOptional({
+    nullable: true,
+    type: String,
+    description: 'Định hướng / chuyên ngành con (null = tự chọn chung).',
+  })
+  @Transform(emptyToNull)
+  @IsOptional()
+  @IsString()
+  trackId?: string | null;
 }
 
 export class UpdateElectiveGroupDto extends PartialType(
@@ -65,6 +75,7 @@ export class ElectiveGroupDto {
   @ApiProperty() id!: string;
   @ApiProperty() groupCode!: string;
   @ApiProperty() groupName!: string;
+  @ApiProperty({ nullable: true, type: String }) trackId!: string | null;
   @ApiProperty({ nullable: true, type: String }) minCredits!: string | null;
   @ApiProperty({ nullable: true, type: Number }) minCourses!: number | null;
   @ApiProperty({ type: [String] }) itemIds!: string[];
@@ -92,6 +103,7 @@ export function toElectiveGroupDto(row: GroupRow): ElectiveGroupDto {
     id: row.id,
     groupCode: row.groupCode,
     groupName: row.groupName,
+    trackId: row.trackId ?? null,
     minCredits: row.minCredits === null ? null : toWireDecimal(row.minCredits),
     minCourses: row.minCourses,
     itemIds: row.items.map((item) => item.id),

@@ -7,10 +7,10 @@ import { PERMISSIONS } from '../authz/permission-codes.js';
 import { editPermissionsFor } from './request-kinds.js';
 
 describe('editPermissionsFor', () => {
-  it('lets either outcome permission open a programme outcome request', () => {
+  it('requires PLO permission for a programme outcome request', () => {
     expect(
       editPermissionsFor(ChangeRequestType.OUTCOME, ChangeTargetType.PROGRAM),
-    ).toEqual([PERMISSIONS.PLO_EDIT, PERMISSIONS.CLO_EDIT]);
+    ).toEqual([PERMISSIONS.PLO_EDIT]);
   });
 
   it('keeps a course outcome request on the CLO permission', () => {

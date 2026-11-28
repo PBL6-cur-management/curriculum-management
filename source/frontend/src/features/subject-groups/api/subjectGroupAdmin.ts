@@ -17,10 +17,18 @@ export type AddMemberRequest =
   components['schemas']['AddSubjectGroupMemberDto'];
 export type EndMemberRequest =
   components['schemas']['EndSubjectGroupMemberDto'];
+export type PromoteCoordinatorRequest =
+  components['schemas']['PromoteCoordinatorDto'];
+export type DemoteCoordinatorRequest =
+  components['schemas']['DemoteCoordinatorDto'];
+
 const groupPath = (groupId: string) =>
   `${SUBJECT_GROUPS_PATH}/${encodeURIComponent(groupId)}`;
 const memberPath = (groupId: string, memberId: string) =>
   `${groupPath(groupId)}/members/${encodeURIComponent(memberId)}`;
+const coordinatorPath = (groupId: string, lecturerId: string) =>
+  `${groupPath(groupId)}/coordinators/${encodeURIComponent(lecturerId)}`;
+
 export const fetchSubjectGroup = (groupId: string) =>
   getJson<SubjectGroupDetail>(groupPath(groupId));
 export const createSubjectGroup = (body: CreateSubjectGroupRequest) =>
@@ -51,4 +59,24 @@ export const revokeMember = (groupId: string, memberId: string) =>
   sendJson<SubjectGroupMember>(
     'POST',
     `${memberPath(groupId, memberId)}/revoke`,
+  );
+export const promoteCoordinator = (
+  groupId: string,
+  lecturerId: string,
+  body: PromoteCoordinatorRequest = {},
+) =>
+  sendJson<SubjectGroupMember>(
+    'POST',
+    `${coordinatorPath(groupId, lecturerId)}/promote`,
+    body,
+  );
+export const demoteCoordinator = (
+  groupId: string,
+  lecturerId: string,
+  body: DemoteCoordinatorRequest = {},
+) =>
+  sendJson<SubjectGroupMember[]>(
+    'POST',
+    `${coordinatorPath(groupId, lecturerId)}/demote`,
+    body,
   );

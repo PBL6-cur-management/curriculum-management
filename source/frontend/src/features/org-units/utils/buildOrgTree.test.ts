@@ -11,6 +11,7 @@ const unit = (
   unitCode: id,
   unitName,
   unitType,
+  isExternal: false,
   parentUnitId,
   status: 'ACTIVE' as const,
 });

@@ -91,16 +91,24 @@ export function ImportUploadForm({
           }
         />
       </Form.Item>
-      {(importType === 'STUDENT_LIST' || importType === 'ACADEMIC_RESULT') && (
+      {(importType === 'STUDENT_LIST' ||
+        importType === 'ACADEMIC_RESULT' ||
+        importType === 'PROGRAM_TRANSFER') && (
         <Alert
           type="info"
           showIcon
           title={
             importType === 'STUDENT_LIST'
               ? 'Dùng mã chương trình, học kỳ nhập học và học kỳ trạng thái trong tệp mẫu. Trạng thái: STUDYING, ON_LEAVE, WITHDRAWN, GRADUATED.'
-              : 'Mỗi dòng là một lần học theo mã sinh viên, mã học phần và học kỳ. Giữ nguyên điểm từng thang; trạng thái: PASSED, FAILED, IN_PROGRESS, EXEMPT.'
+              : importType === 'ACADEMIC_RESULT'
+                ? 'Mỗi dòng là một lần học theo mã sinh viên, mã học phần và học kỳ. Giữ nguyên điểm từng thang; trạng thái: PASSED, FAILED, IN_PROGRESS, EXEMPT.'
+                : 'Mỗi dòng chuyển một sinh viên sang phiên bản chương trình đích từ học kỳ hiệu lực kèm số quyết định hoặc căn cứ.'
           }
-          description="Dữ liệu từ cơ sở dữ liệu Trường được ưu tiên. Cảnh báo thiếu chương trình vẫn tạo hồ sơ và tài khoản nhưng chưa tạo ghi danh."
+          description={
+            importType === 'PROGRAM_TRANSFER'
+              ? 'Tải tệp mẫu để điền đúng mã sinh viên, phiên bản chương trình đích, định hướng (nếu có), học kỳ bắt đầu và căn cứ.'
+              : 'Dữ liệu từ cơ sở dữ liệu Trường được ưu tiên. Cảnh báo thiếu chương trình vẫn tạo hồ sơ và tài khoản nhưng chưa tạo ghi danh.'
+          }
         />
       )}
       {needsVersion && (

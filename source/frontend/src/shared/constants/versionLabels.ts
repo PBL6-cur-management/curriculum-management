@@ -4,7 +4,7 @@ export const DRAFT_VERSION_LABEL = 'Nháp';
 export const VERSION_STATUS_LABELS = {
   DRAFT: 'Nháp',
   PENDING: 'Chờ hiệu lực',
-  ACTIVE: 'Đang hiệu lực',
+  ACTIVE: 'Mới nhất',
   HISTORICAL: 'Lịch sử',
 } as const;
 export const VERSION_STATUS_COLORS = {
@@ -15,3 +15,10 @@ export const VERSION_STATUS_COLORS = {
 } as const;
 export const versionLabel = (version: { versionNumber: string | null }) =>
   version.versionNumber ?? DRAFT_VERSION_LABEL;
+export const versionWithDecision = (version: {
+  versionNumber: string | null;
+  decisionNumber?: string | null;
+}) => {
+  const base = versionLabel(version);
+  return version.decisionNumber ? `${base} (${version.decisionNumber})` : base;
+};

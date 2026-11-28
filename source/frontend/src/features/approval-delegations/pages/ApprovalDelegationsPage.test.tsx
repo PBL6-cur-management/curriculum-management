@@ -40,6 +40,7 @@ function renderPage(access: object, items: object[]) {
       [LIST]: { items, total: items.length, page: 1, pageSize: 20 },
       '/api/approval-delegations/levels': [
         { approvalLevel: 1, levelName: 'Điều phối nhóm chuyên môn' },
+        { approvalLevel: 3, levelName: 'Ban lãnh đạo khoa' },
       ],
       '/api/approval-delegations/recipients': [user('u2', 'Giảng viên B')],
     },
@@ -95,6 +96,18 @@ describe('ApprovalDelegationsPage (MH-14)', () => {
     ).toBeInTheDocument();
     expect(screen.queryByLabelText('Người ủy quyền')).not.toBeInTheDocument();
     expect(await screen.findByText('Chưa có ủy quyền nào')).toBeInTheDocument();
+  });
+
+  it('displays Level 3 faculty leadership delegation scope cleanly', async () => {
+    renderPage({}, [
+      grant({
+        id: 'd3',
+        scope: { approvalLevel: 3, levelName: 'Ban lãnh đạo khoa' },
+      }),
+    ]);
+    expect(
+      await screen.findByText('Cấp 3 — Ban lãnh đạo khoa'),
+    ).toBeInTheDocument();
   });
 
   it('hides creation from someone who may only read their grants', async () => {

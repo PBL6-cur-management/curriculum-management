@@ -57,6 +57,7 @@ export type CheckedVersion = Prisma.ProgramVersionGetPayload<{
 const CHECK_ITEM_SELECT = {
   id: true,
   courseId: true,
+  trackId: true,
   plannedSemester: true,
   isElective: true,
   electiveGroupId: true,
@@ -176,7 +177,7 @@ export class ConsistencyChecker {
     if (!version) {
       throw new AppException(CONSISTENCY_ERRORS.VERSION_NOT_FOUND);
     }
-    const [rows, groupRows, catalogRelations] = await Promise.all([
+    const [rows, groupRows, tracks, catalogRelations] = await Promise.all([
       db.curriculumItem.findMany({
         where: { versionId },
         select: CHECK_ITEM_SELECT,
@@ -185,6 +186,13 @@ export class ConsistencyChecker {
         where: { versionId },
         orderBy: { groupCode: 'asc' },
       }),
+      db.programTrack
+        ? db.programTrack.findMany({
+            where: { versionId },
+            orderBy: [{ sortOrder: 'asc' }, { trackCode: 'asc' }],
+            select: { id: true, trackCode: true, trackName: true },
+          })
+        : Promise.resolve([]),
       db.courseRelation.findMany({
         where: { relationType: { in: [...CYCLE_CHECKED_TYPES] } },
         select: { sourceCourseId: true, targetCourseId: true },
@@ -197,7 +205,58 @@ export class ConsistencyChecker {
       minCredits: group.minCredits,
       minCourses: group.minCourses,
     }));
-    const credits = this.creditCheck(version, programCredits(items, groups));
+    // Track-aware credit calculation: when tracks exist, evaluate common-core + each track separately
+    // rather than summing all tracks together into one inflated credit count.
+    const primaryCreditRows =
+      tracks.length > 0
+        ? rows.filter((r) => r.trackId === null || r.trackId === tracks[0]!.id)
+        : rows;
+    const primaryCreditGroups =
+      tracks.length > 0
+        ? groupRows.filter(
+            (g) => g.trackId === null || g.trackId === tracks[0]!.id,
+          )
+        : groupRows;
+    const credits = this.creditCheck(
+      version,
+      programCredits(
+        primaryCreditRows.map(toWarningItem),
+        primaryCreditGroups.map((g) => ({
+          id: g.id,
+          groupCode: g.groupCode,
+          minCredits: g.minCredits,
+          minCourses: g.minCourses,
+        })),
+      ),
+    );
+    const extraTrackCreditIssues: CurriculumWarning[] = [];
+    for (const track of tracks.slice(1)) {
+      const trackItems = rows
+        .filter((r) => r.trackId === null || r.trackId === track.id)
+        .map(toWarningItem);
+      const trackGroups = groupRows
+        .filter((g) => g.trackId === null || g.trackId === track.id)
+        .map((g) => ({
+          id: g.id,
+          groupCode: g.groupCode,
+          minCredits: g.minCredits,
+          minCourses: g.minCourses,
+        }));
+      const trackCheck = this.creditCheck(
+        version,
+        programCredits(trackItems, trackGroups),
+      );
+      if (trackCheck.mismatch && !trackCheck.acceptanceCurrent) {
+        extraTrackCreditIssues.push({
+          semester: null,
+          itemId: null,
+          groupId: null,
+          code: CURRICULUM_WARNING.CREDIT_MISMATCH,
+          severity: WARNING_SEVERITY.HIGH,
+          message: `Định hướng ${track.trackCode} (${track.trackName}): tín chỉ khai báo ${breakdown(trackCheck.declared)}; tính từ khung ${breakdown(trackCheck.computed)}; chênh lệch ${abs(trackCheck.gap.total)}.`,
+        });
+      }
+    }
     const cycles = await this.cycleIssues(db, catalogRelations, items);
     const missing = await missingSyllabusIssues(db, rows, items);
     return {
@@ -213,6 +272,7 @@ export class ConsistencyChecker {
         ...cycles,
         ...missing,
         ...creditIssues(credits),
+        ...extraTrackCreditIssues,
       ]),
     };
   }

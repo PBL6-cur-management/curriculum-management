@@ -14,6 +14,11 @@ import {
   REQUEST_DRAFT_SELECT,
   toRequestRef,
 } from '../../shared/change-requests/request-draft.js';
+import {
+  SemesterDto,
+  toSemesterDto,
+} from '../../shared/releases/semester.dto.js';
+import { toIsoDay } from '../../shared/time/today.js';
 import type { SyllabusCourseRow } from './syllabus-access.js';
 import {
   AttachmentRulesDto,
@@ -68,6 +73,11 @@ export class SyllabusDto {
   @ApiProperty(NULLABLE_HTML) assessmentMethods!: string | null;
   @ApiProperty(NULLABLE_HTML) references!: string | null;
   @ApiProperty({ nullable: true, type: String }) publishedAt!: string | null;
+  @ApiProperty({ type: SemesterDto, nullable: true })
+  effectiveSemester!: SemesterDto | null;
+  @ApiProperty({ nullable: true, type: String }) documentNumber!: string | null;
+  @ApiProperty({ nullable: true, type: String, format: 'date' })
+  signedDate!: string | null;
   @ApiProperty() updatedAt!: string;
   @ApiProperty({ type: [WeeklyContentDto] })
   weeklyContents!: WeeklyContentDto[];
@@ -147,8 +157,25 @@ export class CourseSyllabusDto {
   version!: SyllabusVersionRefDto | null;
 }
 
+export class SyllabusHistoryItemDto {
+  @ApiProperty() id!: string;
+  @ApiProperty({ nullable: true, type: Number }) revisionNumber!: number | null;
+  @ApiProperty({ enum: SyllabusStatus, enumName: 'SyllabusStatus' })
+  status!: SyllabusStatus;
+  @ApiProperty({ type: SemesterDto, nullable: true })
+  effectiveSemester!: SemesterDto | null;
+  @ApiProperty({ nullable: true, type: String }) documentNumber!: string | null;
+  @ApiProperty({ nullable: true, type: String, format: 'date' })
+  signedDate!: string | null;
+  @ApiProperty({ nullable: true, type: String }) publishedAt!: string | null;
+  @ApiProperty({ nullable: true, type: String })
+  originRequestId!: string | null;
+  @ApiProperty() attachmentCount!: number;
+}
+
 export const SYLLABUS_INCLUDE = {
   ...REQUEST_DRAFT_SELECT,
+  effectiveSemester: true,
   weeklyContents: {
     include: WEEKLY_CONTENT_INCLUDE,
     orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }],
@@ -197,6 +224,11 @@ export function toSyllabusDto(
     assessmentMethods: row.assessmentMethods,
     references: row.references,
     publishedAt: row.publishedAt?.toISOString() ?? null,
+    effectiveSemester: row.effectiveSemester
+      ? toSemesterDto(row.effectiveSemester)
+      : null,
+    documentNumber: row.documentNumber ?? null,
+    signedDate: row.signedDate ? toIsoDay(row.signedDate) : null,
     updatedAt: row.updatedAt.toISOString(),
     weeklyContents: row.weeklyContents.map(toWeeklyContentDto),
     clos: row.clos.map(toCloDto),

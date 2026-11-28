@@ -26,16 +26,15 @@ function access(...roleCodes: string[]): AccessContext {
 }
 
 describe('toMeDto canApprove', () => {
-  it('is true for R1, R3 and R4 holders', () => {
-    for (const role of ['R1', 'R3', 'R4'])
+  it('is true for R1, R2, R3 and R4 holders', () => {
+    for (const role of ['R1', 'R2', 'R3', 'R4'])
       expect(toMeDto(user, null, access('R5', role), false).canApprove).toBe(
         true,
       );
   });
 
-  it('is false for a lecturer, the faculty board or a student without a delegation', () => {
+  it('is false for a lecturer or a student without a delegation', () => {
     expect(toMeDto(user, null, access('R5'), false).canApprove).toBe(false);
-    expect(toMeDto(user, null, access('R2'), false).canApprove).toBe(false);
     expect(toMeDto(user, null, access('R6'), false).canApprove).toBe(false);
     expect(toMeDto(user, null, access(), false).canApprove).toBe(false);
   });

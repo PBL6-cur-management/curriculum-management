@@ -11,10 +11,6 @@ import {
 } from 'antd';
 import { useState } from 'react';
 import { CourseSelect } from '../../../shared/courses/CourseSelect';
-import {
-  GRADE_POINT_MESSAGE,
-  GRADE_POINT_PATTERN,
-} from '../../../shared/courses/gradePoint';
 import { errorMessage } from '../../../shared/forms/applyFieldErrors';
 import type {
   CurriculumItem,
@@ -25,7 +21,10 @@ import {
   REQUISITE_TYPE_LABELS,
 } from '../constants/curriculumLabels';
 import { useReplaceRequisites } from '../hooks/useCurriculum';
-import { CURRICULUM_FORM_LIMITS } from '../schema/curriculumRules';
+import {
+  CURRICULUM_FORM_LIMITS,
+  CURRICULUM_SCORE_RULES,
+} from '../schema/curriculumRules';
 
 interface RequisitesModalProps {
   versionId: string;
@@ -170,15 +169,10 @@ export function RequisitesModal({
                         <Form.Item
                           name={[field.name, 'minScore']}
                           label="Ngưỡng điểm"
-                          rules={[
-                            {
-                              pattern: GRADE_POINT_PATTERN,
-                              message: GRADE_POINT_MESSAGE,
-                            },
-                          ]}
+                          rules={CURRICULUM_SCORE_RULES}
                           style={{ width: 120, marginBottom: 0 }}
                         >
-                          <Input inputMode="decimal" />
+                          <Input inputMode="decimal" placeholder="Ví dụ: 4.0" />
                         </Form.Item>
                       ) : null
                     }
