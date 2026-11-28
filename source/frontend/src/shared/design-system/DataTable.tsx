@@ -48,6 +48,8 @@ export function DataTable<T extends object>({
   loading,
   onPageChange,
   emptyText = 'Chưa có dữ liệu',
+  scroll = { x: 'max-content' },
+  size = 'middle',
   ...rest
 }: DataTableProps<T>) {
   return (
@@ -56,13 +58,19 @@ export function DataTable<T extends object>({
       dataSource={dataSource}
       loading={loading}
       locale={{ emptyText }}
+      scroll={scroll}
+      size={size}
       pagination={{
         current: page,
         pageSize,
         total,
         pageSizeOptions: PAGE_SIZE_OPTIONS,
         showSizeChanger: true,
-        showTotal: (t) => `${t} kết quả`,
+        showTotal: (t) => (
+          <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+            {t} kết quả
+          </span>
+        ),
         onChange: onPageChange,
       }}
       {...rest}

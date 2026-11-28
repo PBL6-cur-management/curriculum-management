@@ -93,7 +93,7 @@ export class MajorsService {
       this.prisma.major.findMany({
         where,
         include: MAJOR_INCLUDE,
-        orderBy: { majorCode: 'asc' },
+        orderBy: [{ createdAt: 'desc' }, { majorCode: 'asc' }],
         ...toSkipTake(query),
       }),
       this.prisma.major.count({ where }),
@@ -259,7 +259,7 @@ export class MajorsService {
       await Promise.all([
         this.prisma.program.findMany({
           where: { majorId },
-          orderBy: { programCode: 'asc' },
+          orderBy: [{ createdAt: 'desc' }, { programCode: 'asc' }],
           select: {
             id: true,
             programCode: true,

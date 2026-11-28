@@ -29,8 +29,6 @@ import { SectionNav } from '../../../shared/layout/SectionNav';
 const INITIAL_QUERY: CourseQuery = {
   page: 1,
   pageSize: DEFAULT_PAGE_SIZE,
-  sort: 'courseCode',
-  order: 'asc',
 };
 const QUERY_KINDS = {
   page: 'number',
@@ -45,7 +43,7 @@ type CourseSorter = Parameters<
 >[2];
 
 // Maps AntD's sorter ('ascend' | 'descend' | none) to the API's sort and order,
-// falling back to code ascending, and keeps the page and page size.
+// clearing sort/order so the backend default (newest first) applies, and keeps the page and page size.
 export function toCourseQuery(
   query: CourseQuery,
   pagination: { current?: number; pageSize?: number },
@@ -58,8 +56,8 @@ export function toCourseQuery(
     ...query,
     page: pagination.current ?? query.page,
     pageSize: pagination.pageSize ?? query.pageSize,
-    sort: sorted ? key : INITIAL_QUERY.sort,
-    order: sorted && single?.order === 'descend' ? 'desc' : 'asc',
+    sort: sorted ? key : undefined,
+    order: sorted ? (single?.order === 'descend' ? 'desc' : 'asc') : undefined,
   };
 }
 

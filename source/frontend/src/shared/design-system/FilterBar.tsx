@@ -7,6 +7,7 @@
 
 import { Flex } from 'antd';
 import type { ReactNode } from 'react';
+import { palette, radius } from './tokens.js';
 
 interface FilterBarProps {
   children: ReactNode;
@@ -16,7 +17,18 @@ interface FilterBarProps {
 
 export function FilterBar({ children, extra }: FilterBarProps) {
   return (
-    <Flex justify="space-between" align="center" wrap gap="small">
+    <Flex
+      justify="space-between"
+      align="center"
+      wrap
+      gap="small"
+      style={{
+        background: palette.white,
+        border: `1px solid ${palette.slate200}`,
+        borderRadius: radius.md,
+        padding: '10px 14px',
+      }}
+    >
       <Flex wrap gap="small" align="center">
         {children}
       </Flex>

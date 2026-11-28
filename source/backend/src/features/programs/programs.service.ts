@@ -109,7 +109,7 @@ export class ProgramsService {
       this.prisma.program.findMany({
         where,
         include: programInclude(todayDate()),
-        orderBy: { programCode: 'asc' },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
         ...toSkipTake(query),
       }),
       this.prisma.program.count({ where }),

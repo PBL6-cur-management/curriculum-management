@@ -49,6 +49,7 @@ export function ElectiveGroupsPage() {
     <Flex vertical gap="middle">
       <RequestDraftBanner request={version.sourceRequest} />
       <PageHeader
+        compact
         title="Nhóm tự chọn"
         actions={
           <>

@@ -113,7 +113,7 @@ export function AppLayout() {
         <Layout.Sider
           breakpoint="lg"
           collapsedWidth={0}
-          width={248}
+          width={236}
           theme="light"
           style={{
             borderRight: `1px solid ${palette.slate200}`,
@@ -136,7 +136,7 @@ export function AppLayout() {
             )}
           />
         </Layout.Sider>
-        <Layout.Content style={{ padding: '24px 32px 48px', minWidth: 0 }}>
+        <Layout.Content style={{ padding: '20px 28px 40px', minWidth: 0 }}>
           {/* key theo pathname: mỗi trang có Suspense riêng, không thay cả layout bằng spinner. */}
           <Suspense key={pathname} fallback={<PageSkeleton />}>
             <Outlet />

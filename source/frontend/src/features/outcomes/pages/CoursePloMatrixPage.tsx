@@ -23,6 +23,7 @@ export function CoursePloMatrixPage() {
   return (
     <Flex vertical gap="middle">
       <PageHeader
+        compact
         title={
           <>
             Ma trận học phần–PLO — {version.programName} (

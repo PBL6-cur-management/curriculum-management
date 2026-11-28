@@ -341,6 +341,116 @@ describe('CurriculumReadService.read', () => {
     });
   });
 
+  it('computes programCredits from common core plus the first track when tracks exist', async () => {
+    programVersion.findUnique.mockResolvedValue({
+      ...VERSION,
+      compulsoryCredits: new Prisma.Decimal('6'),
+      electiveCredits: new Prisma.Decimal('9'),
+      totalCredits: new Prisma.Decimal('15'),
+    });
+    const programTrack = {
+      findMany: vi.fn().mockResolvedValue([
+        {
+          id: 't1',
+          trackCode: 'CNPM',
+          trackName: 'Công nghệ phần mềm',
+          englishName: 'Software Engineering',
+          description: null,
+          sortOrder: 1,
+          compulsoryCredits: new Prisma.Decimal('3'),
+          electiveCredits: new Prisma.Decimal('6'),
+          _count: { curriculumItems: 3 },
+        },
+        {
+          id: 't2',
+          trackCode: 'HTTT',
+          trackName: 'Hệ thống thông tin',
+          englishName: 'Information Systems',
+          description: null,
+          sortOrder: 2,
+          compulsoryCredits: new Prisma.Decimal('3'),
+          electiveCredits: new Prisma.Decimal('6'),
+          _count: { curriculumItems: 3 },
+        },
+      ]),
+    };
+    const client = {
+      programVersion,
+      curriculumItem,
+      electiveGroup,
+      programTrack,
+      knowledgeBlock: { findMany: vi.fn().mockResolvedValue([]) },
+    };
+    service = new CurriculumReadService(client as unknown as PrismaService);
+
+    curriculumItem.findMany.mockResolvedValue([
+      row('COMMON1', 1, 1, { trackId: null }),
+      row('COMMONE1', 2, 1, {
+        trackId: null,
+        isElective: true,
+        electiveGroupId: 'g-common',
+      }),
+      row('T1C', 5, 1, { trackId: 't1' }),
+      row('T1E1', 7, 1, {
+        trackId: 't1',
+        isElective: true,
+        electiveGroupId: 'g-t1',
+      }),
+      row('T1E2', 7, 2, {
+        trackId: 't1',
+        isElective: true,
+        electiveGroupId: 'g-t1',
+      }),
+      row('T2C', 5, 2, { trackId: 't2' }),
+      row('T2E1', 7, 3, {
+        trackId: 't2',
+        isElective: true,
+        electiveGroupId: 'g-t2',
+      }),
+      row('T2E2', 7, 4, {
+        trackId: 't2',
+        isElective: true,
+        electiveGroupId: 'g-t2',
+      }),
+    ]);
+    electiveGroup.findMany.mockResolvedValue([
+      {
+        id: 'g-common',
+        trackId: null,
+        groupCode: 'TC-C',
+        groupName: 'Tự chọn chung',
+        minCredits: new Prisma.Decimal('3'),
+        minCourses: null,
+        items: [],
+      },
+      {
+        id: 'g-t1',
+        trackId: 't1',
+        groupCode: 'TC-CNPM',
+        groupName: 'Tự chọn CNPM',
+        minCredits: new Prisma.Decimal('6'),
+        minCourses: null,
+        items: [],
+      },
+      {
+        id: 'g-t2',
+        trackId: 't2',
+        groupCode: 'TC-HTTT',
+        groupName: 'Tự chọn HTTT',
+        minCredits: new Prisma.Decimal('6'),
+        minCourses: null,
+        items: [],
+      },
+    ]);
+
+    const result = await service.read('v1', R1);
+    expect(result.programCredits).toEqual({
+      computed: { compulsory: '6', elective: '9', total: '15' },
+      declared: { compulsory: '6', elective: '9', total: '15' },
+      mismatch: false,
+    });
+  });
+
   it('shows VIA_REQUEST and no editing for an Active version', async () => {
     programVersion.findUnique.mockResolvedValue({
       ...VERSION,

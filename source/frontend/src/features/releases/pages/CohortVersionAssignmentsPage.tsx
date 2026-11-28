@@ -23,6 +23,7 @@ function ProgramCohortAssignments({ programId }: { programId: string }) {
   return (
     <DetailPageLayout>
       <PageHeader
+        compact
         title="Gán phiên bản cho khóa"
         actions={
           <Button

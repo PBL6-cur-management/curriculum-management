@@ -120,7 +120,7 @@ describe('SemestersService', () => {
     ]);
     expect(semester.findMany.mock.calls[0][0].orderBy).toEqual([
       { academicYear: 'desc' },
-      { termInYear: 'asc' },
+      { termInYear: 'desc' },
     ]);
   });
 

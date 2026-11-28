@@ -73,6 +73,7 @@ export function OutcomeCoveragePage() {
   return (
     <Flex vertical gap="large">
       <PageHeader
+        compact
         title={
           <>
             Kiểm tra phủ chuẩn đầu ra — {data.version.programName} (

@@ -47,7 +47,7 @@ export class UsersService {
       this.prisma.user.findMany({
         where,
         select: USER_DETAIL_SELECT,
-        orderBy: { fullName: 'asc' },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
         ...toSkipTake(query),
       }),
       this.prisma.user.count({ where }),

@@ -147,6 +147,15 @@ describe('applyCurriculumFilters', () => {
           trackFilter: 't-cnpm',
         }),
       ),
+    ).toEqual(['MAT101', 'SE401']);
+    expect(
+      codes(
+        applyCurriculumFilters(tracked, {
+          ...EMPTY_CURRICULUM_FILTERS,
+          trackFilter: 't-cnpm',
+          trackIncludeCommon: false,
+        }),
+      ),
     ).toEqual(['SE401']);
     expect(
       codes(

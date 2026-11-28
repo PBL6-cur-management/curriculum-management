@@ -59,16 +59,13 @@ describe('app menu', () => {
     );
   });
 
-  it('opens the core groups on arrival, plus the group of the current page', () => {
-    expect(openMenuGroups(APP_MENU, ROUTES.home)).toEqual([
+  it('opens the primary program group on arrival, plus the group of the current page', () => {
+    expect(openMenuGroups(APP_MENU, ROUTES.home)).toEqual([PROGRAMS]);
+    expect(openMenuGroups(APP_MENU, ROUTES.changeRequests)).toEqual([
       PROGRAMS,
       APPROVALS,
     ]);
-    expect(openMenuGroups(APP_MENU, ROUTES.users)).toEqual([
-      PROGRAMS,
-      APPROVALS,
-      ADMIN,
-    ]);
+    expect(openMenuGroups(APP_MENU, ROUTES.users)).toEqual([PROGRAMS, ADMIN]);
   });
 
   it('shows graduation as one entry to permitted staff, including mixed staff/student identities', () => {

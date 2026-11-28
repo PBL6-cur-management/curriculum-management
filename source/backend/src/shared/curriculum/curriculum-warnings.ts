@@ -163,14 +163,24 @@ function emptySemesters(
 }
 
 // A requisite in the same or a later semester is saved (EC-10) but flagged; one outside the curriculum is flagged too.
+// When tracks are present, only compare against rows in common core or the same track — never cross-check another track.
 function requisiteWarnings(items: readonly WarningItem[]): CurriculumWarning[] {
   const found: CurriculumWarning[] = [];
-  const byCourse = new Map(items.map((item) => [item.courseId, item]));
+  const byCourse = new Map<string, WarningItem[]>();
   for (const item of items) {
+    const existing = byCourse.get(item.courseId);
+    if (existing) {
+      existing.push(item);
+    } else {
+      byCourse.set(item.courseId, [item]);
+    }
+  }
+  for (const item of items) {
+    const itemTrack = item.trackId ?? null;
     for (const requisite of item.requisites) {
-      const source = byCourse.get(requisite.sourceCourseId);
+      const candidates = byCourse.get(requisite.sourceCourseId);
       const where = { semester: item.plannedSemester, itemId: item.id };
-      if (!source) {
+      if (!candidates || candidates.length === 0) {
         found.push(
           warning(
             CURRICULUM_WARNING.REQUISITE_OUTSIDE,
@@ -179,7 +189,21 @@ function requisiteWarnings(items: readonly WarningItem[]): CurriculumWarning[] {
             where,
           ),
         );
-      } else if (
+        continue;
+      }
+      const sameScope = candidates.filter((candidate) => {
+        const candidateTrack = candidate.trackId ?? null;
+        return candidateTrack === null || candidateTrack === itemTrack;
+      });
+      if (sameScope.length === 0) {
+        continue;
+      }
+      const source = sameScope.reduce((earliest, candidate) =>
+        candidate.plannedSemester < earliest.plannedSemester
+          ? candidate
+          : earliest,
+      );
+      if (
         ORDER_SENSITIVE_TYPES.includes(requisite.relationType) &&
         source.plannedSemester >= item.plannedSemester
       ) {

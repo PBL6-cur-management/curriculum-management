@@ -49,7 +49,7 @@ export class EquivalenceGroupsService {
       this.prisma.equivalentCourseGroup.findMany({
         where,
         include: GROUP_INCLUDE,
-        orderBy: { groupCode: 'asc' },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
         ...toSkipTake(query),
       }),
       this.prisma.equivalentCourseGroup.count({ where }),

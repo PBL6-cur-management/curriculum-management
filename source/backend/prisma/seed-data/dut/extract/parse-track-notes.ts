@@ -272,22 +272,13 @@ function parseCnttDtNote(
     return [];
   }
 
-  // Notes like "Công nghệ PM, tự chọn HTTT" or "Mạng, Tự chọn ATTT" mean the
-  // unmarked track is compulsory while the explicitly marked one is elective.
-  const hasMixedPrimaryAndElective =
-    parsedSegments.length > 1 &&
-    parsedSegments.some((seg) => seg.hasElective) &&
-    parsedSegments.some((seg) => !seg.hasElective && !seg.hasCompulsory);
-
   const assignments: TrackAssignment[] = [];
   for (const seg of parsedSegments) {
     const isElective = seg.hasCompulsory
       ? false
       : seg.hasElective
         ? true
-        : hasMixedPrimaryAndElective
-          ? false
-          : defaultIsElective;
+        : defaultIsElective;
     for (const trackCode of seg.trackCodes) {
       assignments.push({ trackCode, isElective });
     }

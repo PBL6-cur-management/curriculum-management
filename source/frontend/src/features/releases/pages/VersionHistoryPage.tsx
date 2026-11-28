@@ -43,18 +43,25 @@ export function VersionHistoryPage() {
   }
   return (
     <Flex vertical gap="middle">
-      <PageHeader title="Lịch sử phiên bản" />
-      {canCompare && (
-        <Button
-          type="primary"
-          disabled={selected.length !== VERSION_COMPARISON_SELECTION_SIZE}
-          onClick={() =>
-            void navigate(comparisonPath(programId, selected[0]!, selected[1]!))
-          }
-        >
-          So sánh hai phiên bản
-        </Button>
-      )}
+      <PageHeader
+        compact
+        title="Lịch sử phiên bản"
+        actions={
+          canCompare ? (
+            <Button
+              type="primary"
+              disabled={selected.length !== VERSION_COMPARISON_SELECTION_SIZE}
+              onClick={() =>
+                void navigate(
+                  comparisonPath(programId, selected[0]!, selected[1]!),
+                )
+              }
+            >
+              So sánh hai phiên bản
+            </Button>
+          ) : undefined
+        }
+      />
       <Typography.Text type="secondary">
         Các khóa có dòng gán cho phiên bản này; xem màn hình gán khóa để xác
         định theo học kỳ.

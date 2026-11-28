@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import { Tabs } from 'antd';
+import { Flex } from 'antd';
 import { useLocation, useNavigate } from 'react-router';
 import { ROUTES } from '../../routes';
 import type { PermissionCode } from '../auth/permissions';
 import { fetchMe, meQueryKey } from '../auth/me';
+import { palette, radius } from '../design-system/tokens';
 
 interface SectionPage {
   path: string;
@@ -68,12 +69,49 @@ export function SectionNav({ section }: { section: SectionName }) {
   );
   // One reachable page needs no switcher.
   if (pages.length < 2) return null;
+  const activePath = activeSectionPath(pages, pathname);
   return (
-    <Tabs
-      activeKey={activeSectionPath(pages, pathname)}
-      onChange={(path) => void navigate(path)}
-      items={pages.map((page) => ({ key: page.path, label: page.label }))}
-      style={{ marginBottom: 0 }}
-    />
+    <Flex
+      role="tablist"
+      wrap
+      gap={6}
+      style={{
+        background: palette.slate100,
+        padding: 3,
+        borderRadius: radius.lg,
+        width: 'fit-content',
+      }}
+    >
+      {pages.map((page) => {
+        const isActive = page.path === activePath;
+        return (
+          <button
+            key={page.path}
+            type="button"
+            role="tab"
+            aria-selected={isActive}
+            onClick={() => void navigate(page.path)}
+            style={{
+              appearance: 'none',
+              background: isActive ? palette.white : 'transparent',
+              color: isActive ? palette.brand : palette.slate600,
+              fontWeight: isActive ? 600 : 500,
+              fontSize: 14,
+              lineHeight: 1.4,
+              padding: '5px 12px',
+              borderRadius: radius.md,
+              border: isActive
+                ? `1px solid ${palette.slate200}`
+                : '1px solid transparent',
+              cursor: 'pointer',
+              transition:
+                'background-color 140ms cubic-bezier(0.4, 0, 0.2, 1), color 140ms cubic-bezier(0.4, 0, 0.2, 1)',
+            }}
+          >
+            {page.label}
+          </button>
+        );
+      })}
+    </Flex>
   );
 }

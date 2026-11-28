@@ -109,11 +109,15 @@ describe('StudentsReadService', () => {
       expect(where.id).toEqual({ in: [] });
     });
 
-    it('leaves the office unrestricted without a program, and orders by name then id', async () => {
+    it('leaves the office unrestricted without a program, and orders newest cohort and student first', async () => {
       await service.list(office, { semesterId: 'sem', ...page });
       const args = studentFindMany.mock.calls[0]![0];
       expect(args.where).toEqual({});
-      expect(args.orderBy).toEqual([{ fullName: 'asc' }, { id: 'asc' }]);
+      expect(args.orderBy).toEqual([
+        { cohort: { intakeYear: 'desc' } },
+        { createdAt: 'desc' },
+        { id: 'desc' },
+      ]);
     });
 
     it('applies the search text to code and name', async () => {

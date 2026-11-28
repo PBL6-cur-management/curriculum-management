@@ -28,6 +28,7 @@ export function PloListPage() {
   return (
     <Flex vertical gap="middle">
       <PageHeader
+        compact
         title={
           <>
             PLO — {version.programName} ({versionLabel(version)})

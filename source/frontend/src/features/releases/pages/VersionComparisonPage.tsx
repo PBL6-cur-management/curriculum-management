@@ -32,7 +32,7 @@ export function VersionComparisonPage() {
       <BackLink to={generatePath(ROUTES.versionHistory, { programId })}>
         Lịch sử phiên bản
       </BackLink>
-      <PageHeader title="So sánh phiên bản" />
+      <PageHeader compact title="So sánh phiên bản" />
       {history.error ? (
         <ReleaseQueryError
           error={history.error}
