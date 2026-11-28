@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Alert, App, Button, Flex, Skeleton, Tabs, Tooltip } from 'antd';
-import { Link, useParams, useSearchParams } from 'react-router';
+import { generatePath, Link, useParams, useSearchParams } from 'react-router';
 import { ROUTES } from '../../../routes';
 import { useMe } from '../../../shared/auth/useMe';
 import {
@@ -204,13 +204,43 @@ export function StudentDetailPage() {
               }
             />
           ) : (
-            applied.data && (
-              <Alert
-                type="info"
-                title="Phiên bản áp dụng cho học kỳ đã chọn"
-                description={`${applied.data.programVersionId} · ${applied.data.source === 'COHORT' ? 'Theo khóa' : 'Ngoại lệ'}. Ghi danh đã lưu được hiển thị riêng bên dưới.`}
-              />
-            )
+            applied.data && (() => {
+              const appliedWithNumber = applied.data as typeof applied.data & {
+                programVersionNumber?: string | null;
+              };
+              const matchedEnrollment = student.enrollments.find(
+                (e) => e.appliedVersion.id === applied.data.programVersionId,
+              );
+              const versionLabel =
+                appliedWithNumber.programVersionNumber
+                  ? `Phiên bản ${appliedWithNumber.programVersionNumber}`
+                  : matchedEnrollment?.appliedVersion.versionNumber
+                    ? `Phiên bản ${matchedEnrollment.appliedVersion.versionNumber}`
+                    : applied.data.programVersionId;
+              return (
+                <Alert
+                  type="info"
+                  title="Phiên bản áp dụng cho học kỳ đã chọn"
+                  description={
+                    <>
+                      <Link
+                        to={generatePath(ROUTES.versionDetail, {
+                          programId: applied.data.programId,
+                          versionId: applied.data.programVersionId,
+                        })}
+                      >
+                        {versionLabel}
+                      </Link>
+                      {' · '}
+                      {applied.data.source === 'COHORT'
+                        ? 'Theo khóa'
+                        : 'Ngoại lệ'}
+                      . Ghi danh đã lưu được hiển thị riêng bên dưới.
+                    </>
+                  }
+                />
+              );
+            })()
           )}
           {!student.canManageEnrollments && isR1 && (
             <Alert

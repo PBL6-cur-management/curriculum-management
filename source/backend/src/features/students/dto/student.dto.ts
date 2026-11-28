@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   EnrollmentStatus,
   EnrollmentType,
@@ -69,6 +69,8 @@ export class StudentEnrollmentDto {
   @ApiProperty({ type: StudentIssuedVersionDto })
   appliedVersion!: StudentIssuedVersionDto;
   @ApiProperty() admissionVersionId!: string;
+  @ApiPropertyOptional({ type: StudentIssuedVersionDto })
+  admissionVersion?: StudentIssuedVersionDto;
   @ApiProperty({ type: StudentTrackDto, nullable: true })
   track!: StudentTrackDto | null;
   @ApiProperty({ type: String, nullable: true }) cohortAssignmentId!:
@@ -119,6 +121,8 @@ export class StudentAppliedVersionDto {
   @ApiProperty() programId!: string;
   @ApiProperty() semesterId!: string;
   @ApiProperty() programVersionId!: string;
+  @ApiPropertyOptional({ type: String, nullable: true })
+  programVersionNumber?: string | null;
   @ApiProperty({
     enum: APPLIED_VERSION_SOURCES,
     enumName: 'AppliedVersionSource',
