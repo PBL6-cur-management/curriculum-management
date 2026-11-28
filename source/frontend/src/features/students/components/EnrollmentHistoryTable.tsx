@@ -1,4 +1,6 @@
 import { Button, Flex, Table } from 'antd';
+import { generatePath, Link } from 'react-router';
+import { ROUTES } from '../../../routes';
 import { StatusTag } from '../../../shared/design-system';
 import type { StudentEnrollment } from '../api/students';
 import {
@@ -32,8 +34,15 @@ export function EnrollmentHistoryTable({
       columns={[
         {
           title: 'Chương trình',
-          render: (_, enrollment) =>
-            `${enrollment.program.programCode} — ${enrollment.program.programName}`,
+          render: (_, enrollment) => (
+            <Link
+              to={generatePath(ROUTES.programDetail, {
+                programId: enrollment.program.id,
+              })}
+            >
+              {enrollment.program.programCode} — {enrollment.program.programName}
+            </Link>
+          ),
         },
         {
           title: 'Định hướng / Chuyên ngành con',

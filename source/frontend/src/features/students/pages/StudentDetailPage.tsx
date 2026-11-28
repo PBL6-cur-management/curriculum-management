@@ -20,21 +20,56 @@ import {
   useReconcileStudent,
   useStudent,
   useStudentAppliedVersion,
+  useStudentSemesters,
 } from '../hooks/useStudents';
+import { currentSemester } from '../constants/currentSemester';
+
+function pickDefaultEnrollment(enrollments: StudentEnrollment[] | undefined) {
+  if (!enrollments?.length) return undefined;
+  return (
+    enrollments.find(
+      (e) => e.status === 'ACTIVE' && e.enrollmentType === 'PRIMARY',
+    ) ??
+    enrollments.find((e) => e.status === 'ACTIVE') ??
+    enrollments[0]
+  );
+}
 
 export function StudentDetailPage() {
   const { studentId = '' } = useParams();
   const [search, setSearch] = useSearchParams();
   const { data: me } = useMe();
   const { modal } = App.useApp();
-  const context = {
-    semesterId: search.get('semesterId') ?? '',
-    programId: search.get('programId') ?? '',
-  };
+  const semesters = useStudentSemesters();
+  const urlSemesterId = search.get('semesterId') ?? '';
+  const urlProgramId = search.get('programId') ?? '';
+  const effectiveSemesterId =
+    urlSemesterId || currentSemester(semesters.data ?? [])?.id || '';
+
   const detail = useStudent(studentId, {
-    semesterId: context.semesterId,
-    programId: context.programId || undefined,
+    semesterId: effectiveSemesterId,
+    programId: urlProgramId || undefined,
   });
+  const student = detail.isError ? undefined : detail.data;
+  const defaultEnrollment = pickDefaultEnrollment(student?.enrollments);
+  const effectiveProgramId = urlProgramId || defaultEnrollment?.program.id || '';
+  const context = {
+    semesterId: effectiveSemesterId,
+    programId: effectiveProgramId,
+  };
+  const enrolledPrograms = (() => {
+    if (!student?.enrollments.length) return undefined;
+    const unique = new Map<
+      string,
+      { id: string; programCode: string; programName: string }
+    >();
+    for (const enrollment of student.enrollments) {
+      if (!unique.has(enrollment.program.id)) {
+        unique.set(enrollment.program.id, enrollment.program);
+      }
+    }
+    return [...unique.values()];
+  })();
   const applied = useStudentAppliedVersion(studentId, context);
   const reconcile = useReconcileStudent(studentId);
   const [command, setCommand] = useState<{
@@ -45,7 +80,6 @@ export function StudentDetailPage() {
     null,
   );
   const isR1 = me?.roles.some((role) => role.roleCode === 'R1') ?? false;
-  const student = detail.isError ? undefined : detail.data;
   const canManage = Boolean(
     isR1 &&
     student?.canManageEnrollments &&
@@ -102,7 +136,12 @@ export function StudentDetailPage() {
         }
       />
       <FilterBar>
-        <StudentFilters params={context} onChange={change} />
+        <StudentFilters
+          params={context}
+          onChange={change}
+          contextOnly
+          enrolledPrograms={enrolledPrograms}
+        />
       </FilterBar>
       {!context.semesterId ? (
         <Alert type="info" title="Chọn học kỳ để xem hồ sơ sinh viên" />
