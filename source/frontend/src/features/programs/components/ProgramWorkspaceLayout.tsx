@@ -292,7 +292,12 @@ export function ProgramWorkspaceLayout() {
                 <RequestStatusTag status={sourceRequest.status} />
               </>
             ) : (
-              <ProgramStatusTag status={program.status} />
+              <ProgramStatusTag
+                status={program.status}
+                hasReleasedVersion={program.versions.some(
+                  (v) => v.status !== 'DRAFT',
+                )}
+              />
             )}
           </Flex>
           {isProposalMode && sourceRequest ? (

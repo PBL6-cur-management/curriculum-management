@@ -40,7 +40,8 @@
     "backup:drill": "tsx scripts/backup-restore-drill.ts",
     "db:rebuild:real": "tsx scripts/rebuild-real.ts",
     "db:demo-curate": "tsx prisma/demo-curate.ts",
-    "db:demo-org": "tsx prisma/demo-org.ts"
+    "db:demo-org": "tsx prisma/demo-org.ts",
+    "db:seed:extra": "tsx prisma/seed-extra-faculties.ts"
   },
   "dependencies": {
     "@nestjs/bullmq": "^12.0.0",

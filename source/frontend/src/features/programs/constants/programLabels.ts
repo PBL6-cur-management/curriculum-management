@@ -20,9 +20,27 @@ export const DEGREE_LEVEL_LABELS: Record<
   DOCTORATE: 'Tiến sĩ',
 };
 export const PROGRAM_STATUS_LABELS: Record<ProgramStatus, string> = {
-  ACTIVE: 'Đang sử dụng',
+  ACTIVE: 'Đang hoạt động',
   INACTIVE: 'Ngừng sử dụng',
 };
+export const PROGRAM_TAG_DISPLAY = {
+  DRAFT_ONLY: {
+    label: 'Đang soạn thảo',
+    color: 'blue',
+    tooltip: 'Chương trình mới tạo, chưa ban hành phiên bản chính thức.',
+  },
+  ACTIVE: {
+    label: 'Đang đào tạo',
+    color: 'green',
+    tooltip: 'Chương trình đang hoạt động và có phiên bản đã ban hành.',
+  },
+  INACTIVE: {
+    label: 'Ngừng sử dụng',
+    color: 'default',
+    tooltip:
+      'Chương trình đã ngừng tuyển sinh/sử dụng; vẫn tra cứu được dữ liệu cũ.',
+  },
+} as const;
 export const PROGRAM_STATUS_COLORS: Record<ProgramStatus, string> = {
   ACTIVE: 'green',
   INACTIVE: 'default',

@@ -148,7 +148,12 @@ export function ProgramListPage() {
     {
       title: 'Trạng thái',
       dataIndex: 'status',
-      render: (status: ProgramStatus) => <ProgramStatusTag status={status} />,
+      render: (status: ProgramStatus, row) => (
+      <ProgramStatusTag
+        status={status}
+        hasReleasedVersion={row.releasedVersions.length > 0}
+      />
+    ),
     },
   ];
   if (isError)

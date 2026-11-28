@@ -161,6 +161,8 @@ describe('ProgramListPage', () => {
     const second = screen.getByText('Công nghệ thông tin').closest('tr')!;
     expect(second).toHaveTextContent('Cử nhân');
     expect(second).toHaveTextContent('Chưa gán');
+    expect(first).toHaveTextContent('Đang soạn thảo');
+    expect(second).toHaveTextContent('Đang đào tạo');
     const request = programRequests(fetchMock).at(-1)!;
     expect(request.searchParams.get('status')).toBe('ACTIVE');
     expect(request.searchParams.get('page')).toBe('1');
