@@ -194,4 +194,35 @@ describe('StudentDetailPage', () => {
       },
     });
   });
+  it('auto-selects the primary active enrollment program when programId is omitted from URL', async () => {
+    renderStudentPage({
+      element: <StudentDetailPage />,
+      route: '/students/:studentId',
+      path: '/students/st1?semesterId=s1',
+      responses: new Map<string, unknown>([
+        ['/api/students/st1?semesterId=s1', student],
+        [
+          '/api/students/st1/applied-version?semesterId=s1&programId=p1',
+          {
+            studentId: 'st1',
+            enrollmentId: 'en1',
+            programId: 'p1',
+            semesterId: 's1',
+            programVersionId: 'v-auto',
+            source: 'COHORT',
+            cohortAssignmentId: 'ca1',
+          } satisfies components['schemas']['StudentAppliedVersionDto'],
+        ],
+        [
+          '/api/students/st1/results?semesterId=s1&programId=p1&page=1&pageSize=20',
+          { items: [result], total: 1, page: 1, pageSize: 20 },
+        ],
+      ]),
+    });
+    expect(await screen.findByText(/v-auto/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('tab', { name: 'Kết quả học tập' }));
+    expect(
+      await screen.findByRole('cell', { name: 'HP01 — Học phần tổng hợp' }),
+    ).toBeInTheDocument();
+  });
 });

@@ -15,11 +15,34 @@ import type { StudentListParams } from '../api/students';
 interface StudentFiltersProps {
   params: StudentListParams;
   onChange: (values: Record<string, string | undefined>) => void;
+  /** On a single student profile, only semester & program context selectors are relevant. */
+  contextOnly?: boolean;
+  /** When viewing a specific student, restrict or prioritize their enrolled programs. */
+  enrolledPrograms?: Array<{
+    id: string;
+    programCode: string;
+    programName: string;
+  }>;
 }
-export function StudentFilters({ params, onChange }: StudentFiltersProps) {
+export function StudentFilters({
+  params,
+  onChange,
+  contextOnly = false,
+  enrolledPrograms,
+}: StudentFiltersProps) {
   const semesters = useStudentSemesters();
   const cohorts = useStudentCohorts();
   const programs = useStudentPrograms(params.semesterId);
+  const programOptions =
+    enrolledPrograms && enrolledPrograms.length > 0
+      ? enrolledPrograms.map((program) => ({
+          value: program.id,
+          label: `${program.programCode} — ${program.programName}`,
+        }))
+      : programs.data?.map((program) => ({
+          value: program.id,
+          label: `${program.programCode} — ${program.programName}`,
+        }));
   return (
     <>
       <Select
@@ -41,49 +64,50 @@ export function StudentFilters({ params, onChange }: StudentFiltersProps) {
       <Select
         aria-label="Chương trình"
         placeholder="Chương trình"
-        allowClear
+        allowClear={!contextOnly}
         showSearch
         optionFilterProp="label"
         value={params.programId || undefined}
-        style={{ minWidth: 220 }}
-        loading={programs.isFetching}
-        options={programs.data?.map((program) => ({
-          value: program.id,
-          label: `${program.programCode} — ${program.programName}`,
-        }))}
+        style={{ minWidth: 260 }}
+        loading={!enrolledPrograms?.length && programs.isFetching}
+        options={programOptions}
         onChange={(value) => onChange({ programId: value })}
       />
-      <Select
-        aria-label="Khóa"
-        placeholder="Khóa"
-        allowClear
-        value={params.cohortId}
-        style={{ minWidth: 130 }}
-        options={cohorts.data?.map((cohort) => ({
-          value: cohort.id,
-          label: cohort.cohortCode,
-        }))}
-        onChange={(value) => onChange({ cohortId: value })}
-      />
-      <Select
-        aria-label="Trạng thái sinh viên"
-        placeholder="Trạng thái"
-        allowClear
-        value={params.status}
-        style={{ minWidth: 160 }}
-        options={Object.entries(STUDENT_STATUS_LABELS).map(
-          ([value, label]) => ({ value, label }),
-        )}
-        onChange={(value) => onChange({ status: value })}
-      />
-      <SearchInput
-        ariaLabel="Tìm sinh viên"
-        placeholder="Mã sinh viên hoặc họ tên"
-        value={params.q}
-        style={{ width: 280 }}
-        delayMs={STUDENT_SEARCH_DEBOUNCE_MS}
-        onCommit={(q) => onChange({ q })}
-      />
+      {!contextOnly && (
+        <>
+          <Select
+            aria-label="Khóa"
+            placeholder="Khóa"
+            allowClear
+            value={params.cohortId}
+            style={{ minWidth: 130 }}
+            options={cohorts.data?.map((cohort) => ({
+              value: cohort.id,
+              label: cohort.cohortCode,
+            }))}
+            onChange={(value) => onChange({ cohortId: value })}
+          />
+          <Select
+            aria-label="Trạng thái sinh viên"
+            placeholder="Trạng thái"
+            allowClear
+            value={params.status}
+            style={{ minWidth: 160 }}
+            options={Object.entries(STUDENT_STATUS_LABELS).map(
+              ([value, label]) => ({ value, label }),
+            )}
+            onChange={(value) => onChange({ status: value })}
+          />
+          <SearchInput
+            ariaLabel="Tìm sinh viên"
+            placeholder="Mã sinh viên hoặc họ tên"
+            value={params.q}
+            style={{ width: 280 }}
+            delayMs={STUDENT_SEARCH_DEBOUNCE_MS}
+            onCommit={(q) => onChange({ q })}
+          />
+        </>
+      )}
       {[semesters, cohorts, programs].some((query) => query.isError) && (
         <Alert
           type="error"
