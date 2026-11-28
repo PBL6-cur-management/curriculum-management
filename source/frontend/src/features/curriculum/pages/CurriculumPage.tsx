@@ -21,6 +21,7 @@ import { ApiError } from '../../../shared/api/client';
 import { RequestDraftBanner } from '../../../shared/change-requests/RequestDraftBanner';
 import { versionLabel } from '../../../shared/constants/versionLabels';
 import type { CurriculumItem, ProgramTrack } from '../api/curriculum';
+import { BulkAssignTrackModal } from '../components/BulkAssignTrackModal';
 import { CurriculumAddButton } from '../components/CurriculumAddButton';
 import { CurriculumFiltersBar } from '../components/CurriculumFiltersBar';
 import { CurriculumItemModal } from '../components/CurriculumItemModal';
@@ -68,15 +69,18 @@ export function CurriculumPage() {
   const canImportExport = useCan(PERMISSIONS.curriculumImportExportExcel);
   const exportExcel = useExportCurriculum(versionId);
   const [view, setView] = useState<CurriculumView>(CURRICULUM_VIEW.rows);
+  const [searchParams, setSearchParams] = useSearchParams();
   const { filters, setFilters, visible, filtered } = useCurriculumFilters(
     curriculum?.items ?? [],
+    searchParams.get('track') ?? undefined,
   );
+  const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
+  const [bulkAssignOpen, setBulkAssignOpen] = useState(false);
   const [editing, setEditing] = useState<CurriculumItem | 'new' | null>(null);
   const [editingTrack, setEditingTrack] = useState<ProgramTrack | 'new' | null>(
     null,
   );
   const [requisitesOf, setRequisitesOf] = useState<CurriculumItem | null>(null);
-  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { data: me } = useMe();
   const canViewEligibility = useCan(
@@ -334,6 +338,7 @@ export function CurriculumPage() {
     return <Result status="404" title="Không tìm thấy khung chương trình" />;
   }
   const { version } = curriculum;
+  const canSelect = !studentMode && curriculum.canEditStructure;
   return (
     <Flex vertical gap="middle">
       <RequestDraftBanner request={version.sourceRequest} />
@@ -410,12 +415,26 @@ export function CurriculumPage() {
           )}
         </>
       )}
-      {(curriculum.tracks.length > 0 ||
-        (!studentMode && curriculum.canEditStructure)) && (
+      {!studentMode && (
         <ProgramTrackBar
           curriculum={curriculum}
           value={filters.trackFilter ?? 'ALL'}
-          canEdit={!studentMode && curriculum.canEditStructure}
+          canEdit={curriculum.canEditStructure}
+          programId={programId}
+          canProposeChange={version.status === 'ACTIVE'}
+          onChange={(trackFilter) =>
+            setFilters({ ...filters, trackFilter })
+          }
+          onAdd={() => setEditingTrack('new')}
+          onEdit={(track) => setEditingTrack(track)}
+          onBulkAssign={() => setBulkAssignOpen(true)}
+        />
+      )}
+      {studentMode && curriculum.tracks.length > 0 && (
+        <ProgramTrackBar
+          curriculum={curriculum}
+          value={filters.trackFilter ?? 'ALL'}
+          canEdit={false}
           onChange={(trackFilter) =>
             setFilters({ ...filters, trackFilter })
           }
@@ -429,8 +448,21 @@ export function CurriculumPage() {
         filtered={filtered}
         onChange={setFilters}
       />
+      {canSelect && selectedItemIds.length > 0 && (
+        <Flex align="center" gap="small" wrap>
+          <span>Đã chọn {selectedItemIds.length} học phần</span>
+          <Button size="small" type="primary" onClick={() => setBulkAssignOpen(true)}>
+            Gán chuyên ngành
+          </Button>
+          <Button size="small" onClick={() => setSelectedItemIds([])}>
+            Bỏ chọn
+          </Button>
+        </Flex>
+      )}
       {view === CURRICULUM_VIEW.rows ? (
         <CurriculumTable
+          selectedItemIds={canSelect ? selectedItemIds : undefined}
+          onSelectItems={canSelect ? setSelectedItemIds : undefined}
           curriculum={curriculum}
           items={visible}
           sortable={!studentMode && !filtered && curriculum.canEditStructure}
@@ -478,6 +510,14 @@ export function CurriculumPage() {
           versionId={version.id}
           track={editingTrack === 'new' ? null : editingTrack}
           onClose={() => setEditingTrack(null)}
+        />
+      )}
+      {!studentMode && bulkAssignOpen && (
+        <BulkAssignTrackModal
+          curriculum={curriculum}
+          initialItemIds={selectedItemIds}
+          onClose={() => setBulkAssignOpen(false)}
+          onSuccess={() => setSelectedItemIds([])}
         />
       )}
       {!studentMode && requisitesOf && (

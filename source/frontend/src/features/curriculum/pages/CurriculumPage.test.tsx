@@ -573,4 +573,78 @@ describe('CurriculumPage', () => {
       }),
     });
   });
-});
+
+  it('shows the track bar with a proposal shortcut on an ACTIVE version without tracks', async () => {
+    const base = fixture();
+    renderPage(
+      fixture({
+        canEditStructure: false,
+        tracks: [],
+        version: { ...base.version, status: 'ACTIVE' },
+      }),
+    );
+    expect(
+      await screen.findByText('Tạo đề xuất thêm chuyên ngành'),
+    ).toBeInTheDocument();
+  });
+
+  it('pre-filters the table by the ?track= URL param', async () => {
+    const cnpm = trackFixture();
+    renderPage(
+      fixture({
+        tracks: [cnpm],
+        items: [
+          item('MAT101', 'Giải tích 1', { track: null }),
+          item('IT301', 'Mạng máy tính', {
+            track: {
+              id: 't-cnpm',
+              trackCode: 'CNPM',
+              trackName: 'Công nghệ phần mềm',
+            },
+          }),
+        ],
+      }),
+      200,
+      '?track=t-cnpm',
+    );
+    await screen.findByText('Mạng máy tính');
+    expect(courseCodes()).toEqual(['IT301']);
+  });
+
+  it('bulk-assigns selected items to a track', async () => {
+    const cnpm = trackFixture();
+    renderPage(fixture({ tracks: [cnpm] }));
+    fireEvent.click(
+      await screen.findByRole('button', {
+        name: /Gán học phần vào chuyên ngành/,
+      }),
+    );
+    const dialog = await screen.findByRole('dialog');
+    const fetchMock = vi.mocked(fetch);
+    const original = fetchMock.getMockImplementation()!;
+    const writes: { url: string; body: unknown }[] = [];
+    fetchMock.mockImplementation((input, init) => {
+      const url = String(input);
+      if (init?.method === 'POST' && url.endsWith('/tracks/bulk-assign')) {
+        writes.push({ url, body: JSON.parse(String(init.body)) });
+        return Promise.resolve(json({ updated: 1, created: 0, skipped: 0 }));
+      }
+      return original(input, init);
+    });
+    const rows = within(dialog).getAllByRole('row');
+    fireEvent.click(within(rows[1]).getByRole('checkbox'));
+    expect(within(dialog).getByText('Đã chọn 1 học phần')).toBeInTheDocument();
+    fireEvent.mouseDown(within(dialog).getByLabelText('Chuyên ngành đích'));
+    const options = await screen.findAllByText('CNPM — Công nghệ phần mềm');
+    fireEvent.click(options[options.length - 1]);
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Gán' }));
+    await vi.waitFor(() => expect(writes).toHaveLength(1));
+    expect(writes[0].url).toBe(
+      '/api/program-versions/v1/tracks/bulk-assign',
+    );
+    expect(writes[0].body).toEqual({
+      itemIds: ['i-MAT101'],
+      trackIds: ['t-cnpm'],
+      mode: 'MOVE',
+    });
+  });});

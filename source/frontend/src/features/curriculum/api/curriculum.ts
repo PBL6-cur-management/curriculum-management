@@ -7,8 +7,22 @@ export type CurriculumRequisite =
   components['schemas']['CurriculumRequisiteDto'];
 export type CurriculumWarning = components['schemas']['CurriculumWarningDto'];
 export type ElectiveGroup = components['schemas']['ElectiveGroupDto'];
-export type ProgramTrack = components['schemas']['ProgramTrackDto'];
+export type ProgramTrack = components['schemas']['ProgramTrackDto'] & {
+  studentCount?: number;
+};
 export type ProgramTrackRef = components['schemas']['ProgramTrackRefDto'];
+export type BulkAssignTrackMode = 'MOVE' | 'COPY';
+export interface BulkAssignTrackItemsRequest {
+  itemIds: string[];
+  trackIds: string[];
+  mode: BulkAssignTrackMode;
+  isElective?: boolean;
+}
+export interface BulkAssignTrackResult {
+  updated: number;
+  created: number;
+  skipped: number;
+}
 export type SemesterTotal = components['schemas']['SemesterTotalDto'];
 export type BlockTotal = components['schemas']['BlockTotalDto'];
 export type KnowledgeBlock = components['schemas']['KnowledgeBlockDto'];
@@ -96,3 +110,12 @@ export const updateTrack = (trackId: string, body: UpdateProgramTrackRequest) =>
   sendJson<ProgramTrack>('PATCH', trackPath(trackId), body);
 export const deleteTrack = (trackId: string) =>
   sendJson<void>('DELETE', trackPath(trackId));
+export const bulkAssignTrackItems = (
+  versionId: string,
+  body: BulkAssignTrackItemsRequest,
+) =>
+  sendJson<BulkAssignTrackResult>(
+    'POST',
+    `${versionPath(versionId)}/tracks/bulk-assign`,
+    body,
+  );

@@ -15,6 +15,8 @@ import { CurrentAccess } from '../../shared/authz/current-access.decorator.js';
 import { PERMISSIONS } from '../../shared/authz/permission-codes.js';
 import { RequirePermission } from '../../shared/authz/require-permission.decorator.js';
 import {
+  BulkAssignTrackItemsDto,
+  BulkAssignTrackResultDto,
   CreateProgramTrackDto,
   ProgramTrackDto,
   UpdateProgramTrackDto,
@@ -47,6 +49,21 @@ export class ProgramTracksController {
     @CurrentAccess() access: AccessContext,
   ): Promise<ProgramTrackDto> {
     return this.tracks.create(versionId, dto, access);
+  }
+
+  @Post('program-versions/:versionId/tracks/bulk-assign')
+  @HttpCode(HttpStatus.OK)
+  @RequirePermission(PERMISSIONS.CURRICULUM_EDIT)
+  @ApiOperation({
+    summary: 'Gán hàng loạt học phần vào một hoặc nhiều chuyên ngành / định hướng',
+  })
+  @ApiOkResponse({ type: BulkAssignTrackResultDto })
+  bulkAssign(
+    @Param('versionId') versionId: string,
+    @Body() dto: BulkAssignTrackItemsDto,
+    @CurrentAccess() access: AccessContext,
+  ): Promise<BulkAssignTrackResultDto> {
+    return this.tracks.bulkAssign(versionId, dto, access);
   }
 
   @Patch('program-tracks/:trackId')

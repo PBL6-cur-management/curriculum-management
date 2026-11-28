@@ -41,6 +41,8 @@ interface CurriculumTableProps {
   onRequisites: (item: CurriculumItem) => void;
   // Row to highlight, from the consistency result's `focus` parameter.
   focusId?: string | null;
+  selectedItemIds?: string[];
+  onSelectItems?: (ids: string[]) => void;
 }
 
 const flag = (on: boolean) => (on ? <CheckOutlined aria-label="Có" /> : null);
@@ -55,6 +57,8 @@ export function CurriculumTable({
   studentMode = false,
   eligibilityByItemId,
   onShowEligibility,
+  selectedItemIds,
+  onSelectItems,
 }: CurriculumTableProps) {
   const { sensors, onDragEnd, isSaving } = useSemesterReorder(curriculum);
   const columns: TableColumnsType<CurriculumItem> = [
@@ -177,6 +181,14 @@ export function CurriculumTable({
       pagination={false}
       loading={isSaving}
       columns={columns}
+      rowSelection={
+        onSelectItems
+          ? {
+              selectedRowKeys: selectedItemIds ?? [],
+              onChange: (keys) => onSelectItems(keys.map(String)),
+            }
+          : undefined
+      }
       dataSource={items}
       scroll={{ x: 'max-content' }}
       components={sortable ? { body: { row: SortableRow } } : undefined}

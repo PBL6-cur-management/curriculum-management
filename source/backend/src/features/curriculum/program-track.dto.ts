@@ -1,6 +1,11 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  IsArray,
+  IsBoolean,
+  IsEnum,
   IsInt,
   IsOptional,
   IsString,
@@ -38,6 +43,7 @@ export class ProgramTrackDto extends ProgramTrackRefDto {
   @ApiProperty({ nullable: true, type: String })
   electiveCredits!: string | null;
   @ApiProperty() itemCount!: number;
+  @ApiProperty() studentCount!: number;
 }
 
 export class CreateProgramTrackDto {
@@ -92,7 +98,7 @@ export class CreateProgramTrackDto {
 export class UpdateProgramTrackDto extends PartialType(CreateProgramTrackDto) {}
 
 export const TRACK_INCLUDE = {
-  _count: { select: { curriculumItems: true } },
+  _count: { select: { curriculumItems: true, enrollments: true } },
 } as const satisfies Prisma.ProgramTrackInclude;
 
 export type TrackRow = Prisma.ProgramTrackGetPayload<{
@@ -114,5 +120,51 @@ export function toProgramTrackDto(row: TrackRow): ProgramTrackDto {
     electiveCredits:
       row.electiveCredits === null ? null : toWireDecimal(row.electiveCredits),
     itemCount: row._count.curriculumItems,
+    studentCount: row._count.enrollments ?? 0,
   };
+}
+
+
+export enum BulkAssignTrackMode {
+  MOVE = 'MOVE',
+  COPY = 'COPY',
+}
+
+export class BulkAssignTrackItemsDto {
+  @ApiProperty({
+    type: [String],
+    description: 'Danh sách ID dòng CurriculumItem trong phiên bản',
+  })
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(200)
+  @IsString({ each: true })
+  itemIds!: string[];
+
+  @ApiProperty({
+    type: [String],
+    description: 'Danh sách ID ProgramTrack đích; mảng rỗng = đưa về Khung chung',
+  })
+  @IsArray()
+  @ArrayMaxSize(20)
+  @IsString({ each: true })
+  trackIds!: string[];
+
+  @ApiProperty({ enum: BulkAssignTrackMode, enumName: 'BulkAssignTrackMode' })
+  @IsEnum(BulkAssignTrackMode)
+  mode!: BulkAssignTrackMode;
+
+  @ApiPropertyOptional({
+    type: Boolean,
+    description: 'Tùy chọn ghi đè trạng thái tự chọn/bắt buộc',
+  })
+  @IsOptional()
+  @IsBoolean()
+  isElective?: boolean;
+}
+
+export class BulkAssignTrackResultDto {
+  @ApiProperty() updated!: number;
+  @ApiProperty() created!: number;
+  @ApiProperty() skipped!: number;
 }

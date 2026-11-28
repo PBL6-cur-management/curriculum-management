@@ -42,6 +42,7 @@
     "db:demo-curate": "tsx prisma/demo-curate.ts",
     "db:demo-org": "tsx prisma/demo-org.ts",
     "db:seed:extra": "tsx prisma/seed-extra-faculties.ts",
+    "db:seed:tracks": "tsx prisma/seed-tracks-from-notes.ts",
     "db:seed:extra:full": "tsx prisma/seed-extra-full.ts"
   },
   "dependencies": {

@@ -64,8 +64,26 @@ export function isFiltering(filters: CurriculumFilters): boolean {
   );
 }
 
-export function useCurriculumFilters(items: readonly CurriculumItem[]) {
-  const [filters, setFilters] = useState(EMPTY_CURRICULUM_FILTERS);
+export function useCurriculumFilters(
+  items: readonly CurriculumItem[],
+  initialTrackFilter?: CurriculumTrackFilter,
+) {
+  const normalizedInitial: CurriculumTrackFilter =
+    initialTrackFilter && initialTrackFilter.trim() !== ''
+      ? initialTrackFilter
+      : 'ALL';
+  const [filters, setFilters] = useState<CurriculumFilters>(() => ({
+    ...EMPTY_CURRICULUM_FILTERS,
+    trackFilter: normalizedInitial,
+  }));
+  const [prevInitialTrack, setPrevInitialTrack] =
+    useState<CurriculumTrackFilter>(normalizedInitial);
+
+  if (normalizedInitial !== prevInitialTrack) {
+    setPrevInitialTrack(normalizedInitial);
+    setFilters((current) => ({ ...current, trackFilter: normalizedInitial }));
+  }
+
   const visible = useMemo(
     () => applyCurriculumFilters(items, filters),
     [items, filters],
