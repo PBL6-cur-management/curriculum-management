@@ -42,6 +42,7 @@ export function PermissionMatrixPage() {
   const [search, setSearch] = useState('');
   const [onlyDifferent, setOnlyDifferent] = useState(false);
   const [editingRole, setEditingRole] = useState<string>();
+  const [editingTemplate, setEditingTemplate] = useState<string>();
   const [roleModal, setRoleModal] = useState<{
     open: boolean;
     role: Role | null;
@@ -290,16 +291,28 @@ export function PermissionMatrixPage() {
       )}
       <RoleEditorDrawer
         role={roles.find((role) => role.roleCode === editingRole)}
+        roles={roles}
         permissions={data?.permissions ?? []}
         index={index}
-        onClose={() => setEditingRole(undefined)}
+        initialTemplateRoleCode={editingTemplate}
+        onClose={() => {
+          setEditingRole(undefined);
+          setEditingTemplate(undefined);
+        }}
       />
       {roleModal.open && (
         <RoleFormModal
           key={roleModal.role?.roleCode ?? 'create'}
           open
           role={roleModal.role}
+          roles={roles}
+          permissions={data?.permissions ?? []}
+          index={index}
           onClose={() => setRoleModal({ open: false, role: null })}
+          onCreated={(createdCode, templateCode) => {
+            setEditingTemplate(templateCode);
+            setEditingRole(createdCode);
+          }}
         />
       )}
     </Flex>

@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Alert, App, Form, Input, Modal } from 'antd';
+import { Alert, App, Checkbox, Form, Input, Modal, Select } from 'antd';
 import {
   applyFieldErrors,
   errorMessage,
 } from '../../../shared/forms/applyFieldErrors';
-import type { Role } from '../api/permissionMatrix';
+import type { PermissionMatrix, Role } from '../api/permissionMatrix';
+import type { MatrixIndex } from '../hooks/useMatrixIndex';
 import {
   useCreateRole,
   useUpdateRole,
@@ -18,16 +19,30 @@ import {
 interface RoleFormModalProps {
   open: boolean;
   role: Role | null;
+  roles?: Role[];
+  permissions?: PermissionMatrix['permissions'];
+  index?: MatrixIndex;
   onClose: () => void;
+  onCreated?: (roleCode: string, templateRoleCode?: string) => void;
 }
 
 interface RoleFormValues {
   roleCode: string;
   roleName: string;
   description?: string;
+  templateRoleCode?: string;
+  openPermissionsAfter?: boolean;
 }
 
-export function RoleFormModal({ open, role, onClose }: RoleFormModalProps) {
+export function RoleFormModal({
+  open,
+  role,
+  roles = [],
+  permissions = [],
+  index,
+  onClose,
+  onCreated,
+}: RoleFormModalProps) {
   const [form] = Form.useForm<RoleFormValues>();
   const { message } = App.useApp();
   const createRole = useCreateRole();
@@ -35,6 +50,19 @@ export function RoleFormModal({ open, role, onClose }: RoleFormModalProps) {
   const [serverError, setServerError] = useState<string | null>(null);
   const isEdit = role !== null;
   const pending = createRole.isPending || updateRole.isPending;
+
+  const templateOptions = roles.map((item) => {
+    const grantedCount = index
+      ? permissions.filter((p) => Boolean(index.cell(item.roleCode, p.permissionCode))).length
+      : null;
+    return {
+      value: item.roleCode,
+      label:
+        grantedCount !== null
+          ? `${item.roleCode} — ${item.roleName} (${grantedCount} quyền)`
+          : `${item.roleCode} — ${item.roleName}`,
+    };
+  });
 
   return (
     <Modal
@@ -64,6 +92,8 @@ export function RoleFormModal({ open, role, onClose }: RoleFormModalProps) {
           roleCode: role?.roleCode ?? '',
           roleName: role?.roleName ?? '',
           description: role?.description ?? '',
+          templateRoleCode: undefined,
+          openPermissionsAfter: true,
         }}
         onValuesChange={() => setServerError(null)}
         onFinish={async (values) => {
@@ -76,6 +106,7 @@ export function RoleFormModal({ open, role, onClose }: RoleFormModalProps) {
                 body: { roleName, description },
               });
               void message.success(`Đã cập nhật vai trò ${updated.roleCode}`);
+              onClose();
             } else {
               const created = await createRole.mutateAsync({
                 roleCode: values.roleCode.trim().toUpperCase(),
@@ -83,8 +114,11 @@ export function RoleFormModal({ open, role, onClose }: RoleFormModalProps) {
                 description,
               });
               void message.success(`Đã tạo vai trò ${created.roleCode}`);
+              onClose();
+              if (values.openPermissionsAfter || values.templateRoleCode) {
+                onCreated?.(created.roleCode, values.templateRoleCode);
+              }
             }
-            onClose();
           } catch (error) {
             if (!applyFieldErrors(form, error)) {
               setServerError(
@@ -131,6 +165,30 @@ export function RoleFormModal({ open, role, onClose }: RoleFormModalProps) {
             placeholder="Mô tả chức năng hoặc đối tượng gán vai trò này"
           />
         </Form.Item>
+        {!isEdit && templateOptions.length > 0 && (
+          <>
+            <Form.Item
+              name="templateRoleCode"
+              label="Sao chép bộ quyền mẫu (tùy chọn)"
+              extra="Điền sẵn quyền từ một vai trò có sẵn để chỉnh nhanh thay vì chọn từng quyền."
+            >
+              <Select
+                allowClear
+                showSearch
+                optionFilterProp="label"
+                placeholder="Bắt đầu trống hoặc chọn vai trò mẫu..."
+                options={templateOptions}
+              />
+            </Form.Item>
+            <Form.Item
+              name="openPermissionsAfter"
+              valuePropName="checked"
+              style={{ marginBottom: 0 }}
+            >
+              <Checkbox>Mở bảng chọn quyền ngay sau khi tạo</Checkbox>
+            </Form.Item>
+          </>
+        )}
       </Form>
     </Modal>
   );
