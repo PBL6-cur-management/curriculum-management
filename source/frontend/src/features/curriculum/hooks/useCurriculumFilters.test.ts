@@ -28,6 +28,7 @@ function item(
     blockName: null,
     isElective: false,
     electiveGroup: null,
+    track: null,
     htDa: false,
     tqDa: false,
     minStudiedScore: null,
@@ -109,5 +110,59 @@ describe('applyCurriculumFilters', () => {
       codes(applyCurriculumFilters(ROWS, { ...filters, blockSymbol: null })),
     ).toEqual(['IT302']);
     expect(isFiltering({ ...filters, blockSymbol: null })).toBe(true);
+  });
+
+  it('filters by track (ALL, COMMON, or specific trackId) together with other filters', () => {
+    const tracked = [
+      item('MAT101', 'Giải tích 1', { track: null }),
+      item('SE401', 'Kiến trúc phần mềm', {
+        plannedSemester: 6,
+        track: {
+          id: 't-cnpm',
+          trackCode: 'CNPM',
+          trackName: 'Công nghệ phần mềm',
+        },
+      }),
+      item('IS401', 'Hệ thống thông tin quản lý', {
+        plannedSemester: 6,
+        track: {
+          id: 't-httt',
+          trackCode: 'HTTT',
+          trackName: 'Hệ thống thông tin',
+        },
+      }),
+    ];
+    expect(
+      codes(
+        applyCurriculumFilters(tracked, {
+          ...EMPTY_CURRICULUM_FILTERS,
+          trackFilter: 'COMMON',
+        }),
+      ),
+    ).toEqual(['MAT101']);
+    expect(
+      codes(
+        applyCurriculumFilters(tracked, {
+          ...EMPTY_CURRICULUM_FILTERS,
+          trackFilter: 't-cnpm',
+        }),
+      ),
+    ).toEqual(['SE401']);
+    expect(
+      codes(
+        applyCurriculumFilters(tracked, {
+          ...EMPTY_CURRICULUM_FILTERS,
+          trackFilter: 't-cnpm',
+          semester: 6,
+          search: 'kiến trúc',
+        }),
+      ),
+    ).toEqual(['SE401']);
+    expect(
+      isFiltering({ ...EMPTY_CURRICULUM_FILTERS, trackFilter: 'COMMON' }),
+    ).toBe(true);
+    expect(
+      isFiltering({ ...EMPTY_CURRICULUM_FILTERS, trackFilter: 'ALL' }),
+    ).toBe(false);
   });
 });

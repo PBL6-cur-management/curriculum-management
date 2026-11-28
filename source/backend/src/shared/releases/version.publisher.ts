@@ -12,7 +12,7 @@ import { lockCourses } from './release-locks.js';
 import { RELEASE_ERRORS } from './release.errors.js';
 import { SyllabusPublisher } from './syllabus.publisher.js';
 
-export type ReleasedStatus = 'ACTIVE' | 'PENDING';
+export type ReleasedStatus = 'ACTIVE' | 'PENDING' | 'HISTORICAL';
 
 export interface PromoteVersionInput {
   versionId: string;

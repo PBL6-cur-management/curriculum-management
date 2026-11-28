@@ -5,11 +5,15 @@ import {
   addMember,
   createSubjectGroup,
   deactivateSubjectGroup,
+  demoteCoordinator,
   endMember,
   fetchDeactivationImpact,
   fetchSubjectGroup,
+  promoteCoordinator,
   revokeMember,
   updateSubjectGroup,
+  type DemoteCoordinatorRequest,
+  type PromoteCoordinatorRequest,
 } from '../api/subjectGroupAdmin';
 
 export const SUBJECT_GROUP_QUERY_KEYS = {
@@ -103,6 +107,36 @@ export function useRevokeMember() {
       groupId: string;
       memberId: string;
     }) => revokeMember(groupId, memberId),
+    onSuccess: invalidate,
+  });
+}
+export function usePromoteCoordinator() {
+  const invalidate = useInvalidateGroups();
+  return useMutation({
+    mutationFn: ({
+      groupId,
+      lecturerId,
+      body,
+    }: {
+      groupId: string;
+      lecturerId: string;
+      body?: PromoteCoordinatorRequest;
+    }) => promoteCoordinator(groupId, lecturerId, body),
+    onSuccess: invalidate,
+  });
+}
+export function useDemoteCoordinator() {
+  const invalidate = useInvalidateGroups();
+  return useMutation({
+    mutationFn: ({
+      groupId,
+      lecturerId,
+      body,
+    }: {
+      groupId: string;
+      lecturerId: string;
+      body?: DemoteCoordinatorRequest;
+    }) => demoteCoordinator(groupId, lecturerId, body),
     onSuccess: invalidate,
   });
 }

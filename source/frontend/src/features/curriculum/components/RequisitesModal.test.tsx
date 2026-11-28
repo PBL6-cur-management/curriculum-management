@@ -118,16 +118,31 @@ describe('RequisitesModal', () => {
     expect(puts[0].body).toEqual({ requisites: [] });
   });
 
-  it('refuses a threshold above 4 before sending', async () => {
-    const { puts } = renderModal();
+  it('accepts 0..10 thresholds (DEC-11) and refuses a threshold above 10 before sending', async () => {
+    const { puts, onClose } = renderModal();
     fireEvent.change(screen.getByLabelText('Ngưỡng điểm'), {
-      target: { value: '4.5' },
+      target: { value: '10.5' },
     });
     fireEvent.click(screen.getByRole('button', { name: 'Lưu' }));
     expect(
-      await screen.findByText(/Ngưỡng điểm theo thang 4/),
+      await screen.findByText(/Ngưỡng điểm theo thang 10/),
     ).toBeInTheDocument();
     expect(puts).toHaveLength(0);
+
+    fireEvent.change(screen.getByLabelText('Ngưỡng điểm'), {
+      target: { value: '5.5' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Lưu' }));
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(puts[0].body).toEqual({
+      requisites: [
+        {
+          sourceCourseId: 'c-IT101',
+          relationType: 'PREREQUISITE',
+          minScore: '5.5',
+        },
+      ],
+    });
   });
 
   it('shows the cycle refusal with its path inside the dialog and stays open (KB-020)', async () => {

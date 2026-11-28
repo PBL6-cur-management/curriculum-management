@@ -38,6 +38,12 @@ export const CHANGE_REQUEST_ERRORS = {
     code: 'BASIS_REQUIRED',
     message: 'Đề xuất theo yêu cầu của Trường phải có số văn bản căn cứ.',
   },
+  PROGRAM_CREATOR_RESTRICTED: {
+    status: HttpStatus.FORBIDDEN,
+    code: 'PROGRAM_CREATOR_RESTRICTED',
+    message:
+      'Chỉ Giám đốc CTĐT hoặc Phòng Đào tạo mới được khởi tạo đề xuất thay đổi chương trình đào tạo.',
+  },
 } as const satisfies Record<string, ErrorDefinition>;
 
 export const AUTHORED_ITEM_ERRORS = {
@@ -108,6 +114,12 @@ export const SUBMISSION_ERRORS = {
     code: 'NO_DIRECTOR',
     message:
       'Chương trình chưa có Giám đốc CTĐT nên chưa gửi duyệt được. Liên hệ Phòng Đào tạo để phân công.',
+  },
+  NO_FACULTY_LEADERSHIP: {
+    status: HttpStatus.CONFLICT,
+    code: 'NO_FACULTY_LEADERSHIP',
+    message:
+      'Khoa chưa có Ban lãnh đạo khoa nên chưa gửi duyệt được. Liên hệ Phòng Đào tạo để phân công.',
   },
   WITHDRAW_NOT_ALLOWED: {
     status: HttpStatus.CONFLICT,

@@ -303,11 +303,11 @@ describe('CourseDetailPage', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('edits a threshold in place, refusing a value above 4 on the client', async () => {
+  it('edits a threshold in place, refusing a value above 10 on the client', async () => {
     const fetchMock = renderPage(
       (url, init) =>
         init?.method === 'PATCH' && url === '/api/course-relations/r1'
-          ? json(relation({ minScore: '2.5' }))
+          ? json(relation({ minScore: '5.5' }))
           : json(course),
       { relations: [relation()] },
     );
@@ -315,19 +315,19 @@ describe('CourseDetailPage', () => {
       await screen.findByRole('button', { name: 'Sửa ngưỡng điểm' }),
     );
     const input = screen.getByLabelText('Ngưỡng điểm');
-    fireEvent.change(input, { target: { value: '4.5' } });
+    fireEvent.change(input, { target: { value: '10.5' } });
     fireEvent.click(screen.getByRole('button', { name: 'Lưu' }));
     expect(await screen.findByText(GRADE_POINT_MESSAGE)).toBeInTheDocument();
     expect(
       fetchMock.mock.calls.some(([, init]) => init?.method === 'PATCH'),
     ).toBe(false);
-    fireEvent.change(input, { target: { value: '2.5' } });
+    fireEvent.change(input, { target: { value: '5.5' } });
     fireEvent.click(screen.getByRole('button', { name: 'Lưu' }));
     await waitFor(() =>
       expect(
         fetchMock.mock.calls.find(([, init]) => init?.method === 'PATCH')?.[1]
           ?.body,
-      ).toBe(JSON.stringify({ minScore: '2.5' })),
+      ).toBe(JSON.stringify({ minScore: '5.5' })),
     );
   });
 

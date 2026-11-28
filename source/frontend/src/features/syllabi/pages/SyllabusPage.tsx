@@ -10,8 +10,10 @@ import { RequestDraftBanner } from '../../../shared/change-requests/RequestDraft
 import { VERSION_ID_PARAM } from '../../../shared/releases/versionParams';
 import type { Syllabus } from '../api/syllabi';
 import { SyllabusActions } from '../components/SyllabusActions';
+import { SyllabusHistoryTab } from '../components/SyllabusHistoryTab';
 import { SyllabusSections } from '../components/SyllabusSections';
 import {
+  HISTORY_TAB_LABEL,
   REQUEST_COPY_TAB_LABEL,
   BACK_TO_COURSE,
   LANGUAGE_OPTIONS,
@@ -110,27 +112,48 @@ export function SyllabusPage() {
         <Empty description={NO_SYLLABUS} />
       ) : (
         <Tabs
-          items={revisions.map((revision) => ({
-            key: revision.id,
-            label:
-              revision.revisionNumber === null
-                ? REQUEST_COPY_TAB_LABEL
-                : `${SYLLABUS_STATUS_LABELS[revision.status]} — bản ${revision.revisionNumber}`,
-            children: (
-              <SyllabusSections
-                syllabus={revision}
-                language={language}
-                attachTo={
-                  data.canAttachToPublished && revision.status !== 'DRAFT'
-                    ? {
-                        courseId: data.course.id,
-                        attachmentRules: data.attachmentRules,
-                      }
-                    : undefined
-                }
-              />
-            ),
-          }))}
+          items={[
+            ...revisions.map((revision) => {
+              const canAttachWorkingCopy =
+                Boolean(requestId && revision.sourceRequest) &&
+                data.editPath === 'DIRECT' &&
+                revision.status === 'DRAFT';
+              const canAttachPublished =
+                data.canAttachToPublished && revision.status !== 'DRAFT';
+              return {
+                key: revision.id,
+                label:
+                  revision.revisionNumber === null
+                    ? REQUEST_COPY_TAB_LABEL
+                    : `${SYLLABUS_STATUS_LABELS[revision.status]} — bản ${revision.revisionNumber}`,
+                children: (
+                  <SyllabusSections
+                    syllabus={revision}
+                    language={language}
+                    attachTo={
+                      canAttachWorkingCopy || canAttachPublished
+                        ? {
+                            courseId: data.course.id,
+                            attachmentRules: data.attachmentRules,
+                            allowDelete: canAttachWorkingCopy,
+                          }
+                        : undefined
+                    }
+                  />
+                ),
+              };
+            }),
+            {
+              key: 'history',
+              label: HISTORY_TAB_LABEL,
+              children: (
+                <SyllabusHistoryTab
+                  courseId={data.course.id}
+                  language={language}
+                />
+              ),
+            },
+          ]}
         />
       )}
     </Flex>

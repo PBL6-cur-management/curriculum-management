@@ -22,6 +22,37 @@ function sum(values: string[]): Prisma.Decimal {
   );
 }
 
+// Weighted 4-point GPA: best graded PASSED attempt per course/equivalence
+// class, zero-credit and EXEMPT results excluded.
+function cumulativeGpa(input: GraduationInputSnapshot): Prisma.Decimal | null {
+  const courses = new Map(
+    input.courses.map((course) => [course.course.id, course]),
+  );
+  const best = new Map<
+    string,
+    { score: Prisma.Decimal; credits: Prisma.Decimal }
+  >();
+  for (const attempt of input.attempts) {
+    if (attempt.status !== 'PASSED' || attempt.score4 === null) continue;
+    const course = courses.get(attempt.courseId)!;
+    const credits = new Prisma.Decimal(course.credits);
+    if (!credits.gt(0)) continue;
+    const score = new Prisma.Decimal(attempt.score4);
+    const key = graduationClassKey(course);
+    const current = best.get(key);
+    if (!current || score.gt(current.score)) best.set(key, { score, credits });
+  }
+  let points = new Prisma.Decimal(0);
+  let credits = new Prisma.Decimal(0);
+  for (const entry of best.values()) {
+    points = points.plus(entry.score.times(entry.credits));
+    credits = credits.plus(entry.credits);
+  }
+  return credits.isZero()
+    ? null
+    : points.div(credits).toDecimalPlaces(2, Prisma.Decimal.ROUND_HALF_UP);
+}
+
 function missing(required: string, earned: string): string {
   return Prisma.Decimal.max(
     new Prisma.Decimal(required).minus(earned),
@@ -49,23 +80,12 @@ export function evaluateGraduation(
   const recognizedIds = new Set(
     allocation.recognitions.map((row) => row.curriculumItemId),
   );
-  const recognizedClasses = new Set(
-    allocation.recognitions.map((row) =>
-      graduationClassKey(courses.get(row.studiedCourse.id)!),
-    ),
-  );
   for (const row of input.frame) {
-    if (
-      recognizedIds.has(row.id) ||
-      (row.isElective && row.courseType !== 'CONDITIONAL')
-    )
-      continue;
+    if (recognizedIds.has(row.id) || row.isElective) continue;
     const key = graduationClassKey(courses.get(row.course.id)!);
     const relevant = facts.filter(
       (fact) => graduationClassKey(courses.get(fact.courseId)!) === key,
     );
-    if (relevant.some((fact) => fact.isExempt && !fact.hasPassedAttempt))
-      throw new AppException(GRADUATION_ERRORS.EXEMPTION_POLICY_UNCONFIRMED);
     const reason: CompletionReason = relevant.some(
       (fact) => fact.hasInProgressAttempt,
     )
@@ -117,34 +137,6 @@ export function evaluateGraduation(
         group.minCourses === null
           ? null
           : Math.max(0, group.minCourses - earnedCourses);
-      if (
-        (missingCredits !== null && new Prisma.Decimal(missingCredits).gt(0)) ||
-        (missingCourses !== null && missingCourses > 0)
-      ) {
-        const groupClasses = new Set(
-          input.frame
-            .filter((row) => row.electiveGroupId === group.id)
-            .map((row) => graduationClassKey(courses.get(row.course.id)!)),
-        );
-        if (
-          facts.some(
-            (fact) =>
-              fact.isExempt &&
-              !fact.hasPassedAttempt &&
-              groupClasses.has(
-                graduationClassKey(courses.get(fact.courseId)!),
-              ) &&
-              (!recognizedClasses.has(
-                graduationClassKey(courses.get(fact.courseId)!),
-              ) ||
-                (missingCredits !== null &&
-                  new Prisma.Decimal(missingCredits).gt(0))),
-          )
-        )
-          throw new AppException(
-            GRADUATION_ERRORS.EXEMPTION_POLICY_UNCONFIRMED,
-          );
-      }
       if (missingCredits !== null && new Prisma.Decimal(missingCredits).gt(0))
         shortfalls.push({
           code: 'ELECTIVE_CREDITS_MISSING',
@@ -192,11 +184,10 @@ export function evaluateGraduation(
       .map((row) => row.recognizedCredits),
   );
   const free = sum(allocation.freeCredits.map((row) => row.credits));
-  const recognizedTotal = compulsory.plus(elective).plus(free).toString();
+  // Free credits are reported for transparency but never count toward the total.
+  const recognizedTotal = compulsory.plus(elective).toString();
   const missingTotal = missing(input.version.totalCredits, recognizedTotal);
   if (new Prisma.Decimal(missingTotal).gt(0)) {
-    if (facts.some((fact) => fact.isExempt && !fact.hasPassedAttempt))
-      throw new AppException(GRADUATION_ERRORS.EXEMPTION_POLICY_UNCONFIRMED);
     shortfalls.push({
       code: 'TOTAL_CREDITS_MISSING',
       category: 'TOTAL_CREDITS',
@@ -206,6 +197,22 @@ export function evaluateGraduation(
       message: `Tổng tín chỉ được công nhận còn thiếu ${missingTotal} tín chỉ; chưa đủ điều kiện tốt nghiệp.`,
     });
   }
+  const minGpa = new Prisma.Decimal(input.version.minGraduationGpa ?? '2.00');
+  const gpa = cumulativeGpa(input);
+  if (gpa !== null && gpa.lt(minGpa))
+    shortfalls.push({
+      code: 'LOW_GPA',
+      category: 'GPA',
+      requiredGpa: minGpa.toString(),
+      actualGpa: gpa.toString(),
+      message: `Điểm trung bình tích lũy chưa đạt ngưỡng tối thiểu (${gpa.toString()} < ${minGpa.toString()}).`,
+    });
+  if (input.tracks?.hasTracks && input.tracks.selectedTrackId === null)
+    shortfalls.push({
+      code: 'TRACK_NOT_SELECTED',
+      category: 'TRACK',
+      message: 'Sinh viên chưa chọn chuyên ngành / định hướng trong khung CTĐT',
+    });
   const symbols = [...new Set(input.frame.map((row) => row.blockSymbol))].sort(
     (left, right) =>
       left === right
@@ -254,6 +261,8 @@ export function evaluateGraduation(
       'ELECTIVE_GROUP',
       'TOTAL_CREDITS',
       'CONDITIONAL_COURSE',
+      'GPA',
+      'TRACK',
     ];
     const categoryOrder =
       categories.indexOf(left.category) - categories.indexOf(right.category);
@@ -289,6 +298,8 @@ export function evaluateGraduation(
     evaluatedAt: timestamp,
     context: input.context,
     conclusion: shortfalls.length ? 'NOT_ELIGIBLE' : 'ELIGIBLE',
+    cumulativeGpa: gpa?.toString() ?? null,
+    minGraduationGpa: minGpa.toString(),
     shortfalls,
     warnings: allocation.warnings,
     credits: {

@@ -49,6 +49,7 @@ import type { ImportReport } from './validation/import-report.js';
 import { writeAcademicResults } from './writers/academic-result-writer.js';
 import { writeCatalog } from './writers/catalog-writer.js';
 import { writeCurriculum } from './writers/curriculum-writer.js';
+import { writeProgramTransfers } from './writers/program-transfer-writer.js';
 import { writeStudents } from './writers/student-writer.js';
 
 const WORKING_STATES: ImportBatchStatus[] = [
@@ -256,7 +257,8 @@ export class ImportsProcessor
         );
         if (
           result.importType === ImportType.STUDENT_LIST ||
-          result.importType === ImportType.ACADEMIC_RESULT
+          result.importType === ImportType.ACADEMIC_RESULT ||
+          result.importType === ImportType.PROGRAM_TRANSFER
         )
           throw new Error('Student imports are committed by their own path');
         if (result.errorRows) {
@@ -299,7 +301,10 @@ export class ImportsProcessor
       include: { file: true },
     });
     if (!stored?.file || stored.file.expiresAt <= new Date()) return [];
-    const parsed = await readImportSheet(stored.importType, stored.file.content);
+    const parsed = await readImportSheet(
+      stored.importType,
+      stored.file.content,
+    );
     if (parsed.sheet.formatErrors.length) return [];
     const result = await validateImport(
       this.prisma,
@@ -393,6 +398,8 @@ export class ImportsProcessor
           );
         } else if (result.importType === ImportType.ACADEMIC_RESULT) {
           await writeAcademicResults(tx, result.plan, batch.performedById);
+        } else if (result.importType === ImportType.PROGRAM_TRANSFER) {
+          await writeProgramTransfers(tx, result.plan, batch.performedById);
         } else {
           throw new Error('Not a student import');
         }

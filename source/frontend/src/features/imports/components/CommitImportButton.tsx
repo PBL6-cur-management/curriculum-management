@@ -36,7 +36,8 @@ export function CommitImportButton({ batch }: CommitImportButtonProps) {
           versionId: batch.versionId,
         })
       : batch.importType === 'STUDENT_LIST' ||
-          batch.importType === 'ACADEMIC_RESULT'
+          batch.importType === 'ACADEMIC_RESULT' ||
+          batch.importType === 'PROGRAM_TRANSFER'
         ? ROUTES.students
         : ROUTES.courses;
   return (
@@ -93,7 +94,9 @@ export function CommitImportButton({ batch }: CommitImportButtonProps) {
               ? 'hồ sơ sinh viên'
               : batch.importType === 'ACADEMIC_RESULT'
                 ? 'kết quả học tập'
-                : 'danh mục học phần'}
+                : batch.importType === 'PROGRAM_TRANSFER'
+                  ? 'ghi danh chuyển chương trình'
+                  : 'danh mục học phần'}
           ?
         </Typography.Paragraph>
         <Alert

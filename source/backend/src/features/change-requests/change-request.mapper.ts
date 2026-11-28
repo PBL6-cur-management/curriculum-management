@@ -8,7 +8,11 @@ import {
   APPROVAL_LEVEL_NAMES,
   type ApprovalLevel,
 } from '../../shared/change-requests/approval.constants.js';
-import { USER_REF_SELECT } from '../../shared/dtos/ref.dto.js';
+import { ORG_UNIT_REF_SELECT, USER_REF_SELECT } from '../../shared/dtos/ref.dto.js';
+import {
+  toCohortDto,
+  toSemesterDto,
+} from '../../shared/releases/semester.dto.js';
 import { daysSince } from '../../shared/time/days-since.js';
 import type {
   ApprovalStepDto,
@@ -53,6 +57,11 @@ export const REQUEST_SUMMARY_SELECT = {
     },
   },
   subjectGroup: { select: { id: true, groupCode: true, groupName: true } },
+  effectiveSemester: true,
+  targetCohorts: {
+    select: { cohort: true },
+    orderBy: { cohort: { intakeYear: 'desc' } },
+  },
 } as const satisfies Prisma.ChangeRequestSelect;
 export type RequestSummaryRow = Prisma.ChangeRequestGetPayload<{
   select: typeof REQUEST_SUMMARY_SELECT;
@@ -96,6 +105,12 @@ export function toSummaryDto(row: RequestSummaryRow): ChangeRequestSummaryDto {
     submissionRound: row.submissionRound,
     levelEnteredAt: row.levelEnteredAt?.toISOString() ?? null,
     daysWaiting: row.levelEnteredAt ? daysSince(row.levelEnteredAt) : null,
+    effectiveSemester: row.effectiveSemester
+      ? toSemesterDto(row.effectiveSemester)
+      : null,
+    targetCohorts: (row.targetCohorts ?? []).map((link) =>
+      toCohortDto(link.cohort),
+    ),
     createdBy: row.createdBy,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
@@ -150,6 +165,7 @@ export const STEP_INCLUDE = {
     select: { id: true, groupCode: true, groupName: true },
   },
   forProgram: { select: { id: true, programCode: true } },
+  forFaculty: { select: ORG_UNIT_REF_SELECT },
   delegation: {
     select: { id: true, delegator: { select: USER_REF_SELECT } },
   },
@@ -166,6 +182,7 @@ export function toStepDto(row: StepRow): ApprovalStepDto {
     approver: row.approver,
     forSubjectGroup: row.forSubjectGroup,
     forProgram: row.forProgram,
+    forFaculty: row.forFaculty ?? null,
     action: row.action,
     isSkipped: row.isSkipped,
     skipReason: row.skipReason,

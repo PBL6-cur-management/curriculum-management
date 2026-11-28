@@ -189,21 +189,25 @@ async function writeFrame(
   const courseId = new Map(courses.map((c) => [c.courseCode, c.id]));
   const itemId = new Map<string, string>();
   for (const row of program.rows) {
-    const item = await prisma.curriculumItem.upsert({
-      where: {
-        versionId_courseId: { versionId, courseId: courseId.get(row.course)! },
-      },
-      create: {
-        versionId,
-        courseId: courseId.get(row.course)!,
-        plannedSemester: row.semester,
-        sortOrder: row.order,
-        blockSymbol: row.block,
-        isElective: row.group !== undefined,
-        electiveGroupId: row.group ? group.id : null,
-      },
-      update: {},
+    const targetCourseId = courseId.get(row.course)!;
+    const existingItem = await prisma.curriculumItem.findFirst({
+      where: { versionId, courseId: targetCourseId, trackId: null },
+      select: { id: true },
     });
+    const item = existingItem
+      ? existingItem
+      : await prisma.curriculumItem.create({
+          data: {
+            versionId,
+            courseId: targetCourseId,
+            plannedSemester: row.semester,
+            sortOrder: row.order,
+            blockSymbol: row.block,
+            isElective: row.group !== undefined,
+            electiveGroupId: row.group ? group.id : null,
+          },
+          select: { id: true },
+        });
     itemId.set(row.course, item.id);
   }
   // The row copy of each catalog relation whose source course is in the same frame.

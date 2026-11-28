@@ -1,6 +1,7 @@
 import type {
   AcademicResultStatus,
   CourseStatus,
+  CourseType,
   Prisma,
 } from '../../generated/prisma/client.js';
 import type { AcademicAttemptFact } from '../students/best-academic-results.js';
@@ -77,6 +78,9 @@ export interface EligibilityRowFact {
   plannedSemester: number;
   sortOrder: number;
   minStudiedScore: Prisma.Decimal | null;
+  courseType?: CourseType;
+  htDa?: boolean;
+  tqDa?: boolean;
   requisites: readonly EligibilityRequisiteFact[];
 }
 export interface EligibilityCatalogFact {

@@ -17,6 +17,12 @@ export function StudentInfoCard({
   student,
   canViewAccount,
 }: StudentInfoCardProps) {
+  const activeTracks = student.enrollments
+    .filter((enrollment) => enrollment.status === 'ACTIVE' && enrollment.track)
+    .map(
+      (enrollment) =>
+        `${enrollment.track!.trackCode} — ${enrollment.track!.trackName}`,
+    );
   return (
     <Card title="Hồ sơ sinh viên">
       <Descriptions
@@ -26,6 +32,15 @@ export function StudentInfoCard({
           { key: 'name', label: 'Họ tên', children: student.fullName },
           { key: 'cohort', label: 'Khóa', children: student.cohort.cohortCode },
           { key: 'major', label: 'Mã ngành', children: student.major },
+          ...(activeTracks.length > 0
+            ? [
+                {
+                  key: 'track',
+                  label: 'Định hướng / Chuyên ngành con',
+                  children: activeTracks.join(', '),
+                },
+              ]
+            : []),
           {
             key: 'status',
             label: 'Trạng thái',

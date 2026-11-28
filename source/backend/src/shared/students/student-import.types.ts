@@ -60,3 +60,19 @@ export interface AcademicResultWriteOutcome {
   unchanged: number;
   sourcePreserved: number;
 }
+
+export interface ProgramTransferPlanRow {
+  rowNumber: number;
+  studentId: string;
+  studentCode: string;
+  studentUpdatedAt: string;
+  sourceEnrollmentId: string;
+  sourceUpdatedAt: string;
+  targetVersionId: string;
+  trackId: string | null;
+  fromSemesterId: string;
+  basisDecision: string;
+}
+export interface ProgramTransferImportPlan {
+  rows: ProgramTransferPlanRow[];
+}

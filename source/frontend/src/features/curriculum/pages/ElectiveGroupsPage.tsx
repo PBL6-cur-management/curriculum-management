@@ -88,6 +88,7 @@ export function ElectiveGroupsPage() {
       {editing && (
         <ElectiveGroupFormModal
           versionId={version.id}
+          tracks={curriculum.tracks}
           group={editing === 'new' ? null : editing}
           onClose={() => setEditing(null)}
         />

@@ -1,36 +1,53 @@
 import { useMemo, useState } from 'react';
 import { EditOutlined } from '@ant-design/icons';
 import {
+  Alert,
+  App,
   Button,
   Collapse,
   Flex,
   Input,
+  Popconfirm,
   Result,
   Skeleton,
   Switch,
   Table,
+  Tag,
   Typography,
 } from 'antd';
 import type { TableColumnsType } from 'antd';
 import { useCan } from '../../../shared/auth/useCan';
 import { PERMISSIONS } from '../../../shared/auth/permissions';
 import { PageHeader } from '../../../shared/design-system';
-import { usePermissionMatrix } from '../hooks/usePermissionMatrix';
+import { errorMessage } from '../../../shared/forms/applyFieldErrors';
+import {
+  useDeleteRole,
+  usePermissionMatrix,
+} from '../hooks/usePermissionMatrix';
 import { useMatrixIndex } from '../hooks/useMatrixIndex';
-import type { PermissionMatrix } from '../api/permissionMatrix';
+import type { PermissionMatrix, Role } from '../api/permissionMatrix';
 import { FUNCTION_GROUP_LABELS, cellKeyOf } from '../constants/matrixLabels';
 import { MatrixCell, MatrixLegend } from '../components/MatrixCell';
 import { RoleEditorDrawer } from '../components/RoleEditorDrawer';
+import { RoleFormModal } from '../components/RoleFormModal';
 
 type PermissionRow = PermissionMatrix['permissions'][number];
 
 export function PermissionMatrixPage() {
   const { data, isPending, isError } = usePermissionMatrix();
+  const deleteRole = useDeleteRole();
+  const { message } = App.useApp();
   const editable = useCan(PERMISSIONS.permissionManage);
   const index = useMatrixIndex(data);
   const [search, setSearch] = useState('');
   const [onlyDifferent, setOnlyDifferent] = useState(false);
   const [editingRole, setEditingRole] = useState<string>();
+  const [editingTemplate, setEditingTemplate] = useState<string>();
+  const [roleModal, setRoleModal] = useState<{
+    open: boolean;
+    role: Role | null;
+  }>({ open: false, role: null });
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const roles = useMemo(() => data?.roles ?? [], [data]);
 
   const visible = useMemo(() => {
@@ -87,21 +104,75 @@ export function PermissionMatrixPage() {
           <span>
             {role.roleCode} {role.roleName}
           </span>
+          {role.isSystemRole && (
+            <Tag style={{ alignSelf: 'flex-start', marginInlineEnd: 0 }}>
+              Hệ thống
+            </Tag>
+          )}
           {editable && (
-            <Button
-              type="link"
-              size="small"
-              icon={<EditOutlined />}
-              style={{ padding: 0, height: 'auto', alignSelf: 'flex-start' }}
-              onClick={() => setEditingRole(role.roleCode)}
-            >
-              Sửa quyền
-            </Button>
+            <Flex vertical gap={2} align="flex-start">
+              <Button
+                type="link"
+                size="small"
+                icon={<EditOutlined />}
+                style={{ padding: 0, height: 'auto' }}
+                onClick={() => setEditingRole(role.roleCode)}
+              >
+                Sửa quyền
+              </Button>
+              {!role.isSystemRole && (
+                <Flex gap={8} wrap>
+                  <Button
+                    type="link"
+                    size="small"
+                    aria-label={`Sửa thông tin ${role.roleCode}`}
+                    style={{ padding: 0, height: 'auto' }}
+                    onClick={() => setRoleModal({ open: true, role })}
+                  >
+                    Sửa thông tin
+                  </Button>
+                  <Popconfirm
+                    title={`Xóa vai trò ${role.roleCode}?`}
+                    description="Chỉ xóa được khi không còn người dùng đang giữ vai trò này."
+                    okText="Xóa vai trò"
+                    cancelText="Hủy"
+                    okButtonProps={{
+                      danger: true,
+                      loading: deleteRole.isPending,
+                    }}
+                    onConfirm={async () => {
+                      setDeleteError(null);
+                      try {
+                        await deleteRole.mutateAsync(role.roleCode);
+                        void message.success(`Đã xóa vai trò ${role.roleCode}`);
+                      } catch (error) {
+                        const friendly = errorMessage(
+                          error,
+                          'Không thể xóa vai trò đang có người dùng hoạt động.',
+                        );
+                        setDeleteError(friendly);
+                        void message.error(friendly);
+                      }
+                    }}
+                  >
+                    <Button
+                      type="link"
+                      size="small"
+                      danger
+                      aria-label={`Xóa ${role.roleCode}`}
+                      style={{ padding: 0, height: 'auto' }}
+                    >
+                      Xóa
+                    </Button>
+                  </Popconfirm>
+                </Flex>
+              )}
+            </Flex>
           )}
         </Flex>
       ),
       key: role.roleCode,
-      width: 136,
+      width: 156,
       render: (_: unknown, permission: PermissionRow) => (
         <MatrixCell
           cellKey={cellKeyOf(
@@ -115,13 +186,34 @@ export function PermissionMatrixPage() {
 
   return (
     <Flex vertical gap={20}>
-      <PageHeader title="Ma trận quyền" />
+      <PageHeader
+        title="Ma trận quyền"
+        actions={
+          editable ? (
+            <Button
+              type="primary"
+              onClick={() => setRoleModal({ open: true, role: null })}
+            >
+              Tạo vai trò mới
+            </Button>
+          ) : undefined
+        }
+      />
       <Typography.Text type="secondary" style={{ marginTop: -12 }}>
         {roles.length} vai trò · {data?.permissions.length ?? 0} quyền.{' '}
         {editable
           ? 'Chọn “Sửa quyền” ở cột vai trò để thay đổi; mọi thay đổi được xác nhận một lần.'
           : 'Bạn chỉ có quyền xem.'}
       </Typography.Text>
+      {deleteError && (
+        <Alert
+          type="error"
+          showIcon
+          closable
+          title={deleteError}
+          onClose={() => setDeleteError(null)}
+        />
+      )}
       <Flex wrap gap={16} align="center" justify="space-between">
         <Flex wrap gap={16} align="center">
           <Input.Search
@@ -199,10 +291,30 @@ export function PermissionMatrixPage() {
       )}
       <RoleEditorDrawer
         role={roles.find((role) => role.roleCode === editingRole)}
+        roles={roles}
         permissions={data?.permissions ?? []}
         index={index}
-        onClose={() => setEditingRole(undefined)}
+        initialTemplateRoleCode={editingTemplate}
+        onClose={() => {
+          setEditingRole(undefined);
+          setEditingTemplate(undefined);
+        }}
       />
+      {roleModal.open && (
+        <RoleFormModal
+          key={roleModal.role?.roleCode ?? 'create'}
+          open
+          role={roleModal.role}
+          roles={roles}
+          permissions={data?.permissions ?? []}
+          index={index}
+          onClose={() => setRoleModal({ open: false, role: null })}
+          onCreated={(createdCode, templateCode) => {
+            setEditingTemplate(templateCode);
+            setEditingRole(createdCode);
+          }}
+        />
+      )}
     </Flex>
   );
 }

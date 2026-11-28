@@ -29,12 +29,12 @@ export class ApprovalQueueItemDto {
   requestType!: ChangeRequestType;
   @ApiProperty({ enum: ChangeRequestStatus, enumName: 'ChangeRequestStatus' })
   status!: ChangeRequestStatus;
-  @ApiProperty({ enum: [1, 2, 3] }) approvalLevel!: number;
+  @ApiProperty({ enum: [1, 2, 3, 4] }) approvalLevel!: number;
   @ApiProperty({
     nullable: true,
     type: String,
     description:
-      'Group or program codes the caller stands for; null at level 3',
+      'Group, program or faculty codes the caller stands for; null at level 4',
   })
   standsFor!: string | null;
   @ApiProperty({ type: UserRefDto }) createdBy!: UserRefDto;

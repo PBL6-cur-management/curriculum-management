@@ -141,6 +141,24 @@ describe('curriculumWarnings', () => {
     expect(warnings[0].message).toContain('2, 5');
   });
 
+  it('allows the same course in two different tracks but flags common-core + track overlap', () => {
+    const differentTracks = [
+      item('A', 3, [], { id: 't1-a', trackId: 'track-1' }),
+      item('A', 3, [], { id: 't2-a', trackId: 'track-2' }),
+    ];
+    expect(
+      only(CURRICULUM_WARNING.DUPLICATE_COURSE, run(3, differentTracks)),
+    ).toEqual([]);
+
+    const commonAndTrack = [
+      item('A', 2, [], { id: 'common-a', trackId: null }),
+      item('A', 3, [], { id: 't1-a', trackId: 'track-1' }),
+    ];
+    expect(
+      only(CURRICULUM_WARNING.DUPLICATE_COURSE, run(3, commonAndTrack)),
+    ).toHaveLength(1);
+  });
+
   it('flags an elective row with no group and still counts nothing for it', () => {
     const rows = [item('E', 1, [], { isElective: true })];
     const warnings = only(

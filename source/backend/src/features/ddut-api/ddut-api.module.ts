@@ -6,6 +6,7 @@ import { GraduationModule } from '../graduation/graduation.module.js';
 import { StudentPortalModule } from '../student-portal/student-portal.module.js';
 import { DdutApiController } from './ddut-api.controller.js';
 import { DdutApiService } from './ddut-api.service.js';
+import { DdutCoursesService } from './ddut-courses.service.js';
 
 @Module({
   imports: [
@@ -15,6 +16,6 @@ import { DdutApiService } from './ddut-api.service.js';
     StudentPortalModule,
   ],
   controllers: [DdutApiController],
-  providers: [DdutApiService, IntegrationInterceptor],
+  providers: [DdutApiService, DdutCoursesService, IntegrationInterceptor],
 })
 export class DdutApiModule {}

@@ -80,6 +80,9 @@ export function SemesterBoard({
                           {item.electiveGroup && (
                             <Tag>{item.electiveGroup.groupCode}</Tag>
                           )}
+                          {item.track && (
+                            <Tag color="geekblue">{item.track.trackCode}</Tag>
+                          )}
                         </span>
                         <RequisiteTags item={item} />
                         {studentMode && eligibilityByItemId?.get(item.id) && (

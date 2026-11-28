@@ -1,14 +1,28 @@
-import { Button, Flex, Form, Input, Radio, Segmented, Select } from 'antd';
+import {
+  Button,
+  Flex,
+  Form,
+  Input,
+  Radio,
+  Segmented,
+  Select,
+} from 'antd';
 import type { FormInstance } from 'antd';
 import { useId, useRef } from 'react';
 import { hasPermission } from '../../../shared/auth/permissions';
 import { useMe } from '../../../shared/auth/useMe';
+import { semesterLabel } from '../../../shared/releases/semesters';
+import {
+  useCohorts,
+  useSemesters,
+} from '../../../shared/releases/useReleaseOptions';
 import type {
   ChangeRequestType,
   ChangeTargetType,
 } from '../api/changeRequests';
 import {
   ORIGIN_LABELS,
+  PROGRAM_LEVEL_REQUEST_HINT,
   REQUEST_TYPE_LABELS,
   TARGET_FIELD_HINT,
   TARGET_TYPE_LABELS,
@@ -53,6 +67,12 @@ export function RequestHeaderForm({
   submitting,
 }: RequestHeaderFormProps) {
   const { data: me } = useMe();
+  const { data: semesters = [], isPending: semestersPending } = useSemesters();
+  const { data: cohorts = [], isPending: cohortsPending } = useCohorts();
+  const canCreateProgramRequest =
+    me?.roles.some(
+      (role) => role.roleCode === 'R1' || role.roleCode === 'R3',
+    ) ?? false;
   const requestType = Form.useWatch('requestType', form);
   const targetType = Form.useWatch('targetType', form);
   const targetId = Form.useWatch('targetId', form);
@@ -72,11 +92,22 @@ export function RequestHeaderForm({
       : {},
   );
 
+  const isProgramOnlyType = (type: ChangeRequestType) =>
+    type === 'CURRICULUM' || type === 'PROGRAM_INFO';
+  const hasProgramLevelType = types.some(
+    (type) =>
+      isProgramOnlyType(type) ||
+      (type === 'OUTCOME' && TYPE_TARGETS[type].includes('PROGRAM')),
+  );
+
   // A type is offered to someone who holds one of its edit permissions somewhere; the server decides on the target.
+  // Program-level CR types require R1 or R3 (Workflow B).
   const typeOptions = types.map((type) => {
     const unsupported = UNSUPPORTED_TYPES.includes(type);
+    const programBlocked = isProgramOnlyType(type) && !canCreateProgramRequest;
     const allowed =
       !unsupported &&
+      !programBlocked &&
       EDIT_PERMISSIONS[type].some((code) => hasPermission(me, code));
     return {
       value: type,
@@ -88,9 +119,13 @@ export function RequestHeaderForm({
   });
 
   const onTypeChange = (next: ChangeRequestType) => {
-    const supportedKinds = TYPE_TARGETS[next];
+    const supportedKinds = TYPE_TARGETS[next].filter(
+      (kind) =>
+        !(next === 'OUTCOME' && kind === 'PROGRAM' && !canCreateProgramRequest),
+    );
     const currentType = form.getFieldValue('targetType') as
-      ChangeTargetType | undefined;
+      | ChangeTargetType
+      | undefined;
     if (currentType && supportedKinds.includes(currentType)) return;
 
     const initialKind = initialValues?.targetType;
@@ -135,6 +170,11 @@ export function RequestHeaderForm({
         name="requestType"
         label="Loại đề xuất"
         rules={[{ required: true, message: 'Chọn loại đề xuất.' }]}
+        extra={
+          !editing && !canCreateProgramRequest && hasProgramLevelType
+            ? PROGRAM_LEVEL_REQUEST_HINT
+            : undefined
+        }
       >
         <Select
           options={typeOptions}
@@ -153,6 +193,10 @@ export function RequestHeaderForm({
             options={kinds.map((kind) => ({
               value: kind,
               label: TARGET_TYPE_LABELS[kind],
+              disabled:
+                requestType === 'OUTCOME' &&
+                kind === 'PROGRAM' &&
+                !canCreateProgramRequest,
             }))}
             onChange={(next) => {
               form.setFieldsValue({
@@ -199,12 +243,39 @@ export function RequestHeaderForm({
       </Form.Item>
       <Form.Item
         name="basisDocumentNumber"
-        label="Số văn bản căn cứ"
+        label="Số văn bản"
         dependencies={['origin']}
         required={origin === 'UNIVERSITY'}
         rules={basisNumberRules(origin)}
       >
-        <Input placeholder="Ví dụ 123/QĐ-ĐHBK" />
+        <Input placeholder="Ví dụ 123/TTr-CNTT hoặc 123/QĐ-ĐHBK" />
+      </Form.Item>
+      <Form.Item name="effectiveSemesterId" label="Học kỳ hiệu lực dự kiến">
+        <Select
+          allowClear
+          showSearch
+          optionFilterProp="label"
+          loading={semestersPending}
+          placeholder="Chọn học kỳ hiệu lực dự kiến"
+          options={semesters.map((semester) => ({
+            value: semester.id,
+            label: semesterLabel(semester),
+          }))}
+        />
+      </Form.Item>
+      <Form.Item name="cohortIds" label="Các khóa áp dụng dự kiến">
+        <Select
+          mode="multiple"
+          allowClear
+          showSearch
+          optionFilterProp="label"
+          loading={cohortsPending}
+          placeholder="Chọn các khóa áp dụng dự kiến"
+          options={cohorts.map((cohort) => ({
+            value: cohort.id,
+            label: `${cohort.cohortCode} (tuyển sinh ${cohort.intakeYear})`,
+          }))}
+        />
       </Form.Item>
       <Flex gap="small">
         <Button type="primary" htmlType="submit" loading={submitting}>

@@ -15,7 +15,7 @@ const ALL_LEVELS = 'ALL';
 interface FormValues {
   delegatorId?: string;
   delegateId: string;
-  scopeLevel: 1 | 2 | typeof ALL_LEVELS;
+  scopeLevel: 1 | 2 | 3 | typeof ALL_LEVELS;
   range: [Dayjs, Dayjs];
 }
 
@@ -84,7 +84,7 @@ export function CreateDelegationModal({
             rules={[{ required: true, message: 'Chọn người ủy quyền' }]}
           >
             <UserOptionSelect
-              placeholder="Điều phối nhóm hoặc giám đốc CTĐT"
+              placeholder="Điều phối nhóm, giám đốc CTĐT hoặc ban lãnh đạo khoa"
               useOptions={useDelegatorOptions}
             />
           </Form.Item>
@@ -126,7 +126,7 @@ export function CreateDelegationModal({
           <Alert
             type="warning"
             showIcon
-            title="Người ủy quyền hiện không giữ cấp duyệt nào (điều phối nhóm chuyên môn hoặc giám đốc CTĐT)."
+            title="Người ủy quyền hiện không giữ cấp duyệt nào (điều phối nhóm chuyên môn, giám đốc CTĐT hoặc ban lãnh đạo khoa)."
           />
         )}
       </Form>

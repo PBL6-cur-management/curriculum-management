@@ -42,6 +42,9 @@ function shortfall(value: unknown): boolean {
     ([code]) => code === value.code,
   )?.[1];
   if (value.category !== category) return false;
+  if (value.code === 'LOW_GPA')
+    return fields(value, ['requiredGpa', 'actualGpa'], decimal);
+  if (value.code === 'TRACK_NOT_SELECTED') return true;
   if (
     value.code === 'MANDATORY_COURSE_MISSING' ||
     value.code === 'CONDITIONAL_COURSE_MISSING'
@@ -142,10 +145,17 @@ function validResult(value: unknown): value is GraduationResult {
     return false;
   const credits = value.credits;
   if (
-    !new Prisma.Decimal(String(credits.compulsory))
-      .plus(String(credits.elective))
-      .plus(String(credits.free))
-      .equals(String(credits.recognizedTotal)) ||
+    // Free credits are reported but never counted toward the total; results
+    // stored before that rule also summed them.
+    !(
+      new Prisma.Decimal(String(credits.compulsory))
+        .plus(String(credits.elective))
+        .equals(String(credits.recognizedTotal)) ||
+      new Prisma.Decimal(String(credits.compulsory))
+        .plus(String(credits.elective))
+        .plus(String(credits.free))
+        .equals(String(credits.recognizedTotal))
+    ) ||
     !Prisma.Decimal.max(
       0,
       new Prisma.Decimal(String(credits.requiredTotal)).minus(

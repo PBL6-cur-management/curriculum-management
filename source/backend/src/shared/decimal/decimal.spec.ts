@@ -3,6 +3,7 @@ import { Prisma } from '../../generated/prisma/client.js';
 import {
   CREDITS_PATTERN,
   GRADE_POINT_PATTERN,
+  SCORE10_PATTERN,
   toWireDecimal,
 } from './decimal.js';
 
@@ -37,6 +38,18 @@ describe('grade point decimal', () => {
     'rejects %j',
     (value) => {
       expect(GRADE_POINT_PATTERN.test(value)).toBe(false);
+    },
+  );
+});
+
+describe('score10 decimal', () => {
+  it.each(['0', '4', '4.0', '9.99', '10', '10.00'])('accepts %s', (value) => {
+    expect(SCORE10_PATTERN.test(value)).toBe(true);
+  });
+  it.each(['10.01', '11', '-1', '2.555', '', ' 2', '.5', '2.'])(
+    'rejects %j',
+    (value) => {
+      expect(SCORE10_PATTERN.test(value)).toBe(false);
     },
   );
 });

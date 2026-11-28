@@ -1,4 +1,4 @@
-import { Button, Table } from 'antd';
+import { Button, Flex, Table } from 'antd';
 import { StatusTag } from '../../../shared/design-system';
 import type { StudentEnrollment } from '../api/students';
 import {
@@ -11,18 +11,20 @@ interface EnrollmentHistoryTableProps {
   enrollments: StudentEnrollment[];
   canManage: boolean;
   onTransfer: (enrollment: StudentEnrollment) => void;
+  onSelectTrack?: (enrollment: StudentEnrollment) => void;
 }
 export function EnrollmentHistoryTable({
   enrollments,
   canManage,
   onTransfer,
+  onSelectTrack,
 }: EnrollmentHistoryTableProps) {
   return (
     <Table<StudentEnrollment>
       rowKey="id"
       pagination={false}
       dataSource={enrollments}
-      scroll={{ x: 1200 }}
+      scroll={{ x: 1360 }}
       locale={{
         emptyText:
           'Chưa có ghi danh. Cần gán chương trình hoặc kiểm tra danh sách nhập.',
@@ -32,6 +34,13 @@ export function EnrollmentHistoryTable({
           title: 'Chương trình',
           render: (_, enrollment) =>
             `${enrollment.program.programCode} — ${enrollment.program.programName}`,
+        },
+        {
+          title: 'Định hướng / Chuyên ngành con',
+          render: (_, enrollment) =>
+            enrollment.track
+              ? `${enrollment.track.trackCode} — ${enrollment.track.trackName}`
+              : '—',
         },
         {
           title: 'Loại',
@@ -44,7 +53,15 @@ export function EnrollmentHistoryTable({
         },
         {
           title: 'Ghi danh đã lưu',
-          render: (_, enrollment) => enrollment.appliedVersion.versionNumber,
+          render: (_, enrollment) => {
+            const v = enrollment.appliedVersion as {
+              versionNumber: string | null;
+              decisionNumber?: string | null;
+            };
+            return v.decisionNumber
+              ? `${v.versionNumber ?? '—'} (${v.decisionNumber})`
+              : v.versionNumber;
+          },
         },
         { title: 'Phiên bản nhập học', dataIndex: 'admissionVersionId' },
         {
@@ -81,9 +98,16 @@ export function EnrollmentHistoryTable({
                 title: 'Thao tác',
                 render: (_: unknown, enrollment: StudentEnrollment) =>
                   enrollment.status === 'ACTIVE' ? (
-                    <Button onClick={() => onTransfer(enrollment)}>
-                      Chuyển chương trình
-                    </Button>
+                    <Flex gap={8} wrap>
+                      <Button onClick={() => onTransfer(enrollment)}>
+                        Chuyển chương trình
+                      </Button>
+                      {onSelectTrack && (
+                        <Button onClick={() => onSelectTrack(enrollment)}>
+                          Chọn định hướng
+                        </Button>
+                      )}
+                    </Flex>
                   ) : (
                     'Ghi danh đã đóng'
                   ),

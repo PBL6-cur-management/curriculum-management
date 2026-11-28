@@ -14,6 +14,7 @@ import {
   UserRefDto,
 } from '../../shared/dtos/ref.dto.js';
 import { activeDirectorWhere } from '../../shared/programs/active-director.js';
+import { MajorRefDto } from '../majors/majors.dto.js';
 import { isReleased, releaseYearOf } from './program-release-year.js';
 
 export class ProgramVersionRefDto {
@@ -21,6 +22,7 @@ export class ProgramVersionRefDto {
   @ApiProperty({ nullable: true, type: String }) versionNumber!: string | null;
   @ApiProperty({ enum: ProgramVersionStatus, enumName: 'ProgramVersionStatus' })
   status!: ProgramVersionStatus;
+  @ApiProperty({ nullable: true, type: String }) decisionNumber!: string | null;
 }
 
 export class ProgramVersionInfoDto extends ProgramVersionRefDto {
@@ -31,6 +33,8 @@ export class ProgramVersionInfoDto extends ProgramVersionRefDto {
   @ApiProperty({ example: '150' }) totalCredits!: string;
   @ApiProperty({ example: '140' }) compulsoryCredits!: string;
   @ApiProperty({ example: '10' }) electiveCredits!: string;
+  @ApiProperty({ nullable: true, type: String, example: '2.00' })
+  minGraduationGpa!: string | null;
   @ApiProperty() updatedAt!: string;
 }
 
@@ -53,6 +57,8 @@ export class ProgramSummaryDto {
   @ApiProperty({ enum: ProgramStatus, enumName: 'ProgramStatus' })
   status!: ProgramStatus;
   @ApiProperty({ type: OrgUnitRefDto }) faculty!: OrgUnitRefDto;
+  @ApiProperty({ type: MajorRefDto, nullable: true })
+  major!: MajorRefDto | null;
   @ApiProperty() programName!: string;
   @ApiProperty({ type: ProgramVersionRefDto })
   currentVersion!: ProgramVersionRefDto;
@@ -97,6 +103,7 @@ export const VERSION_INFO_SELECT = {
   id: true,
   versionNumber: true,
   status: true,
+  decisionNumber: true,
   programName: true,
   majorCode: true,
   majorName: true,
@@ -104,12 +111,16 @@ export const VERSION_INFO_SELECT = {
   totalCredits: true,
   compulsoryCredits: true,
   electiveCredits: true,
+  minGraduationGpa: true,
   updatedAt: true,
 } as const satisfies Prisma.ProgramVersionSelect;
 
 export const programInclude = (today: Date) =>
   ({
     faculty: { select: ORG_UNIT_REF_SELECT },
+    major: {
+      select: { id: true, majorCode: true, majorName: true, degreeGroup: true },
+    },
     versions: {
       // A request's working copy and an unissued correction Draft (F-15) are not versions of the program.
       where: {
@@ -143,6 +154,7 @@ export const programInclude = (today: Date) =>
         id: true,
         versionNumber: true,
         status: true,
+        decisionNumber: true,
         program: { select: { id: true, programCode: true } },
       },
     },
@@ -168,11 +180,17 @@ export function draftVersion(row: ProgramRow): VersionInfoRow | undefined {
   );
 }
 
-function toVersionRef(version: VersionInfoRow): ProgramVersionRefDto {
+function toVersionRef(version: {
+  id: string;
+  versionNumber: string | null;
+  status: ProgramVersionStatus;
+  decisionNumber?: string | null;
+}): ProgramVersionRefDto {
   return {
     id: version.id,
     versionNumber: version.versionNumber,
     status: version.status,
+    decisionNumber: version.decisionNumber ?? null,
   };
 }
 
@@ -185,6 +203,7 @@ export function toVersionInfo(
     id: version.id,
     versionNumber: version.versionNumber,
     status: version.status,
+    decisionNumber: version.decisionNumber ?? null,
     programName: version.programName,
     majorCode: version.majorCode,
     majorName: version.majorName,
@@ -192,6 +211,10 @@ export function toVersionInfo(
     totalCredits: toWireDecimal(version.totalCredits),
     compulsoryCredits: toWireDecimal(version.compulsoryCredits),
     electiveCredits: toWireDecimal(version.electiveCredits),
+    minGraduationGpa:
+      version.minGraduationGpa == null
+        ? null
+        : toWireDecimal(version.minGraduationGpa),
     updatedAt: version.updatedAt.toISOString(),
   };
 }
@@ -207,6 +230,7 @@ function toReleasedVersions(row: ProgramRow): ProgramReleasedVersionDto[] {
         id: version.id,
         versionNumber: version.versionNumber,
         status: version.status,
+        decisionNumber: version.decisionNumber,
         releaseYear: releaseYearOf(version.signedDate, version.publishedAt),
         cohorts: [...cohorts.values()].sort(
           (a, b) =>
@@ -232,6 +256,7 @@ export function toProgramSummaryDto(row: ProgramRow): ProgramSummaryDto {
     degreeLevel: row.degreeLevel,
     status: row.status,
     faculty: row.faculty,
+    major: row.major,
     programName: current.programName,
     currentVersion: toVersionRef(current),
     majorCode: current.majorCode,
@@ -264,6 +289,7 @@ export function toProgramDetailDto(
             id: row.clonedFrom.id,
             versionNumber: row.clonedFrom.versionNumber,
             status: row.clonedFrom.status,
+            decisionNumber: row.clonedFrom.decisionNumber,
           },
         }
       : null,

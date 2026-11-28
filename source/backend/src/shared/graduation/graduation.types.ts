@@ -16,7 +16,9 @@ export type ShortfallCategory =
   | 'MANDATORY_COURSE'
   | 'ELECTIVE_GROUP'
   | 'TOTAL_CREDITS'
-  | 'CONDITIONAL_COURSE';
+  | 'CONDITIONAL_COURSE'
+  | 'GPA'
+  | 'TRACK';
 export type CreditBasis = 'APPLIED_VERSION_SNAPSHOT' | 'CURRENT_CATALOG';
 export type CompletionReason = 'NOT_TAKEN' | 'FAILED' | 'IN_PROGRESS';
 export interface GraduationLookup {
@@ -84,7 +86,21 @@ export interface TotalCreditShortfall {
   missingCredits: string;
   message: string;
 }
+export interface LowGpaShortfall {
+  code: 'LOW_GPA';
+  category: 'GPA';
+  requiredGpa: string;
+  actualGpa: string;
+  message: string;
+}
+export interface TrackNotSelectedShortfall {
+  code: 'TRACK_NOT_SELECTED';
+  category: 'TRACK';
+  message: string;
+}
 export type GraduationShortfall =
+  | LowGpaShortfall
+  | TrackNotSelectedShortfall
   | CourseShortfall
   | ElectiveCreditShortfall
   | ElectiveCourseShortfall
@@ -148,6 +164,9 @@ export interface GraduationResult {
   evaluatedAt: string;
   context: GraduationContextValue;
   conclusion: GraduationConclusion;
+  // Weighted 4-point GPA over graded passed courses; null when none are graded.
+  cumulativeGpa?: string | null;
+  minGraduationGpa?: string;
   shortfalls: GraduationShortfall[];
   warnings: GraduationWarning[];
   credits: {

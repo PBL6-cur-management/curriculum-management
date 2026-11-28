@@ -88,7 +88,7 @@ export default function CourseGraphPage() {
       <Alert
         type="error"
         showIcon
-        title={errorMessage(graph.error, 'Không đọc được đồ thị học phần.')}
+        title={errorMessage(graph.error, 'Không đọc được cây chương trình đào tạo.')}
       />
     );
   const external = graph.data.nodes.filter((node) => node.external).length;
@@ -96,7 +96,7 @@ export default function CourseGraphPage() {
   return (
     <Flex vertical gap="middle">
       <PageHeader
-        title="Đồ thị học phần"
+        title="Cây chương trình đào tạo"
         actions={
           <PdfExportButton programId={programId} versionId={versionId} />
         }

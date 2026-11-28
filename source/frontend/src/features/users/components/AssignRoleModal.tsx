@@ -1,4 +1,4 @@
-import { App, DatePicker, Form, Modal, Radio, Select } from 'antd';
+import { Alert, App, DatePicker, Form, Modal, Radio, Select } from 'antd';
 import dayjs from 'dayjs';
 import { ApiError } from '../../../shared/api/client';
 import { OrgUnitSelect } from '../../../shared/org-units/OrgUnitSelect';
@@ -52,6 +52,13 @@ export function AssignRoleModal({
       onOk={() => form.submit()}
       confirmLoading={assign.isPending}
     >
+      <Alert
+        type="info"
+        showIcon
+        style={{ marginBottom: 16 }}
+        title="Chỉ hiển thị vai trò gán trực tiếp (R1, R2 và vai trò tùy biến)"
+        description="Các vai trò theo phân công (Giám đốc CTĐT R3, Điều phối R4, Giảng viên R5, Sinh viên R6) được cấp tự động tại màn hình Chương trình đào tạo, Nhóm chuyên môn hoặc Hồ sơ sinh viên."
+      />
       <Form
         form={form}
         layout="vertical"
@@ -64,6 +71,9 @@ export function AssignRoleModal({
           rules={[{ required: true, message: 'Chọn vai trò' }]}
         >
           <Select
+            showSearch
+            optionFilterProp="label"
+            placeholder="Chọn vai trò cần gán"
             options={roles
               .filter((role) => role.assignable)
               .map((role) => ({

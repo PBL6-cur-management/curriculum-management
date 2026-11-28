@@ -99,9 +99,12 @@ describe('WorkingCopyService', () => {
       courseId: 'c1',
     });
     await service.create(tx, request);
-    expect(copySyllabusRevision).toHaveBeenCalledWith(tx, 's-base', {
-      sourceRequestId: 'cr1',
-    });
+    expect(copySyllabusRevision).toHaveBeenCalledWith(
+      tx,
+      's-base',
+      { sourceRequestId: 'cr1' },
+      undefined,
+    );
     syllabus.findFirst.mockResolvedValue(null);
     await expect(service.create(tx, request)).rejects.toMatchObject({
       code: 'TARGET_NOT_RELEASED',
@@ -118,9 +121,12 @@ describe('WorkingCopyService', () => {
         courseId: 'c1',
       }),
     );
-    expect(copySyllabusRevision).toHaveBeenCalledWith(tx, 's-base', {
-      sourceRequestId: 'cr1',
-    });
+    expect(copySyllabusRevision).toHaveBeenCalledWith(
+      tx,
+      's-base',
+      { sourceRequestId: 'cr1' },
+      undefined,
+    );
   });
 
   it('makes a program copy for an outcome request on a program and a syllabus copy on a course', async () => {

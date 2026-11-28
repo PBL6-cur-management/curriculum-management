@@ -128,4 +128,165 @@ describe('PermissionMatrixPage', () => {
       ).toBe(true),
     );
   }, 20_000);
+
+  it('creates, edits and deletes custom roles while protecting system roles and reporting active-user errors', async () => {
+    const customMatrix = {
+      ...matrix,
+      roles: [
+        ...roleRows,
+        {
+          id: 'r-custom',
+          roleCode: 'CVHT',
+          roleName: 'Cố vấn học tập',
+          description: 'Tư vấn sinh viên',
+          isSystemRole: false,
+          scopeSource: 'NONE',
+          assignable: true,
+        },
+      ],
+    };
+    let deleteFails = true;
+    const fetchMock = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      if (url.includes('/auth/me'))
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              id: 'admin',
+              permissions: ['permission.view', 'permission.manage'],
+            }),
+          ),
+        );
+      if (url.endsWith('/roles') && init?.method === 'POST') {
+        const body = JSON.parse(String(init.body)) as {
+          roleCode: string;
+          roleName: string;
+          description: string | null;
+        };
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              id: 'r-new',
+              ...body,
+              isSystemRole: false,
+              scopeSource: 'NONE',
+              assignable: true,
+            }),
+            { status: 201 },
+          ),
+        );
+      }
+      if (url.endsWith('/roles/CVHT') && init?.method === 'PATCH') {
+        const body = JSON.parse(String(init.body)) as { roleName: string };
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              ...customMatrix.roles[6],
+              roleName: body.roleName,
+            }),
+          ),
+        );
+      }
+      if (url.endsWith('/roles/CVHT') && init?.method === 'DELETE') {
+        if (deleteFails) {
+          return Promise.resolve(
+            new Response(
+              JSON.stringify({
+                code: 'ROLE_IN_USE',
+                message:
+                  'Không thể xóa vai trò CVHT vì đang có 3 tài khoản hoạt động.',
+              }),
+              { status: 409 },
+            ),
+          );
+        }
+        return Promise.resolve(new Response(null, { status: 204 }));
+      }
+      return Promise.resolve(new Response(JSON.stringify(customMatrix)));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    render(
+      <QueryClientProvider
+        client={
+          new QueryClient({
+            defaultOptions: {
+              queries: { retry: false },
+              mutations: { retry: false },
+            },
+          })
+        }
+      >
+        <App>
+          <PermissionMatrixPage />
+        </App>
+      </QueryClientProvider>,
+    );
+    await screen.findByText('Quyền 41');
+    expect(screen.getAllByText('Hệ thống').length).toBeGreaterThanOrEqual(6);
+    expect(
+      screen.queryByRole('button', { name: 'Xóa R1' }),
+    ).not.toBeInTheDocument();
+
+    // Create custom role
+    fireEvent.click(screen.getByRole('button', { name: 'Tạo vai trò mới' }));
+    fireEvent.change(await screen.findByLabelText('Mã vai trò'), {
+      target: { value: 'tro_ly' },
+    });
+    fireEvent.change(screen.getByLabelText('Tên vai trò'), {
+      target: { value: 'Trợ lý đào tạo' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Tạo vai trò' }));
+    await vi.waitFor(() =>
+      expect(
+        fetchMock.mock.calls.some(
+          ([url, init]) =>
+            String(url).endsWith('/roles') &&
+            init?.method === 'POST' &&
+            String(init.body).includes('"roleCode":"TRO_LY"'),
+        ),
+      ).toBe(true),
+    );
+
+    // Edit custom role
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Sửa thông tin CVHT' }),
+    );
+    const nameInput = await screen.findByDisplayValue('Cố vấn học tập');
+    fireEvent.change(nameInput, {
+      target: { value: 'Cố vấn học tập Khoa' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Lưu thay đổi' }));
+    await vi.waitFor(() =>
+      expect(
+        fetchMock.mock.calls.some(
+          ([url, init]) =>
+            String(url).endsWith('/roles/CVHT') && init?.method === 'PATCH',
+        ),
+      ).toBe(true),
+    );
+
+    // Delete custom role -> friendly API error when active users exist
+    fireEvent.click(screen.getByRole('button', { name: 'Xóa CVHT' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Xóa vai trò' }));
+    expect(
+      (
+        await screen.findAllByText(
+          'Không thể xóa vai trò CVHT vì đang có 3 tài khoản hoạt động.',
+        )
+      ).length,
+    ).toBeGreaterThan(0);
+
+    // Retry delete succeeds
+    deleteFails = false;
+    fireEvent.click(screen.getByRole('button', { name: 'Xóa CVHT' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Xóa vai trò' }));
+    await vi.waitFor(() =>
+      expect(
+        fetchMock.mock.calls.filter(
+          ([url, init]) =>
+            String(url).endsWith('/roles/CVHT') && init?.method === 'DELETE',
+        ).length,
+      ).toBe(2),
+    );
+  }, 20_000);
 });

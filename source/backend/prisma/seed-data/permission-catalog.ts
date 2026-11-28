@@ -83,7 +83,7 @@ export const PERMISSION_CATALOG: readonly PermissionSeed[] = [
     name: 'Ủy quyền phê duyệt',
     group: FunctionGroup.SYSTEM_ADMIN,
     source: 'FR-09, US-114',
-    cells: { R1: X, R3: P, R4: P },
+    cells: { R1: X, R2: P, R3: P, R4: P },
   },
   {
     code: PERMISSIONS.INTEGRATION_CLIENT_MANAGE,
@@ -160,7 +160,7 @@ export const PERMISSION_CATALOG: readonly PermissionSeed[] = [
     name: 'Sửa khung chương trình',
     group: FunctionGroup.PROGRAM,
     source: '3.4',
-    cells: { R1: X, R3: DP, R4: DP, R5: DP },
+    cells: { R1: X, R3: DP },
   },
   {
     code: PERMISSIONS.CURRICULUM_IMPORT_EXPORT_EXCEL,
@@ -241,7 +241,7 @@ export const PERMISSION_CATALOG: readonly PermissionSeed[] = [
   },
   {
     code: PERMISSIONS.CHANGE_REQUEST_OVERRIDE,
-    name: 'Duyệt thay ở cấp 1 và 2',
+    name: 'Duyệt thay ở cấp 1, 2 và 3',
     group: FunctionGroup.APPROVAL,
     source: '3.4, BR-31',
     cells: { R1: X },

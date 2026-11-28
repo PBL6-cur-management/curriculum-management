@@ -1,4 +1,4 @@
-import { App, Form, Input, InputNumber, Modal } from 'antd';
+import { App, Form, Input, InputNumber, Modal, Select } from 'antd';
 import {
   CREDITS_MESSAGE,
   CREDITS_PATTERN,
@@ -7,13 +7,14 @@ import {
   applyFieldErrors,
   errorMessage,
 } from '../../../shared/forms/applyFieldErrors';
-import type { ElectiveGroup } from '../api/curriculum';
+import type { ElectiveGroup, ProgramTrack } from '../api/curriculum';
 import { MINIMUM_REQUIRED_MESSAGE } from '../constants/curriculumLabels';
 import { useCreateGroup, useUpdateGroup } from '../hooks/useCurriculum';
 import { CURRICULUM_FORM_LIMITS } from '../schema/curriculumRules';
 
 interface ElectiveGroupFormModalProps {
   versionId: string;
+  tracks?: ProgramTrack[];
   // null = a new group.
   group: ElectiveGroup | null;
   onClose: () => void;
@@ -22,6 +23,7 @@ interface ElectiveGroupFormModalProps {
 interface GroupFormValues {
   groupCode: string;
   groupName: string;
+  trackId?: string | null;
   minCredits?: string | null;
   minCourses?: number | null;
 }
@@ -45,6 +47,7 @@ const atLeastOneMinimum = ({
 
 export function ElectiveGroupFormModal({
   versionId,
+  tracks = [],
   group,
   onClose,
 }: ElectiveGroupFormModalProps) {
@@ -52,11 +55,16 @@ export function ElectiveGroupFormModal({
   const [form] = Form.useForm<GroupFormValues>();
   const create = useCreateGroup(versionId);
   const update = useUpdateGroup(versionId);
+  const trackOptions = tracks.map((track) => ({
+    value: track.id,
+    label: `${track.trackCode} — ${track.trackName}`,
+  }));
 
   const submit = (values: GroupFormValues) => {
     const body = {
       groupCode: values.groupCode.trim(),
       groupName: values.groupName.trim(),
+      trackId: values.trackId ?? null,
       minCredits: values.minCredits?.trim() ? values.minCredits.trim() : null,
       minCourses: values.minCourses ?? null,
     };
@@ -88,6 +96,7 @@ export function ElectiveGroupFormModal({
         initialValues={{
           groupCode: group?.groupCode,
           groupName: group?.groupName,
+          trackId: group?.trackId ?? undefined,
           minCredits: group?.minCredits,
           minCourses: group?.minCourses,
         }}
@@ -118,6 +127,13 @@ export function ElectiveGroupFormModal({
           ]}
         >
           <Input />
+        </Form.Item>
+        <Form.Item name="trackId" label="Định hướng / Chuyên ngành">
+          <Select
+            allowClear
+            placeholder="Khung chung (tất cả định hướng)"
+            options={trackOptions}
+          />
         </Form.Item>
         <Form.Item
           name="minCredits"

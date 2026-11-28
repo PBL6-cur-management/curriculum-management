@@ -96,7 +96,9 @@ export function useImportBatch(id: string) {
             ['users'] as const,
             IMPORT_QUERY_KEYS.credentials(query.data.id),
           ]
-        : []),
+        : query.data.importType === 'PROGRAM_TRANSFER'
+          ? [STUDENT_QUERY_ROOT]
+          : []),
     ]) {
       void client.invalidateQueries({ queryKey });
     }

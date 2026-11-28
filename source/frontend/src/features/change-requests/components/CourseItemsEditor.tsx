@@ -19,10 +19,6 @@ import { ApiError } from '../../../shared/api/client';
 import { useCan } from '../../../shared/auth/useCan';
 import { PERMISSIONS } from '../../../shared/auth/permissions';
 import { CourseSelect } from '../../../shared/courses/CourseSelect';
-import {
-  GRADE_POINT_MESSAGE,
-  GRADE_POINT_PATTERN,
-} from '../../../shared/courses/gradePoint';
 import { compareDecimals } from '../../../shared/decimal/decimal';
 import {
   CREDITS_MESSAGE,
@@ -43,6 +39,8 @@ import {
   COURSE_TYPE_LABELS,
   MIN_SCORE_HINT,
   RELATION_CHOICES,
+  SCORE_SCALE_10_MESSAGE,
+  SCORE_SCALE_10_PATTERN,
 } from '../constants/courseItemLabels';
 import {
   useCourseInfo,
@@ -522,7 +520,7 @@ function MinScoreModal({ relation, onClose, onSave }: MinScoreModalProps) {
           label="Ngưỡng điểm"
           extra={MIN_SCORE_HINT}
           rules={[
-            { pattern: GRADE_POINT_PATTERN, message: GRADE_POINT_MESSAGE },
+            { pattern: SCORE_SCALE_10_PATTERN, message: SCORE_SCALE_10_MESSAGE },
           ]}
         >
           <Input inputMode="decimal" />
@@ -598,7 +596,7 @@ function AddRelationModal({
           label="Ngưỡng điểm"
           extra={MIN_SCORE_HINT}
           rules={[
-            { pattern: GRADE_POINT_PATTERN, message: GRADE_POINT_MESSAGE },
+            { pattern: SCORE_SCALE_10_PATTERN, message: SCORE_SCALE_10_MESSAGE },
           ]}
         >
           <Input inputMode="decimal" />

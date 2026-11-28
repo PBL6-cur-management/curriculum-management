@@ -89,6 +89,11 @@ const EquivalenceGroupsPage = lazy(() =>
 import { ProgramWorkspaceLayout } from './features/programs/components/ProgramWorkspaceLayout';
 import { ComingSoonGate } from './shared/components/ComingSoon';
 
+const MajorsPage = lazy(() =>
+  import('./features/majors/pages/MajorsPage').then((module) => ({
+    default: module.MajorsPage,
+  })),
+);
 const ProgramListPage = lazy(() =>
   import('./features/programs/pages/ProgramListPage').then((module) => ({
     default: module.ProgramListPage,
@@ -780,6 +785,14 @@ export const router = createBrowserRouter([
           {
             path: ROUTES.approvalDelegations,
             element: <ApprovalDelegationsPage />,
+          },
+          {
+            path: ROUTES.majors,
+            element: (
+              <RequirePermission code={PERMISSIONS.programView}>
+                <MajorsPage />
+              </RequirePermission>
+            ),
           },
           {
             path: ROUTES.equivalenceGroups,

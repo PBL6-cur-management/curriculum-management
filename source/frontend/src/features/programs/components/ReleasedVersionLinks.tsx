@@ -5,7 +5,7 @@ import type { ProgramReleasedVersion } from '../api/programs';
 import {
   IN_USE_VERSION_LABEL,
   NO_RELEASED_VERSION_LABEL,
-  versionLabel,
+  versionWithDecision,
 } from '../constants/programLabels';
 
 interface ReleasedVersionLinksProps {
@@ -35,8 +35,8 @@ export function ReleasedVersionLinks({
             })}
           >
             {version.releaseYear === null
-              ? versionLabel(version)
-              : `${versionLabel(version)} · ${version.releaseYear}`}
+              ? versionWithDecision(version)
+              : `${versionWithDecision(version)} · ${version.releaseYear}`}
           </Link>
           {version.status === 'ACTIVE' && (
             <Typography.Text type="secondary">

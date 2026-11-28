@@ -16,6 +16,7 @@ export interface ResolvedTarget {
   code: string;
   name: string;
   scope: ScopeTarget;
+  ownerFacultyCode?: string;
 }
 
 type Db = PrismaService | Prisma.TransactionClient;
@@ -39,6 +40,7 @@ export class RequestTargetResolver {
             courseName: true,
             ownerGroupId: true,
             ownerFacultyId: true,
+            ownerFaculty: { select: { unitCode: true } },
           },
         });
         if (!course)
@@ -49,6 +51,7 @@ export class RequestTargetResolver {
           code: course.courseCode,
           name: course.courseName,
           scope: courseTarget(course),
+          ownerFacultyCode: course.ownerFaculty?.unitCode,
         };
       }
       case ChangeTargetType.PROGRAM: {

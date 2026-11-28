@@ -166,7 +166,7 @@ describe('evaluateGraduation', () => {
   it('retains a lower-scored PASSED despite a higher-scored FAILED retake', () => {
     const input = fixture();
     addCourse(input, 'a');
-    attempt(input, 'a', 'PASSED', 'pass', '1');
+    attempt(input, 'a', 'PASSED', 'pass', '2');
     attempt(input, 'a', 'FAILED', 'fail', '4');
     const result = evaluateGraduation(input, NOW);
     expect(result.conclusion).toBe('ELIGIBLE');
@@ -270,8 +270,9 @@ describe('evaluateGraduation', () => {
       earnedCredits: '2.5',
       earnedCourses: 1,
     });
+    // Free credits are reported but never counted toward the total.
     expect(result.credits).toMatchObject({
-      recognizedTotal: '102.5',
+      recognizedTotal: '2.5',
       elective: '2.5',
       free: '100',
     });
@@ -366,50 +367,82 @@ describe('evaluateGraduation', () => {
     expect(result.conclusion).toBe('ELIGIBLE');
   });
 
-  it.each([
-    'mandatory',
-    'group',
-    'total',
-    'same-class-total',
-    'same-class-group',
-  ])('diagnoses a necessary exemption: %s', (kind) => {
+  it('counts an EXEMPT mandatory course as completed without GPA or errors', () => {
     const input = fixture();
-    addCourse(input, 'a', '3', true, 'eq');
-    if (kind === 'mandatory') attempt(input, 'a', 'EXEMPT');
-    else {
-      attempt(input, 'a');
-      addCourse(
-        input,
-        'exempt',
-        '3',
-        false,
-        kind.startsWith('same-class') ? 'eq' : null,
-      );
-      attempt(input, 'exempt', 'EXEMPT');
-      if (kind.endsWith('group') || kind === 'group') {
-        input.groups.push({
-          id: 'group',
-          groupCode: 'G',
-          groupName: 'Nhóm',
-          minCredits: '6',
-          minCourses: null,
-        });
-        Object.assign(input.frame[0]!, {
-          isElective: true,
-          electiveGroupId: 'group',
-        });
-        if (kind === 'group') {
-          const row = addCourse(input, 'required-exempt', '3', true, 'extra')!;
-          Object.assign(row, { isElective: true, electiveGroupId: 'group' });
-          input.courses.find(
-            (course) => course.course.id === 'exempt',
-          )!.equivalenceGroupId = 'extra';
-        }
-      } else input.version.totalCredits = '6';
-    }
-    expect(() => evaluateGraduation(input, NOW)).toThrow(
-      expect.objectContaining({ code: 'EXEMPTION_POLICY_UNCONFIRMED' }),
-    );
+    addCourse(input, 'a');
+    attempt(input, 'a', 'EXEMPT');
+    const result = evaluateGraduation(input, NOW);
+    expect(result.conclusion).toBe('ELIGIBLE');
+    expect(result.recognitions[0]).toMatchObject({
+      completionStatus: 'EXEMPT',
+      recognizedCredits: '3',
+    });
+    expect(result.cumulativeGpa).toBeNull();
+  });
+
+  it('counts exempt credits toward group and total requirements', () => {
+    const input = fixture();
+    input.version.totalCredits = '6';
+    addCourse(input, 'a');
+    attempt(input, 'a');
+    Object.assign(addCourse(input, 'g')!, {
+      isElective: true,
+      electiveGroupId: 'group',
+    });
+    input.groups.push({
+      id: 'group',
+      groupCode: 'G',
+      groupName: 'Nhóm',
+      minCredits: '3',
+      minCourses: null,
+    });
+    attempt(input, 'g', 'EXEMPT');
+    const result = evaluateGraduation(input, NOW);
+    expect(result.shortfalls).toEqual([]);
+    expect(result.credits).toMatchObject({ recognizedTotal: '6' });
+  });
+
+  it('reports LOW_GPA when the weighted GPA is below the default 2.00', () => {
+    const input = fixture();
+    addCourse(input, 'a');
+    attempt(input, 'a', 'PASSED', 'a', '1.5');
+    const result = evaluateGraduation(input, NOW);
+    expect(result.cumulativeGpa).toBe('1.5');
+    expect(result.minGraduationGpa).toBe('2');
+    expect(result.conclusion).toBe('NOT_ELIGIBLE');
+    expect(result.shortfalls).toEqual([
+      expect.objectContaining({ code: 'LOW_GPA', category: 'GPA' }),
+    ]);
+  });
+
+  it('honours a version-specific minimum GPA and excludes EXEMPT and zero-credit courses', () => {
+    const input = fixture();
+    input.version.minGraduationGpa = '3.00';
+    input.version.totalCredits = '3';
+    addCourse(input, 'a', '3');
+    attempt(input, 'a', 'PASSED', 'a', '3');
+    addCourse(input, 'z', '0');
+    attempt(input, 'z', 'PASSED', 'z', '0');
+    expect(evaluateGraduation(input, NOW).conclusion).toBe('ELIGIBLE');
+    input.version.minGraduationGpa = '3.5';
+    expect(evaluateGraduation(input, NOW).shortfalls).toEqual([
+      expect.objectContaining({ code: 'LOW_GPA', requiredGpa: '3.5' }),
+    ]);
+  });
+
+  it('requires a track selection when the version has tracks', () => {
+    const input = fixture();
+    input.tracks = { hasTracks: true, selectedTrackId: null };
+    addCourse(input, 'a');
+    attempt(input, 'a');
+    expect(evaluateGraduation(input, NOW).shortfalls).toEqual([
+      expect.objectContaining({
+        code: 'TRACK_NOT_SELECTED',
+        category: 'TRACK',
+      }),
+    ]);
+    input.tracks.selectedTrackId = 'track';
+    expect(evaluateGraduation(input, NOW).conclusion).toBe('ELIGIBLE');
   });
 
   it('ignores unused exemptions when PASSED independently establishes that course', () => {
@@ -460,8 +493,9 @@ describe('evaluateGraduation', () => {
     ]);
   });
 
-  it('rejects conditional group membership instead of inventing institutional policy', () => {
+  it('evaluates a CONDITIONAL elective normally inside its group', () => {
     const input = fixture();
+    input.version.totalCredits = '0';
     addCourse(input, 'condition', '0');
     input.courses[0]!.courseType = 'CONDITIONAL';
     Object.assign(input.frame[0]!, {
@@ -476,9 +510,13 @@ describe('evaluateGraduation', () => {
       minCredits: null,
       minCourses: 1,
     });
-    expect(() => evaluateGraduation(input, NOW)).toThrow(
-      expect.objectContaining({ code: 'GRADUATION_POLICY_UNCONFIRMED' }),
-    );
+    expect(evaluateGraduation(input, NOW).shortfalls).toEqual([
+      expect.objectContaining({ code: 'ELECTIVE_COURSES_MISSING' }),
+    ]);
+    attempt(input, 'condition');
+    const done = evaluateGraduation(input, NOW);
+    expect(done.conclusion).toBe('ELIGIBLE');
+    expect(done.recognitions[0]).toMatchObject({ category: 'ELECTIVE_GROUP' });
   });
 
   it('rejects scored results without authoritative scales and invalid evaluation timestamps', () => {

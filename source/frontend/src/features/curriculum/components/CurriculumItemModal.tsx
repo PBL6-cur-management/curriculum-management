@@ -12,10 +12,6 @@ import {
 } from 'antd';
 import { CourseSelect } from '../../../shared/courses/CourseSelect';
 import {
-  GRADE_POINT_MESSAGE,
-  GRADE_POINT_PATTERN,
-} from '../../../shared/courses/gradePoint';
-import {
   applyFieldErrors,
   errorMessage,
 } from '../../../shared/forms/applyFieldErrors';
@@ -26,7 +22,10 @@ import {
   TQ_DA_LABEL,
 } from '../constants/curriculumLabels';
 import { useCreateItem, useUpdateItem } from '../hooks/useCurriculum';
-import { CURRICULUM_FORM_LIMITS } from '../schema/curriculumRules';
+import {
+  CURRICULUM_FORM_LIMITS,
+  CURRICULUM_SCORE_RULES,
+} from '../schema/curriculumRules';
 
 interface CurriculumItemModalProps {
   curriculum: Curriculum;
@@ -40,6 +39,7 @@ interface CurriculumItemFormValues {
   plannedSemester?: number;
   blockSymbol?: string | null;
   isElective: boolean;
+  trackId?: string | null;
   htDa: boolean;
   tqDa: boolean;
   minStudiedScore?: string | null;
@@ -59,6 +59,7 @@ function toItemFormValues(
     plannedSemester: item?.plannedSemester,
     blockSymbol: item?.blockSymbol,
     isElective: item?.isElective ?? false,
+    trackId: item?.track?.id ?? undefined,
     htDa: item?.htDa ?? false,
     tqDa: item?.tqDa ?? false,
     minStudiedScore: item?.minStudiedScore,
@@ -73,6 +74,7 @@ export function toItemBody(values: CurriculumItemFormValues) {
     plannedSemester: values.plannedSemester as number,
     blockSymbol: blankToNull(values.blockSymbol),
     isElective: values.isElective,
+    trackId: values.trackId ?? null,
     htDa: values.htDa,
     tqDa: values.tqDa,
     minStudiedScore: blankToNull(values.minStudiedScore),
@@ -98,6 +100,10 @@ export function CurriculumItemModal({
   const update = useUpdateItem(curriculum.version.id);
   const pending = create.isPending || update.isPending;
   const listedCourseIds = curriculum.items.map((row) => row.course.id);
+  const trackOptions = curriculum.tracks.map((track) => ({
+    value: track.id,
+    label: `${track.trackCode} — ${track.trackName}`,
+  }));
 
   const submit = (values: CurriculumItemFormValues) => {
     const body = toItemBody(values);
@@ -157,6 +163,13 @@ export function CurriculumItemModal({
         >
           <Select options={semesterOptions(curriculum.version.semesterCount)} />
         </Form.Item>
+        <Form.Item name="trackId" label="Định hướng / Chuyên ngành">
+          <Select
+            allowClear
+            placeholder="Khung chung (tất cả định hướng)"
+            options={trackOptions}
+          />
+        </Form.Item>
         <Form.Item
           name="blockSymbol"
           label="Khối kiến thức"
@@ -208,20 +221,16 @@ export function CurriculumItemModal({
           <Form.Item
             name="minStudiedScore"
             label="Điểm học"
-            rules={[
-              { pattern: GRADE_POINT_PATTERN, message: GRADE_POINT_MESSAGE },
-            ]}
+            rules={CURRICULUM_SCORE_RULES}
           >
-            <Input inputMode="decimal" />
+            <Input inputMode="decimal" placeholder="Ví dụ: 4.0" />
           </Form.Item>
           <Form.Item
             name="minTransferScore"
             label="Điểm chuyển"
-            rules={[
-              { pattern: GRADE_POINT_PATTERN, message: GRADE_POINT_MESSAGE },
-            ]}
+            rules={CURRICULUM_SCORE_RULES}
           >
-            <Input inputMode="decimal" />
+            <Input inputMode="decimal" placeholder="Ví dụ: 5.5" />
           </Form.Item>
         </Space>
         <Form.Item

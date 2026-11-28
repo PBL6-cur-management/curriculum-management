@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import {
   ProgramVersionStatus,
   SyllabusStatus,
@@ -12,6 +12,7 @@ import {
   workspaceKindFor,
 } from '../../shared/change-requests/request-kinds.js';
 import { AppException } from '../../shared/exception/app.exception.js';
+import { FileStorageService } from '../../shared/files/file-storage.service.js';
 import { versionCopyFields } from '../../shared/programs/version-fields.js';
 import { VersionContentCopier } from '../../shared/programs/version-content.copier.js';
 import { copySyllabusRevision } from '../../shared/syllabi/syllabus-revision.copier.js';
@@ -29,7 +30,10 @@ export interface CopyOwner {
 // sourceRequestId points back at the request. Every reader that must not see copies filters sourceRequestId: null.
 @Injectable()
 export class WorkingCopyService {
-  constructor(private readonly versionCopier: VersionContentCopier) {}
+  constructor(
+    private readonly versionCopier: VersionContentCopier,
+    @Optional() private readonly files?: FileStorageService,
+  ) {}
 
   async create(
     tx: Prisma.TransactionClient,
@@ -98,6 +102,11 @@ export class WorkingCopyService {
     if (!base) {
       throw new AppException(CHANGE_REQUEST_ERRORS.TARGET_NOT_RELEASED);
     }
-    await copySyllabusRevision(tx, base.id, { sourceRequestId: requestId });
+    await copySyllabusRevision(
+      tx,
+      base.id,
+      { sourceRequestId: requestId },
+      this.files,
+    );
   }
 }

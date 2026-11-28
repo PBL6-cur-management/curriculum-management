@@ -8,7 +8,12 @@ import { AppException } from '../../shared/exception/app.exception.js';
 import type { ErrorDefinition } from '../../shared/exception/error-definition.js';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
 import { mapUniqueViolation } from '../../shared/prisma/unique-violation.js';
-import { CreateOrgUnitDto } from './create-org-unit.dto.js';
+import {
+  CreateOrgUnitDto,
+  hasLegacyUnitAbbreviation,
+  normalizeUnitName,
+} from './create-org-unit.dto.js';
+import { OrgUnitQueryDto } from './org-unit-query.dto.js';
 import { UpdateOrgUnitDto } from './update-org-unit.dto.js';
 import { createsCycle, isAllowedParent } from './org-unit-hierarchy.js';
 import { OrgUnitDto, ORG_UNIT_SELECT, toOrgUnitDto } from './org-unit.dto.js';
@@ -19,10 +24,16 @@ export class OrgUnitsService {
   private readonly logger = new Logger(OrgUnitsService.name);
   constructor(private readonly prisma: PrismaService) {}
 
-  async list(): Promise<OrgUnitDto[]> {
-    return this.prisma.orgUnit.findMany({
+  async list(query?: OrgUnitQueryDto): Promise<OrgUnitDto[]> {
+    const rows = await this.prisma.orgUnit.findMany({
+      where:
+        query?.isExternal !== undefined
+          ? { isExternal: query.isExternal }
+          : undefined,
+      select: ORG_UNIT_SELECT,
       orderBy: { unitName: 'asc' },
     });
+    return rows.map(toOrgUnitDto);
   }
 
   async create(dto: CreateOrgUnitDto, actorId: string): Promise<OrgUnitDto> {
@@ -31,12 +42,20 @@ export class OrgUnitsService {
       ORG_UNIT_ERRORS.PARENT_INVALID,
     );
     assertParentUsable(dto.unitType, parent);
+    const unitCode = dto.unitCode.trim().toUpperCase();
+    const unitName = normalizeUnitName(dto.unitName);
+    if (hasLegacyUnitAbbreviation(unitName)) {
+      this.logger.warn(
+        `Org unit ${unitCode} uses abbreviated name "${unitName}"; prefer full "Khoa " / "Phòng " prefix`,
+      );
+    }
     try {
       const row = await this.prisma.orgUnit.create({
         data: {
-          unitCode: dto.unitCode,
-          unitName: dto.unitName,
+          unitCode,
+          unitName,
           unitType: dto.unitType,
+          isExternal: dto.isExternal ?? false,
           parentUnitId: parent.id,
         },
         select: ORG_UNIT_SELECT,
@@ -78,9 +97,20 @@ export class OrgUnitsService {
       if (createsCycle(unit.id, parent.id, parentOf))
         throw new AppException(ORG_UNIT_ERRORS.PARENT_CYCLE);
     }
+    const unitName =
+      dto.unitName !== undefined ? normalizeUnitName(dto.unitName) : undefined;
+    if (unitName !== undefined && hasLegacyUnitAbbreviation(unitName)) {
+      this.logger.warn(
+        `Org unit ${unit.unitCode} updated with abbreviated name "${unitName}"; prefer full "Khoa " / "Phòng " prefix`,
+      );
+    }
     const row = await this.prisma.orgUnit.update({
       where: { id: unit.id },
-      data: { unitName: dto.unitName, parentUnitId: dto.parentUnitId },
+      data: {
+        unitName,
+        isExternal: dto.isExternal,
+        parentUnitId: dto.parentUnitId,
+      },
       select: ORG_UNIT_SELECT,
     });
     this.logger.log(`Org unit ${row.unitCode} updated by ${actorId}`);

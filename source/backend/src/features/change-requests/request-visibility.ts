@@ -30,6 +30,7 @@ export function visibleWhere(
         submissionRound: { gt: 0 },
         OR: [
           { steps: { some: { approverId: access.userId } } },
+          { steps: { some: { forFacultyId: { in: orgUnitIds } } } },
           {
             course: {
               OR: [

@@ -18,6 +18,8 @@ export interface RequestHeaderValues {
   reason: string;
   origin: RequestOrigin;
   basisDocumentNumber?: string;
+  effectiveSemesterId?: string | null;
+  cohortIds?: string[];
 }
 
 export const titleRules: Rule[] = [

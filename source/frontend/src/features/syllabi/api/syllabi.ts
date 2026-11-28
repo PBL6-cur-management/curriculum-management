@@ -9,6 +9,8 @@ import type { components } from '../../../shared/api/schema';
 
 export type CourseSyllabus = components['schemas']['CourseSyllabusDto'];
 export type Syllabus = components['schemas']['SyllabusDto'];
+export type SyllabusHistoryItem =
+  components['schemas']['SyllabusHistoryItemDto'];
 export type WeeklyContent = components['schemas']['WeeklyContentDto'];
 export type SyllabusAttachment = components['schemas']['SyllabusAttachmentDto'];
 export type SyllabusMaterialKind =
@@ -37,6 +39,8 @@ export type SyllabusSectionField = keyof UpdateSyllabusRequest;
 
 const coursePath = (courseId: string) =>
   `/courses/${encodeURIComponent(courseId)}/syllabus`;
+const courseSyllabiPath = (courseId: string) =>
+  `/courses/${encodeURIComponent(courseId)}/syllabi`;
 const syllabusPath = (syllabusId: string) =>
   `/syllabi/${encodeURIComponent(syllabusId)}`;
 const weekPath = (weeklyContentId: string) =>
@@ -54,6 +58,12 @@ export const fetchCourseSyllabus = (
 ) =>
   getJson<CourseSyllabus>(
     withQuery(coursePath(courseId), { requestId, versionId }),
+  );
+export const fetchSyllabusHistory = (courseId: string) =>
+  getJson<SyllabusHistoryItem[]>(`${courseSyllabiPath(courseId)}/history`);
+export const fetchSyllabusRevision = (courseId: string, syllabusId: string) =>
+  getJson<Syllabus>(
+    `${courseSyllabiPath(courseId)}/${encodeURIComponent(syllabusId)}`,
   );
 export const createSyllabus = (courseId: string) =>
   sendJson<CourseSyllabus>('POST', coursePath(courseId));

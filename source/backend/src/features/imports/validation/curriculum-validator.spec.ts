@@ -279,7 +279,7 @@ describe('curriculum validator', () => {
     ['priorCourses', 'UNKNOWN', IMPORT_ISSUE.REQUISITE_UNKNOWN],
     ['priorCourses', 'A', IMPORT_ISSUE.REQUISITE_SELF],
     ['priorCourses', 'B; B', IMPORT_ISSUE.REQUISITE_DUPLICATE],
-    ['minStudiedScore', '4.01', IMPORT_ISSUE.VALUE_INVALID],
+    ['minStudiedScore', '10.01', IMPORT_ISSUE.VALUE_INVALID],
     ['minTransferScore', '-1', IMPORT_ISSUE.VALUE_INVALID],
     ['blockSymbol', 'A'.repeat(21), IMPORT_ISSUE.VALUE_INVALID],
     ['note', 'A'.repeat(501), IMPORT_ISSUE.VALUE_INVALID],

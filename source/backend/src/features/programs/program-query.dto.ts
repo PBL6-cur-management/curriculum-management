@@ -40,6 +40,11 @@ export class ProgramQueryDto extends PageQueryDto {
   @IsString()
   facultyId?: string;
 
+  @ApiPropertyOptional({ description: 'Lọc theo ngành đào tạo (Level 0)' })
+  @IsOptional()
+  @IsString()
+  majorId?: string;
+
   @ApiPropertyOptional({ minimum: PROGRAM_YEAR_MIN, maximum: PROGRAM_YEAR_MAX })
   @Type(() => Number)
   @IsOptional()

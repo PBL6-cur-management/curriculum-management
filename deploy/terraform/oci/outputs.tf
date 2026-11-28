@@ -9,16 +9,16 @@ output "public_host" {
 
 # The one record to add by hand in tenten.vn's DNS panel.
 output "dns_record" {
-  value = "A  ${var.public_host == var.dns_zone ? "@" : trimsuffix(var.public_host, ".${var.dns_zone}")}  ${local.public_ip}  TTL 300  (zone ${var.dns_zone})"
+  value = local.public_ip != null ? "A  ${var.public_host == var.dns_zone ? "@" : trimsuffix(var.public_host, ".${var.dns_zone}")}  ${local.public_ip}  TTL 300  (zone ${var.dns_zone})" : null
 }
 
 # Free wildcard DNS for the same address: usable before the tenten record has propagated.
 output "fallback_host" {
-  value = "${replace(local.public_ip, ".", "-")}.sslip.io"
+  value = local.public_ip != null ? "${replace(local.public_ip, ".", "-")}.sslip.io" : null
 }
 
 output "ssh" {
-  value = "ssh -i ~/.ssh/oci_ctdt ubuntu@${local.public_ip}"
+  value = local.public_ip != null ? "ssh -i ~/.ssh/oci_ctdt ubuntu@${local.public_ip}" : null
 }
 
 output "image" {

@@ -40,7 +40,8 @@ describe('permission catalog', () => {
 
     expect(cell(PERMISSIONS.COURSE_EDIT, 'R3')).toBe(CELL.D);
     expect(cell(PERMISSIONS.CURRICULUM_EDIT, 'R3')).toBe(CELL.DP);
-    expect(cell(PERMISSIONS.CURRICULUM_EDIT, 'R4')).toBe(CELL.DP);
+    expect(cell(PERMISSIONS.CURRICULUM_EDIT, 'R4')).toBeUndefined();
+    expect(cell(PERMISSIONS.CURRICULUM_EDIT, 'R5')).toBeUndefined();
     expect(cell(PERMISSIONS.PROGRAM_VIEW, 'R6')).toBe(CELL.P);
   });
 });

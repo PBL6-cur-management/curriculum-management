@@ -73,10 +73,10 @@ describe('ApprovalRecorder', () => {
 
     it('moves to the lowest higher level with a PENDING row', async () => {
       const db = client();
-      db.approvalStep.findMany.mockResolvedValue([{ approvalLevel: 3 }]);
+      db.approvalStep.findMany.mockResolvedValue([{ approvalLevel: 4 }]);
       await expect(recorder.advance(asTx(db), request)).resolves.toEqual({
         kind: 'NEXT_LEVEL',
-        level: 3,
+        level: 4,
       });
       expect(db.changeRequest.update).toHaveBeenCalledWith({
         where: { id: 'r1' },

@@ -1,7 +1,7 @@
 locals {
   compartment_id = var.compartment_ocid != "" ? var.compartment_ocid : var.tenancy_ocid
   ssh_keys       = join("\n", [for path in var.ssh_public_key_paths : trimspace(file(pathexpand(path)))])
-  public_ip      = var.use_reserved_ip ? oci_core_public_ip.demo[0].ip_address : oci_core_instance.demo.public_ip
+  public_ip      = var.enable_a1_vm ? (var.use_reserved_ip ? oci_core_public_ip.demo[0].ip_address : oci_core_instance.demo[0].public_ip) : (var.trial_x86_vm ? oci_core_instance.trial[0].public_ip : null)
 }
 
 data "oci_identity_availability_domains" "all" {
@@ -81,15 +81,6 @@ resource "oci_core_security_list" "public" {
   }
 
   # Path MTU discovery.
-  # scale.tf: the LB and the API pool reach PostgreSQL, Redis, NFS and Caddy :8080 inside the subnet only.
-  # Unconditional on purpose: apply-until-capacity.sh targets the demo instance without scale_out, and
-  # -target pulls this list in; a conditional rule was removed that way and the LB went 502 (2026-11-06).
-  ingress_security_rules {
-    description = "VCN-internal traffic (scale-out)"
-    source      = "10.0.1.0/24"
-    protocol    = "6"
-  }
-
   ingress_security_rules {
     source   = "0.0.0.0/0"
     protocol = "1"
@@ -113,6 +104,7 @@ resource "oci_core_subnet" "public" {
 # ---------- The VM ----------
 
 resource "oci_core_instance" "demo" {
+  count               = var.enable_a1_vm ? 1 : 0
   compartment_id      = local.compartment_id
   availability_domain = data.oci_identity_availability_domains.all.availability_domains[var.availability_domain_index].name
   display_name        = var.name
@@ -152,20 +144,20 @@ resource "oci_core_instance" "demo" {
 # ---------- Optional reserved public IP (use_reserved_ip) ----------
 
 data "oci_core_vnic_attachments" "demo" {
-  count          = var.use_reserved_ip ? 1 : 0
+  count          = var.enable_a1_vm && var.use_reserved_ip ? 1 : 0
   compartment_id = local.compartment_id
-  instance_id    = oci_core_instance.demo.id
+  instance_id    = oci_core_instance.demo[0].id
 }
 
 data "oci_core_private_ips" "demo" {
-  count   = var.use_reserved_ip ? 1 : 0
+  count   = var.enable_a1_vm && var.use_reserved_ip ? 1 : 0
   vnic_id = data.oci_core_vnic_attachments.demo[0].vnic_attachments[0].vnic_id
 }
 
 # A replaced VM only moves this address to its new private IP; the address itself stays.
 # `terraform destroy` releases it, and the DNS record must then be updated by hand.
 resource "oci_core_public_ip" "demo" {
-  count          = var.use_reserved_ip ? 1 : 0
+  count          = var.enable_a1_vm && var.use_reserved_ip ? 1 : 0
   compartment_id = local.compartment_id
   display_name   = "${var.name}-ip"
   lifetime       = "RESERVED"

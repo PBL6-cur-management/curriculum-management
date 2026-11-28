@@ -7,32 +7,48 @@ import {
   assignGroupItems,
   createGroup,
   createItem,
+  createTrack,
   deleteGroup,
   deleteItem,
-  fetchCurriculum,
+  deleteTrack,
   exportCurriculum,
+  fetchCurriculum,
+  fetchTracks,
   reorderSemester,
   replaceRequisites,
   updateGroup,
   updateItem,
+  updateTrack,
   type CreateCurriculumItemRequest,
   type CreateElectiveGroupRequest,
+  type CreateProgramTrackRequest,
   type ReorderCurriculumRequest,
   type ReplaceRequisitesRequest,
   type UpdateCurriculumItemRequest,
   type UpdateElectiveGroupRequest,
+  type UpdateProgramTrackRequest,
 } from '../api/curriculum';
 
 export const CURRICULUM_QUERY_KEYS = {
   all: CURRICULUM_QUERY_ROOT,
   version: (versionId: string) =>
     [...CURRICULUM_QUERY_ROOT, versionId] as const,
+  tracks: (versionId: string) =>
+    [...CURRICULUM_QUERY_ROOT, versionId, 'tracks'] as const,
 };
 
 export function useCurriculum(versionId: string) {
   return useQuery({
     queryKey: CURRICULUM_QUERY_KEYS.version(versionId),
     queryFn: () => fetchCurriculum(versionId),
+    enabled: Boolean(versionId),
+  });
+}
+
+export function useProgramTracks(versionId: string) {
+  return useQuery({
+    queryKey: CURRICULUM_QUERY_KEYS.tracks(versionId),
+    queryFn: () => fetchTracks(versionId),
     enabled: Boolean(versionId),
   });
 }
@@ -109,3 +125,21 @@ export const useAssignGroupItems = (versionId: string) =>
     ({ groupId, itemIds }: { groupId: string; itemIds: string[] }) =>
       assignGroupItems(groupId, itemIds),
   );
+
+export const useCreateTrack = (versionId: string) =>
+  useCurriculumMutation(versionId, (body: CreateProgramTrackRequest) =>
+    createTrack(versionId, body),
+  );
+export const useUpdateTrack = (versionId: string) =>
+  useCurriculumMutation(
+    versionId,
+    ({
+      trackId,
+      body,
+    }: {
+      trackId: string;
+      body: UpdateProgramTrackRequest;
+    }) => updateTrack(trackId, body),
+  );
+export const useDeleteTrack = (versionId: string) =>
+  useCurriculumMutation(versionId, (trackId: string) => deleteTrack(trackId));

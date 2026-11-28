@@ -7,6 +7,7 @@ import {
 import type { AccessContext } from '../../shared/authz/access-context.js';
 import { toWireDecimal } from '../../shared/decimal/decimal.js';
 import { AppException } from '../../shared/exception/app.exception.js';
+import type { GraduationOutcome } from '../../shared/graduation/graduation.types.js';
 import { integrationAccess } from '../../shared/integration-access/integration-access.js';
 import { INTEGRATION_ERRORS } from '../../shared/integration-access/integration.errors.js';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
@@ -21,8 +22,18 @@ import {
   issuedPin,
   StudentPortalService,
 } from '../student-portal/student-portal.service.js';
+import {
+  toDdutEligibility,
+  toDdutGraduation,
+  toDdutProgressTerms,
+  toDdutSyllabusContent,
+} from './ddut-api.mapper.js';
+import { DdutCoursesService } from './ddut-courses.service.js';
 import type {
   DdutApplicableProgramDto,
+  DdutCourseCatalogPageDto,
+  DdutCourseCatalogQueryDto,
+  DdutCourseDetailDto,
   DdutEligibilityDto,
   DdutGraduationDto,
   DdutMetaDto,
@@ -44,7 +55,12 @@ type RequisiteType = (typeof REQUISITE_TYPES)[number];
 
 interface StudentCall {
   access: AccessContext;
-  lookup: { studentId: string; programId: string; semesterId: string };
+  lookup: {
+    studentId: string;
+    programId: string;
+    semesterId: string;
+    programVersionId: string;
+  };
   context: DdutStudentContextDto;
 }
 
@@ -64,7 +80,18 @@ export class DdutApiService {
     private readonly eligibility: RegistrationEligibilityReader,
     private readonly graduation: GraduationService,
     private readonly portal: StudentPortalService,
+    private readonly courses: DdutCoursesService,
   ) {}
+
+  courseCatalog(
+    query: DdutCourseCatalogQueryDto,
+  ): Promise<DdutCourseCatalogPageDto> {
+    return this.courses.listCatalog(query);
+  }
+
+  courseDetail(courseCode: string): Promise<DdutCourseDetailDto> {
+    return this.courses.courseDetail(courseCode);
+  }
 
   private async studentCall(
     clientId: string,
@@ -99,14 +126,14 @@ export class DdutApiService {
     });
     if (!enrollment) throw new AppException(INTEGRATION_ERRORS.NO_CONTEXT);
     const access = integrationAccess(clientId, student.id);
-    const lookup = {
+    const baseLookup = {
       studentId: student.id,
       programId: enrollment.programId,
       semesterId: semester.id,
     };
     const applied = await this.versions
       .forAccess(access, 'PROGRESS')
-      .resolveForStudent(lookup);
+      .resolveForStudent(baseLookup);
     const version = await this.prisma.programVersion.findUniqueOrThrow({
       where: { id: applied.programVersionId },
       select: {
@@ -118,13 +145,11 @@ export class DdutApiService {
     });
     return {
       access,
-      lookup,
+      lookup: { ...baseLookup, programVersionId: applied.programVersionId },
       context: {
         studentCode: student.studentCode,
-        enrollmentId: applied.enrollmentId,
         programCode: version.program.programCode,
         programName: version.programName,
-        programVersionId: applied.programVersionId,
         versionNumber: version.versionNumber,
         decisionNumber: version.decisionNumber,
         semesterCode: semester.semesterCode,
@@ -300,7 +325,7 @@ export class DdutApiService {
         query.mssv!,
         query.semester,
       );
-      versionId = call.context.programVersionId;
+      versionId = call.lookup.programVersionId;
       context = {
         programCode: call.context.programCode,
         versionNumber: call.context.versionNumber,
@@ -337,7 +362,7 @@ export class DdutApiService {
     return {
       meta: meta(),
       context,
-      syllabus: await this.portal.syllabusProjection(pin),
+      syllabus: toDdutSyllabusContent(await this.portal.syllabusProjection(pin)),
     };
   }
 
@@ -347,18 +372,23 @@ export class DdutApiService {
     semester?: string,
   ): Promise<DdutProgressDto> {
     const call = await this.studentCall(clientId, studentCode, semester);
+    const studentLookup = {
+      studentId: call.lookup.studentId,
+      programId: call.lookup.programId,
+      semesterId: call.lookup.semesterId,
+    };
     const attempts = await this.prisma.$transaction(
       (tx) =>
         this.results
           .forAccess(call.access, 'PROGRESS')
-          .forStudent(call.lookup, tx),
+          .forStudent(studentLookup, tx),
       { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead },
     );
     const curriculum = await this.portal.curriculumFor(
       call.access,
-      call.lookup,
+      studentLookup,
     );
-    const outcome = await this.graduation.live(call.access, call.lookup);
+    const outcome = await this.graduation.live(call.access, studentLookup);
     return {
       meta: meta(),
       context: call.context,
@@ -368,7 +398,7 @@ export class DdutApiService {
         outcome.status === 'CANNOT_AUDIT'
           ? { code: outcome.error.code, message: outcome.error.message }
           : null,
-      terms: curriculum.terms,
+      terms: toDdutProgressTerms(curriculum.terms),
     };
   }
 
@@ -378,12 +408,17 @@ export class DdutApiService {
     semester?: string,
   ): Promise<DdutEligibilityDto> {
     const call = await this.studentCall(clientId, studentCode, semester);
+    const raw = toRegistrationEligibilityDto(
+      await this.eligibility.forAccess(call.access).evaluate({
+        studentId: call.lookup.studentId,
+        programId: call.lookup.programId,
+        semesterId: call.lookup.semesterId,
+      }),
+    );
     return {
       meta: meta(),
       context: call.context,
-      eligibility: toRegistrationEligibilityDto(
-        await this.eligibility.forAccess(call.access).evaluate(call.lookup),
-      ),
+      eligibility: toDdutEligibility(raw, call.context),
     };
   }
 
@@ -393,10 +428,59 @@ export class DdutApiService {
     semester?: string,
   ): Promise<DdutGraduationDto> {
     const call = await this.studentCall(clientId, studentCode, semester);
+    const outcome = await this.graduation.live(call.access, {
+      studentId: call.lookup.studentId,
+      programId: call.lookup.programId,
+      semesterId: call.lookup.semesterId,
+    });
+    const lookups = await this.graduationNaturalCodes(outcome);
     return {
       meta: meta(),
       context: call.context,
-      graduation: await this.graduation.live(call.access, call.lookup),
+      graduation: toDdutGraduation(outcome, lookups),
+    };
+  }
+
+  private async graduationNaturalCodes(outcome: GraduationOutcome) {
+    if (outcome.status !== 'REVIEWED') {
+      return {
+        courseCodesById: new Map<string, string>(),
+        equivalenceGroupCodesById: new Map<string, string>(),
+      };
+    }
+    const warningCourseIds = [
+      ...new Set(
+        outcome.result.warnings
+          .map((w) => w.courseId)
+          .filter((id): id is string => id !== null),
+      ),
+    ];
+    const eqGroupIds = [
+      ...new Set(
+        outcome.result.recognitions
+          .map((r) => r.equivalenceGroupId)
+          .filter((id): id is string => id !== null),
+      ),
+    ];
+    const [courses, eqGroups] = await Promise.all([
+      warningCourseIds.length > 0
+        ? this.prisma.course.findMany({
+            where: { id: { in: warningCourseIds } },
+            select: { id: true, courseCode: true },
+          })
+        : Promise.resolve([]),
+      eqGroupIds.length > 0
+        ? this.prisma.equivalentCourseGroup.findMany({
+            where: { id: { in: eqGroupIds } },
+            select: { id: true, groupCode: true },
+          })
+        : Promise.resolve([]),
+    ]);
+    return {
+      courseCodesById: new Map(courses.map((c) => [c.id, c.courseCode])),
+      equivalenceGroupCodesById: new Map(
+        eqGroups.map((g) => [g.id, g.groupCode]),
+      ),
     };
   }
 }

@@ -37,6 +37,7 @@ const ref = (code: string) => ({
   programCode: `CT${code}`,
   programName: `Chương trình ${code}`,
   versionNumber: '1.0',
+  decisionNumber: null,
   status: 'ACTIVE' as const,
   totalCredits: '130',
 });

@@ -15,6 +15,7 @@ import {
   useEnrollmentTargets,
   useStudentPrograms,
   useStudentSemesters,
+  useVersionTracks,
 } from '../hooks/useStudents';
 import { enrollmentBasisRules } from '../schema/enrollmentRules';
 
@@ -30,6 +31,7 @@ interface EnrollmentValues {
   programId: string;
   fromSemesterId: string;
   targetVersionId: string;
+  trackId?: string;
   basisDecision: string;
 }
 export function EnrollmentCommandModal({
@@ -47,12 +49,17 @@ export function EnrollmentCommandModal({
   const [reloading, setReloading] = useState(false);
   const semesterId = Form.useWatch('fromSemesterId', form) ?? '';
   const programId = Form.useWatch('programId', form) ?? '';
+  const targetVersionId = Form.useWatch('targetVersionId', form) ?? '';
   const semesters = useStudentSemesters();
   const programs = useStudentPrograms(semesterId);
   const targets = useEnrollmentTargets(
     student.id,
     { programId, semesterId },
     open,
+  );
+  const tracks = useVersionTracks(
+    targetVersionId,
+    open && Boolean(targetVersionId),
   );
   const mutation = useCreateStudentEnrollment(student.id);
   const { modal } = App.useApp();
@@ -150,6 +157,9 @@ export function EnrollmentCommandModal({
           const semester = semesters.data?.find(
             (entry) => entry.id === values.fromSemesterId,
           );
+          const selectedTrack = tracks.data?.find(
+            (entry) => entry.id === values.trackId,
+          );
           if (
             !target ||
             !semester?.startDate ||
@@ -162,6 +172,7 @@ export function EnrollmentCommandModal({
             fromSemesterId: values.fromSemesterId,
             basisDecision: values.basisDecision.trim(),
             expectedStudentUpdatedAt: snapshot.student.updatedAt,
+            ...(values.trackId ? { trackId: values.trackId } : {}),
             ...(operation === 'TRANSFER' && snapshot.sourceEnrollment
               ? {
                   sourceEnrollmentId: snapshot.sourceEnrollment.id,
@@ -174,7 +185,7 @@ export function EnrollmentCommandModal({
           setConfirming(true);
           modal.confirm({
             title: ENROLLMENT_OPERATION_LABELS[operation],
-            content: `${snapshot.sourceEnrollment?.program.programCode ?? 'Chưa ghi danh'} → ${target.program.programCode} / ${target.version.versionNumber}; từ ${semester.semesterCode}; căn cứ: ${body.basisDecision}`,
+            content: `${snapshot.sourceEnrollment?.program.programCode ?? 'Chưa ghi danh'} → ${target.program.programCode} / ${target.version.versionNumber}${selectedTrack ? ` (${selectedTrack.trackCode})` : ''}; từ ${semester.semesterCode}; căn cứ: ${body.basisDecision}`,
             okText: 'Xác nhận ghi danh',
             cancelText: 'Quay lại',
             onOk: async () => {
@@ -209,6 +220,7 @@ export function EnrollmentCommandModal({
               form.setFieldsValue({
                 programId: undefined,
                 targetVersionId: undefined,
+                trackId: undefined,
               })
             }
           />
@@ -224,7 +236,12 @@ export function EnrollmentCommandModal({
               value: program.id,
               label: `${program.programCode} — ${program.programName}`,
             }))}
-            onChange={() => form.setFieldValue('targetVersionId', undefined)}
+            onChange={() =>
+              form.setFieldsValue({
+                targetVersionId: undefined,
+                trackId: undefined,
+              })
+            }
           />
         </Form.Item>
         <Form.Item
@@ -239,6 +256,7 @@ export function EnrollmentCommandModal({
               value: target.version.id,
               label: `${target.version.versionNumber} · ${target.effectiveSemester.semesterCode}`,
             }))}
+            onChange={() => form.setFieldValue('trackId', undefined)}
           />
         </Form.Item>
         {programId &&
@@ -250,6 +268,22 @@ export function EnrollmentCommandModal({
               title="Chưa có phiên bản đã ban hành phù hợp với chương trình và học kỳ này."
             />
           )}
+        {Boolean(tracks.data?.length) && (
+          <Form.Item
+            name="trackId"
+            label="Định hướng / Chuyên ngành con"
+          >
+            <Select
+              allowClear
+              loading={tracks.isFetching}
+              placeholder="Chưa chọn định hướng"
+              options={tracks.data?.map((track) => ({
+                value: track.id,
+                label: `${track.trackCode} — ${track.trackName}`,
+              }))}
+            />
+          </Form.Item>
+        )}
         <Form.Item
           name="basisDecision"
           label="Căn cứ / số quyết định"

@@ -86,6 +86,9 @@ export function AppliedCohortVersionPanel({
                   })}
                 >
                   {result.data.assignment.version.versionNumber}
+                  {result.data.assignment.version.decisionNumber
+                    ? ` (${result.data.assignment.version.decisionNumber})`
+                    : ''}
                 </Link>{' '}
                 · Từ học kỳ {result.data.assignment.fromSemester.semesterCode}
               </Typography.Paragraph>

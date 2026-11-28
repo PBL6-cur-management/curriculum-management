@@ -53,3 +53,11 @@ export const ENROLLMENT_OPERATION_LABELS = {
   TRANSFER: 'Chuyển chương trình',
   ADD_SECOND_MAJOR: 'Thêm song ngành',
 } as const;
+export const BULK_TRANSFER_RESULT_LABELS = {
+  OK: 'Thành công',
+  FAILED: 'Thất bại',
+} as const;
+export const BULK_TRANSFER_RESULT_COLORS = {
+  OK: 'success',
+  FAILED: 'error',
+} as const;

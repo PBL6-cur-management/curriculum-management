@@ -48,14 +48,17 @@ export function StudentLayout() {
                 width: 36,
                 height: 36,
                 background: palette.white,
+                borderRadius: 6,
+                padding: 2,
                 flexShrink: 0,
               }}
             >
               <img
                 src="/logo-dut.webp"
                 alt="Logo ĐHBK Đà Nẵng"
-                width={30}
-                height={30}
+                width={32}
+                height={32}
+                style={{ objectFit: 'contain', display: 'block' }}
               />
             </Flex>
             <Typography.Text

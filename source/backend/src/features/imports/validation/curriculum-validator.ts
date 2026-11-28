@@ -19,7 +19,7 @@ import { programCredits } from '../../../shared/curriculum/program-credits.js';
 import { COURSE_FIELD_LIMITS } from '../../../shared/courses/course-field-limits.js';
 import {
   CREDITS_PATTERN,
-  GRADE_POINT_PATTERN,
+  SCORE10_PATTERN,
 } from '../../../shared/decimal/decimal.js';
 import { CURRICULUM_LIMITS } from '../../../shared/curriculum/curriculum-limits.js';
 import {
@@ -201,12 +201,8 @@ export function validateCurriculumRows(
     const score = (key: 'minStudiedScore' | 'minTransferScore') => {
       const value = cells[key].trim();
       if (!value) return null;
-      if (!GRADE_POINT_PATTERN.test(value)) {
-        error(
-          key,
-          IMPORT_ISSUE.VALUE_INVALID,
-          'Điểm phải từ 0 đến 4, tối đa hai chữ số thập phân.',
-        );
+      if (!SCORE10_PATTERN.test(value)) {
+        error(key, IMPORT_ISSUE.VALUE_INVALID, 'Điểm phải từ 0 đến 10');
         return null;
       }
       return new Prisma.Decimal(value);

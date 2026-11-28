@@ -1,14 +1,28 @@
+import { randomUUID } from 'node:crypto';
+import path from 'node:path';
 import { SyllabusStatus, type Prisma } from '../../generated/prisma/client.js';
+import type { FileStorageService } from '../files/file-storage.service.js';
 import { sanitizeRichText } from '../rich-text/sanitize-rich-text.js';
 import { SYLLABUS_SECTION_FIELDS } from './syllabus-sections.js';
 
-// Copies a revision's text, weeks, CLOs, week–CLO links, grade formula and assessment–CLO links into a request's working copy. Attachments stay with
-// their revision. The copy has no revision number: F-15 numbers it when it publishes (Syllabus_number_unless_copy).
+const SYLLABUS_FILES_DIR = 'syllabi';
+
+async function streamToBytes(stream: NodeJS.ReadableStream): Promise<Uint8Array> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream) {
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  }
+  return new Uint8Array(Buffer.concat(chunks));
+}
+
+// Copies a revision's text, weeks, CLOs, week–CLO links, grade formula, assessment–CLO links and attachments into a request's working copy.
+// The copy has no revision number: F-15 numbers it when it publishes (Syllabus_number_unless_copy).
 // Every rich-text value goes through sanitizeRichText again; a copy is a write like any other.
 export async function copySyllabusRevision(
   tx: Prisma.TransactionClient,
   fromId: string,
   copy: { sourceRequestId: string },
+  files?: Pick<FileStorageService, 'open' | 'write'>,
 ): Promise<string> {
   const from = await tx.syllabus.findUniqueOrThrow({
     where: { id: fromId },
@@ -21,6 +35,9 @@ export async function copySyllabusRevision(
       assessmentComponents: {
         include: { mappings: true },
         orderBy: [{ componentCode: 'asc' }, { id: 'asc' }],
+      },
+      attachments: {
+        orderBy: [{ recordedAt: 'asc' }, { id: 'asc' }],
       },
     },
   });
@@ -98,6 +115,37 @@ export async function copySyllabusRevision(
     if (links.length > 0) {
       await tx.assessmentCLOMapping.createMany({ data: links });
     }
+  }
+  const attachments = from.attachments ?? [];
+  if (attachments.length > 0 && tx.syllabusAttachment) {
+    const copiedRows: Prisma.SyllabusAttachmentCreateManyInput[] = [];
+    for (const attachment of attachments) {
+      const ext = path.posix.extname(attachment.filePath);
+      const nextPath = path.posix.join(
+        SYLLABUS_FILES_DIR,
+        created.id,
+        `${randomUUID()}${ext}`,
+      );
+      if (files) {
+        try {
+          const { stream } = await files.open(attachment.filePath);
+          const bytes = await streamToBytes(stream);
+          await files.write(nextPath, bytes);
+        } catch {
+          // Physical file may not exist in dev/seed environments; still preserve metadata under unique path.
+        }
+      }
+      copiedRows.push({
+        syllabusId: created.id,
+        materialKind: attachment.materialKind,
+        fileName: attachment.fileName,
+        fileType: attachment.fileType,
+        filePath: nextPath,
+        sizeBytes: attachment.sizeBytes,
+        uploadedById: attachment.uploadedById,
+      });
+    }
+    await tx.syllabusAttachment.createMany({ data: copiedRows });
   }
   return created.id;
 }

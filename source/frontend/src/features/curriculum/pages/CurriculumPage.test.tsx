@@ -4,7 +4,7 @@ import { App } from 'antd';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Curriculum } from '../api/curriculum';
-import { curriculum as fixture, item } from '../testFixtures';
+import { curriculum as fixture, item, trackFixture } from '../testFixtures';
 import { CurriculumPage } from './CurriculumPage';
 import {
   eligibilityAnswerFixture,
@@ -505,5 +505,72 @@ describe('CurriculumPage', () => {
       '/courses/c-MAT101/syllabus',
       '/courses/c-PHY101/syllabus',
     ]);
+  });
+
+  it('filters items by ProgramTrack, renders track tags, and creates a new track', async () => {
+    const cnpm = trackFixture();
+    const httt = trackFixture({
+      id: 't-httt',
+      trackCode: 'HTTT',
+      trackName: 'Hệ thống thông tin',
+    });
+    renderPage(
+      fixture({
+        tracks: [cnpm, httt],
+        items: [
+          item('MAT101', 'Giải tích 1', { track: null }),
+          item('IT301', 'Mạng máy tính', {
+            track: {
+              id: 't-cnpm',
+              trackCode: 'CNPM',
+              trackName: 'Công nghệ phần mềm',
+            },
+          }),
+        ],
+      }),
+    );
+    expect(await screen.findByText('CNPM')).toBeInTheDocument();
+    expect(courseCodes()).toEqual(['MAT101', 'IT301']);
+
+    fireEvent.click(screen.getByText('Khung chung'));
+    expect(courseCodes()).toEqual(['MAT101']);
+
+    fireEvent.click(screen.getByText('CNPM — Công nghệ phần mềm'));
+    expect(courseCodes()).toEqual(['IT301']);
+
+    const fetchMock = vi.mocked(fetch);
+    const original = fetchMock.getMockImplementation()!;
+    const trackWrites: { method: string; url: string; body: unknown }[] = [];
+    fetchMock.mockImplementation((input, init) => {
+      const url = String(input);
+      if (init?.method === 'POST' && url.endsWith('/tracks')) {
+        trackWrites.push({
+          method: init.method,
+          url,
+          body: JSON.parse(String(init.body)),
+        });
+        return Promise.resolve(json(cnpm));
+      }
+      return original(input, init);
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /Thêm định hướng/ }));
+    const dialog = await screen.findByRole('dialog');
+    fireEvent.change(within(dialog).getByLabelText('Mã định hướng'), {
+      target: { value: 'ATTT' },
+    });
+    fireEvent.change(within(dialog).getByLabelText('Tên định hướng'), {
+      target: { value: 'An toàn thông tin' },
+    });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Lưu' }));
+    await vi.waitFor(() => expect(trackWrites).toHaveLength(1));
+    expect(trackWrites[0]).toEqual({
+      method: 'POST',
+      url: '/api/program-versions/v1/tracks',
+      body: expect.objectContaining({
+        trackCode: 'ATTT',
+        trackName: 'An toàn thông tin',
+      }),
+    });
   });
 });

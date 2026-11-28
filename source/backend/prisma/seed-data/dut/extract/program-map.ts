@@ -5,8 +5,11 @@ import { HOME_FACULTY_LEGACY_CODE } from '../legacy-mapping.js';
 // program code above it, so frames are grouped into programs by rule; data/report.json lists the mapping for the
 // Khoa to confirm.
 export const FRAME_CODE = /^\d{7}$/;
-// tmNganh.CapDT: CD01 = đại học. CD02 (thạc sĩ) and CD03 (tiến sĩ) are outside the SRS degree levels.
+// tmNganh.CapDT: CD01 = đại học, CD02 = thạc sĩ, CD03 = tiến sĩ.
 export const UNDERGRADUATE_LEVEL = 'CD01';
+export const MASTER_LEVEL = 'CD02';
+export const DOCTORATE_LEVEL = 'CD03';
+const GRADUATE_LEVELS = new Set<string>([MASTER_LEVEL, DOCTORATE_LEVEL]);
 // Every frame in this range is seeded, with or without students (the faculty's current frames).
 export const CURRENT_FRAME_PREFIX = `${HOME_FACULTY_LEGACY_CODE}4`;
 export const PROGRAM_CODE_PREFIX = 'CNTT';
@@ -30,6 +33,7 @@ export interface FrameScope {
 export function selectFrameScope(
   majors: readonly FrameMajor[],
   studentsByFrame: ReadonlyMap<string, number>,
+  options?: { includeGraduate?: boolean },
 ): FrameScope {
   const scope: FrameScope = { frameCodes: [], excluded: [] };
   for (const major of majors) {
@@ -38,7 +42,10 @@ export function selectFrameScope(
       continue;
     const students = studentsByFrame.get(code) ?? 0;
     if (!code.startsWith(CURRENT_FRAME_PREFIX) && students === 0) continue;
-    if (major.CapDT !== UNDERGRADUATE_LEVEL) {
+    const allowed =
+      major.CapDT === UNDERGRADUATE_LEVEL ||
+      (options?.includeGraduate === true && GRADUATE_LEVELS.has(major.CapDT));
+    if (!allowed) {
       if (students > 0)
         scope.excluded.push({ frameCode: code, level: major.CapDT, students });
       continue;
@@ -53,6 +60,12 @@ export function selectFrameScope(
 }
 
 const ENGINEER_MIN_SEMESTERS = 9;
+const DEGREE_CODE_TOKENS: Readonly<Record<DegreeLevel, string>> = {
+  BACHELOR: 'CN',
+  ENGINEER: 'KS',
+  MASTER: 'THS',
+  DOCTORATE: 'TS',
+};
 const normalized = (name: string) => name.normalize('NFC').toLowerCase();
 const tokens = (name: string) =>
   name
@@ -61,8 +74,13 @@ const tokens = (name: string) =>
     .split(/[^\p{L}\p{N}]+/u)
     .filter(Boolean);
 
-// LoaiCTDT is KS (kỹ sư) or CN (cử nhân) on recent frames; older ones say "Kỹ sư" in the name or run 9+ semesters.
+// CapDT distinguishes graduate levels (CD02 thạc sĩ, CD03 tiến sĩ); on CD01, LoaiCTDT is KS/CN on recent frames
+// and older ones say "Kỹ sư" in the name or run 9+ semesters.
 export function degreeLevelFor(major: FrameMajor): DegreeLevel {
+  if (major.CapDT === MASTER_LEVEL || major.LoaiCTDT === 'THS')
+    return DegreeLevel.MASTER;
+  if (major.CapDT === DOCTORATE_LEVEL || major.LoaiCTDT === 'TS')
+    return DegreeLevel.DOCTORATE;
   if (major.LoaiCTDT === 'KS') return DegreeLevel.ENGINEER;
   if (major.LoaiCTDT === 'CN') return DegreeLevel.BACHELOR;
   if (/kỹ\s*sư/.test(normalized(major.TenNganh))) return DegreeLevel.ENGINEER;
@@ -101,12 +119,9 @@ function trackFor(major: FrameMajor): string | null {
   return null;
 }
 
-// CNTT-{CN|KS}[-CU|-K26][-CLC][-track][-specialization]; "DT" (đặc thù) only when nothing else names the frame.
+// CNTT-{CN|KS|THS|TS}[-CU|-K26][-CLC][-track][-specialization]; "DT" (đặc thù) only when nothing else names the frame.
 export function programCodeFor(major: FrameMajor): string {
-  const parts = [
-    PROGRAM_CODE_PREFIX,
-    degreeLevelFor(major) === DegreeLevel.ENGINEER ? 'KS' : 'CN',
-  ];
+  const parts = [PROGRAM_CODE_PREFIX, DEGREE_CODE_TOKENS[degreeLevelFor(major)]];
   const start = Number(major.KyBDau);
   if (major.KyBDau && start < OLD_ERA_BEFORE) parts.push('CU');
   if (major.KyBDau && start >= NEW_ERA_FROM) parts.push('K26');

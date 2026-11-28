@@ -43,12 +43,13 @@ export async function assertEditPath(
   target: ScopeTarget,
   request: RequestDraftRef | null,
   state: () => Promise<EditState>,
+  allowForeignCreator = false,
 ): Promise<void> {
   if (!request) {
     assertDirectEdit(access, code, target, await state());
     return;
   }
-  assertCopyWritable(access, code, target, request);
+  assertCopyWritable(access, code, target, request, allowForeignCreator);
 }
 
 // A programme-info request ships under a minor version number, so its copy takes general-info writes only.
@@ -68,11 +69,18 @@ export function assertCopyWritable(
   code: PermissionCode,
   target: ScopeTarget,
   request: RequestDraftRef,
+  allowForeignCreator = false,
 ): void {
   if (isOutsideProgramInfoCopy(request, code)) {
     throw new AppException(REQUEST_DRAFT_ERRORS.WRONG_REQUEST_TYPE);
   }
-  access.assertCan(code, target);
+  if (allowForeignCreator && request.createdById === access.userId) {
+    if (!access.has(code)) {
+      access.assertCan(code, target);
+    }
+  } else {
+    access.assertCan(code, target);
+  }
   if (request.createdById !== access.userId) {
     throw new AppException(REQUEST_DRAFT_ERRORS.NOT_CREATOR);
   }
@@ -87,12 +95,15 @@ export function canEditCopy(
   code: PermissionCode,
   target: ScopeTarget,
   request: RequestDraftRef,
+  allowForeignCreator = false,
 ): boolean {
   return (
     !isOutsideProgramInfoCopy(request, code) &&
     request.createdById === access.userId &&
     request.status === ChangeRequestStatus.DRAFT &&
-    access.modeFor(code, target) !== null
+    (allowForeignCreator
+      ? access.has(code)
+      : access.modeFor(code, target) !== null)
   );
 }
 

@@ -3,6 +3,7 @@ import type { CourseUsageReader } from '../../shared/courses/course-usage.reader
 import type { AppliedProgramVersionReader } from '../../shared/releases/applied-program-version.reader.js';
 import type {
   AcademicResultImportPlan,
+  ProgramTransferImportPlan,
   StudentImportPlan,
 } from '../../shared/students/student-import.types.js';
 import { assertSupported } from './import-access.js';
@@ -27,6 +28,11 @@ import {
   findNonTextIdentityCells,
   type NonTextCells,
 } from './sheets/identity-cells.js';
+import {
+  PROGRAM_TRANSFER_IDENTITY_COLUMNS,
+  PROGRAM_TRANSFER_SHEET,
+  type ProgramTransferColumn,
+} from './sheets/program-transfer.sheet.js';
 import { readSheet, type ParsedSheet } from './sheets/sheet-reader.js';
 import {
   STUDENT_IDENTITY_COLUMNS,
@@ -35,6 +41,8 @@ import {
 } from './sheets/student-list.sheet.js';
 import { loadAcademicResultContext } from './validation/academic-result-context.js';
 import { validateAcademicResultRows } from './validation/academic-result-validator.js';
+import { loadProgramTransferContext } from './validation/program-transfer-context.js';
+import { validateProgramTransferRows } from './validation/program-transfer-validator.js';
 import { loadStudentContext } from './validation/student-context.js';
 import { validateStudentRows } from './validation/student-validator.js';
 import { loadCatalogContext } from './validation/catalog-context.js';
@@ -67,6 +75,11 @@ export type ParsedImport =
       importType: typeof ImportType.ACADEMIC_RESULT;
       sheet: ParsedSheet<ResultColumn, string>;
       nonText: NonTextCells<ResultColumn>;
+    }
+  | {
+      importType: typeof ImportType.PROGRAM_TRANSFER;
+      sheet: ParsedSheet<ProgramTransferColumn, string>;
+      nonText: NonTextCells<ProgramTransferColumn>;
     };
 export type ValidatedImport =
   | ({
@@ -80,7 +93,10 @@ export type ValidatedImport =
     } & ValidationResult<StudentImportPlan>)
   | ({
       importType: typeof ImportType.ACADEMIC_RESULT;
-    } & ValidationResult<AcademicResultImportPlan>);
+    } & ValidationResult<AcademicResultImportPlan>)
+  | ({
+      importType: typeof ImportType.PROGRAM_TRANSFER;
+    } & ValidationResult<ProgramTransferImportPlan>);
 
 export async function readImportSheet(
   importType: ImportType,
@@ -88,7 +104,10 @@ export async function readImportSheet(
 ): Promise<ParsedImport> {
   assertSupported(importType);
   if (importType === ImportType.COURSE_CATALOG)
-    return { importType, sheet: await readSheet(content, COURSE_CATALOG_SHEET) };
+    return {
+      importType,
+      sheet: await readSheet(content, COURSE_CATALOG_SHEET),
+    };
   if (importType === ImportType.STUDENT_LIST)
     return {
       importType,
@@ -109,6 +128,16 @@ export async function readImportSheet(
         RESULT_IDENTITY_COLUMNS,
       ),
     };
+  if (importType === ImportType.PROGRAM_TRANSFER)
+    return {
+      importType,
+      sheet: await readSheet(content, PROGRAM_TRANSFER_SHEET),
+      nonText: await findNonTextIdentityCells(
+        content,
+        PROGRAM_TRANSFER_SHEET,
+        PROGRAM_TRANSFER_IDENTITY_COLUMNS,
+      ),
+    };
   return {
     importType: ImportType.CURRICULUM,
     sheet: await readSheet(content, CURRICULUM_SHEET),
@@ -122,8 +151,13 @@ export async function validateImport(
   appliedVersions?: AppliedProgramVersionReader,
 ): Promise<ValidatedImport> {
   if (parsed.importType === ImportType.STUDENT_LIST) {
-    if (!appliedVersions) throw new Error('Student import needs the applied-version reader');
-    const context = await loadStudentContext(client, parsed.sheet.rows, appliedVersions);
+    if (!appliedVersions)
+      throw new Error('Student import needs the applied-version reader');
+    const context = await loadStudentContext(
+      client,
+      parsed.sheet.rows,
+      appliedVersions,
+    );
     return {
       importType: parsed.importType,
       ...validateStudentRows(parsed.sheet.rows, context, parsed.nonText),
@@ -134,6 +168,17 @@ export async function validateImport(
     return {
       importType: parsed.importType,
       ...validateAcademicResultRows(parsed.sheet.rows, context, parsed.nonText),
+    };
+  }
+  if (parsed.importType === ImportType.PROGRAM_TRANSFER) {
+    const context = await loadProgramTransferContext(client, parsed.sheet.rows);
+    return {
+      importType: parsed.importType,
+      ...validateProgramTransferRows(
+        parsed.sheet.rows,
+        context,
+        parsed.nonText,
+      ),
     };
   }
   const codes = new Set(

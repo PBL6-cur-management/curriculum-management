@@ -15,12 +15,18 @@ import {
   IntegrationResourceOf,
 } from '../../shared/integration-access/integration.interceptor.js';
 import { VERSION_NUMBER_PATTERN } from '../../shared/releases/version-number.js';
-import { GraduationOutcomeDto } from '../graduation/graduation.dto.js';
 import { DdutApiService } from './ddut-api.service.js';
 import {
+  DDUT_SHORTFALL_MODELS,
   DdutApplicableProgramDto,
+  DdutCourseCatalogPageDto,
+  DdutCourseCatalogQueryDto,
+  DdutCourseDetailDto,
   DdutEligibilityDto,
+  DdutGraduationCannotAuditOutcomeDto,
   DdutGraduationDto,
+  DdutGraduationOutcomeDto,
+  DdutGraduationReviewedOutcomeDto,
   DdutProgramVersionDto,
   DdutProgressDto,
   DdutSemesterQueryDto,
@@ -30,15 +36,43 @@ import {
 
 export const DDUT_API_KEY_SCHEME = 'api-key';
 
-// Read-only for dDUT's trusted server. No session cookie is read or created here: the key is the only identity.
+// Read-only for dDUT & partner systems. Keyed strictly by natural codes (no internal CUIDs/UUIDs).
 @ApiTags('dDUT v1')
 @ApiSecurity(DDUT_API_KEY_SCHEME)
-@ApiExtraModels(GraduationOutcomeDto)
+@ApiExtraModels(
+  DdutGraduationOutcomeDto,
+  DdutGraduationReviewedOutcomeDto,
+  DdutGraduationCannotAuditOutcomeDto,
+  ...DDUT_SHORTFALL_MODELS,
+)
 @Public()
 @UseInterceptors(IntegrationInterceptor)
 @Controller('v1')
 export class DdutApiController {
   constructor(private readonly api: DdutApiService) {}
+
+  @Get('hoc-phan')
+  @IntegrationResourceOf('COURSE_CATALOG')
+  @ApiOperation({
+    operationId: 'ddutV1ListCourses',
+    summary: 'Danh mục học phần phân trang và lọc theo mã tự nhiên',
+  })
+  @ApiOkResponse({ type: DdutCourseCatalogPageDto })
+  courseCatalog(@Query() query: DdutCourseCatalogQueryDto) {
+    return this.api.courseCatalog(query);
+  }
+
+  @Get('hoc-phan/:maHP')
+  @IntegrationResourceOf('COURSE_DETAIL')
+  @ApiOperation({
+    operationId: 'ddutV1GetCourseDetail',
+    summary:
+      'Chi tiết học phần, đề cương đã công bố mới nhất, công thức điểm và quan hệ học phần theo mã học phần',
+  })
+  @ApiOkResponse({ type: DdutCourseDetailDto })
+  courseDetail(@Param('maHP') maHP: string) {
+    return this.api.courseDetail(maHP);
+  }
 
   @Get('sinh-vien/:mssv/chuong-trinh')
   @IntegrationResourceOf('STUDENT_PROGRAM')

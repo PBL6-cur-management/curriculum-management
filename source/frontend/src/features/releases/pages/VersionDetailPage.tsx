@@ -63,7 +63,9 @@ export function VersionDetailPage() {
         title={
           <>
             {version.programCode} — {version.programName} · phiên bản{' '}
-            {versionLabel(version)} <VersionStatusTag status={version.status} />
+            {versionLabel(version)}
+            {version.decisionNumber ? ` (${version.decisionNumber})` : ''}{' '}
+            <VersionStatusTag status={version.status} />
           </>
         }
         actions={
@@ -132,10 +134,10 @@ export function VersionDetailPage() {
               Ma trận CLO–PLO
             </Link>
             <Link to={generatePath(ROUTES.courseGraph, params)}>
-              Đồ thị học phần
+              Cây chương trình đào tạo
             </Link>
             <Link to={generatePath(ROUTES.programHealth, params)}>
-              Sức khỏe chương trình
+              Rà soát chất lượng CTĐT
             </Link>
           </>
         )}

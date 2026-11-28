@@ -81,6 +81,7 @@ export function attempt(
   status: AcademicAttemptFact['status'],
   score4: string | null = null,
   id = `result-${courseId}`,
+  score10: string | null = null,
 ): AcademicAttemptFact {
   return {
     id,
@@ -88,7 +89,7 @@ export function attempt(
     courseId,
     semesterId: 'semester',
     semesterStart: new Date('2026-01-01'),
-    score10: null,
+    score10,
     score4,
     letterGrade: null,
     status,

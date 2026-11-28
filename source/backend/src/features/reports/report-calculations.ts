@@ -30,6 +30,7 @@ export function versionRef(version: ReportVersion): ReportVersionRefDto {
     programCode: version.programCode,
     programName: version.programName,
     versionNumber: version.versionNumber,
+    decisionNumber: version.decisionNumber,
     status: version.status,
     totalCredits: toWireDecimal(version.totalCredits),
   };

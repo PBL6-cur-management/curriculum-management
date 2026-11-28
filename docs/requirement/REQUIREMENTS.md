@@ -17,6 +17,13 @@
 > - **Chốt:** Q-01 — CLO dùng chung theo học phần (DEC-03); Q-02 — chấp nhận sinh phiên bản mới cho mọi CTĐT liên quan; giữ luồng duyệt **ba cấp** (DEC-04).
 > - **Bổ sung từ khảo sát lần 2:** mục 6.4, FR-108, FR-109 (mục 5.6), thực thể `HoSoDeXuat` (mục 4.2.6), các câu hỏi Q-18..Q-28 (mục 13.5). Tổng số FR: **109**.
 > - Các khối `> **[Bổ sung 2026-10-11]**` đánh dấu nội dung **không có** trong `Requirements.pdf`.
+>
+> **Hiệu đính 2026-11-28 — phản hồi kiểm thử & đối chiếu CSDL trường thật (`FEEDBACK.md`):**
+> - **Luồng phê duyệt 4 cấp / 2 nhánh (cập nhật DEC-04 & Q-24):** Ban lãnh đạo khoa (`R2`) tham gia duyệt **Cấp 3 (Pool theo Khoa — 1 người duyệt là qua)**, Phòng Đào tạo (`R1`) là **Cấp 4 (cuối)**. Nhánh Học phần/ĐCCT/Công thức điểm/CLO đi đủ 4 cấp (`R4 → R3 song song → R2 Pool → R1 Pool`); nhánh CTĐT/Khung/PLO đi 2 cấp (`R2 Pool → R1 Pool`) và chỉ `R3` (được phân công) hoặc `R1` được tạo đề xuất.
+> - **Sửa lỗi thang điểm DEC-11 (đối chiếu `sv.dut.udn.vn` & `tmKhungCT`):** Cột `Điểm học` / `Điểm chuyển` trên cổng sinh viên là điểm đạt được của sinh viên (thang 4), không phải ngưỡng tiên quyết của khung CTĐT. Ngưỡng điểm tiên quyết (`minScore`) được chuẩn hóa sang **thang 10 (`0..10`)** và so sánh với `score10`; bổ sung điều kiện **GPA tích lũy ≥ 2.0 (thang 4)** khi xét tốt nghiệp; khóa lỗ hổng tín chỉ tự do (`freeCredits`) và bổ sung cờ `HTDA`/`TQDA` gắn trực tiếp vào học phần `CAPSTONE` (Đồ án Tốt nghiệp).
+> - **Phiên bản đồng thời & đính chính linh hoạt (cập nhật BR-22):** Mỗi khóa tuyển sinh dùng phiên bản CTĐT được gán riêng (`CohortProgramVersion`); nhãn hiển thị `ACTIVE` đổi từ "Đang áp dụng" thành **"Mới nhất"** kèm `decisionNumber`. Cho phép đính chính (`Corrections`) phiên bản `HISTORICAL` đang được khóa/sinh viên sử dụng mà không hạ cấp phiên bản `ACTIVE` mới hơn.
+> - **Cấp độ Ngành (`Major`) & Định hướng chuyên ngành (`ProgramTrack`):** Bổ sung danh mục Ngành cấp 0 (56 ngành theo `tmNganhQG`), trình độ `MASTER` (Thạc sĩ) & `DOCTORATE` (Tiến sĩ), và định hướng/chuyên ngành con (`ProgramTrack`) nằm trong từng `ProgramVersion` (khung chung + các nhánh chuyên ngành có thể vừa bắt buộc vừa tự chọn).
+> - **Phân quyền động, Đề xuất trước HK/Khóa, Chuyển CTĐT hàng loạt & API sạch:** Hỗ trợ CRUD vai trò tùy chỉnh, nhập `effectiveSemesterId` & `cohortIds` ngay khi tạo đề xuất, lưu lịch sử phiên bản đề cương + tệp đính kèm, chuyển CTĐT hàng loạt (UI + Excel import/export), và loại bỏ hoàn toàn CUID nội bộ khỏi API tích hợp dDUT `/api/v1/*`.
 
 ---
 
@@ -152,11 +159,11 @@ Hệ thống được xây dựng theo kiến trúc **monolith (khối đơn)**,
 
 | Mã | Vai trò | Cấp duyệt |
 |---|---|---|
-| R1 | **Phòng Đào tạo** | Cấp 3 (cuối cùng) |
-| R2 | **Ban lãnh đạo khoa** | Không chặn (chỉ giám sát + bình luận) |
-| R3 | **Giám đốc CTĐT** | Cấp 2 |
-| R4 | **Điều phối nhóm chuyên môn** | Cấp 1 |
-| R5 | **Giảng viên** | Người đề xuất |
+| R1 | **Phòng Đào tạo** | Cấp 4 (cuối cùng — Pool toàn trường) |
+| R2 | **Ban lãnh đạo khoa** | Cấp 3 (Pool theo Khoa — 1 người duyệt là qua) *(cập nhật 2026-11-28)* |
+| R3 | **Giám đốc CTĐT** | Cấp 2 (song song các CTĐT bị ảnh hưởng; người tạo đề xuất nhánh CTĐT) |
+| R4 | **Điều phối nhóm chuyên môn** | Cấp 1 (nhánh Học phần / Đề cương) |
+| R5 | **Giảng viên** | Người đề xuất (nhánh Học phần / Đề cương) |
 | R6 | **Sinh viên** | Chỉ đọc |
 
 ### 3.2. Cơ cấu tổ chức
@@ -945,7 +952,7 @@ HÀM XetTotNghiep(sinhVien):
 
 | Mã | Quy tắc |
 |---|---|
-| BR-22 | Mỗi Chương trình đào tạo có **tối đa một phiên bản Đang hiệu lực** tại mỗi thời điểm |
+| BR-22 | Mỗi Chương trình đào tạo có **tối đa một phiên bản Mới nhất (`ACTIVE`)** tại mỗi thời điểm; đồng thời nhiều phiên bản cũ (`HISTORICAL`) vẫn tiếp tục áp dụng song song cho các khóa tuyển sinh đã được gán (BR-26) và có thể thực hiện đính chính mà không làm hạ cấp phiên bản `ACTIVE` mới hơn *(cập nhật 2026-11-28)* |
 | BR-23 | Phiên bản đã ban hành là **bất biến** |
 | BR-24 | Số phiên bản theo định dạng `<Chính>.<Phụ>` — thay đổi khung chương trình hoặc PLO tăng số **Chính**; thay đổi đề cương hoặc công thức điểm tăng số **Phụ** |
 | BR-25 | Phiên bản mới có hiệu lực **từ đầu học kỳ** được chỉ định, không áp dụng giữa học kỳ |
@@ -1104,16 +1111,16 @@ HÀM XetTotNghiep(sinhVien):
 | **So với `plo-clo-backend`** | Ở đó CLO được định danh theo (học phần, học kỳ); ở đây CLO được phiên bản hóa qua đề cương và ảnh chụp CTĐT (DEC-01) — cùng mục đích, khác cơ chế. Các điểm còn khác nhau được treo ở Q-25, Q-26, Q-28 |
 | **Ràng buộc bổ sung** | Khi một học phần bị gỡ khỏi khung của một CTĐT, các dòng `MaTranCLO_PLO` của cặp (CTĐT, Học phần) đó **không được mang sang phiên bản mới**. `plo-clo-backend` để lại liên kết CLO–PLO mồ côi trong trường hợp này |
 
-### DEC-04 — Luồng phê duyệt ba cấp
+### DEC-04 — Luồng phê duyệt bốn cấp, hai nhánh *(cập nhật 2026-11-28)*
 
 | | |
 |---|---|
-| **Quyết định** | Điều phối nhóm chuyên môn (cấp 1) → Giám đốc CTĐT (cấp 2) → Phòng Đào tạo (cấp 3) |
-| **Phương án thay thế đã cân nhắc** | Hai cấp (bỏ Điều phối nhóm chuyên môn) · Bốn cấp (thêm Ban lãnh đạo khoa) · Luồng cấu hình hoàn toàn tự do |
-| **Lý do chọn** | Ba cấp phản ánh đúng quyền sở hữu chuyên môn thực tế của Điều phối nhóm chuyên môn mà không làm luồng duyệt dài tới mức không khả thi |
-| **Vai trò Ban lãnh đạo khoa** | Được xem và bình luận trên mọi đề xuất, **không phải chốt chặn** — tránh làm nghẽn luồng |
-| **Cơ chế mở rộng** | Số cấp và người duyệt từng cấp khai báo trong bảng cấu hình (NFR-24), cho phép thêm cấp sau này mà không sửa mã nguồn |
-| **Xác nhận 2026-10-11** | **Giữ ba cấp.** Ghi chú phỏng vấn thầy Bình có mô tả luồng hai cấp (Giám đốc CTĐT → Phòng Đào tạo), đồng thời vẫn liệt kê vai trò phụ trách nhóm chuyên môn trong cơ cấu khoa; nhóm thực hiện quyết định giữ cấp 1. Khả năng giảm cấp cho thay đổi nhỏ được treo ở Q-21 |
+| **Quyết định** | **Nhánh A (Học phần / Đề cương / Công thức điểm / CLO / Quan hệ HP — 4 cấp):** Điều phối nhóm CM (`R4`, cấp 1) → Giám đốc CTĐT (`R3`, cấp 2, duyệt song song mọi CTĐT chứa HP) → Ban lãnh đạo khoa (`R2`, cấp 3, Pool theo Khoa) → Phòng Đào tạo (`R1`, cấp 4, Pool). **Nhánh B (CTĐT / Khung chương trình / PLO — 2 cấp):** Ban lãnh đạo khoa (`R2`, cấp 3, Pool theo Khoa) → Phòng Đào tạo (`R1`, cấp 4, Pool); chỉ `R3` (được phân công) hoặc `R1` được tạo đề xuất nhánh B |
+| **Phương án thay thế đã cân nhắc** | Hai cấp · Ba cấp (bỏ R2 khỏi chốt chặn) · Luồng cấu hình hoàn toàn tự do |
+| **Lý do chọn** | Phản ánh đúng phân quyền thực tế tại ĐH Bách khoa Đà Nẵng: Ban lãnh đạo khoa chịu trách nhiệm ký duyệt đề xuất ở cấp Khoa trước khi gửi Phòng Đào tạo, trong khi dùng cơ chế Pool theo Khoa (1 lãnh đạo khoa duyệt là qua) tránh nghẽn luồng |
+| **Vai trò Ban lãnh đạo khoa (`R2`)** | Phê duyệt Cấp 3 (Pool theo Khoa) cho cả hai nhánh, đồng thời vẫn được xem và bình luận toàn Khoa |
+| **Cơ chế mở rộng** | Số cấp và người duyệt từng cấp khai báo trong bảng cấu hình (`ApprovalLevelConfig`, NFR-24) |
+| **Lịch sử cập nhật** | 2026-10-11: giữ 3 cấp. **2026-11-28:** chốt 4 cấp / 2 nhánh, đóng Q-24 |
 
 ### DEC-05 — Giữ nguyên ký hiệu của bản Excel gốc
 
@@ -1165,13 +1172,13 @@ HÀM XetTotNghiep(sinhVien):
 | **Lý do chọn** | Cơ sở dữ liệu là nguồn chính thức, cập nhật liên tục; Excel chỉ là ảnh chụp tại một thời điểm |
 | **Hệ quả** | Hệ thống phải hoạt động được kể cả khi không có kết nối cơ sở dữ liệu, dùng dữ liệu đã nhập từ Excel |
 
-### DEC-11 — Thang điểm
+### DEC-11 — Thang điểm *(đã hiệu đính 2026-11-28)*
 
 | | |
 |---|---|
-| **Quyết định** | Lưu song song **thang 10, thang 4 và điểm chữ** cho mọi kết quả học tập. Việc so sánh điều kiện tiên quyết dùng **thang 4** (khớp với giá trị Điểm học trong bản Excel: 3 · 3.5 · 4) |
-| **Lý do chọn** | Giá trị Điểm học trong bản Excel nằm trong khoảng 3–4, phù hợp thang 4; lưu cả ba thang tránh mất thông tin và cho phép đổi quy tắc so sánh sau này mà không phải chuyển đổi dữ liệu |
-| **Cần xác nhận** | Xem **Q-03** |
+| **Quyết định** | Lưu song song **thang 10, thang 4 và điểm chữ** cho mọi kết quả học tập. Ngưỡng điểm tiên quyết (`minScore`) khai báo và so sánh theo **thang 10 (`0..10`, so sánh với `score10`)**; GPA tích lũy xét tốt nghiệp (`minGraduationGpa`, mặc định `2.00`) tính theo **thang 4** |
+| **Lý do hiệu đính** | Đối chiếu thực tế `sv.dut.udn.vn/PageCTDT.aspx` và bảng `tmKhungCT` trong CSDL DUT (`2026-11-28`): cột `Điểm học` (`3 · 3.5 · 4`) và `Điểm chuyển` trên cổng sinh viên là **điểm kết quả đã đạt của sinh viên theo thang 4**, không phải ngưỡng điểm tiên quyết của CTĐT. Giữ sai thang 4 ở `minScore` gây lỗi khi so sánh điểm thành phần/điểm học phần thang 10 |
+| **Trạng thái** | **Đã chốt 2026-11-28**, đóng **Q-03** |
 
 ### DEC-12 — Không xây dựng quy trình tạo mới Chương trình đào tạo
 

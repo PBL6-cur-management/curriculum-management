@@ -198,6 +198,23 @@ describe('ProgramOverviewPage', () => {
     ).toBeInTheDocument();
   });
 
+  it('displays linked major badge and minGraduationGpa on the overview card', async () => {
+    renderPage({
+      ...PROGRAM,
+      major: {
+        id: 'm1',
+        majorCode: '7480106',
+        majorName: 'Kỹ thuật máy tính',
+        degreeGroup: 'CD01',
+      },
+      draftVersion: { ...INFO, minGraduationGpa: '2.50' },
+    });
+    expect(
+      await screen.findByText('7480106 — Kỹ thuật máy tính'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('2.50')).toBeInTheDocument();
+  });
+
   it('opens the curriculum views of the Draft version (F-07)', async () => {
     renderPage();
     await openTab('Khung chương trình');
@@ -226,7 +243,7 @@ describe('ProgramOverviewPage', () => {
     renderPage(PROGRAM, [], ME);
     await openTab('Phân tích');
     expect(await here()).toBe('/programs/p1/versions/v1/course-graph');
-    await openTab('Sức khỏe chương trình');
+    await openTab('Rà soát chất lượng CTĐT');
     expect(await here()).toBe('/programs/p1/versions/v1/health');
   });
 

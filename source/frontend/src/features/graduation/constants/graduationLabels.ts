@@ -68,7 +68,13 @@ export const SHORTFALL_LABELS = {
   ELECTIVE_COURSES_MISSING: 'Thiếu số học phần nhóm tự chọn',
   TOTAL_CREDITS_MISSING: 'Thiếu tổng tín chỉ',
   CONDITIONAL_COURSE_MISSING: 'Chưa hoàn thành học phần điều kiện',
+  LOW_GPA: 'GPA tích lũy chưa đạt mức tối thiểu',
+  TRACK_NOT_SELECTED: 'Chưa chọn định hướng / chuyên ngành con',
 } satisfies Record<GraduationResult['shortfalls'][number]['code'], string>;
+export const EXTRA_SHORTFALL_CODE_LABELS: Record<string, string> = {
+  ...SHORTFALL_LABELS,
+  GPA_BELOW_MINIMUM: 'GPA tích lũy chưa đạt mức tối thiểu',
+};
 export const WARNING_LABELS = {
   EQUIVALENT_CREDIT_GAP: 'Chênh lệch tín chỉ học phần tương đương',
   CURRENT_CATALOG_CREDIT_BASIS: 'Tín chỉ theo danh mục hiện tại',

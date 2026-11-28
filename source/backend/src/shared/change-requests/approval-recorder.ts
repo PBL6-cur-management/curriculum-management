@@ -9,6 +9,7 @@ import {
 import { AppException } from '../exception/app.exception.js';
 import type { PrismaService } from '../prisma/prisma.service.js';
 import { isAcademicOfficeHolder } from './academic-office.js';
+import { facultyLeadershipScope } from './faculty-leadership.js';
 import { levelOfStatus } from './approval-rules.js';
 import {
   APPROVAL_LEVEL,
@@ -66,7 +67,9 @@ export class ApprovalRecorder {
     }
   }
 
-  // Rows the user may decide now. Level 3 has no named approver: any active academic-office holder acts (D11).
+  // Rows the user may decide now.
+  // Level 4 has no named approver: any active academic-office holder acts (D11).
+  // Level 3 is a pool per faculty: any active R2 holder for that faculty (or their delegate) acts.
   // At levels 1-2 the user's own rows come with the rows of anyone who delegated that level to them today (F-25);
   // the actual creator is refused before either, so a grant never lets someone approve their own request.
   async actionableRows(
@@ -79,10 +82,68 @@ export class ApprovalRecorder {
     if (level === null) return [];
     if (await blocksSelfApproval(db, request.createdById, userId)) return [];
     const isFinalLevel = level === APPROVAL_LEVEL.ACADEMIC_OFFICE;
-    if (isFinalLevel && !(await isAcademicOfficeHolder(db, userId, today))) {
-      return [];
+    if (isFinalLevel) {
+      if (!(await isAcademicOfficeHolder(db, userId, today))) return [];
+      const rows = await db.approvalStep.findMany({
+        where: {
+          changeRequestId: request.id,
+          submissionRound: request.submissionRound,
+          approvalLevel: level,
+          action: ApprovalAction.PENDING,
+        },
+        orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+      });
+      return rows.map((row) => ({ ...row, viaDelegationId: null }));
     }
-    const grants = isFinalLevel ? [] : await usableGrants(db, userId, today);
+    if (level === APPROVAL_LEVEL.FACULTY_LEADERSHIP) {
+      const [ownScope, grants] = await Promise.all([
+        facultyLeadershipScope(db, userId, today),
+        usableGrants(db, userId, today),
+      ]);
+      const levelGrants = grants.filter(
+        (g) => g.scopeLevel === null || g.scopeLevel === level,
+      );
+      const delegatorScopes = await Promise.all(
+        levelGrants.map(async (grant) => ({
+          grant,
+          scope: await facultyLeadershipScope(db, grant.delegatorId, today),
+        })),
+      );
+      if (
+        !ownScope.all &&
+        ownScope.facultyIds.length === 0 &&
+        delegatorScopes.every(
+          (d) => !d.scope.all && d.scope.facultyIds.length === 0,
+        )
+      ) {
+        return [];
+      }
+      const rows = await db.approvalStep.findMany({
+        where: {
+          changeRequestId: request.id,
+          submissionRound: request.submissionRound,
+          approvalLevel: level,
+          action: ApprovalAction.PENDING,
+        },
+        orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+      });
+      return rows.flatMap((row): ActionableRow[] => {
+        const facultyId = row.forFacultyId;
+        if (
+          ownScope.all ||
+          (facultyId !== null && ownScope.facultyIds.includes(facultyId))
+        ) {
+          return [{ ...row, viaDelegationId: null }];
+        }
+        const matched = delegatorScopes.find(
+          (d) =>
+            d.scope.all ||
+            (facultyId !== null && d.scope.facultyIds.includes(facultyId)),
+        );
+        return matched ? [{ ...row, viaDelegationId: matched.grant.id }] : [];
+      });
+    }
+    const grants = await usableGrants(db, userId, today);
     const delegators = grants.map((grant) => grant.delegatorId);
     const rows = await db.approvalStep.findMany({
       where: {
@@ -90,14 +151,12 @@ export class ApprovalRecorder {
         submissionRound: request.submissionRound,
         approvalLevel: level,
         action: ApprovalAction.PENDING,
-        ...(!isFinalLevel && {
-          approverId: { in: [userId, ...delegators] },
-        }),
+        approverId: { in: [userId, ...delegators] },
       },
       orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
     });
     return rows.flatMap((row): ActionableRow[] => {
-      if (isFinalLevel || row.approverId === userId) {
+      if (row.approverId === userId) {
         return [{ ...row, viaDelegationId: null }];
       }
       const grant = grantFor(grants, row.approverId, level);

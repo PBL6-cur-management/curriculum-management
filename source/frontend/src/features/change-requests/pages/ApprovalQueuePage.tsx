@@ -58,7 +58,13 @@ const COLUMNS: TableColumnsType<ApprovalQueueItem> = [
         {standsFor ? (
           <ScopeCodes
             codes={standsFor.split(', ')}
-            noun={item.approvalLevel === 1 ? 'nhóm' : 'CTĐT'}
+            noun={
+              item.approvalLevel === 1
+                ? 'nhóm'
+                : item.approvalLevel === 3
+                  ? 'khoa'
+                  : 'CTĐT'
+            }
           />
         ) : (
           SELF_LABEL

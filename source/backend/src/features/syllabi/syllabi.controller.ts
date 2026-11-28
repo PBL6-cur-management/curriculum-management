@@ -54,6 +54,7 @@ import {
   CourseSyllabusDto,
   CourseSyllabusQueryDto,
   SyllabusDto,
+  SyllabusHistoryItemDto,
 } from './syllabus.dto.js';
 import { SyllabiService } from './syllabi.service.js';
 import { UpdateSyllabusDto } from './update-syllabus.dto.js';
@@ -91,6 +92,27 @@ export class SyllabiController {
       query.requestId,
       query.versionId,
     );
+  }
+
+  @Get('courses/:courseId/syllabi/history')
+  @RequirePermission(PERMISSIONS.SYLLABUS_VIEW)
+  @ApiOkResponse({ type: [SyllabusHistoryItemDto] })
+  history(
+    @Param('courseId') courseId: string,
+    @CurrentAccess() access: AccessContext,
+  ) {
+    return this.syllabi.history(courseId, access);
+  }
+
+  @Get('courses/:courseId/syllabi/:syllabusId')
+  @RequirePermission(PERMISSIONS.SYLLABUS_VIEW)
+  @ApiOkResponse({ type: SyllabusDto })
+  revision(
+    @Param('courseId') courseId: string,
+    @Param('syllabusId') syllabusId: string,
+    @CurrentAccess() access: AccessContext,
+  ) {
+    return this.syllabi.revision(courseId, syllabusId, access);
   }
 
   @Post('courses/:courseId/syllabus')

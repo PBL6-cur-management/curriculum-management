@@ -8,6 +8,7 @@ import {
 import { NotificationService } from '../notifications/notification.service.js';
 import { todayDate } from '../time/today.js';
 import { academicOfficeHolderIds } from './academic-office.js';
+import { facultyLeadershipHolderIds } from './faculty-leadership.js';
 import type { ClosingAction, DecisionAction } from './approval-recorder.js';
 import { levelOfStatus } from './approval-rules.js';
 import {
@@ -164,6 +165,30 @@ export class RequestNotifier {
   ): Promise<string[]> {
     if (level === APPROVAL_LEVEL.ACADEMIC_OFFICE) {
       return academicOfficeHolderIds(tx, request.createdById, todayDate());
+    }
+    if (level === APPROVAL_LEVEL.FACULTY_LEADERSHIP) {
+      const rows = await tx.approvalStep.findMany({
+        where: {
+          changeRequestId: request.id,
+          submissionRound: request.submissionRound,
+          approvalLevel: level,
+          action: ApprovalAction.PENDING,
+          forFacultyId: { not: null },
+        },
+        select: { forFacultyId: true },
+      });
+      const facultyIds = [
+        ...new Set(
+          rows.flatMap((row) => (row.forFacultyId ? [row.forFacultyId] : [])),
+        ),
+      ];
+      const today = todayDate();
+      const ids = await Promise.all(
+        facultyIds.map((facultyId) =>
+          facultyLeadershipHolderIds(tx, facultyId, request.createdById, today),
+        ),
+      );
+      return [...new Set(ids.flat())];
     }
     const rows = await tx.approvalStep.findMany({
       where: {

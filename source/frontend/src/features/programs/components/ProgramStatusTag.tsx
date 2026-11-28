@@ -1,18 +1,25 @@
-import { Tag } from 'antd';
+import { Tag, Tooltip } from 'antd';
 import type { ProgramStatus } from '../api/programs';
-import {
-  PROGRAM_STATUS_COLORS,
-  PROGRAM_STATUS_LABELS,
-} from '../constants/programLabels';
+import { PROGRAM_TAG_DISPLAY } from '../constants/programLabels';
 
 interface ProgramStatusTagProps {
   status: ProgramStatus;
+  hasReleasedVersion?: boolean;
 }
 
-export function ProgramStatusTag({ status }: ProgramStatusTagProps) {
+export function ProgramStatusTag({
+  status,
+  hasReleasedVersion = true,
+}: ProgramStatusTagProps) {
+  const display =
+    status === 'INACTIVE'
+      ? PROGRAM_TAG_DISPLAY.INACTIVE
+      : hasReleasedVersion
+        ? PROGRAM_TAG_DISPLAY.ACTIVE
+        : PROGRAM_TAG_DISPLAY.DRAFT_ONLY;
   return (
-    <Tag color={PROGRAM_STATUS_COLORS[status]}>
-      {PROGRAM_STATUS_LABELS[status]}
-    </Tag>
+    <Tooltip title={display.tooltip}>
+      <Tag color={display.color}>{display.label}</Tag>
+    </Tooltip>
   );
 }

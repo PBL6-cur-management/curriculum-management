@@ -12,6 +12,13 @@ const SEMESTER = {
   academicYear: '2026-2027',
   termInYear: 2,
   startDate: '2027-01-18',
+  startDateEstimated: false,
+};
+
+const COHORT = {
+  id: 'k25',
+  cohortCode: 'K25',
+  intakeYear: 2025,
 };
 
 const preview = (
@@ -27,6 +34,8 @@ const preview = (
   authoredLabels: [],
   canAssignCohorts: false,
   canAllowPastSemester: false,
+  effectiveSemester: null,
+  targetCohorts: [],
   ...patch,
 });
 
@@ -41,6 +50,7 @@ function renderPage(
     reads: {
       ...(data ? { [PREVIEW_URL]: data } : {}),
       '/api/semesters': [SEMESTER],
+      '/api/cohorts': [COHORT],
     },
     writeResponse,
     extraRoutes: [
@@ -109,6 +119,34 @@ describe('FinalApprovalPage', () => {
     expect(
       await screen.findByRole('button', { name: 'Phê duyệt cuối' }),
     ).toBeDisabled();
+  });
+
+  it('prefills effectiveSemesterId and cohortIds from the request proposal', async () => {
+    const { writes } = renderPage(
+      preview({
+        canAssignCohorts: true,
+        effectiveSemester: SEMESTER,
+        targetCohorts: [COHORT],
+      }),
+    );
+    fireEvent.change(await screen.findByLabelText('Số quyết định'), {
+      target: { value: 'QĐ-456/ĐHBK' },
+    });
+    const date = screen.getByLabelText('Ngày ký');
+    fireEvent.mouseDown(date);
+    fireEvent.change(date, { target: { value: '01/09/2026' } });
+    fireEvent.keyDown(date, { key: 'Enter' });
+    fireEvent.click(screen.getByRole('button', { name: 'Phê duyệt cuối' }));
+
+    const dialog = await screen.findByRole('dialog');
+    fireEvent.click(
+      within(dialog).getByRole('button', { name: 'Phê duyệt cuối' }),
+    );
+    await screen.findByText('Chi tiết đề xuất');
+    expect(writes[0].body).toMatchObject({
+      effectiveSemesterId: 's1',
+      cohortIds: ['k25'],
+    });
   });
 
   it("shows the server's reason and a way back when the preview cannot load", async () => {

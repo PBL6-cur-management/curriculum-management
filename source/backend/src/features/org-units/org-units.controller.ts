@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   ApiCookieAuth,
@@ -20,6 +21,7 @@ import { PERMISSIONS } from '../../shared/authz/permission-codes.js';
 import { RequirePermission } from '../../shared/authz/require-permission.decorator.js';
 import { AnyAuthenticated } from '../../shared/authz/any-authenticated.decorator.js';
 import { CreateOrgUnitDto } from './create-org-unit.dto.js';
+import { OrgUnitQueryDto } from './org-unit-query.dto.js';
 import { UpdateOrgUnitDto } from './update-org-unit.dto.js';
 import { OrgUnitDto } from './org-unit.dto.js';
 import { OrgUnitsService } from './org-units.service.js';
@@ -33,8 +35,8 @@ export class OrgUnitsController {
   @Get()
   @AnyAuthenticated()
   @ApiOkResponse({ type: [OrgUnitDto] })
-  list(): Promise<OrgUnitDto[]> {
-    return this.orgUnits.list();
+  list(@Query() query: OrgUnitQueryDto): Promise<OrgUnitDto[]> {
+    return this.orgUnits.list(query);
   }
 
   @Post()

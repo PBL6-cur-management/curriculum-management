@@ -2,9 +2,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { App } from 'antd';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { GRADE_POINT_MESSAGE } from '../../../shared/courses/gradePoint';
 import type { Curriculum, CurriculumItem } from '../api/curriculum';
-import { curriculum as fixture, item } from '../testFixtures';
+import { CURRICULUM_SCORE_MESSAGE } from '../schema/curriculumRules';
+import { curriculum as fixture, item, trackFixture } from '../testFixtures';
 import { CurriculumItemModal, toItemBody } from './CurriculumItemModal';
 
 const json = (body: unknown, status = 200) =>
@@ -95,6 +95,7 @@ describe('toItemBody', () => {
       plannedSemester: 2,
       blockSymbol: null,
       isElective: false,
+      trackId: null,
       htDa: true,
       tqDa: false,
       minStudiedScore: null,
@@ -119,7 +120,7 @@ describe('CurriculumItemModal', () => {
     fireEvent.mouseDown(screen.getByLabelText('Học kỳ'));
     fireEvent.click(await screen.findByText('Học kỳ 2'));
     fireEvent.change(screen.getByLabelText('Điểm học'), {
-      target: { value: '3.5' },
+      target: { value: '5.5' },
     });
     fireEvent.click(screen.getByLabelText('HT ĐA'));
     fireEvent.click(screen.getByRole('button', { name: 'Lưu' }));
@@ -133,9 +134,10 @@ describe('CurriculumItemModal', () => {
           plannedSemester: 2,
           blockSymbol: null,
           isElective: false,
+          trackId: null,
           htDa: true,
           tqDa: false,
-          minStudiedScore: '3.5',
+          minStudiedScore: '5.5',
           minTransferScore: null,
           note: null,
         },
@@ -195,13 +197,28 @@ describe('CurriculumItemModal', () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
-  it('blocks a threshold above 4 before anything is sent', async () => {
+  it('allows selecting a ProgramTrack for the item', async () => {
+    const { writes, onClose } = renderModal(
+      item('MAT101', 'Giải tích 1'),
+      () => json({}),
+      fixture({ tracks: [trackFixture()] }),
+    );
+    fireEvent.mouseDown(screen.getByLabelText('Định hướng / Chuyên ngành'));
+    fireEvent.click(await screen.findByText('CNPM — Công nghệ phần mềm'));
+    fireEvent.click(screen.getByRole('button', { name: 'Lưu' }));
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(writes[0].body).toMatchObject({ trackId: 't-cnpm' });
+  });
+
+  it('blocks a threshold above 10 (DEC-11 0..10 scale) before anything is sent', async () => {
     const { writes } = renderModal(item('MAT101', 'Giải tích 1'));
     fireEvent.change(screen.getByLabelText('Điểm học'), {
-      target: { value: '5' },
+      target: { value: '10.5' },
     });
     fireEvent.click(screen.getByRole('button', { name: 'Lưu' }));
-    expect(await screen.findByText(GRADE_POINT_MESSAGE)).toBeInTheDocument();
+    expect(
+      await screen.findByText(CURRICULUM_SCORE_MESSAGE),
+    ).toBeInTheDocument();
     expect(writes).toHaveLength(0);
   });
 });

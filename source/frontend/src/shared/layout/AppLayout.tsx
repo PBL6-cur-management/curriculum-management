@@ -70,14 +70,17 @@ export function AppLayout() {
                 width: 44,
                 height: 44,
                 background: palette.white,
+                borderRadius: 6,
+                padding: 3,
                 flexShrink: 0,
               }}
             >
               <img
                 src="/logo-dut.webp"
                 alt="Logo ĐHBK Đà Nẵng"
-                width={36}
-                height={36}
+                width={38}
+                height={38}
+                style={{ objectFit: 'contain', display: 'block' }}
               />
             </Flex>
             <Flex vertical style={{ lineHeight: 1.25 }}>

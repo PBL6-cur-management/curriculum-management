@@ -37,6 +37,7 @@ export interface WarningItem extends CreditItem {
   courseId: string;
   courseCode: string;
   plannedSemester: number;
+  trackId?: string | null;
   requisites: readonly {
     sourceCourseId: string;
     sourceCourseCode: string;
@@ -70,6 +71,7 @@ export interface WarningItemRow {
   plannedSemester: number;
   isElective: boolean;
   electiveGroupId: string | null;
+  trackId?: string | null;
   creditsSnapshot: Prisma.Decimal | null;
   course: { courseCode: string; credits: Prisma.Decimal };
   requisites: readonly {
@@ -88,6 +90,7 @@ export function toWarningItem(row: WarningItemRow): WarningItem {
     credits: rowCredits(row),
     isElective: row.isElective,
     electiveGroupId: row.electiveGroupId,
+    trackId: row.trackId ?? null,
     requisites: row.requisites.map((requisite) => ({
       sourceCourseId: requisite.sourceCourseId,
       sourceCourseCode: requisite.sourceCourse.courseCode,
@@ -194,24 +197,45 @@ function requisiteWarnings(items: readonly WarningItem[]): CurriculumWarning[] {
   return found;
 }
 
-// The stored unique (version, course) index refuses these; the check serves import previews that run over file rows.
+// Same course may legitimately appear in two DIFFERENT tracks (e.g. compulsory in CNPM, elective in HTTT),
+// but never twice inside the same track (or common core) nor in both common core and a track.
 function duplicateCourses(items: readonly WarningItem[]): CurriculumWarning[] {
   const byCourse = new Map<string, WarningItem[]>();
   for (const item of items) {
     byCourse.set(item.courseId, [...(byCourse.get(item.courseId) ?? []), item]);
   }
   const found: CurriculumWarning[] = [];
-  for (const rows of byCourse.values()) {
-    if (rows.length < 2) continue;
-    const semesters = rows.map((row) => row.plannedSemester);
-    found.push(
-      warning(
-        CURRICULUM_WARNING.DUPLICATE_COURSE,
-        WARNING_SEVERITY.ERROR,
-        `${rows[0].courseCode} xuất hiện ${rows.length} lần trong khung (học kỳ ${semesters.join(', ')}).`,
-        { itemId: rows[1].id, semester: rows[1].plannedSemester },
-      ),
-    );
+  for (const allRows of byCourse.values()) {
+    if (allRows.length < 2) continue;
+    const byTrack = new Map<string | null, WarningItem[]>();
+    for (const row of allRows) {
+      const key = row.trackId ?? null;
+      byTrack.set(key, [...(byTrack.get(key) ?? []), row]);
+    }
+    const commonRows = byTrack.get(null) ?? [];
+    for (const [trackKey, rows] of byTrack) {
+      if (rows.length >= 2) {
+        const semesters = rows.map((row) => row.plannedSemester);
+        found.push(
+          warning(
+            CURRICULUM_WARNING.DUPLICATE_COURSE,
+            WARNING_SEVERITY.ERROR,
+            `${rows[0].courseCode} xuất hiện ${rows.length} lần trong khung (học kỳ ${semesters.join(', ')}).`,
+            { itemId: rows[1].id, semester: rows[1].plannedSemester },
+          ),
+        );
+      } else if (trackKey !== null && commonRows.length > 0) {
+        const semesters = [commonRows[0].plannedSemester, rows[0].plannedSemester];
+        found.push(
+          warning(
+            CURRICULUM_WARNING.DUPLICATE_COURSE,
+            WARNING_SEVERITY.ERROR,
+            `${rows[0].courseCode} xuất hiện ở cả khung chung và định hướng (học kỳ ${semesters.join(', ')}).`,
+            { itemId: rows[0].id, semester: rows[0].plannedSemester },
+          ),
+        );
+      }
+    }
   }
   return found;
 }

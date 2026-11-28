@@ -8,6 +8,18 @@ export const UNIT_STATUS_LABELS: Record<OrgUnit['status'], string> = {
   ACTIVE: 'Đang hoạt động',
   INACTIVE: 'Ngừng hoạt động',
 };
+export const EXTERNAL_UNIT_TAG_LABEL = 'Đơn vị ngoài trường';
+export const EXTERNAL_UNIT_CHECKBOX_LABEL =
+  'Đơn vị ngoài trường (ví dụ: Trung tâm GDQP&AN ĐHĐN)';
+export type OrgUnitScopeFilter = 'ALL' | 'INTERNAL' | 'EXTERNAL';
+export const ORG_UNIT_SCOPE_OPTIONS: {
+  value: OrgUnitScopeFilter;
+  label: string;
+}[] = [
+  { value: 'ALL', label: 'Tất cả' },
+  { value: 'INTERNAL', label: 'Nội bộ' },
+  { value: 'EXTERNAL', label: 'Ngoài trường' },
+];
 export const CREATABLE_UNIT_TYPES = [
   'FACULTY',
   'OFFICE',

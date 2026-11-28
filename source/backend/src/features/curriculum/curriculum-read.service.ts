@@ -47,6 +47,7 @@ import {
 import { blockTotals, semesterTotals } from './curriculum-totals.js';
 import { CURRICULUM_ERRORS } from './curriculum.errors.js';
 import { GROUP_INCLUDE, toElectiveGroupDto } from './elective-group.dto.js';
+import { TRACK_INCLUDE, toProgramTrackDto } from './program-track.dto.js';
 
 // A row with the version and course facts a write needs to decide on scope and edit path.
 export interface WritableItem {
@@ -67,7 +68,7 @@ export class CurriculumReadService {
   async read(versionId: string, access: AccessContext): Promise<CurriculumDto> {
     const version = await this.findVersion(versionId);
     access.assertCan(PERMISSIONS.PROGRAM_VIEW, programTarget(version.program));
-    const [rows, groups, blocks, state] = await Promise.all([
+    const [rows, groups, tracks, blocks, state] = await Promise.all([
       this.prisma.curriculumItem.findMany({
         where: { versionId },
         include: ITEM_INCLUDE,
@@ -78,6 +79,13 @@ export class CurriculumReadService {
         include: GROUP_INCLUDE,
         orderBy: { groupCode: 'asc' },
       }),
+      this.prisma.programTrack
+        ? this.prisma.programTrack.findMany({
+            where: { versionId },
+            include: TRACK_INCLUDE,
+            orderBy: [{ sortOrder: 'asc' }, { trackCode: 'asc' }],
+          })
+        : Promise.resolve([]),
       this.prisma.knowledgeBlock.findMany({ orderBy: { blockCode: 'asc' } }),
       programEditState(this.prisma, version.programId),
     ]);
@@ -132,7 +140,28 @@ export class CurriculumReadService {
       minCredits: group.minCredits,
       minCourses: group.minCourses,
     }));
-    const computed = programCredits(warningItems, warningGroups);
+    const creditRows =
+      tracks.length > 0
+        ? rows.filter(
+            (row) => row.trackId === null || row.trackId === tracks[0]!.id,
+          )
+        : rows;
+    const creditGroups =
+      tracks.length > 0
+        ? groups.filter(
+            (group) =>
+              group.trackId === null || group.trackId === tracks[0]!.id,
+          )
+        : groups;
+    const computed = programCredits(
+      creditRows.map(toWarningItem),
+      creditGroups.map((group) => ({
+        id: group.id,
+        groupCode: group.groupCode,
+        minCredits: group.minCredits,
+        minCourses: group.minCourses,
+      })),
+    );
     return {
       version: toCurriculumVersionDto(version),
       editPath,
@@ -152,6 +181,7 @@ export class CurriculumReadService {
       blocks: blockTotals(totalsInput, blockNames),
       knowledgeBlocks: blocks.map(toKnowledgeBlockDto),
       electiveGroups: groups.map(toElectiveGroupDto),
+      tracks: tracks.map(toProgramTrackDto),
       programCredits: {
         computed: toCreditBreakdownDto(computed),
         declared: toCreditBreakdownDto({

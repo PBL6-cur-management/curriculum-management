@@ -2,6 +2,7 @@ import {
   DRAFT_VERSION_LABEL,
   VERSION_STATUS_LABELS as SHARED_VERSION_STATUS_LABELS,
   versionLabel,
+  versionWithDecision,
 } from '../../../shared/constants/versionLabels';
 import type {
   DegreeLevel,
@@ -9,14 +10,37 @@ import type {
   ProgramVersionStatus,
 } from '../api/programs';
 
-export const DEGREE_LEVEL_LABELS: Record<DegreeLevel, string> = {
+export const DEGREE_LEVEL_LABELS: Record<
+  DegreeLevel | 'MASTER' | 'DOCTORATE',
+  string
+> = {
   ENGINEER: 'Kỹ sư',
   BACHELOR: 'Cử nhân',
+  MASTER: 'Thạc sĩ',
+  DOCTORATE: 'Tiến sĩ',
 };
 export const PROGRAM_STATUS_LABELS: Record<ProgramStatus, string> = {
-  ACTIVE: 'Đang sử dụng',
+  ACTIVE: 'Đang hoạt động',
   INACTIVE: 'Ngừng sử dụng',
 };
+export const PROGRAM_TAG_DISPLAY = {
+  DRAFT_ONLY: {
+    label: 'Đang soạn thảo',
+    color: 'blue',
+    tooltip: 'Chương trình mới tạo, chưa ban hành phiên bản chính thức.',
+  },
+  ACTIVE: {
+    label: 'Đang đào tạo',
+    color: 'green',
+    tooltip: 'Chương trình đang hoạt động và có phiên bản đã ban hành.',
+  },
+  INACTIVE: {
+    label: 'Ngừng sử dụng',
+    color: 'default',
+    tooltip:
+      'Chương trình đã ngừng tuyển sinh/sử dụng; vẫn tra cứu được dữ liệu cũ.',
+  },
+} as const;
 export const PROGRAM_STATUS_COLORS: Record<ProgramStatus, string> = {
   ACTIVE: 'green',
   INACTIVE: 'default',
@@ -25,7 +49,7 @@ export const PROGRAM_STATUS_COLORS: Record<ProgramStatus, string> = {
 export const VERSION_STATUS_LABELS: Record<ProgramVersionStatus, string> =
   SHARED_VERSION_STATUS_LABELS;
 // Moved to shared/ so the curriculum and course screens print the same label; re-exported for the programs screens.
-export { DRAFT_VERSION_LABEL, versionLabel };
+export { DRAFT_VERSION_LABEL, versionLabel, versionWithDecision };
 
 export const ALL_STATUSES_LABEL = 'Tất cả';
 export const CLONE_SCOPE_NOTE =
@@ -42,10 +66,11 @@ export const PROGRAM_COLUMN_LABELS = {
 } as const;
 export const PROGRAM_FILTER_LABELS = {
   FACULTY: 'Khoa quản lý',
+  MAJOR: 'Ngành đào tạo',
   DEGREE_LEVEL: 'Trình độ',
   RELEASE_YEAR: 'Năm ban hành',
   INTAKE_YEAR: 'Năm tuyển sinh',
 } as const;
 export const NO_RELEASED_VERSION_LABEL = 'Chưa ban hành';
 export const NO_COHORT_LABEL = 'Chưa gán khóa';
-export const IN_USE_VERSION_LABEL = 'đang áp dụng';
+export const IN_USE_VERSION_LABEL = 'mới nhất';

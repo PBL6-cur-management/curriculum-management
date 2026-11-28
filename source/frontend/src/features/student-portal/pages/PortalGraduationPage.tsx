@@ -23,7 +23,22 @@ function Review({ context }: { context: PortalContext }) {
       />
     );
   }
-  return <GraduationResultView result={outcome.result} />;
+  const missingTrack = outcome.result.shortfalls.some(
+    (shortfall) => shortfall.code === 'TRACK_NOT_SELECTED',
+  );
+  return (
+    <Flex vertical gap="middle">
+      {missingTrack && (
+        <Alert
+          type="warning"
+          showIcon
+          title="Chưa ghi nhận định hướng / chuyên ngành con"
+          description="Chương trình áp dụng của bạn có chia định hướng. Liên hệ Phòng Đào tạo để đăng ký định hướng trước khi xét tốt nghiệp chính thức."
+        />
+      )}
+      <GraduationResultView result={outcome.result} />
+    </Flex>
+  );
 }
 
 // MH-59: the same live evaluation the office uses, computed now and never saved from here.

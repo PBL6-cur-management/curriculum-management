@@ -1,14 +1,27 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString, Matches, MaxLength } from 'class-validator';
-import { RegistrationEligibilityDto } from '../../registration-eligibility/dto/registration-eligibility.dto.js';
-import {
-  PortalSyllabusDto,
-  PortalTermDto,
-} from '../../student-portal/dto/student-portal.dto.js';
-import { GRADUATION_OUTCOME_SCHEMA } from '../../graduation/graduation.dto.js';
-import type { GraduationOutcome } from '../../../shared/graduation/graduation.types.js';
+import { SyllabusMaterialKind } from '../../../generated/prisma/client.js';
 import { INTEGRATION } from '../../../shared/integration-access/integration.constants.js';
 import { VERSION_NUMBER_PATTERN } from '../../../shared/releases/version-number.js';
+import {
+  PORTAL_COURSE_STATES,
+  PortalAssessmentDto,
+  PortalCloDto,
+  PortalWeekDto,
+  type PortalCourseState,
+} from '../../student-portal/dto/student-portal.dto.js';
+import { DdutCourseRefDto, DdutMetaDto } from './ddut-course.dto.js';
+import { DdutRegistrationEligibilityDto } from './ddut-eligibility.dto.js';
+import {
+  DDUT_GRADUATION_OUTCOME_SCHEMA,
+  DdutCreditsDto,
+  DdutDiagnosticDto,
+  type DdutGraduationOutcome,
+} from './ddut-graduation.dto.js';
+
+export * from './ddut-course.dto.js';
+export * from './ddut-eligibility.dto.js';
+export * from './ddut-graduation.dto.js';
 
 export class DdutSemesterQueryDto {
   @ApiPropertyOptional({
@@ -43,17 +56,10 @@ export class DdutSyllabusQueryDto extends DdutSemesterQueryDto {
   programVersion?: string;
 }
 
-export class DdutMetaDto {
-  @ApiProperty({ enum: ['v1'] }) apiVersion!: 'v1';
-  @ApiProperty({ format: 'date-time' }) evaluatedAt!: string;
-}
-
 export class DdutStudentContextDto {
   @ApiProperty() studentCode!: string;
-  @ApiProperty() enrollmentId!: string;
   @ApiProperty() programCode!: string;
   @ApiProperty() programName!: string;
-  @ApiProperty() programVersionId!: string;
   @ApiProperty({ type: String, nullable: true }) versionNumber!: string | null;
   @ApiProperty({ type: String, nullable: true }) decisionNumber!: string | null;
   @ApiProperty() semesterCode!: string;
@@ -65,11 +71,6 @@ export class DdutStudentContextDto {
 export class DdutApplicableProgramDto {
   @ApiProperty({ type: DdutMetaDto }) meta!: DdutMetaDto;
   @ApiProperty({ type: DdutStudentContextDto }) context!: DdutStudentContextDto;
-}
-
-export class DdutCourseRefDto {
-  @ApiProperty() courseCode!: string;
-  @ApiProperty() courseName!: string;
 }
 
 export class DdutRequisiteDto {
@@ -149,25 +150,64 @@ export class DdutSyllabusContextDto {
   @ApiProperty({ type: String, nullable: true }) studentCode!: string | null;
 }
 
+export class DdutSyllabusAttachmentDto {
+  @ApiProperty() fileName!: string;
+  @ApiProperty({ enum: SyllabusMaterialKind, enumName: 'SyllabusMaterialKind' })
+  materialKind!: SyllabusMaterialKind;
+  @ApiProperty() sizeBytes!: number;
+}
+
+export class DdutSyllabusContentDto {
+  @ApiProperty() courseCode!: string;
+  @ApiProperty() courseName!: string;
+  @ApiProperty() credits!: string;
+  @ApiProperty() revisionNumber!: number;
+  @ApiProperty({ type: String, nullable: true }) publishedAt!: string | null;
+  @ApiProperty({ type: String, nullable: true }) courseDescription!:
+    string | null;
+  @ApiProperty({ type: String, nullable: true }) objectives!: string | null;
+  @ApiProperty({ type: String, nullable: true }) teachingMethods!:
+    string | null;
+  @ApiProperty({ type: String, nullable: true }) assessmentMethods!:
+    string | null;
+  @ApiProperty({ type: String, nullable: true }) references!: string | null;
+  @ApiProperty({ type: [PortalCloDto] }) clos!: PortalCloDto[];
+  @ApiProperty({ type: [PortalWeekDto] }) weeks!: PortalWeekDto[];
+  @ApiProperty({ type: [PortalAssessmentDto] })
+  assessments!: PortalAssessmentDto[];
+  @ApiProperty({ type: [DdutSyllabusAttachmentDto] })
+  attachments!: DdutSyllabusAttachmentDto[];
+}
+
 export class DdutSyllabusDto {
   @ApiProperty({ type: DdutMetaDto }) meta!: DdutMetaDto;
   @ApiProperty({ type: DdutSyllabusContextDto })
   context!: DdutSyllabusContextDto;
-  @ApiProperty({ type: PortalSyllabusDto }) syllabus!: PortalSyllabusDto;
+  @ApiProperty({ type: DdutSyllabusContentDto })
+  syllabus!: DdutSyllabusContentDto;
 }
 
-export class DdutCreditsDto {
-  @ApiProperty() requiredTotal!: string;
-  @ApiProperty() recognizedTotal!: string;
-  @ApiProperty() missingTotal!: string;
-  @ApiProperty() compulsory!: string;
-  @ApiProperty() elective!: string;
-  @ApiProperty() free!: string;
+export class DdutProgressCourseDto {
+  @ApiProperty() courseCode!: string;
+  @ApiProperty() courseName!: string;
+  @ApiProperty() credits!: string;
+  @ApiProperty() isElective!: boolean;
+  @ApiProperty({ type: String, nullable: true }) groupName!: string | null;
+  @ApiProperty({ type: String, nullable: true }) blockSymbol!: string | null;
+  @ApiProperty({ enum: PORTAL_COURSE_STATES, enumName: 'PortalCourseState' })
+  state!: PortalCourseState;
+  @ApiProperty() attemptCount!: number;
+  @ApiProperty({ type: String, nullable: true }) score10!: string | null;
+  @ApiProperty({ type: String, nullable: true }) score4!: string | null;
+  @ApiProperty({ type: String, nullable: true }) letterGrade!: string | null;
+  @ApiProperty() hasSyllabus!: boolean;
 }
 
-export class DdutDiagnosticDto {
-  @ApiProperty() code!: string;
-  @ApiProperty() message!: string;
+export class DdutProgressTermDto {
+  @ApiProperty() plannedSemester!: number;
+  @ApiProperty() credits!: string;
+  @ApiProperty({ type: [DdutProgressCourseDto] })
+  courses!: DdutProgressCourseDto[];
 }
 
 export class DdutProgressDto {
@@ -183,19 +223,19 @@ export class DdutProgressDto {
   credits!: DdutCreditsDto | null;
   @ApiProperty({ type: DdutDiagnosticDto, nullable: true })
   creditsUnavailable!: DdutDiagnosticDto | null;
-  @ApiProperty({ type: [PortalTermDto] }) terms!: PortalTermDto[];
+  @ApiProperty({ type: [DdutProgressTermDto] }) terms!: DdutProgressTermDto[];
 }
 
 export class DdutEligibilityDto {
   @ApiProperty({ type: DdutMetaDto }) meta!: DdutMetaDto;
   @ApiProperty({ type: DdutStudentContextDto }) context!: DdutStudentContextDto;
-  @ApiProperty({ type: RegistrationEligibilityDto })
-  eligibility!: RegistrationEligibilityDto;
+  @ApiProperty({ type: DdutRegistrationEligibilityDto })
+  eligibility!: DdutRegistrationEligibilityDto;
 }
 
 export class DdutGraduationDto {
   @ApiProperty({ type: DdutMetaDto }) meta!: DdutMetaDto;
   @ApiProperty({ type: DdutStudentContextDto }) context!: DdutStudentContextDto;
-  @ApiProperty(GRADUATION_OUTCOME_SCHEMA)
-  graduation!: GraduationOutcome;
+  @ApiProperty(DDUT_GRADUATION_OUTCOME_SCHEMA)
+  graduation!: DdutGraduationOutcome;
 }

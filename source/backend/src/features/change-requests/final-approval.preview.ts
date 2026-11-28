@@ -21,11 +21,14 @@ import {
   VERSION_BUMP,
   type VersionBump,
 } from '../../shared/releases/version-number.js';
+import {
+  toCohortDto,
+  toSemesterDto,
+} from '../../shared/releases/semester.dto.js';
 import type {
   FinalApprovalProgramDto,
   FinalApprovalPreviewDto,
 } from './final-approval.dto.js';
-import { hasGradingChanges } from './grading-changes.js';
 
 // What the academic office is shown before it decides. Advisory: the approval repeats every check in its transaction.
 @Injectable()
@@ -38,14 +41,30 @@ export class FinalApprovalPreviewReader {
 
   async read(request: ChangeRequest): Promise<FinalApprovalPreviewDto> {
     const workspace = workspaceKindFor(request.requestType, request.targetType);
+    const [proposedSemester, proposedCohorts] = await Promise.all([
+      request.effectiveSemesterId
+        ? this.prisma.semester.findUnique({
+            where: { id: request.effectiveSemesterId },
+          })
+        : Promise.resolve(null),
+      this.prisma.changeRequestCohort
+        ? this.prisma.changeRequestCohort.findMany({
+            where: { changeRequestId: request.id },
+            include: { cohort: true },
+            orderBy: { cohort: { intakeYear: 'desc' } },
+          })
+        : Promise.resolve([]),
+    ]);
     const base = {
       requestId: request.id,
       requestCode: request.requestCode,
       requestType: request.requestType,
       stale: await this.stale.isStale(this.prisma, request),
-      canAllowPastSemester:
-        request.createdByAcademicOffice &&
-        !(await hasGradingChanges(this.prisma, request.id)),
+      canAllowPastSemester: true,
+      effectiveSemester: proposedSemester
+        ? toSemesterDto(proposedSemester)
+        : null,
+      targetCohorts: proposedCohorts.map((row) => toCohortDto(row.cohort)),
     };
     if (workspace === WORKSPACE_KIND.PROGRAM_VERSION) {
       const affected = await this.programCopy(request);
@@ -55,7 +74,7 @@ export class FinalApprovalPreviewReader {
         affectedPrograms: affected,
         copyIssues: [],
         authoredLabels: [],
-        canAssignCohorts: affected.length === 1,
+        canAssignCohorts: affected.length >= 1,
       };
     }
     if (workspace === WORKSPACE_KIND.SYLLABUS) {
@@ -66,7 +85,7 @@ export class FinalApprovalPreviewReader {
         affectedPrograms: affected,
         copyIssues,
         authoredLabels: [],
-        canAssignCohorts: affected.length === 1,
+        canAssignCohorts: affected.length >= 1,
       };
     }
     const items = await this.prisma.changeItem.findMany({

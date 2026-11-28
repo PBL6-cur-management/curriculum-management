@@ -32,6 +32,10 @@ import { SubjectGroupsService } from './subject-groups.service.js';
 import { UpdateSubjectGroupDto } from './update-subject-group.dto.js';
 import { AddSubjectGroupMemberDto } from './add-subject-group-member.dto.js';
 import { EndSubjectGroupMemberDto } from './end-subject-group-member.dto.js';
+import {
+  DemoteCoordinatorDto,
+  PromoteCoordinatorDto,
+} from './promote-coordinator.dto.js';
 import { SubjectGroupMemberDto } from './subject-group-member.dto.js';
 import { SubjectGroupMembersService } from './subject-group-members.service.js';
 
@@ -148,5 +152,41 @@ export class SubjectGroupsController {
     @CurrentUser() actor: AuthenticatedUser,
   ) {
     return this.members.revoke(groupId, memberId, actor.id);
+  }
+
+  @Post(':groupId/coordinators/:lecturerId/promote')
+  @HttpCode(HttpStatus.OK)
+  @RequirePermission(PERMISSIONS.ORG_UNIT_MANAGE)
+  @ApiOkResponse({ type: SubjectGroupMemberDto })
+  promoteCoordinator(
+    @Param('groupId') groupId: string,
+    @Param('lecturerId') lecturerId: string,
+    @Body() dto: PromoteCoordinatorDto,
+    @CurrentUser() actor: AuthenticatedUser,
+  ) {
+    return this.members.promoteCoordinator(
+      groupId,
+      lecturerId,
+      dto,
+      actor.id,
+    );
+  }
+
+  @Post(':groupId/coordinators/:lecturerId/demote')
+  @HttpCode(HttpStatus.OK)
+  @RequirePermission(PERMISSIONS.ORG_UNIT_MANAGE)
+  @ApiOkResponse({ type: [SubjectGroupMemberDto] })
+  demoteCoordinator(
+    @Param('groupId') groupId: string,
+    @Param('lecturerId') lecturerId: string,
+    @Body() dto: DemoteCoordinatorDto,
+    @CurrentUser() actor: AuthenticatedUser,
+  ) {
+    return this.members.demoteCoordinator(
+      groupId,
+      lecturerId,
+      dto,
+      actor.id,
+    );
   }
 }

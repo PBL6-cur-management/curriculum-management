@@ -89,12 +89,12 @@ describe('AddRelationModal', () => {
     );
   });
 
-  it('blocks a threshold above 4 before anything is sent', async () => {
+  it('blocks a threshold above 10 before anything is sent', async () => {
     const { posts, onClose } = renderModal();
     await choose('IT001', 'Cần đạt tiên quyết học phần');
     await choose('Học phần', OTHER_LABEL);
     fireEvent.change(screen.getByLabelText('Ngưỡng điểm'), {
-      target: { value: '4.5' },
+      target: { value: '10.5' },
     });
     fireEvent.click(screen.getByRole('button', { name: 'Lưu' }));
     expect(await screen.findByText(GRADE_POINT_MESSAGE)).toBeInTheDocument();
@@ -102,12 +102,12 @@ describe('AddRelationModal', () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
-  it('sends the other course as the source of a requirement this course has, with the threshold', async () => {
+  it('sends the other course as the source of a requirement this course has, with the 0..10 threshold', async () => {
     const { posts, onClose } = renderModal();
     await choose('IT001', 'Cần đạt tiên quyết học phần');
     await choose('Học phần', OTHER_LABEL);
     fireEvent.change(screen.getByLabelText('Ngưỡng điểm'), {
-      target: { value: '2' },
+      target: { value: '5.5' },
     });
     fireEvent.click(screen.getByRole('button', { name: 'Lưu' }));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
@@ -116,7 +116,7 @@ describe('AddRelationModal', () => {
         sourceCourseId: 'c2',
         targetCourseId: 'c1',
         relationType: 'PREREQUISITE',
-        minScore: '2',
+        minScore: '5.5',
       },
     ]);
   });

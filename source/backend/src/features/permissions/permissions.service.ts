@@ -2,13 +2,18 @@ import { Injectable, Logger } from '@nestjs/common';
 import {
   PermissionMode,
   PermissionScope,
+  Prisma,
   ScopeSource,
 } from '../../generated/prisma/client.js';
 import { PERMISSIONS } from '../../shared/authz/permission-codes.js';
 import { isLockedCell, LOCKED_CELLS } from '../../shared/authz/locked-cells.js';
 import { AppException } from '../../shared/exception/app.exception.js';
+import { INTEGRATION } from '../../shared/integration-access/integration.constants.js';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
+import { mapUniqueViolation } from '../../shared/prisma/unique-violation.js';
+import { todayDate } from '../../shared/time/today.js';
 import type { PermissionCode } from '../../shared/authz/permission-codes.js';
+import { CreateRoleDto } from './create-role.dto.js';
 import {
   MatrixCellDto,
   PermissionDto,
@@ -17,6 +22,7 @@ import {
 } from './permission-matrix.dto.js';
 import { PERMISSION_ERRORS } from './permissions.errors.js';
 import { SetRolePermissionDto } from './set-role-permission.dto.js';
+import { UpdateRoleDto } from './update-role.dto.js';
 
 const MATRIX_CELL_SELECT = {
   mode: true,
@@ -38,6 +44,104 @@ export class PermissionsService {
       orderBy: { roleCode: 'asc' },
     });
     return rows.map(toRoleDto);
+  }
+
+  async createRole(dto: CreateRoleDto, actorId: string): Promise<RoleDto> {
+    const roleCode = dto.roleCode.trim().toUpperCase();
+    const roleName = dto.roleName.trim().replace(/\s+/g, ' ');
+    if (roleCode === INTEGRATION.ROLE_CODE) {
+      throw new AppException(PERMISSION_ERRORS.ROLE_CODE_TAKEN, [
+        { field: 'roleCode', constraints: ['unique'] },
+      ]);
+    }
+    try {
+      const created = await this.prisma.role.create({
+        data: {
+          roleCode,
+          roleName,
+          description: dto.description ?? null,
+          isSystemRole: false,
+          scopeSource: ScopeSource.NONE,
+        },
+      });
+      this.logger.log(`Custom role ${created.roleCode} created by ${actorId}`);
+      return toRoleDto(created);
+    } catch (error) {
+      throw mapUniqueViolation(
+        error,
+        PERMISSION_ERRORS.ROLE_CODE_TAKEN,
+        'roleCode',
+      );
+    }
+  }
+
+  async updateRole(
+    roleCode: string,
+    dto: UpdateRoleDto,
+    actorId: string,
+  ): Promise<RoleDto> {
+    const code = roleCode.trim().toUpperCase();
+    const existing = await this.prisma.role.findUnique({
+      where: { roleCode: code },
+    });
+    if (!existing) {
+      throw new AppException(PERMISSION_ERRORS.ROLE_NOT_FOUND);
+    }
+    const updated = await this.prisma.role.update({
+      where: { id: existing.id },
+      data: {
+        ...(dto.roleName !== undefined && {
+          roleName: dto.roleName.trim().replace(/\s+/g, ' '),
+        }),
+        ...(dto.description !== undefined && { description: dto.description }),
+      },
+    });
+    this.logger.log(`Role ${updated.roleCode} updated by ${actorId}`);
+    return toRoleDto(updated);
+  }
+
+  async deleteRole(roleCode: string, actorId: string): Promise<void> {
+    const code = roleCode.trim().toUpperCase();
+    const existing = await this.prisma.role.findUnique({
+      where: { roleCode: code },
+    });
+    if (!existing) {
+      throw new AppException(PERMISSION_ERRORS.ROLE_NOT_FOUND);
+    }
+    if (existing.isSystemRole) {
+      throw new AppException(PERMISSION_ERRORS.SYSTEM_ROLE_LOCKED);
+    }
+    const today = todayDate();
+    const [activeAssignments, approvalLevels] = await Promise.all([
+      this.prisma.roleAssignment.count({
+        where: {
+          roleId: existing.id,
+          revokedAt: null,
+          OR: [{ validTo: null }, { validTo: { gte: today } }],
+        },
+      }),
+      this.prisma.approvalLevelConfig.count({
+        where: { roleId: existing.id },
+      }),
+    ]);
+    if (activeAssignments > 0 || approvalLevels > 0) {
+      throw new AppException(PERMISSION_ERRORS.ROLE_IN_USE);
+    }
+    try {
+      await this.prisma.$transaction(async (tx) => {
+        await tx.rolePermission.deleteMany({ where: { roleId: existing.id } });
+        await tx.role.delete({ where: { id: existing.id } });
+      });
+      this.logger.log(`Custom role ${existing.roleCode} deleted by ${actorId}`);
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2003'
+      ) {
+        throw new AppException(PERMISSION_ERRORS.ROLE_IN_USE);
+      }
+      throw error;
+    }
   }
 
   async matrix(): Promise<PermissionMatrixDto> {

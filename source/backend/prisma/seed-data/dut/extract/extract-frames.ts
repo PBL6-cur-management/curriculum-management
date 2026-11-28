@@ -93,7 +93,7 @@ const groupBy = <Row>(rows: readonly Row[], key: (row: Row) => string) => {
   return map;
 };
 
-function extractVersion(
+export function extractVersion(
   major: MajorRow,
   input: {
     frameRows: readonly FrameRow[];

@@ -34,6 +34,7 @@ export interface StudentEnrollmentCommand {
   fromSemesterId: string;
   basisDecision: string;
   sourceEnrollmentId?: string;
+  trackId?: string;
   expectedStudentUpdatedAt: string;
   expectedEnrollmentUpdatedAt?: string;
 }
@@ -152,12 +153,24 @@ export async function applyEnrollmentCommand(
   if (TERMINAL_STATUSES.includes(student.status)) throw invalidInterval();
 
   const fromSemester = await requireSemesterStart(tx, command.fromSemesterId);
+  // Staff may schedule a TRANSFER from an upcoming semester; the other operations still start no later than today.
+  const startsInFuture =
+    command.operation !== 'TRANSFER' &&
+    fromSemester.startDate.getTime() > todayDate().getTime();
   if (
-    fromSemester.startDate.getTime() > todayDate().getTime() ||
+    startsInFuture ||
     targetFact.effectiveSemester.startDate.getTime() >
       fromSemester.startDate.getTime()
   ) {
     throw invalidInterval();
+  }
+  if (command.trackId) {
+    const track = await tx.programTrack.findUnique({
+      where: { id: command.trackId },
+      select: { versionId: true },
+    });
+    if (!track || track.versionId !== target.id)
+      throw new AppException(STUDENT_ERRORS.ENROLLMENT_COMMAND_INVALID);
   }
 
   const enrollments = await tx.programEnrollment.findMany({
@@ -224,6 +237,7 @@ export async function applyEnrollmentCommand(
       cohortId: student.cohortId,
       appliedVersionId: target.id,
       admissionVersionId: target.id,
+      trackId: command.trackId ?? null,
       cohortAssignmentId: null,
       fromSemesterId: fromSemester.id,
       previousEnrollmentId,
@@ -266,6 +280,42 @@ export async function endStudentEnrollments(
   await tx.programEnrollment.updateMany({
     where: { id: { in: ids }, status: EnrollmentStatus.ACTIVE },
     data: { status: EnrollmentStatus.ENDED, untilSemesterId: until.id },
+  });
+  await touchStudent(tx, studentId);
+}
+
+// Chooses (or clears) the track of an active enrollment; the track must belong to the version the student is on.
+export async function setEnrollmentTrack(
+  tx: Prisma.TransactionClient,
+  studentId: string,
+  enrollmentId: string,
+  trackId: string | null,
+  options: { expectedEnrollmentUpdatedAt?: string } = {},
+): Promise<void> {
+  await lockStudents(tx, [studentId]);
+  await lockEnrollments(tx, [enrollmentId]);
+  const enrollment = await tx.programEnrollment.findFirst({
+    where: { id: enrollmentId, studentId },
+    select: { appliedVersionId: true, status: true, updatedAt: true },
+  });
+  if (!enrollment) throw new AppException(STUDENT_ERRORS.ENROLLMENT_NOT_FOUND);
+  if (
+    options.expectedEnrollmentUpdatedAt !== undefined &&
+    enrollment.updatedAt.toISOString() !== options.expectedEnrollmentUpdatedAt
+  )
+    throw new AppException(STUDENT_ERRORS.ENROLLMENT_STATE_CHANGED);
+  if (enrollment.status !== EnrollmentStatus.ACTIVE) throw invalidInterval();
+  if (trackId !== null) {
+    const track = await tx.programTrack.findUnique({
+      where: { id: trackId },
+      select: { versionId: true },
+    });
+    if (!track || track.versionId !== enrollment.appliedVersionId)
+      throw new AppException(STUDENT_ERRORS.ENROLLMENT_COMMAND_INVALID);
+  }
+  await tx.programEnrollment.update({
+    where: { id: enrollmentId },
+    data: { trackId },
   });
   await touchStudent(tx, studentId);
 }

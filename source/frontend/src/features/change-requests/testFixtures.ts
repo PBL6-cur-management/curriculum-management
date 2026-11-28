@@ -13,7 +13,15 @@ export const ME = {
   email: null,
   mustChangePassword: false,
   orgUnit: null,
-  roles: [],
+  roles: [
+    {
+      roleCode: 'R3',
+      roleName: 'Giám đốc CTĐT',
+      scopeType: 'ASSIGNMENT' as const,
+      scopeUnit: null,
+      derived: true,
+    },
+  ],
   permissions: [
     'changeRequest.view',
     'changeRequest.create',
@@ -54,6 +62,8 @@ export function summary(
     submissionRound: 0,
     levelEnteredAt: null,
     daysWaiting: null,
+    effectiveSemester: null,
+    targetCohorts: [],
     createdBy: { id: 'u1', fullName: 'Giảng viên A' },
     createdAt: '2026-10-19T03:00:00.000Z',
     updatedAt: '2026-10-19T04:00:00.000Z',
@@ -88,18 +98,22 @@ export function detail(
 
 export function step(
   id: string,
-  approvalLevel: 1 | 2 | 3,
+  approvalLevel: 1 | 2 | 3 | 4,
   patch: Partial<ApprovalStep> = {},
 ): ApprovalStep {
   return {
     id,
     approvalLevel,
-    levelName: ['Điều phối nhóm chuyên môn', 'Giám đốc CTĐT', 'Phòng Đào tạo'][
-      approvalLevel - 1
-    ],
+    levelName: [
+      'Điều phối nhóm chuyên môn',
+      'Giám đốc CTĐT',
+      'Ban lãnh đạo khoa',
+      'Phòng Đào tạo',
+    ][approvalLevel - 1],
     approver: { id: `a${id}`, fullName: `Người duyệt ${id}` },
     forSubjectGroup: null,
     forProgram: null,
+    forFaculty: null,
     action: 'PENDING',
     isSkipped: false,
     skipReason: null,

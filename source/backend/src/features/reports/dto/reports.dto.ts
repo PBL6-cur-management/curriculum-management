@@ -40,6 +40,7 @@ export class ReportVersionRefDto {
   @ApiProperty() programCode!: string;
   @ApiProperty() programName!: string;
   @ApiProperty({ type: String, nullable: true }) versionNumber!: string | null;
+  @ApiProperty({ type: String, nullable: true }) decisionNumber!: string | null;
   @ApiProperty({ enum: ProgramVersionStatus, enumName: 'ProgramVersionStatus' })
   status!: ProgramVersionStatus;
   @ApiProperty() totalCredits!: string;

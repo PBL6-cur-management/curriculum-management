@@ -40,6 +40,13 @@ export class CreateProgramDto {
   @IsString()
   facultyId?: string;
 
+  @ApiPropertyOptional({
+    description: 'Ngành đào tạo (Level 0).',
+  })
+  @IsOptional()
+  @IsString()
+  majorId?: string;
+
   @ApiProperty({ enum: DegreeLevel, enumName: 'DegreeLevel' })
   @IsEnum(DegreeLevel)
   degreeLevel!: DegreeLevel;

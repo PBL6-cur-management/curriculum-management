@@ -31,7 +31,11 @@ export interface GraduationInputSnapshot {
     totalCredits: string;
     compulsoryCredits: string;
     electiveCredits: string;
+    // Omitted when the version has no explicit threshold (default 2.00).
+    minGraduationGpa?: string | null;
   };
+  // Present only when the applied version defines tracks.
+  tracks?: { hasTracks: true; selectedTrackId: string | null };
   frame: GraduationFrameFact[];
   groups: Array<{
     id: string;

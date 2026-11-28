@@ -202,6 +202,9 @@ export function VersionInfoEditPage() {
           <Descriptions.Item label="Tín chỉ tự chọn">
             {info.electiveCredits}
           </Descriptions.Item>
+          <Descriptions.Item label="GPA tốt nghiệp tối thiểu">
+            {info.minGraduationGpa ?? '2.00'}
+          </Descriptions.Item>
         </Descriptions>
       )}
     </Flex>

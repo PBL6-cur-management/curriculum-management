@@ -1,18 +1,33 @@
-import { getJson, sendJson, withQuery } from '../../../shared/api/client';
+import {
+  downloadFile,
+  getJson,
+  sendJson,
+  withQuery,
+} from '../../../shared/api/client';
 import type { components, operations } from '../../../shared/api/schema';
 
 type Schemas = components['schemas'];
 export type StudentSummary = Schemas['StudentSummaryDto'];
 export type StudentDetail = Schemas['StudentDetailDto'];
 export type StudentEnrollment = Schemas['StudentEnrollmentDto'];
+export type StudentTrack = Schemas['StudentTrackDto'];
+export type ProgramTrack = Schemas['ProgramTrackDto'];
 export type AcademicResult = Schemas['AcademicResultDto'];
 export type EnrollmentCommand = Schemas['StudentEnrollmentCommandDto'];
+export type BulkTransferInput = Schemas['BulkTransferDto'];
+export type BulkTransferResult = Schemas['BulkTransferResultDto'];
+export type BulkTransferResultItem = Schemas['BulkTransferResultItemDto'];
+export type SetEnrollmentTrackInput = Schemas['SetEnrollmentTrackDto'];
+export type TransferExportParams = NonNullable<
+  operations['StudentsController_exportTransfers']['parameters']['query']
+>;
 export type StudentContext =
   operations['StudentsController_appliedVersion']['parameters']['query'];
 export type StudentDetailContext =
   operations['StudentsController_detail']['parameters']['query'];
-export type StudentListParams =
-  operations['StudentsController_list']['parameters']['query'];
+export type StudentListParams = NonNullable<
+  operations['StudentsController_list']['parameters']['query']
+>;
 export type StudentResultParams =
   operations['StudentsController_results']['parameters']['query'];
 
@@ -49,6 +64,10 @@ export const fetchEnrollmentTargets = (
   getJson<Schemas['StudentEnrollmentTargetDto'][]>(
     withQuery(`${studentPath(studentId)}/enrollment-targets`, context),
   );
+export const fetchVersionTracks = (versionId: string) =>
+  getJson<ProgramTrack[]>(
+    `/program-versions/${encodeURIComponent(versionId)}/tracks`,
+  );
 export const createStudentEnrollment = (
   studentId: string,
   body: EnrollmentCommand,
@@ -57,6 +76,23 @@ export const createStudentEnrollment = (
     'POST',
     `${studentPath(studentId)}/enrollments`,
     body,
+  );
+export const setEnrollmentTrack = (
+  studentId: string,
+  enrollmentId: string,
+  body: SetEnrollmentTrackInput,
+) =>
+  sendJson<StudentEnrollment>(
+    'PATCH',
+    `${studentPath(studentId)}/enrollments/${encodeURIComponent(enrollmentId)}/track`,
+    body,
+  );
+export const bulkTransferStudents = (body: BulkTransferInput) =>
+  sendJson<BulkTransferResult>('POST', '/students/enrollments/bulk-transfer', body);
+export const downloadTransferExport = (params: TransferExportParams = {}) =>
+  downloadFile(
+    withQuery('/students/enrollments/transfers/export', params),
+    'Chuyen-chuong-trinh.xlsx',
   );
 export const reconcileStudent = (
   studentId: string,

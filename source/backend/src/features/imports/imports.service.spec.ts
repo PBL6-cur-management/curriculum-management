@@ -354,6 +354,7 @@ describe('ImportsService', () => {
       { importType: ImportType.COURSE_CATALOG, needsVersion: false },
       { importType: ImportType.STUDENT_LIST, needsVersion: false },
       { importType: ImportType.ACADEMIC_RESULT, needsVersion: false },
+      { importType: ImportType.PROGRAM_TRANSFER, needsVersion: false },
     ]);
     expect(
       service.types(access(PERMISSIONS.CURRICULUM_IMPORT_EXPORT_EXCEL, false)),

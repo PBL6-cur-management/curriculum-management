@@ -5,15 +5,23 @@ import {
   ArrayUnique,
   IsArray,
   IsBoolean,
+  IsISO8601,
+  IsNotEmpty,
   IsOptional,
   IsString,
+  Length,
   MaxLength,
 } from 'class-validator';
 import { ChangeRequestType } from '../../generated/prisma/client.js';
 import { CurriculumWarningDto } from '../../shared/curriculum/curriculum-warning.dto.js';
-import { emptyToNull } from '../../shared/dtos/transforms.js';
-import { ReleaseDecisionDto } from '../../shared/releases/release-decision.dto.js';
+import { emptyToNull, trimString } from '../../shared/dtos/transforms.js';
+import { DECISION_NUMBER_MAX } from '../../shared/releases/release-decision.dto.js';
 import { SyllabusReleaseIssueDto } from '../../shared/releases/release-issue.dto.js';
+import {
+  CohortDto,
+  SemesterDto,
+} from '../../shared/releases/semester.dto.js';
+import { ISO_DAY_LENGTH } from '../../shared/time/today.js';
 
 export const FINAL_APPROVAL_LIMITS = {
   REMARK_MAX: 2000,
@@ -27,8 +35,29 @@ export const FINAL_APPROVAL_KINDS = [
 ] as const;
 export type FinalApprovalKind = (typeof FINAL_APPROVAL_KINDS)[number];
 
-// MH-43: the decision and the semester, plus what the academic office may add.
-export class FinalApproveDto extends ReleaseDecisionDto {
+// MH-43: the decision and optional semester/cohorts override (defaults to the CR's proposed values).
+export class FinalApproveDto {
+  @ApiProperty({ example: 'QĐ-123/ĐHBK' })
+  @Transform(trimString)
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(DECISION_NUMBER_MAX)
+  decisionNumber!: string;
+
+  @ApiProperty({ format: 'date' })
+  @IsISO8601({ strict: true })
+  @Length(ISO_DAY_LENGTH, ISO_DAY_LENGTH)
+  signedDate!: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Học kỳ hiệu lực (nếu bỏ trống sẽ dùng học kỳ dự kiến của đề xuất).',
+  })
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  effectiveSemesterId?: string;
+
   @ApiPropertyOptional({ nullable: true, type: String })
   @Transform(emptyToNull)
   @IsOptional()
@@ -38,7 +67,7 @@ export class FinalApproveDto extends ReleaseDecisionDto {
 
   @ApiPropertyOptional({
     description:
-      'Cho phép ban hành vào học kỳ đã bắt đầu; chỉ hiệu lực với đề xuất do Phòng Đào tạo tạo.',
+      'Cho phép ban hành vào học kỳ đã bắt đầu khi Phòng Đào tạo xác nhận.',
   })
   @IsOptional()
   @IsBoolean()
@@ -46,7 +75,8 @@ export class FinalApproveDto extends ReleaseDecisionDto {
 
   @ApiPropertyOptional({
     type: [String],
-    description: 'Chỉ khi đề xuất tạo đúng một phiên bản.',
+    description:
+      'Các khóa tuyển sinh áp dụng (nếu bỏ trống sẽ dùng khóa dự kiến của đề xuất).',
   })
   @IsOptional()
   @IsArray()
@@ -96,12 +126,16 @@ export class FinalApprovalPreviewDto {
   })
   authoredLabels!: string[];
   @ApiProperty({
-    description: 'Gán khóa tuyển sinh được khi tạo đúng một phiên bản.',
+    description: 'Có thể gán khóa tuyển sinh khi tạo ít nhất một phiên bản.',
   })
   canAssignCohorts!: boolean;
   @ApiProperty({
     description:
-      'Người tạo đề xuất là Phòng Đào tạo nên được nạp học kỳ đã qua.',
+      'Phòng Đào tạo có thể xác nhận ban hành vào học kỳ đã bắt đầu.',
   })
   canAllowPastSemester!: boolean;
+  @ApiProperty({ type: SemesterDto, nullable: true })
+  effectiveSemester!: SemesterDto | null;
+  @ApiProperty({ type: [CohortDto] })
+  targetCohorts!: CohortDto[];
 }

@@ -135,6 +135,78 @@ describe('ImportPage', () => {
       ).toHaveLength(1);
     },
   );
+  it('uploads PROGRAM_TRANSFER workbook, downloads its template, and invalidates students on commit', async () => {
+    let committed = false;
+    const wave = (status: 'DRY_RUN' | 'COMMITTED') =>
+      batch({
+        importType: 'PROGRAM_TRANSFER',
+        program: null,
+        versionId: null,
+        status,
+        canCommit: status === 'DRY_RUN',
+      });
+    const fetchMock = vi.fn(
+      async (input: RequestInfo | URL, init?: RequestInit) => {
+        const path = String(input);
+        if (path.endsWith('/imports/types'))
+          return json([{ importType: 'PROGRAM_TRANSFER', needsVersion: false }]);
+        if (path.includes('/templates/PROGRAM_TRANSFER'))
+          return new Response('xlsx');
+        if (path.endsWith('/commit')) {
+          committed = true;
+          return json(wave('COMMITTED'));
+        }
+        if (init?.method === 'POST') return json(wave('DRY_RUN'));
+        return json(wave(committed ? 'COMMITTED' : 'DRY_RUN'));
+      },
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    vi.stubGlobal(
+      'URL',
+      class extends URL {
+        static createObjectURL = vi.fn(() => 'blob:transfer-template');
+        static revokeObjectURL = vi.fn();
+      },
+    );
+    const click = vi
+      .spyOn(HTMLAnchorElement.prototype, 'click')
+      .mockImplementation(() => undefined);
+    const { client } = renderImport(
+      <ImportPage />,
+      '/imports?type=PROGRAM_TRANSFER',
+    );
+    const invalidate = vi.spyOn(client, 'invalidateQueries');
+    expect(
+      await screen.findByText('Chuyển CTĐT hàng loạt'),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Tải tệp mẫu' }));
+    await waitFor(() =>
+      expect(
+        fetchMock.mock.calls.some(([path]) =>
+          String(path).includes('/templates/PROGRAM_TRANSFER'),
+        ),
+      ).toBe(true),
+    );
+    await upload(new File(['transfer'], 'Chuyen-CTDT.xlsx'));
+    fireEvent.click(screen.getByRole('button', { name: 'Chạy thử' }));
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Xác nhận nhập' }),
+    );
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog).toHaveTextContent('ghi danh chuyển chương trình');
+    fireEvent.click(
+      within(dialog).getByRole('button', { name: 'Ghi dữ liệu' }),
+    );
+    await screen.findByText('Đã ghi', { exact: true });
+    await waitFor(() =>
+      expect(
+        invalidate.mock.calls.some(
+          ([options]) => JSON.stringify(options?.queryKey) === '["students"]',
+        ),
+      ).toBe(true),
+    );
+    click.mockRestore();
+  });
   it('resets a crafted student type to the server-authorized catalog before template download', async () => {
     const fetchMock = setup();
     vi.stubGlobal(

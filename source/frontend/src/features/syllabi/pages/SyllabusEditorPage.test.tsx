@@ -88,7 +88,7 @@ const writes = (fetchMock: ReturnType<typeof vi.fn>, method: string) =>
 afterEach(() => vi.unstubAllGlobals());
 
 describe('SyllabusEditorPage', () => {
-  it('edits the copy of a request: banner, no attachments tab, back link keeps the request, opens the tab asked for', async () => {
+  it('edits the copy of a request: banner, attachments tab enabled, back link keeps the request, opens the tab asked for', async () => {
     const fetchMock = renderPage(
       courseSyllabus({
         draft: {
@@ -104,8 +104,8 @@ describe('SyllabusEditorPage', () => {
     );
     expect(await screen.findByText('DX-2026-0001')).toBeInTheDocument();
     expect(
-      screen.queryByRole('tab', { name: /Tệp đính kèm/ }),
-    ).not.toBeInTheDocument();
+      screen.getByRole('tab', { name: /Tệp đính kèm/ }),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: 'Về trang đề cương' }),
     ).toHaveAttribute('href', '/courses/c1/syllabus?requestId=r1');

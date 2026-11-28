@@ -10,6 +10,7 @@ export class OrgUnitDto {
   @ApiProperty() unitCode!: string;
   @ApiProperty() unitName!: string;
   @ApiProperty({ enum: OrgUnitType }) unitType!: OrgUnitType;
+  @ApiProperty() isExternal!: boolean;
   @ApiProperty({ type: String, nullable: true }) parentUnitId!: string | null;
   @ApiProperty({ enum: OrgUnitStatus }) status!: OrgUnitStatus;
 }
@@ -19,6 +20,7 @@ export const ORG_UNIT_SELECT = {
   unitCode: true,
   unitName: true,
   unitType: true,
+  isExternal: true,
   parentUnitId: true,
   status: true,
 } as const satisfies Prisma.OrgUnitSelect;
@@ -31,6 +33,7 @@ export function toOrgUnitDto(
     unitCode: row.unitCode,
     unitName: row.unitName,
     unitType: row.unitType,
+    isExternal: row.isExternal ?? false,
     parentUnitId: row.parentUnitId,
     status: row.status,
   };

@@ -54,6 +54,12 @@ export class StudentIssuedVersionDto {
   status!: IssuedVersionStatus;
 }
 
+export class StudentTrackDto {
+  @ApiProperty() id!: string;
+  @ApiProperty() trackCode!: string;
+  @ApiProperty() trackName!: string;
+}
+
 export class StudentEnrollmentDto {
   @ApiProperty() id!: string;
   @ApiProperty() studentId!: string;
@@ -63,6 +69,8 @@ export class StudentEnrollmentDto {
   @ApiProperty({ type: StudentIssuedVersionDto })
   appliedVersion!: StudentIssuedVersionDto;
   @ApiProperty() admissionVersionId!: string;
+  @ApiProperty({ type: StudentTrackDto, nullable: true })
+  track!: StudentTrackDto | null;
   @ApiProperty({ type: String, nullable: true }) cohortAssignmentId!:
     string | null;
   @ApiProperty({ type: SemesterDto }) fromSemester!: SemesterDto;

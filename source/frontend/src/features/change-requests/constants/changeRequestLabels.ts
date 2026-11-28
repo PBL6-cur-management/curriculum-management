@@ -47,7 +47,16 @@ export const ACTION_LABELS = {
   RETURN: 'Trả lại',
   REJECT: 'Từ chối',
 } as const;
+export const FACULTY_LEADERSHIP_LABEL = 'Ban lãnh đạo khoa';
 export const ACADEMIC_OFFICE_LABEL = 'Phòng Đào tạo';
+export const APPROVAL_LEVEL_LABELS: Record<1 | 2 | 3 | 4, string> = {
+  1: 'Điều phối nhóm chuyên môn',
+  2: 'Giám đốc CTĐT',
+  3: 'Ban lãnh đạo khoa',
+  4: 'Phòng Đào tạo',
+};
+export const PROGRAM_LEVEL_REQUEST_HINT =
+  'Chỉ Giám đốc CTĐT hoặc Phòng Đào tạo được đề xuất thay đổi cấp Chương trình đào tạo.';
 
 export const DELETE_REQUEST_CONFIRM =
   'Xóa đề xuất Nháp này? Bản nháp dữ liệu và hồ sơ đính kèm cũng bị xóa.';

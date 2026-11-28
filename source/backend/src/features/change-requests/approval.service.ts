@@ -15,6 +15,7 @@ import {
 import { levelOfStatus } from '../../shared/change-requests/approval-rules.js';
 import { APPROVAL_LEVEL } from '../../shared/change-requests/approval.constants.js';
 import { APPROVAL_ERRORS } from '../../shared/change-requests/approval.errors.js';
+import { facultyLeadershipHolderIds } from '../../shared/change-requests/faculty-leadership.js';
 import { RequestNotifier } from '../../shared/change-requests/request-notifier.js';
 import { StaleChecker } from '../../shared/change-requests/stale-checker.js';
 import { AppException } from '../../shared/exception/app.exception.js';
@@ -120,7 +121,7 @@ export class ApprovalService {
     );
   }
 
-  // US-070: R1 decides every PENDING row of a level 1 or 2 request on the approvers' behalf, with a reason.
+  // US-070: R1 decides every PENDING row of a level 1, 2 or 3 request on the approvers' behalf, with a reason.
   async override(
     id: string,
     dto: OverrideDecisionDto,
@@ -130,7 +131,8 @@ export class ApprovalService {
     const level = levelOfStatus(request.status);
     if (
       level !== APPROVAL_LEVEL.COORDINATOR &&
-      level !== APPROVAL_LEVEL.DIRECTOR
+      level !== APPROVAL_LEVEL.DIRECTOR &&
+      level !== APPROVAL_LEVEL.FACULTY_LEADERSHIP
     ) {
       throw new AppException(APPROVAL_FEATURE_ERRORS.OVERRIDE_LEVEL);
     }
@@ -154,9 +156,30 @@ export class ApprovalService {
           isOverride: true,
         },
       );
-      const bypassedIds = bypassed.flatMap((row) =>
+      let bypassedIds = bypassed.flatMap((row) =>
         row.approverId ? [row.approverId] : [],
       );
+      if (level === APPROVAL_LEVEL.FACULTY_LEADERSHIP) {
+        const today = todayDate();
+        const facultyIds = [
+          ...new Set(
+            bypassed.flatMap((row) =>
+              row.forFacultyId ? [row.forFacultyId] : [],
+            ),
+          ),
+        ];
+        const r2Ids = await Promise.all(
+          facultyIds.map((facultyId) =>
+            facultyLeadershipHolderIds(
+              tx,
+              facultyId,
+              request.createdById,
+              today,
+            ),
+          ),
+        );
+        bypassedIds = [...new Set([...bypassedIds, ...r2Ids.flat()])];
+      }
       await this.notifier.overridden(
         tx,
         request,

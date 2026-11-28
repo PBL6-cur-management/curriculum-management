@@ -222,7 +222,8 @@ export class ChangeRequestDetailReader {
       canOverride:
         access.has(PERMISSIONS.CHANGE_REQUEST_OVERRIDE) &&
         (level === APPROVAL_LEVEL.COORDINATOR ||
-          level === APPROVAL_LEVEL.DIRECTOR) &&
+          level === APPROVAL_LEVEL.DIRECTOR ||
+          level === APPROVAL_LEVEL.FACULTY_LEADERSHIP) &&
         !(await blocksSelfApproval(
           this.prisma,
           row.createdById,

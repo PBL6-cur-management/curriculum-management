@@ -274,8 +274,12 @@ describe('VersionHistoryReader', () => {
         }),
       );
       expect((await reader.detail('p1', 'v1', R1)).canCorrect).toBe(false);
-      programVersion.findFirst.mockResolvedValue(row({ status: 'HISTORICAL' }));
+      programVersion.findFirst.mockResolvedValue(
+        row({ status: 'HISTORICAL', cohortVersions: [] }),
+      );
       expect((await reader.detail('p1', 'v1', R1)).canCorrect).toBe(false);
+      programVersion.findFirst.mockResolvedValue(row({ status: 'HISTORICAL' }));
+      expect((await reader.detail('p1', 'v1', R1)).canCorrect).toBe(true);
     });
 
     it('offers R1 the open correction Draft to continue, and hides it from everyone else', async () => {

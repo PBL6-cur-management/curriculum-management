@@ -1,17 +1,17 @@
 import type { Rule } from 'antd/es/form';
 import {
-  GRADE_POINT_MESSAGE,
-  GRADE_POINT_PATTERN,
-} from '../../../shared/courses/gradePoint';
-import {
   CREDITS_MESSAGE,
   CREDITS_PATTERN,
 } from '../../../shared/forms/credits';
 
 // Re-exported so the course form tests keep one import path for the shared credit rule.
 export { CREDITS_MESSAGE, CREDITS_PATTERN };
-// Moved to shared/ when the curriculum forms needed them; re-exported so the relation forms keep their import path.
-export { GRADE_POINT_MESSAGE, GRADE_POINT_PATTERN };
+// Mirrors SCORE10_PATTERN in source/backend/src/shared/decimal/decimal.ts (DEC-11: course relation thresholds use 0..10 scale).
+export const SCORE10_PATTERN = /^(10(\.0{1,2})?|\d(\.\d{1,2})?)$/;
+export const SCORE10_MESSAGE =
+  'Ngưỡng điểm theo thang 10: từ 0 đến 10, tối đa 2 chữ số thập phân (ví dụ 4 hoặc 5.5).';
+export const GRADE_POINT_PATTERN = SCORE10_PATTERN;
+export const GRADE_POINT_MESSAGE = SCORE10_MESSAGE;
 // Mirrors COURSE_FIELD_LIMITS in source/backend/src/features/courses/create-course.dto.ts.
 export const COURSE_CODE_MAX = 20;
 export const COURSE_NAME_MAX = 200;

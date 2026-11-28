@@ -90,6 +90,7 @@ export class ProgramsService {
       ...(query.degreeLevel && { degreeLevel: query.degreeLevel }),
       ...(query.status && { status: query.status }),
       ...(query.facultyId && { facultyId: query.facultyId }),
+      ...(query.majorId && { majorId: query.majorId }),
       ...releasedVersionWhere(query),
       ...(query.q && {
         OR: [
@@ -137,6 +138,7 @@ export class ProgramsService {
         data: {
           programCode: dto.programCode,
           facultyId,
+          ...(dto.majorId ? { majorId: dto.majorId } : {}),
           degreeLevel: dto.degreeLevel,
           versions: {
             create: {

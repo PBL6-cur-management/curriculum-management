@@ -11,8 +11,8 @@ import {
 } from 'class-validator';
 import { CourseRelationType } from '../../generated/prisma/client.js';
 import {
-  GRADE_POINT_MESSAGE,
-  GRADE_POINT_PATTERN,
+  SCORE10_MESSAGE,
+  SCORE10_PATTERN,
 } from '../../shared/decimal/decimal.js';
 import { emptyToNull } from '../../shared/dtos/transforms.js';
 import { CURRICULUM_LIMITS } from './create-curriculum-item.dto.js';
@@ -40,7 +40,7 @@ export class RequisiteInputDto {
   @Transform(emptyToNull)
   @IsOptional()
   @IsString()
-  @Matches(GRADE_POINT_PATTERN, { message: GRADE_POINT_MESSAGE })
+  @Matches(SCORE10_PATTERN, { message: SCORE10_MESSAGE })
   minScore?: string | null;
 }
 

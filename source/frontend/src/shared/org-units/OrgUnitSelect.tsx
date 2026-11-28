@@ -38,6 +38,7 @@ export function OrgUnitSelect({
       optionFilterProp="label"
       placeholder={placeholder}
       aria-label={placeholder}
+      style={{ width: '100%' }}
     />
   );
 }

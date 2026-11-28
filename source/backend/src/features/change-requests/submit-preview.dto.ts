@@ -23,7 +23,7 @@ export class PreviewApproverDto {
 }
 
 export class PreviewLevelDto {
-  @ApiProperty({ enum: [1, 2, 3] }) approvalLevel!: number;
+  @ApiProperty({ enum: [1, 2, 3, 4] }) approvalLevel!: number;
   @ApiProperty() levelName!: string;
   @ApiProperty({ type: [PreviewApproverDto] })
   approvers!: PreviewApproverDto[];
@@ -38,7 +38,7 @@ export class SubmitPreviewDto {
   blockingIssues!: BlockingIssueDto[];
 }
 
-const LEVELS: readonly ApprovalLevel[] = [1, 2, 3];
+const LEVELS: readonly ApprovalLevel[] = [1, 2, 3, 4];
 
 function toApprover(step: PlannedStep, levelName: string): PreviewApproverDto {
   return {

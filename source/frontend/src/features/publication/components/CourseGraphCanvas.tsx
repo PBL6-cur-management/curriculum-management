@@ -217,7 +217,7 @@ export function CourseGraphCanvas({
         <div
           ref={container}
           role="img"
-          aria-label="Đồ thị học phần theo học kỳ. Danh sách phụ thuộc bên dưới có cùng nội dung."
+          aria-label="Cây chương trình đào tạo theo học kỳ. Danh sách phụ thuộc bên dưới có cùng nội dung."
           style={{ width, height }}
         />
       </div>

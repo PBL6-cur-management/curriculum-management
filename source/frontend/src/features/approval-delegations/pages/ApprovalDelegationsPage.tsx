@@ -76,7 +76,10 @@ export function ApprovalDelegationsPage() {
     {
       title: 'Cấp duyệt',
       key: 'scope',
-      render: (_, row) => row.scope?.levelName ?? 'Mọi cấp đang giữ',
+      render: (_, row) =>
+        row.scope
+          ? `Cấp ${row.scope.approvalLevel} — ${row.scope.levelName}`
+          : 'Mọi cấp đang giữ',
     },
     {
       title: 'Thời gian',

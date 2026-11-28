@@ -34,12 +34,13 @@ describe('ApprovalQueueReader', () => {
   const stepsFindMany = vi.fn();
   const requestsFindMany = vi.fn();
   const roleFindFirst = vi.fn();
+  const roleFindMany = vi.fn();
   const userFindUnique = vi.fn();
   const prisma = {
     approvalDelegation: { findMany: vi.fn().mockResolvedValue([]) },
     approvalStep: { findMany: stepsFindMany },
     changeRequest: { findMany: requestsFindMany },
-    roleAssignment: { findFirst: roleFindFirst },
+    roleAssignment: { findFirst: roleFindFirst, findMany: roleFindMany },
     user: { findUnique: userFindUnique },
   };
   const reader = new ApprovalQueueReader(prisma as unknown as PrismaService);
@@ -50,6 +51,7 @@ describe('ApprovalQueueReader', () => {
     stepsFindMany.mockResolvedValue([]);
     requestsFindMany.mockResolvedValue([]);
     roleFindFirst.mockResolvedValue(null);
+    roleFindMany.mockResolvedValue([]);
     userFindUnique.mockResolvedValue({ canSelfApprove: false });
   });
 
@@ -114,7 +116,7 @@ describe('ApprovalQueueReader', () => {
     ]);
     const items = await reader.read({}, access);
     expect(items.map((item) => item.requestCode)).toEqual(['DX-2', 'DX-1']);
-    expect(items[0]).toMatchObject({ approvalLevel: 3, standsFor: null });
+    expect(items[0]).toMatchObject({ approvalLevel: 4, standsFor: null });
   });
 
   it('gives a non-holder no level-3 query and passes the type filter to both queries', async () => {
@@ -127,6 +129,29 @@ describe('ApprovalQueueReader', () => {
     await reader.read({ requestType: ChangeRequestType.CURRICULUM }, access);
     expect(requestsFindMany.mock.calls[0][0].where).toMatchObject({
       requestType: ChangeRequestType.CURRICULUM,
+    });
+  });
+
+  it('falls back to levelEnteredAt when a final-level request has no level-4 step row', async () => {
+    const entered = new Date('2026-10-05T00:00:00Z');
+    roleFindFirst.mockResolvedValue({ id: 'ra' });
+    requestsFindMany.mockResolvedValue([
+      {
+        ...request({
+          id: 'r-legacy',
+          requestCode: 'DX-LEGACY',
+          status: ChangeRequestStatus.PENDING_ACADEMIC_OFFICE,
+          levelEnteredAt: entered,
+        }),
+        steps: [],
+      },
+    ]);
+    const items = await reader.read({}, access);
+    expect(items).toHaveLength(1);
+    expect(items[0]).toMatchObject({
+      requestCode: 'DX-LEGACY',
+      approvalLevel: 4,
+      submittedAt: entered.toISOString(),
     });
   });
 });

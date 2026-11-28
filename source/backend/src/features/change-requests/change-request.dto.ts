@@ -6,6 +6,9 @@ import {
 } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
+  ArrayUnique,
+  IsArray,
   IsBoolean,
   IsEnum,
   IsIn,
@@ -139,6 +142,27 @@ export class CreateChangeRequestDto {
   @IsString()
   @MaxLength(CHANGE_REQUEST_LIMITS.BASIS_NUMBER_MAX)
   basisDocumentNumber?: string | null;
+
+  @ApiPropertyOptional({
+    nullable: true,
+    type: String,
+    description: 'Học kỳ dự kiến áp dụng của đề xuất',
+  })
+  @Transform(emptyToNull)
+  @IsOptional()
+  @IsString()
+  effectiveSemesterId?: string | null;
+
+  @ApiPropertyOptional({
+    type: [String],
+    description: 'Các khóa tuyển sinh dự kiến áp dụng của đề xuất',
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @ArrayMaxSize(50)
+  @IsString({ each: true })
+  cohortIds?: string[];
 }
 
 // The service re-checks the origin rule on the merged row.
@@ -148,5 +172,7 @@ export class UpdateChangeRequestDto extends PartialType(
     'reason',
     'origin',
     'basisDocumentNumber',
+    'effectiveSemesterId',
+    'cohortIds',
   ] as const),
 ) {}

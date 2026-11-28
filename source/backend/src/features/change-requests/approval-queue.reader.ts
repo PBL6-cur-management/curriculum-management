@@ -6,6 +6,7 @@ import {
 } from '../../generated/prisma/client.js';
 import type { AccessContext } from '../../shared/authz/access-context.js';
 import { isAcademicOfficeHolder } from '../../shared/change-requests/academic-office.js';
+import { facultyLeadershipScope } from '../../shared/change-requests/faculty-leadership.js';
 import { isActionable } from '../../shared/change-requests/approval-rules.js';
 import { APPROVAL_LEVEL } from '../../shared/change-requests/approval.constants.js';
 import { maySelfApprove } from '../../shared/change-requests/self-approval.js';
@@ -43,6 +44,7 @@ const QUEUE_STEP_SELECT = {
   createdAt: true,
   forSubjectGroup: { select: { groupCode: true } },
   forProgram: { select: { programCode: true } },
+  forFaculty: { select: { id: true, unitCode: true } },
   changeRequest: { select: QUEUE_REQUEST_FIELDS },
 } as const satisfies Prisma.ApprovalStepSelect;
 type QueueStepRow = Prisma.ApprovalStepGetPayload<{
@@ -107,6 +109,32 @@ export class ApprovalQueueReader {
       const grant = grantFor(grants, step.approverId, step.approvalLevel);
       return grant ? [{ ...step, delegationId: grant.id }] : [];
     });
+    const facultyScope = await facultyLeadershipScope(
+      this.prisma,
+      access.userId,
+      today,
+    );
+    const facultySteps =
+      facultyScope.all || facultyScope.facultyIds.length > 0
+        ? await this.prisma.approvalStep.findMany({
+            where: {
+              approvalLevel: APPROVAL_LEVEL.FACULTY_LEADERSHIP,
+              action: ApprovalAction.PENDING,
+              ...(!facultyScope.all && {
+                forFacultyId: { in: facultyScope.facultyIds },
+              }),
+              changeRequest: {
+                status: ChangeRequestStatus.PENDING_FACULTY_LEADERSHIP,
+                ...notMine,
+                ...typeFilter,
+              },
+            },
+            select: QUEUE_STEP_SELECT,
+          })
+        : [];
+    const facultyRows: QueueStep[] = facultySteps
+      .filter((step) => isActionable(step, step.changeRequest))
+      .map((step) => ({ ...step, delegationId: null }));
     const finals = (await isAcademicOfficeHolder(
       this.prisma,
       access.userId,
@@ -122,9 +150,12 @@ export class ApprovalQueueReader {
         })
       : [];
     return [
-      ...[...groupBy(rows, (step) => step.changeRequest.id).values()].map(
-        (group) => toQueueItem(group, today),
-      ),
+      ...[
+        ...groupBy(
+          [...rows, ...facultyRows],
+          (step) => step.changeRequest.id,
+        ).values(),
+      ].map((group) => toQueueItem(group, today)),
       ...finals.map((request) => toFinalQueueItem(request, today)),
     ].sort(
       (a, b) =>
@@ -153,7 +184,9 @@ function toQueueItem(group: QueueStep[], today: Date): ApprovalQueueItemDto {
   const first = group[0];
   const codes = group.flatMap((step) => {
     const code =
-      step.forSubjectGroup?.groupCode ?? step.forProgram?.programCode;
+      step.forSubjectGroup?.groupCode ??
+      step.forProgram?.programCode ??
+      step.forFaculty?.unitCode;
     return code ? [code] : [];
   });
   return {
@@ -188,11 +221,12 @@ function toFinalQueueItem(
     request.steps.find(
       (candidate) => candidate.submissionRound === request.submissionRound,
     ) ?? request.steps[0];
+  const submittedAt = step?.createdAt ?? request.levelEnteredAt ?? today;
   return {
     ...base(request, today),
     approvalLevel: APPROVAL_LEVEL.ACADEMIC_OFFICE,
     standsFor: null,
-    submittedAt: step.createdAt.toISOString(),
+    submittedAt: submittedAt.toISOString(),
     delegatedFor: [],
   };
 }

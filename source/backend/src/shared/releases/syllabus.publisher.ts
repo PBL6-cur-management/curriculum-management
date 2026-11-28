@@ -17,6 +17,12 @@ export interface PublishedRevision {
   previous: Syllabus;
 }
 
+export interface PublishSyllabusMetadata {
+  effectiveSemesterId?: string | null;
+  documentNumber?: string | null;
+  signedDate?: Date | null;
+}
+
 // The only writer of Draft -> Published for a syllabus (DC-03). A published revision moves to Historical first:
 // the partial unique index allows one Published revision per course.
 @Injectable()
@@ -60,6 +66,7 @@ export class SyllabusPublisher {
     copyId: string,
     requestId: string,
     now: Date,
+    metadata?: PublishSyllabusMetadata,
   ): Promise<PublishedRevision> {
     const copy = await tx.syllabus.findUniqueOrThrow({ where: { id: copyId } });
     if (copy.sourceRequestId !== requestId || !copy.baseRevisionId) {
@@ -90,6 +97,15 @@ export class SyllabusPublisher {
         previousVersionId: previous.id,
         status: SyllabusStatus.PUBLISHED,
         publishedAt: now,
+        ...(metadata?.effectiveSemesterId !== undefined && {
+          effectiveSemesterId: metadata.effectiveSemesterId,
+        }),
+        ...(metadata?.documentNumber !== undefined && {
+          documentNumber: metadata.documentNumber,
+        }),
+        ...(metadata?.signedDate !== undefined && {
+          signedDate: metadata.signedDate,
+        }),
       },
     });
     return { revision, previous };

@@ -43,6 +43,12 @@ variable "fault_domain" {
   }
 }
 
+variable "enable_a1_vm" {
+  description = "Create the Always Free Ampere A1 demo VM (2 OCPU / 12 GB, $0/month)."
+  type        = bool
+  default     = true
+}
+
 # Always Free (2026): Ampere A1 2 OCPU and 12 GB in total per tenancy; 200 GB of boot + block storage in total.
 # The defaults take the whole A1 allowance for this one VM; anything above would be billed.
 variable "ocpus" {

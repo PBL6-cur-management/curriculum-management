@@ -43,6 +43,7 @@ export const ENROLLMENT_INCLUDE = {
   },
   fromSemester: true,
   untilSemester: true,
+  track: { select: { id: true, trackCode: true, trackName: true } },
 } as const satisfies Prisma.ProgramEnrollmentInclude;
 export const RESULT_INCLUDE = {
   course: { select: { id: true, courseCode: true, courseName: true } },
@@ -105,6 +106,13 @@ export function toEnrollmentDto(row: EnrollmentRow): StudentEnrollmentDto {
     cohort: toCohortDto(row.cohort),
     appliedVersion: toIssuedVersionDto(row.appliedVersion),
     admissionVersionId: row.admissionVersionId,
+    track: row.track
+      ? {
+          id: row.track.id,
+          trackCode: row.track.trackCode,
+          trackName: row.track.trackName,
+        }
+      : null,
     cohortAssignmentId: row.cohortAssignmentId,
     fromSemester: toSemesterDto(row.fromSemester),
     untilSemester: row.untilSemester ? toSemesterDto(row.untilSemester) : null,

@@ -9,7 +9,9 @@ import {
 import type { AccessContext } from '../../shared/authz/access-context.js';
 import { PERMISSIONS } from '../../shared/authz/permission-codes.js';
 import { isAcademicOfficeHolder } from '../../shared/change-requests/academic-office.js';
+import { activeFacultyLeadershipRoleWhere } from '../../shared/change-requests/faculty-leadership.js';
 import {
+  APPROVAL_LEVEL,
   APPROVAL_LEVEL_NAMES,
   type ApprovalLevel,
 } from '../../shared/change-requests/approval.constants.js';
@@ -267,6 +269,11 @@ export class ApprovalDelegationsService {
             },
           },
           { programDirectorships: { some: activeDirectorWhere(today) } },
+          {
+            roleAssignments: {
+              some: activeFacultyLeadershipRoleWhere(today),
+            },
+          },
         ],
       },
       select: USER_OPTION_SELECT,
@@ -290,10 +297,10 @@ export class ApprovalDelegationsService {
     return (await this.heldLevels(target, today)).map(levelDto);
   }
 
-  // The levels a person is a named approver of today, from the same sources the routing planner uses:
-  // coordinator of a subject group (level 1), director of an active program (level 2).
+  // The levels a person is an approver of today, from the same sources the routing planner uses:
+  // coordinator of a subject group (level 1), director of an active program (level 2), faculty leadership R2 (level 3).
   private async heldLevels(userId: string, today: Date): Promise<number[]> {
-    const [coordinator, director] = await Promise.all([
+    const [coordinator, director, facultyLeadership] = await Promise.all([
       this.prisma.subjectGroupMember.findFirst({
         where: {
           lecturerId: userId,
@@ -311,10 +318,21 @@ export class ApprovalDelegationsService {
         },
         select: { id: true },
       }),
+      this.prisma.roleAssignment.findFirst({
+        where: {
+          userId,
+          ...activeFacultyLeadershipRoleWhere(today),
+        },
+        select: { id: true },
+      }),
     ]);
-    return DELEGABLE_LEVELS.filter((level) =>
-      level === 1 ? coordinator !== null : director !== null,
-    );
+    return DELEGABLE_LEVELS.filter((level) => {
+      if (level === APPROVAL_LEVEL.COORDINATOR) return coordinator !== null;
+      if (level === APPROVAL_LEVEL.DIRECTOR) return director !== null;
+      if (level === APPROVAL_LEVEL.FACULTY_LEADERSHIP)
+        return facultyLeadership !== null;
+      return false;
+    });
   }
 
   private async isManagerOfOthers(

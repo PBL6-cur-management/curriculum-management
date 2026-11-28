@@ -2,19 +2,73 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { meQueryKey } from '../../../shared/auth/me';
 import {
   clearMatrixCell,
+  createRole,
+  deleteRole,
   fetchPermissionMatrix,
   setMatrixCell,
+  updateRole,
 } from '../api/permissionMatrix';
 import type {
+  CreateRoleRequest,
   MatrixCell,
   SetRolePermissionRequest,
+  UpdateRoleRequest,
 } from '../api/permissionMatrix';
 
 export const PERMISSION_MATRIX_QUERY_KEY = ['permission-matrix'] as const;
+export const ROLES_QUERY_KEY = ['roles'] as const;
+
 export function usePermissionMatrix() {
   return useQuery({
     queryKey: PERMISSION_MATRIX_QUERY_KEY,
     queryFn: fetchPermissionMatrix,
+  });
+}
+
+export function useCreateRole() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (body: CreateRoleRequest) => createRole(body),
+    retry: false,
+    onSuccess: () =>
+      Promise.all([
+        client.invalidateQueries({ queryKey: PERMISSION_MATRIX_QUERY_KEY }),
+        client.invalidateQueries({ queryKey: ROLES_QUERY_KEY }),
+      ]),
+  });
+}
+
+export function useUpdateRole() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      roleCode,
+      body,
+    }: {
+      roleCode: string;
+      body: UpdateRoleRequest;
+    }) => updateRole(roleCode, body),
+    retry: false,
+    onSuccess: () =>
+      Promise.all([
+        client.invalidateQueries({ queryKey: PERMISSION_MATRIX_QUERY_KEY }),
+        client.invalidateQueries({ queryKey: ROLES_QUERY_KEY }),
+        client.invalidateQueries({ queryKey: meQueryKey }),
+      ]),
+  });
+}
+
+export function useDeleteRole() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (roleCode: string) => deleteRole(roleCode),
+    retry: false,
+    onSuccess: () =>
+      Promise.all([
+        client.invalidateQueries({ queryKey: PERMISSION_MATRIX_QUERY_KEY }),
+        client.invalidateQueries({ queryKey: ROLES_QUERY_KEY }),
+        client.invalidateQueries({ queryKey: meQueryKey }),
+      ]),
   });
 }
 

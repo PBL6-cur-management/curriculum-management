@@ -5,6 +5,7 @@ export const IMPORT_TYPE_LABELS = {
   CURRICULUM: 'Khung chương trình',
   STUDENT_LIST: 'Danh sách sinh viên',
   ACADEMIC_RESULT: 'Kết quả học tập',
+  PROGRAM_TRANSFER: 'Chuyển CTĐT hàng loạt',
 } satisfies Record<ImportType, string>;
 export const IMPORT_STATUS_LABELS = {
   VALIDATING: 'Đang chạy thử',

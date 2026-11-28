@@ -32,6 +32,13 @@ const PREVIEW: SubmitPreview = {
     },
     {
       approvalLevel: 3,
+      levelName: 'Ban lãnh đạo khoa',
+      approvers: [
+        { name: 'Ban lãnh đạo khoa', scope: 'KHOA_CNTT', skipReason: null },
+      ],
+    },
+    {
+      approvalLevel: 4,
       levelName: 'Phòng Đào tạo',
       approvers: [{ name: 'Phòng Đào tạo', scope: null, skipReason: null }],
     },
@@ -106,9 +113,9 @@ describe('SubmitConfirmModal', () => {
     renderModal({
       ...PREVIEW,
       affectedPrograms: [],
-      levels: [PREVIEW.levels[2]],
+      levels: [PREVIEW.levels[3]],
     });
-    await screen.findByText('Cấp 3 — Phòng Đào tạo');
+    await screen.findByText('Cấp 4 — Phòng Đào tạo');
     expect(screen.queryByText(/Cấp 1/)).not.toBeInTheDocument();
     expect(
       screen.queryByText('Chương trình bị ảnh hưởng'),
