@@ -34,7 +34,7 @@ Script sẽ tự động:
 3. Upload sẵn `demo.env`, `ctdt_real.dump` và `files.tgz` từ `D:\oci-demo-backup\` cùng bản release code mới nhất lên VM mới.
 
 ### Bước 3 — Trỏ DNS & Restore dữ liệu + Cập nhật GitHub CI/CD Secret
-1. Tại panel DNS **tenten.vn**, cập nhật bản ghi `A` của `ctdt.oguri-lab.io.vn` sang `NEW_IP` mà script in ra.
+1. Trên **AWS Route 53** (Hosted Zone `oguri-lab.io.vn` — `Z077325317347BX5JHEX8`), cập nhật bản ghi `A` của `ctdt.oguri-lab.io.vn` sang `NEW_IP` mà script in ra *(không đổi nameserver tại TenTen để không ảnh hưởng các dự án AWS khác)*.
 2. Chạy 2 lệnh cuối script in ra để restore CSDL + khởi động Caddy HTTPS và cập nhật secret GitHub Actions `demo`:
    ```bash
    ssh -i ~/.ssh/oci_ctdt ubuntu@$NEW_IP "/srv/ctdt/releases/$(git rev-parse HEAD)/deploy/scripts/restore-demo-data.sh /srv/ctdt/incoming/ctdt_real.dump /srv/ctdt/incoming/files.tgz"

@@ -49,7 +49,7 @@ export function HomePage() {
     me?.roles.map((role) => role.roleCode) ?? [],
     me?.canApprove ?? false,
   );
-  const roles = me?.roles.map((role) => role.roleName).join(', ');
+  const roles = [...new Set(me?.roles.map((role) => role.roleName))].join(', ');
   return (
     <Flex vertical gap={32} style={{ maxWidth: 960 }}>
       <Flex vertical gap={4}>

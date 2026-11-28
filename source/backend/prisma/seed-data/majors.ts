@@ -97,4 +97,37 @@ export async function seedMajors(prisma: PrismaClient): Promise<void> {
       },
     });
   }
+
+  // Link any existing programs missing majorId using exact or base national major code (e.g. 7480201A -> 7480201).
+  const allMajors = await prisma.major.findMany({
+    select: { id: true, majorCode: true },
+  });
+  const majorByCode = new Map(allMajors.map((m) => [m.majorCode, m.id]));
+  const unlinked = await prisma.program.findMany({
+    where: { majorId: null },
+    select: {
+      id: true,
+      versions: {
+        where: { sourceRequestId: null },
+        select: { majorCode: true, status: true, createdAt: true },
+        orderBy: { createdAt: 'desc' },
+      },
+    },
+  });
+  for (const program of unlinked) {
+    const picked =
+      program.versions.find((v) => v.status === 'ACTIVE') ??
+      program.versions.find((v) => v.status === 'PENDING') ??
+      program.versions[0];
+    if (!picked) continue;
+    const baseCode = picked.majorCode.replace(/[^0-9].*$/, '');
+    const majorId =
+      majorByCode.get(picked.majorCode) ?? majorByCode.get(baseCode);
+    if (majorId) {
+      await prisma.program.update({
+        where: { id: program.id },
+        data: { majorId },
+      });
+    }
+  }
 }

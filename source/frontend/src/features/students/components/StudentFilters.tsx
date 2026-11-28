@@ -44,7 +44,7 @@ export function StudentFilters({ params, onChange }: StudentFiltersProps) {
         allowClear
         showSearch
         optionFilterProp="label"
-        value={params.programId}
+        value={params.programId || undefined}
         style={{ minWidth: 220 }}
         loading={programs.isFetching}
         options={programs.data?.map((program) => ({

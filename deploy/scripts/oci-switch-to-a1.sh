@@ -70,7 +70,7 @@ git -C "$REPO" archive --format=tar.gz "$SHA" | ssh -i "$SSH_KEY" -o ServerAlive
   chmod +x \"\$d.tmp\"/deploy/scripts/*.sh && rm -rf \"\$d\" && mv \"\$d.tmp\" \"\$d\""
 
 echo "=== [5/5] Restoring DB + files and starting single-VM stack ==="
-echo "NOTE: Update DNS A record for ctdt.oguri-lab.io.vn -> $NEW_IP at tenten.vn BEFORE Caddy requests TLS!"
+echo "NOTE: Update DNS A record for ctdt.oguri-lab.io.vn -> $NEW_IP in AWS Route 53 (oguri-lab.io.vn) BEFORE Caddy requests TLS!"
 echo "Then run:"
 echo "  ssh -i $SSH_KEY ubuntu@$NEW_IP \"/srv/ctdt/releases/$SHA/deploy/scripts/restore-demo-data.sh /srv/ctdt/incoming/ctdt_real.dump /srv/ctdt/incoming/files.tgz\""
 echo "  DEMO_HOST=$NEW_IP bash deploy/scripts/set-ci-secrets.sh"

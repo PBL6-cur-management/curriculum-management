@@ -9,8 +9,11 @@
 !prisma/schema.prisma
 !prisma/migrations/**
 !prisma/seed.ts
+!prisma/demo-account.ts
+!prisma/demo-fixtures.ts
 !prisma/seed-data/approval-levels.ts
 !prisma/seed-data/knowledge-blocks.ts
+!prisma/seed-data/majors.ts
 !prisma/seed-data/org-units.ts
 !prisma/seed-data/permission-catalog.ts
 !prisma/seed-data/programs.ts

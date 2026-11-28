@@ -131,4 +131,27 @@ describe('ApprovalQueueReader', () => {
       requestType: ChangeRequestType.CURRICULUM,
     });
   });
+
+  it('falls back to levelEnteredAt when a final-level request has no level-4 step row', async () => {
+    const entered = new Date('2026-10-05T00:00:00Z');
+    roleFindFirst.mockResolvedValue({ id: 'ra' });
+    requestsFindMany.mockResolvedValue([
+      {
+        ...request({
+          id: 'r-legacy',
+          requestCode: 'DX-LEGACY',
+          status: ChangeRequestStatus.PENDING_ACADEMIC_OFFICE,
+          levelEnteredAt: entered,
+        }),
+        steps: [],
+      },
+    ]);
+    const items = await reader.read({}, access);
+    expect(items).toHaveLength(1);
+    expect(items[0]).toMatchObject({
+      requestCode: 'DX-LEGACY',
+      approvalLevel: 4,
+      submittedAt: entered.toISOString(),
+    });
+  });
 });

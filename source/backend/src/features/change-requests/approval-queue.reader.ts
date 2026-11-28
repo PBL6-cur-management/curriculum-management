@@ -221,11 +221,12 @@ function toFinalQueueItem(
     request.steps.find(
       (candidate) => candidate.submissionRound === request.submissionRound,
     ) ?? request.steps[0];
+  const submittedAt = step?.createdAt ?? request.levelEnteredAt ?? today;
   return {
     ...base(request, today),
     approvalLevel: APPROVAL_LEVEL.ACADEMIC_OFFICE,
     standsFor: null,
-    submittedAt: step.createdAt.toISOString(),
+    submittedAt: submittedAt.toISOString(),
     delegatedFor: [],
   };
 }
