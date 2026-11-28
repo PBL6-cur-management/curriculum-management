@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { AccessContext } from '../../shared/authz/access-context.js';
 import { CurrentAccess } from '../../shared/authz/current-access.decorator.js';
@@ -7,6 +15,7 @@ import { RequirePermission } from '../../shared/authz/require-permission.decorat
 import {
   CreateMajorDto,
   MajorDto,
+  MajorOverviewDto,
   MajorPageDto,
   MajorQueryDto,
   SetMajorStatusDto,
@@ -25,6 +34,16 @@ export class MajorsController {
   @ApiOkResponse({ type: MajorPageDto })
   list(@Query() query: MajorQueryDto): Promise<MajorPageDto> {
     return this.majors.list(query);
+  }
+
+  @Get(':majorId/overview')
+  @RequirePermission(PERMISSIONS.PROGRAM_VIEW)
+  @ApiOperation({
+    summary: 'Tổng quan ngành đào tạo (CTĐT, học phần, nhóm chuyên môn, khóa)',
+  })
+  @ApiOkResponse({ type: MajorOverviewDto })
+  overview(@Param('majorId') majorId: string): Promise<MajorOverviewDto> {
+    return this.majors.overview(majorId);
   }
 
   @Get(':majorId')

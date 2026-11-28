@@ -4,49 +4,35 @@ import {
   Button,
   Card,
   Flex,
-  Form,
   Input,
-  Modal,
   Select,
   Space,
+  Switch,
   Table,
   Tag,
+  Tooltip,
   Typography,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useState } from 'react';
+import { Link, generatePath } from 'react-router';
+import { ROUTES } from '../../../routes';
+import { withQuery } from '../../../shared/api/client';
 import { PERMISSIONS } from '../../../shared/auth/permissions';
 import { useCan } from '../../../shared/auth/useCan';
 import { PageHeader } from '../../../shared/design-system';
-import {
-  applyFieldErrors,
-  errorMessage,
-} from '../../../shared/forms/applyFieldErrors';
+import { errorMessage } from '../../../shared/forms/applyFieldErrors';
 import { OrgUnitSelect } from '../../../shared/org-units/OrgUnitSelect';
-import type {
-  CreateMajorRequest,
-  MajorItem,
-  MajorStatus,
-} from '../api/majors';
+import type { MajorItemExtended, MajorStatus } from '../api/majors';
+import { MajorFormModal } from '../components/MajorFormModal';
 import {
-  useCreateMajor,
-  useMajors,
-  useSetMajorStatus,
-  useUpdateMajor,
-} from '../hooks/useMajors';
-import { MAJOR_CODE_RULES, MAJOR_NAME_RULES } from '../schema/majorRules';
-
-const DEGREE_GROUP_LABELS: Record<string, string> = {
-  CD01: 'Đại học (7xxxxxx)',
-  CD02: 'Thạc sĩ (8xxxxxx)',
-  CD03: 'Tiến sĩ (9xxxxxx)',
-};
-
-const DEGREE_GROUP_OPTIONS = Object.entries(DEGREE_GROUP_LABELS).map(
-  ([value, label]) => ({ value, label }),
-);
-
-const FACULTY_TYPES = ['FACULTY'] as const;
+  DEGREE_GROUP_OPTIONS,
+  DEGREE_GROUP_SHORT_LABELS,
+  FACULTY_UNIT_TYPES,
+  MAJOR_STATUS_COLORS,
+  MAJOR_STATUS_LABELS,
+} from '../constants/majorLabels';
+import { useMajors, useSetMajorStatus } from '../hooks/useMajors';
 
 export function MajorsPage() {
   const { message } = App.useApp();
@@ -57,10 +43,10 @@ export function MajorsPage() {
   const [degreeGroup, setDegreeGroup] = useState<string | undefined>();
   const [status, setStatus] = useState<MajorStatus | undefined>();
   const [facultyId, setFacultyId] = useState<string | undefined>();
+  const [onlyWithPrograms, setOnlyWithPrograms] = useState(false);
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState<MajorItem | null>(null);
-  const [form] = Form.useForm<CreateMajorRequest>();
+  const [editing, setEditing] = useState<MajorItemExtended | null>(null);
 
   const majors = useMajors({
     page,
@@ -69,72 +55,22 @@ export function MajorsPage() {
     degreeGroup,
     status,
     facultyId,
+    hasPrograms: onlyWithPrograms ? true : undefined,
   });
 
-  const createMutation = useCreateMajor();
-  const updateMutation = useUpdateMajor();
   const statusMutation = useSetMajorStatus();
-  const isSaving = createMutation.isPending || updateMutation.isPending;
 
   const openCreate = () => {
     setEditing(null);
-    form.resetFields();
     setModalOpen(true);
   };
 
-  const openEdit = (item: MajorItem) => {
+  const openEdit = (item: MajorItemExtended) => {
     setEditing(item);
-    form.setFieldsValue({
-      majorCode: item.majorCode,
-      majorName: item.majorName,
-      englishName: item.englishName ?? '',
-      degreeGroup: item.degreeGroup ?? undefined,
-      facultyId: item.faculty?.id ?? undefined,
-    });
     setModalOpen(true);
   };
 
-  const handleSave = (values: CreateMajorRequest) => {
-    const onSuccess = () => {
-      void message.success(
-        editing ? 'Đã cập nhật ngành đào tạo.' : 'Đã thêm ngành đào tạo mới.',
-      );
-      setModalOpen(false);
-      setEditing(null);
-      form.resetFields();
-    };
-    const onError = (err: unknown) => {
-      if (!applyFieldErrors(form, err))
-        void message.error(errorMessage(err, 'Không lưu được ngành đào tạo.'));
-    };
-
-    if (editing) {
-      updateMutation.mutate(
-        {
-          majorId: editing.id,
-          body: {
-            majorName: values.majorName,
-            englishName: values.englishName || null,
-            degreeGroup: values.degreeGroup ?? null,
-            facultyId: values.facultyId ?? null,
-          },
-        },
-        { onSuccess, onError },
-      );
-      return;
-    }
-    createMutation.mutate(
-      {
-        ...values,
-        englishName: values.englishName || null,
-        degreeGroup: values.degreeGroup ?? null,
-        facultyId: values.facultyId ?? null,
-      },
-      { onSuccess, onError },
-    );
-  };
-
-  const handleStatusToggle = (row: MajorItem) => {
+  const handleStatusToggle = (row: MajorItemExtended) => {
     const next: MajorStatus = row.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
     statusMutation.mutate(
       { majorId: row.id, status: next },
@@ -148,14 +84,16 @@ export function MajorsPage() {
     );
   };
 
-  const columns: ColumnsType<MajorItem> = [
+  const columns: ColumnsType<MajorItemExtended> = [
     {
       title: 'Mã ngành',
       dataIndex: 'majorCode',
       key: 'majorCode',
-      width: 130,
-      render: (code: string) => (
-        <Typography.Text strong>{code}</Typography.Text>
+      width: 120,
+      render: (code: string, row) => (
+        <Link to={generatePath(ROUTES.majorDetail, { majorId: row.id })}>
+          <Typography.Text strong>{code}</Typography.Text>
+        </Link>
       ),
     },
     {
@@ -163,7 +101,9 @@ export function MajorsPage() {
       key: 'majorName',
       render: (_, row) => (
         <Flex vertical>
-          <Typography.Text>{row.majorName}</Typography.Text>
+          <Link to={generatePath(ROUTES.majorDetail, { majorId: row.id })}>
+            {row.majorName}
+          </Link>
           {row.englishName && (
             <Typography.Text type="secondary" style={{ fontSize: 12 }}>
               {row.englishName}
@@ -176,10 +116,10 @@ export function MajorsPage() {
       title: 'Bậc đào tạo',
       dataIndex: 'degreeGroup',
       key: 'degreeGroup',
-      width: 170,
+      width: 115,
       render: (val: string | null) =>
         val ? (
-          <Tag>{DEGREE_GROUP_LABELS[val] ?? val}</Tag>
+          <Tag>{DEGREE_GROUP_SHORT_LABELS[val] ?? val}</Tag>
         ) : (
           <Typography.Text type="secondary">—</Typography.Text>
         ),
@@ -188,18 +128,65 @@ export function MajorsPage() {
       title: 'Khoa phụ trách',
       key: 'faculty',
       render: (_, row) =>
-        row.faculty?.unitName ?? (
+        row.faculty ? (
+          <Tooltip title="Xem các CTĐT thuộc khoa này">
+            <Link
+              to={withQuery(ROUTES.programs, { facultyId: row.faculty.id })}
+            >
+              {row.faculty.unitName}
+            </Link>
+          </Tooltip>
+        ) : (
           <Typography.Text type="secondary">
             Toàn trường / Chưa gán
           </Typography.Text>
         ),
     },
     {
-      title: 'Số CTĐT',
-      dataIndex: 'programCount',
+      title: 'CTĐT',
       key: 'programCount',
-      width: 100,
+      width: 150,
       align: 'right',
+      render: (_, row) => {
+        const programsUrl = withQuery(ROUTES.programs, {
+          majorId: row.id,
+          status: 'ALL',
+        });
+        if (row.programCount === 0) {
+          return (
+            <Link to={programsUrl}>
+              <Typography.Text type="secondary">0</Typography.Text>
+            </Link>
+          );
+        }
+        const label =
+          row.activeProgramCount !== undefined
+            ? `${row.programCount} (${row.activeProgramCount} đang ĐT)`
+            : `${row.programCount}`;
+        return (
+          <Tooltip title="Xem danh sách chương trình đào tạo thuộc ngành này">
+            <Link to={programsUrl}>
+              <Tag color="blue" style={{ marginInlineEnd: 0 }}>
+                {label}
+              </Tag>
+            </Link>
+          </Tooltip>
+        );
+      },
+    },
+    {
+      title: 'Sinh viên',
+      key: 'studentCount',
+      width: 105,
+      align: 'right',
+      render: (_, row) => {
+        const count = row.studentCount ?? 0;
+        return count > 0 ? (
+          <Typography.Text>{count.toLocaleString('vi-VN')}</Typography.Text>
+        ) : (
+          <Typography.Text type="secondary">0</Typography.Text>
+        );
+      },
     },
     {
       title: 'Trạng thái',
@@ -207,19 +194,31 @@ export function MajorsPage() {
       key: 'status',
       width: 130,
       render: (val: MajorStatus) => (
-        <Tag color={val === 'ACTIVE' ? 'green' : 'default'}>
-          {val === 'ACTIVE' ? 'Đang sử dụng' : 'Ngừng sử dụng'}
-        </Tag>
+        <Tag color={MAJOR_STATUS_COLORS[val]}>{MAJOR_STATUS_LABELS[val]}</Tag>
       ),
     },
-    ...(canManage
-      ? [
-          {
-            title: 'Thao tác',
-            key: 'actions',
-            width: 170,
-            render: (_: unknown, row: MajorItem) => (
-              <Space size="small">
+    {
+      title: 'Thao tác',
+      key: 'actions',
+      width: canManage ? 245 : 130,
+      render: (_: unknown, row: MajorItemExtended) => {
+        const detailUrl = generatePath(ROUTES.majorDetail, { majorId: row.id });
+        const programsUrl = withQuery(ROUTES.programs, {
+          majorId: row.id,
+          status: 'ALL',
+        });
+        return (
+          <Space size="small" wrap>
+            <Link to={detailUrl}>
+              <Button size="small">Chi tiết</Button>
+            </Link>
+            <Link to={programsUrl}>
+              <Button size="small" type="text">
+                CTĐT
+              </Button>
+            </Link>
+            {canManage && (
+              <>
                 <Button size="small" onClick={() => openEdit(row)}>
                   Sửa
                 </Button>
@@ -230,11 +229,12 @@ export function MajorsPage() {
                 >
                   {row.status === 'ACTIVE' ? 'Ngừng' : 'Mở lại'}
                 </Button>
-              </Space>
-            ),
-          },
-        ]
-      : []),
+              </>
+            )}
+          </Space>
+        );
+      },
+    },
   ];
 
   return (
@@ -243,15 +243,27 @@ export function MajorsPage() {
         title="Danh mục ngành đào tạo"
         subtitle="Cấp 0 (Level 0) — quản lý mã ngành quốc gia (Đại học, Thạc sĩ, Tiến sĩ) liên kết với các chương trình đào tạo."
         actions={
-          canManage ? (
-            <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
-              Thêm ngành
-            </Button>
-          ) : undefined
+          <Space wrap size="small">
+            <Link to={ROUTES.programs}>
+              <Button>Danh sách CTĐT</Button>
+            </Link>
+            <Link to={ROUTES.reportComparison}>
+              <Button>Báo cáo so sánh</Button>
+            </Link>
+            {canManage && (
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={openCreate}
+              >
+                Thêm ngành
+              </Button>
+            )}
+          </Space>
         }
       />
       <Card size="small">
-        <Flex gap="small" wrap>
+        <Flex gap="small" wrap align="center">
           <Input.Search
             placeholder="Tìm theo mã ngành hoặc tên ngành..."
             allowClear
@@ -275,7 +287,7 @@ export function MajorsPage() {
           />
           <div style={{ minWidth: 240 }}>
             <OrgUnitSelect
-              types={FACULTY_TYPES}
+              types={FACULTY_UNIT_TYPES}
               placeholder="Khoa phụ trách"
               value={facultyId}
               onChange={(val) => {
@@ -289,8 +301,8 @@ export function MajorsPage() {
             placeholder="Trạng thái"
             style={{ width: 150 }}
             options={[
-              { value: 'ACTIVE', label: 'Đang sử dụng' },
-              { value: 'INACTIVE', label: 'Ngừng sử dụng' },
+              { value: 'ACTIVE', label: MAJOR_STATUS_LABELS.ACTIVE },
+              { value: 'INACTIVE', label: MAJOR_STATUS_LABELS.INACTIVE },
             ]}
             value={status}
             onChange={(val?: MajorStatus) => {
@@ -298,13 +310,25 @@ export function MajorsPage() {
               setPage(1);
             }}
           />
+          <Space size="small" style={{ marginInlineStart: 4 }}>
+            <Switch
+              id="only-with-programs-switch"
+              checked={onlyWithPrograms}
+              onChange={(checked) => {
+                setOnlyWithPrograms(checked);
+                setPage(1);
+              }}
+            />
+            <Typography.Text>Chỉ ngành đã có CTĐT</Typography.Text>
+          </Space>
         </Flex>
       </Card>
-      <Table<MajorItem>
+      <Table<MajorItemExtended>
         rowKey="id"
         loading={majors.isPending}
         dataSource={majors.data?.items ?? []}
         columns={columns}
+        scroll={{ x: 'max-content' }}
         pagination={{
           current: page,
           pageSize,
@@ -316,55 +340,14 @@ export function MajorsPage() {
           },
         }}
       />
-      <Modal
+      <MajorFormModal
         open={modalOpen}
-        title={
-          editing
-            ? `Cập nhật ngành ${editing.majorCode}`
-            : 'Thêm ngành đào tạo mới'
-        }
-        okText={editing ? 'Lưu thay đổi' : 'Tạo ngành'}
-        cancelText="Hủy"
-        onCancel={() => {
+        editing={editing}
+        onClose={() => {
           setModalOpen(false);
           setEditing(null);
         }}
-        onOk={() => form.submit()}
-        confirmLoading={isSaving}
-      >
-        <Form<CreateMajorRequest>
-          form={form}
-          layout="vertical"
-          onFinish={handleSave}
-        >
-          <Form.Item
-            name="majorCode"
-            label="Mã ngành quốc gia"
-            rules={MAJOR_CODE_RULES}
-          >
-            <Input disabled={Boolean(editing)} placeholder="Ví dụ: 7480201" />
-          </Form.Item>
-          <Form.Item
-            name="majorName"
-            label="Tên ngành (tiếng Việt)"
-            rules={MAJOR_NAME_RULES}
-          >
-            <Input placeholder="Ví dụ: Công nghệ Thông tin" />
-          </Form.Item>
-          <Form.Item name="englishName" label="Tên ngành (tiếng Anh)">
-            <Input placeholder="Ví dụ: Information Technology" />
-          </Form.Item>
-          <Form.Item name="degreeGroup" label="Bậc đào tạo">
-            <Select allowClear options={DEGREE_GROUP_OPTIONS} />
-          </Form.Item>
-          <Form.Item name="facultyId" label="Khoa phụ trách">
-            <OrgUnitSelect
-              types={FACULTY_TYPES}
-              placeholder="Chọn khoa phụ trách"
-            />
-          </Form.Item>
-        </Form>
-      </Modal>
+      />
     </Flex>
   );
 }

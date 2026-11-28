@@ -94,6 +94,11 @@ const MajorsPage = lazy(() =>
     default: module.MajorsPage,
   })),
 );
+const MajorDetailPage = lazy(() =>
+  import('./features/majors/pages/MajorDetailPage').then((module) => ({
+    default: module.MajorDetailPage,
+  })),
+);
 const ProgramListPage = lazy(() =>
   import('./features/programs/pages/ProgramListPage').then((module) => ({
     default: module.ProgramListPage,
@@ -791,6 +796,14 @@ export const router = createBrowserRouter([
             element: (
               <RequirePermission code={PERMISSIONS.programView}>
                 <MajorsPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: ROUTES.majorDetail,
+            element: (
+              <RequirePermission code={PERMISSIONS.programView}>
+                <MajorDetailPage />
               </RequirePermission>
             ),
           },

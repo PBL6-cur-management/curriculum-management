@@ -23,6 +23,7 @@ export const ROUTES = {
   syllabusEdit: '/courses/:courseId/syllabus/edit',
   equivalenceGroups: '/equivalence-groups',
   majors: '/majors',
+  majorDetail: '/majors/:majorId',
   programs: '/programs',
   programDetail: '/programs/:programId',
   programEdit: '/programs/:programId/edit',
