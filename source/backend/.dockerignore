@@ -11,6 +11,7 @@
 !prisma/seed.ts
 !prisma/seed-extra-faculties.ts
 !prisma/seed-extra-full.ts
+!prisma/seed-tracks-from-notes.ts
 !prisma/demo-account.ts
 !prisma/demo-fixtures.ts
 !prisma/seed-data/approval-levels.ts

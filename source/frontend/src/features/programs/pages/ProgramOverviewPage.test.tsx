@@ -103,6 +103,7 @@ function renderPage(
   me: Record<string, unknown> | null = null,
   initialEntry = '/programs/p1',
   versionInfo: Record<string, unknown> | null = null,
+  tracks: unknown[] = [],
 ) {
   const writes: { url: string; method: string }[] = [];
   vi.stubGlobal(
@@ -117,6 +118,8 @@ function renderPage(
       if (url === '/api/programs/p1/directors')
         return Promise.resolve(json(directors));
       if (url === '/api/programs/p1') return Promise.resolve(json(program));
+      if (/^\/api\/program-versions\/[^/]+\/tracks$/.test(url))
+        return Promise.resolve(json(tracks));
       if (url.startsWith('/api/program-versions/') && versionInfo)
         return Promise.resolve(json(versionInfo));
       return Promise.resolve(json({}, 404));
@@ -301,6 +304,80 @@ describe('ProgramOverviewPage', () => {
       'Phân công',
     ])
       expect(screen.queryByRole('button', { name })).not.toBeInTheDocument();
+  });
+
+  it('renders track cards with counts, credits, students and a deep link', async () => {
+    renderPage(
+      {
+        ...PROGRAM,
+        draftVersion: null,
+        currentVersion: { id: 'v9', versionNumber: '1.0', status: 'ACTIVE' },
+        versions: [{ id: 'v9', versionNumber: '1.0', status: 'ACTIVE' }],
+      },
+      [],
+      null,
+      '/programs/p1',
+      null,
+      [
+        {
+          id: 't1',
+          trackCode: 'CNPM',
+          trackName: 'Công nghệ phần mềm',
+          englishName: 'Software Engineering',
+          description: 'Hướng phần mềm',
+          itemCount: 12,
+          compulsoryCredits: '30',
+          electiveCredits: '8',
+          studentCount: 45,
+        },
+        {
+          id: 't2',
+          trackCode: 'HTTT',
+          trackName: 'Hệ thống thông tin',
+          englishName: null,
+          description: null,
+          itemCount: 5,
+          compulsoryCredits: '0',
+          electiveCredits: '0',
+          studentCount: 0,
+        },
+      ],
+    );
+    expect(await screen.findByText('CNPM')).toBeInTheDocument();
+    expect(screen.getByText('HTTT')).toBeInTheDocument();
+    expect(screen.getByText('Software Engineering')).toBeInTheDocument();
+    expect(screen.getByText(/12 học phần/)).toHaveTextContent(
+      '12 học phần · BB: 30 TC · TC: 8 TC · 45 SV',
+    );
+    expect(screen.getByText('5 học phần')).toBeInTheDocument();
+    const links = screen.getAllByRole('link', { name: 'Xem khung học phần' });
+    expect(links).toHaveLength(2);
+    expect(links[0]).toHaveAttribute(
+      'href',
+      '/programs/p1/versions/v9/curriculum?track=t1',
+    );
+  });
+
+  it('shows the empty track state with a proposal link on an ACTIVE version', async () => {
+    renderPage(
+      {
+        ...PROGRAM,
+        draftVersion: null,
+        currentVersion: { id: 'v9', versionNumber: '1.0', status: 'ACTIVE' },
+        versions: [{ id: 'v9', versionNumber: '1.0', status: 'ACTIVE' }],
+      },
+      [],
+      { ...ME, permissions: ['program.view', 'changeRequest.create'] },
+    );
+    expect(
+      await screen.findByText(/chưa phân tách chuyên ngành con/),
+    ).toBeInTheDocument();
+    const button = await screen.findByRole('button', {
+      name: 'Tạo đề xuất chỉnh sửa CTĐT',
+    });
+    expect(button.closest('a')?.getAttribute('href')).toMatch(
+      /^\/change-requests\/new\?/,
+    );
   });
 
   it('hides the director actions without canManage', async () => {

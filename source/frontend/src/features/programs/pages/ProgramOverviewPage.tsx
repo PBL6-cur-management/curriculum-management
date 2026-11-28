@@ -4,6 +4,7 @@ import { CloneProgramButton } from '../components/CloneProgramButton';
 import { ProgramDirectorsSection } from '../components/ProgramDirectorsSection';
 import { ProgramEditButton } from '../components/ProgramEditButton';
 import { ProgramInfoCard } from '../components/ProgramInfoCard';
+import { ProgramTracksSection } from '../components/ProgramTracksSection';
 import { ProgramVersionsSection } from '../components/ProgramVersionsSection';
 import { ProgramStatusActions } from '../components/ProgramStatusActions';
 import { useProgram } from '../hooks/usePrograms';
@@ -25,6 +26,7 @@ export function ProgramOverviewPage() {
           </Flex>
         }
       />
+      <ProgramTracksSection program={program} />
       <ProgramVersionsSection program={program} />
       <ProgramDirectorsSection program={program} />
     </Flex>

@@ -5,6 +5,7 @@ import { CURRICULUM_QUERY_ROOT } from '../../../shared/curriculum/curriculumQuer
 import { OUTCOME_QUERY_ROOT } from '../../../shared/outcomes/outcomeQueryRoot';
 import {
   assignGroupItems,
+  bulkAssignTrackItems,
   createGroup,
   createItem,
   createTrack,
@@ -19,6 +20,7 @@ import {
   updateGroup,
   updateItem,
   updateTrack,
+  type BulkAssignTrackItemsRequest,
   type CreateCurriculumItemRequest,
   type CreateElectiveGroupRequest,
   type CreateProgramTrackRequest,
@@ -143,3 +145,7 @@ export const useUpdateTrack = (versionId: string) =>
   );
 export const useDeleteTrack = (versionId: string) =>
   useCurriculumMutation(versionId, (trackId: string) => deleteTrack(trackId));
+export const useBulkAssignTrackItems = (versionId: string) =>
+  useCurriculumMutation(versionId, (body: BulkAssignTrackItemsRequest) =>
+    bulkAssignTrackItems(versionId, body),
+  );
