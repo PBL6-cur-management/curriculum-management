@@ -6,21 +6,23 @@ import {
 } from '@tanstack/react-query';
 import {
   createMajor,
+  fetchMajorOverview,
   fetchMajors,
   setMajorStatus,
   updateMajor,
   type CreateMajorRequest,
-  type MajorQuery,
+  type MajorQueryExtended,
   type MajorStatus,
   type UpdateMajorRequest,
 } from '../api/majors';
 
 export const MAJOR_QUERY_KEYS = {
   all: ['majors'] as const,
-  list: (query: MajorQuery) => ['majors', 'list', query] as const,
+  list: (query: MajorQueryExtended) => ['majors', 'list', query] as const,
+  overview: (majorId: string) => ['majors', 'overview', majorId] as const,
 };
 
-export function useMajors(query: MajorQuery) {
+export function useMajors(query: MajorQueryExtended) {
   return useQuery({
     queryKey: MAJOR_QUERY_KEYS.list(query),
     queryFn: () => fetchMajors(query),
@@ -28,9 +30,18 @@ export function useMajors(query: MajorQuery) {
   });
 }
 
+export function useMajorOverview(majorId: string) {
+  return useQuery({
+    queryKey: MAJOR_QUERY_KEYS.overview(majorId),
+    queryFn: () => fetchMajorOverview(majorId),
+    enabled: Boolean(majorId),
+  });
+}
+
 function useInvalidateMajors() {
   const queryClient = useQueryClient();
-  return () => queryClient.invalidateQueries({ queryKey: MAJOR_QUERY_KEYS.all });
+  return () =>
+    queryClient.invalidateQueries({ queryKey: MAJOR_QUERY_KEYS.all });
 }
 
 export function useCreateMajor() {
@@ -58,8 +69,13 @@ export function useUpdateMajor() {
 export function useSetMajorStatus() {
   const invalidate = useInvalidateMajors();
   return useMutation({
-    mutationFn: ({ majorId, status }: { majorId: string; status: MajorStatus }) =>
-      setMajorStatus(majorId, status),
+    mutationFn: ({
+      majorId,
+      status,
+    }: {
+      majorId: string;
+      status: MajorStatus;
+    }) => setMajorStatus(majorId, status),
     onSuccess: invalidate,
   });
 }

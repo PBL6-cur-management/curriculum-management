@@ -19,6 +19,8 @@ const MAJOR_PAGE = {
       faculty: { id: 'f1', unitCode: 'KHOA_CNTT', unitName: 'Khoa CNTT' },
       status: 'ACTIVE',
       programCount: 3,
+      activeProgramCount: 2,
+      studentCount: 1250,
       createdAt: '2026-10-01T00:00:00.000Z',
       updatedAt: '2026-10-01T00:00:00.000Z',
     },
@@ -28,12 +30,17 @@ const MAJOR_PAGE = {
   pageSize: 20,
 };
 
-function renderPage(permissions: string[] = ['program.view', 'program.editInfo']) {
+function renderPage(
+  permissions: string[] = ['program.view', 'program.editInfo'],
+) {
   const writes: { method: string; url: string; body: unknown }[] = [];
+  const requestedUrls: string[] = [];
+
   vi.stubGlobal(
     'fetch',
     vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);
+      requestedUrls.push(url);
       if (init?.method && init.method !== 'GET') {
         writes.push({
           method: init.method,
@@ -98,21 +105,64 @@ function renderPage(permissions: string[] = ['program.view', 'program.editInfo']
     </QueryClientProvider>,
   );
 
-  return { writes };
+  return { writes, requestedUrls };
 }
 
 afterEach(() => vi.unstubAllGlobals());
 
 describe('MajorsPage', () => {
-  it('renders national majors with degree group and faculty', async () => {
+  it('renders national majors with quick-nav links, counts, and read-only actions', async () => {
     renderPage(['program.view']);
-    expect(await screen.findByText('7480201')).toBeInTheDocument();
-    expect(screen.getByText('Công nghệ Thông tin')).toBeInTheDocument();
-    expect(screen.getByText('Đại học (7xxxxxx)')).toBeInTheDocument();
-    expect(screen.getByText('Khoa CNTT')).toBeInTheDocument();
+    const codeLink = (await screen.findByText('7480201')).closest('a');
+    expect(codeLink).toHaveAttribute('href', '/majors/m1');
+
+    const nameLink = screen.getByText('Công nghệ Thông tin').closest('a');
+    expect(nameLink).toHaveAttribute('href', '/majors/m1');
+
+    expect(screen.getByText('Đại học')).toBeInTheDocument();
+
+    const facultyLink = screen.getByText('Khoa CNTT').closest('a');
+    expect(facultyLink).toHaveAttribute('href', '/programs?facultyId=f1');
+
+    const programCountLink = screen.getByText('3 (2 đang ĐT)').closest('a');
+    expect(programCountLink).toHaveAttribute(
+      'href',
+      '/programs?majorId=m1&status=ALL',
+    );
+
+    expect(screen.getByText('1.250')).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('link', { name: 'Danh sách CTĐT' }),
+    ).toHaveAttribute('href', '/programs');
+    expect(
+      screen.getByRole('link', { name: 'Báo cáo so sánh' }),
+    ).toHaveAttribute('href', '/reports/program-comparison');
+    expect(screen.getByRole('link', { name: 'Chi tiết' })).toHaveAttribute(
+      'href',
+      '/majors/m1',
+    );
+    expect(screen.getByRole('link', { name: 'CTĐT' })).toHaveAttribute(
+      'href',
+      '/programs?majorId=m1&status=ALL',
+    );
     expect(
       screen.queryByRole('button', { name: /Thêm ngành/ }),
     ).not.toBeInTheDocument();
+  });
+
+  it('sends hasPrograms=true when toggling only-with-programs switch', async () => {
+    const { requestedUrls } = renderPage(['program.view']);
+    await screen.findByText('7480201');
+
+    const toggle = screen.getByRole('switch');
+    fireEvent.click(toggle);
+
+    await waitFor(() =>
+      expect(
+        requestedUrls.some((u) => u.includes('hasPrograms=true')),
+      ).toBe(true),
+    );
   });
 
   it('creates a new major when permitted', async () => {
