@@ -51,6 +51,9 @@ const PROGRAM_STATUS_FILTER_OPTIONS = [
   { value: 'INACTIVE', label: 'Ngừng sử dụng' },
 ];
 
+const formatCohortCode = (code: string) =>
+  code.toUpperCase().startsWith('K') ? code : `K${code}`;
+
 export function MajorDetailTabs({ overview }: MajorDetailTabsProps) {
   const { major, programs, courses, subjectGroups, cohortBreakdown } = overview;
 
@@ -250,13 +253,18 @@ export function MajorDetailTabs({ overview }: MajorDetailTabsProps) {
     {
       title: 'Khóa áp dụng',
       key: 'cohorts',
-      width: 140,
+      width: 150,
       render: (_, row) =>
         row.cohorts.length > 0 ? (
           <Space size={[4, 4]} wrap>
-            {row.cohorts.map((code) => (
-              <Tag key={code}>K{code}</Tag>
+            {row.cohorts.slice(0, 3).map((code) => (
+              <Tag key={code} style={{ marginInlineEnd: 0 }}>
+                {formatCohortCode(code)}
+              </Tag>
             ))}
+            {row.cohorts.length > 3 && (
+              <Tag style={{ marginInlineEnd: 0 }}>+{row.cohorts.length - 3}</Tag>
+            )}
           </Space>
         ) : (
           <Typography.Text type="secondary">—</Typography.Text>
@@ -282,9 +290,10 @@ export function MajorDetailTabs({ overview }: MajorDetailTabsProps) {
     {
       title: 'Truy cập nhanh',
       key: 'quickAccess',
-      width: 185,
+      width: 180,
+      fixed: 'right',
       render: (_, row) => (
-        <Space size="small">
+        <Space size={4}>
           <Link to={generatePath(ROUTES.programDetail, { programId: row.id })}>
             <Button size="small">Tổng quan</Button>
           </Link>
@@ -375,9 +384,10 @@ export function MajorDetailTabs({ overview }: MajorDetailTabsProps) {
     {
       title: 'Truy cập nhanh',
       key: 'actions',
-      width: 185,
+      width: 180,
+      fixed: 'right',
       render: (_, row) => (
-        <Space size="small">
+        <Space size={4}>
           <Link to={generatePath(ROUTES.courseDetail, { courseId: row.id })}>
             <Button size="small">Chi tiết HP</Button>
           </Link>
@@ -397,7 +407,7 @@ export function MajorDetailTabs({ overview }: MajorDetailTabsProps) {
       dataIndex: 'cohortCode',
       key: 'cohortCode',
       width: 110,
-      render: (code: string) => <Tag color="blue">K{code}</Tag>,
+      render: (code: string) => <Tag color="blue">{formatCohortCode(code)}</Tag>,
     },
     {
       title: 'Chương trình đào tạo',
