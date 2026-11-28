@@ -41,6 +41,13 @@ export const ENROLLMENT_INCLUDE = {
       programName: true,
     },
   },
+  admissionVersion: {
+    select: {
+      id: true,
+      versionNumber: true,
+      status: true,
+    },
+  },
   fromSemester: true,
   untilSemester: true,
   track: { select: { id: true, trackCode: true, trackName: true } },
@@ -106,6 +113,9 @@ export function toEnrollmentDto(row: EnrollmentRow): StudentEnrollmentDto {
     cohort: toCohortDto(row.cohort),
     appliedVersion: toIssuedVersionDto(row.appliedVersion),
     admissionVersionId: row.admissionVersionId,
+    ...(row.admissionVersion
+      ? { admissionVersion: toIssuedVersionDto(row.admissionVersion) }
+      : {}),
     track: row.track
       ? {
           id: row.track.id,
@@ -161,6 +171,7 @@ export function toEnrollmentTargetDto(
 
 export function toAppliedVersionDto(
   result: StudentAppliedVersionResult,
+  programVersionNumber?: string | null,
 ): StudentAppliedVersionDto {
   return {
     studentId: result.studentId,
@@ -168,6 +179,7 @@ export function toAppliedVersionDto(
     programId: result.programId,
     semesterId: result.semesterId,
     programVersionId: result.programVersionId,
+    ...(programVersionNumber !== undefined ? { programVersionNumber } : {}),
     source: result.source,
     cohortAssignmentId: result.cohortAssignmentId,
   };

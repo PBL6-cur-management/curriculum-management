@@ -727,6 +727,22 @@ export const PLO_TEMPLATES: Record<string, ExtraPloTemplate[]> = {
 const filled = (value: string | undefined): string | null =>
   value !== undefined && value !== '' && value !== 'NULL' ? value : null;
 
+export function deriveGradeFromScore10(
+  score10Raw: string | null | undefined,
+): { score4: string; letterGrade: string } | null {
+  if (!score10Raw) return null;
+  const score = Number(score10Raw);
+  if (!Number.isFinite(score) || score < 0 || score > 10) return null;
+  if (score >= 8.5) return { score4: '4.0', letterGrade: 'A' };
+  if (score >= 8.0) return { score4: '3.5', letterGrade: 'B+' };
+  if (score >= 7.0) return { score4: '3.0', letterGrade: 'B' };
+  if (score >= 6.5) return { score4: '2.5', letterGrade: 'C+' };
+  if (score >= 5.5) return { score4: '2.0', letterGrade: 'C' };
+  if (score >= 5.0) return { score4: '1.5', letterGrade: 'D+' };
+  if (score >= 4.0) return { score4: '1.0', letterGrade: 'D' };
+  return { score4: '0.0', letterGrade: 'F' };
+}
+
 function resolveMirrorDir(cliArg?: string): string {
   return resolve(
     cliArg ??
@@ -792,6 +808,7 @@ async function main() {
     studentsTable,
     standingTable,
     resultsTable,
+    summaryResultsRows,
     exemptionsTable,
     lecturersTable,
     termsTable,
@@ -805,6 +822,7 @@ async function main() {
     readMirrorTable(mirrorDir, MIRROR_TABLES.STUDENTS),
     readMirrorTable(mirrorDir, MIRROR_TABLES.ACADEMIC_STANDING),
     readMirrorTable(mirrorDir, MIRROR_TABLES.RESULTS),
+    readMirrorCsv(mirrorDir, 'tmProxDUT', 'tmDiemTK'),
     readMirrorTable(mirrorDir, MIRROR_TABLES.EXEMPTIONS),
     readMirrorTable(mirrorDir, MIRROR_TABLES.LECTURERS),
     readMirrorTable(mirrorDir, MIRROR_TABLES.TERMS),
@@ -967,6 +985,38 @@ async function main() {
       bestResults.set(key, candidate);
     }
   }
+  // Supplement from tmDiemTK (holds full historical grades for ETE/KTMT/Kiến trúc where tmDiemkyhoc only has CNTT/Grad)
+  let summaryAdded = 0;
+  for (const row of summaryResultsRows) {
+    const studentCode = row.MaHS;
+    const courseCode = row.MaHP;
+    const termCode = row.IDCode;
+    if (
+      !studentCode ||
+      !courseCode ||
+      !studentMap.has(studentCode) ||
+      !isValidLegacyTermCode(termCode)
+    ) {
+      continue;
+    }
+    const key = `${studentCode}:${courseCode}:${termCode}`;
+    if (bestResults.has(key)) continue;
+    const score10 = filled(row.Diem);
+    const derived = deriveGradeFromScore10(score10);
+    const score4 = filled(row.Diem4) ?? derived?.score4 ?? null;
+    const letterGrade = filled(row.DiemC) ?? derived?.letterGrade ?? null;
+    if (!score10 && !letterGrade) continue;
+    bestResults.set(key, {
+      studentCode,
+      courseCode,
+      termCode,
+      score10,
+      score4,
+      letterGrade,
+      exempt: false,
+    });
+    summaryAdded++;
+  }
   let exemptionsKept = 0;
   for (const row of exemptionsTable.rows) {
     if (!studentMap.has(row.MaHS) || !isValidLegacyTermCode(row.IDCode)) {
@@ -1128,7 +1178,7 @@ async function main() {
   );
   console.log(`PII files (gitignored): ${peopleOutPath}, ${resultsOutPath}`);
   console.log(
-    `  Students: ${students.length}, Results: ${results.length} (exemptions=${exemptionsKept}), Lecturers: ${lecturers.length}, Terms: ${terms.length} (openTerm=${openTermCode})`,
+    `  Students: ${students.length}, Results: ${results.length} (from tmDiemTK=${summaryAdded}, exemptions=${exemptionsKept}), Lecturers: ${lecturers.length}, Terms: ${terms.length} (openTerm=${openTermCode})`,
   );
 }
 

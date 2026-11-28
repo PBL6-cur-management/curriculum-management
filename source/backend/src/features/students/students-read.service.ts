@@ -229,7 +229,11 @@ export class StudentsReadService {
         programId: query.programId,
         semesterId: query.semesterId,
       });
-    return toAppliedVersionDto(result);
+    const version = await this.prisma.programVersion?.findUnique({
+      where: { id: result.programVersionId },
+      select: { versionNumber: true },
+    });
+    return toAppliedVersionDto(result, version?.versionNumber ?? null);
   }
 
   // Versions the enrollment command would accept: issued, and effective no later than the chosen start semester.

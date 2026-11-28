@@ -68,7 +68,9 @@ describe('StudentDetailPage', () => {
   it('distinguishes semester resolution from the stored pin and keeps repeated attempts', async () => {
     setup();
     expect(await screen.findByText(/v-future/)).toBeInTheDocument();
-    expect(screen.getByRole('cell', { name: '1.0' })).toBeInTheDocument();
+    expect(
+      screen.getAllByRole('cell', { name: '1.0' }).length,
+    ).toBeGreaterThanOrEqual(1);
     fireEvent.click(screen.getByRole('tab', { name: 'Kết quả học tập' }));
     expect(
       await screen.findAllByRole('cell', { name: 'HP01 — Học phần tổng hợp' }),

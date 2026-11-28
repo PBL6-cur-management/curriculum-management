@@ -64,15 +64,51 @@ export function EnrollmentHistoryTable({
           title: 'Ghi danh đã lưu',
           render: (_, enrollment) => {
             const v = enrollment.appliedVersion as {
+              id: string;
               versionNumber: string | null;
               decisionNumber?: string | null;
             };
-            return v.decisionNumber
+            const label = v.decisionNumber
               ? `${v.versionNumber ?? '—'} (${v.decisionNumber})`
-              : v.versionNumber;
+              : (v.versionNumber ?? '—');
+            return (
+              <Link
+                to={generatePath(ROUTES.versionDetail, {
+                  programId: enrollment.program.id,
+                  versionId: v.id,
+                })}
+              >
+                {label}
+              </Link>
+            );
           },
         },
-        { title: 'Phiên bản nhập học', dataIndex: 'admissionVersionId' },
+        {
+          title: 'Phiên bản nhập học',
+          render: (_, enrollment) => {
+            const admission = (
+              enrollment as StudentEnrollment & {
+                admissionVersion?: { id: string; versionNumber: string };
+              }
+            ).admissionVersion;
+            const versionId = admission?.id ?? enrollment.admissionVersionId;
+            const label =
+              admission?.versionNumber ??
+              (enrollment.admissionVersionId === enrollment.appliedVersion.id
+                ? enrollment.appliedVersion.versionNumber
+                : enrollment.admissionVersionId);
+            return (
+              <Link
+                to={generatePath(ROUTES.versionDetail, {
+                  programId: enrollment.program.id,
+                  versionId,
+                })}
+              >
+                {label}
+              </Link>
+            );
+          },
+        },
         {
           title: 'Bắt đầu',
           render: (_, enrollment) => enrollment.fromSemester.semesterCode,
